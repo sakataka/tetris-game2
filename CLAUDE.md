@@ -187,401 +187,61 @@ src/
 
 - GitHub Actions
 
-# 現在のソースコード実装詳細
+# 現在の実装アーキテクチャ
 
-## 詳細なアーキテクチャ分析
+## アプリケーション構成
 
-### 1. エントリーポイント構成
+### エントリーポイント設計
 
-**`src/main.tsx`**
-```typescript
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './App'
-import './index.css'
-import './i18n/config'
+アプリケーションは、React 19の標準的なエントリーポイント構成に従っています。メインエントリーではReact StrictModeを使用してアプリケーションを初期化し、国際化設定の自動読み込みとグローバルCSSの適用を行っています。アプリケーションのルートコンポーネントは最小限の設計で、メインゲームコンポーネント一つのみを配置するシンプルな構成となっています。
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-)
-```
-- React 19 StrictModeでアプリケーション初期化
-- i18n設定の自動読み込み
-- グローバルCSS適用
+### 型安全な設計
 
-**`src/App.tsx`**
-```typescript
-import Game from './components/Game'
+TypeScriptの型システムを活用して、ゲーム全体の型安全性を確保しています。テトリスの7種類のピース型（I、O、T、S、Z、J、L）をユニオン型で定義し、ピースの位置、回転状態、形状を包含する包括的な型システムを構築しています。ゲーム状態は、ボード、現在・次のピース、スコア、レベル、ゲーム状態フラグ、アニメーション用の状態を含む中央集権的な状態管理となっています。
 
-function App() {
-  return <Game />
-}
+### 状態管理アーキテクチャ
 
-export default App
-```
-- 最小限の構成でGameコンポーネントをレンダリング
+Zustandによる軽量で直感的な状態管理を採用しています。ゲーム操作は純粋関数として実装され、状態更新はImmutableパターンに従って行われます。状態ストアは、ゲーム状態の管理とゲーム操作メソッド（移動、回転、ドロップ、一時停止、リセット）を統合して提供し、アニメーション状態の管理も含んでいます。
 
-### 2. 型システム (`src/types/game.ts`)
+### ゲームロジック実装
 
-```typescript
-export type TetrominoType = 'I' | 'O' | 'T' | 'S' | 'Z' | 'J' | 'L'
+ゲームロジックは関数型プログラミングの原則に従い、副作用のない純粋関数として実装されています。メインゲームロジックでは、初期状態生成、ピース移動・回転・ドロップ処理、ライン消去、スコア計算などの核となる機能を提供しています。テトリスピースの定義では、7種類のピース形状をデータ構造として管理し、90度時計回り回転アルゴリズムを実装しています。ボード操作では、20×10のゲームボード管理、ピース配置の有効性検証、完成ライン検出・消去機能を提供しています。
 
-export interface Position {
-  x: number
-  y: number
-}
+### カスタムHooks設計
 
-export interface Tetromino {
-  type: TetrominoType
-  position: Position
-  rotation: number
-  shape: number[][]
-}
+ゲームループ管理には、requestAnimationFrameを使用したスムーズなフレーム制御を実装し、レベルに応じた落下速度調整、一時停止・ゲームオーバー時の適切な停止処理を行っています。キーボード制御では、react-hotkeys-hookライブラリを活用した宣言的なキー入力管理を採用し、矢印キーによる移動・回転、スペースキーによるハードドロップ、Pキーによる一時停止（デバウンス機能付き）、Enterキーによるゲームリセット機能を提供しています。
 
-export interface GameState {
-  board: number[][]
-  currentPiece: Tetromino | null
-  nextPiece: Tetromino
-  score: number
-  lines: number
-  level: number
-  isGameOver: boolean
-  isPaused: boolean
-  placedPositions: Position[]
-  clearingLines: number[]
-  rotationKey: string
-}
-```
+### UIコンポーネント構成
 
-### 3. 状態管理 (`src/store/gameStore.ts`)
+メインゲームコンテナでは、カスタムHooksを統合してゲームループとキーボード制御を管理し、CSS Gridによる完全なレスポンシブレイアウトを実装しています。デスクトップ向けのグリッドレイアウトとモバイル向けの縦スタックレイアウトを提供し、各UIコンポーネント（言語選択、スコアボード、ボード、次のピース、操作説明、オーバーレイ）を適切に配置しています。
 
-```typescript
-import { create } from 'zustand'
-import { GameState } from '../types/game'
-// ゲーム操作関数をインポート
+ゲームボードコンポーネントでは、React.memoによる最適化を実装し、200個のセル（20×10グリッド）を効率的に管理しています。30×30ピクセルの固定サイズセルを採用し、Framer Motionによる豊富なアニメーション効果（ピース落下、配置、ライン消去）を統合しています。
 
-interface GameStore extends GameState {
-  moveLeft: () => void
-  moveRight: () => void
-  moveDown: () => void
-  rotate: () => void
-  drop: () => void
-  togglePause: () => void
-  resetGame: () => void
-  clearAnimationStates: () => void
-}
+### アニメーションシステム
 
-export const useGameStore = create<GameStore>((set, get) => ({
-  // 初期状態
-  ...createInitialGameState(),
-  
-  // ゲーム操作メソッド
-  moveLeft: () => set(state => ({ ...movePieceLeft(state) })),
-  moveRight: () => set(state => ({ ...movePieceRight(state) })),
-  moveDown: () => set(state => ({ ...movePieceDown(state) })),
-  rotate: () => set(state => ({ ...rotatePiece(state) })),
-  drop: () => set(state => ({ ...dropPiece(state) })),
-  togglePause: () => set(state => ({ isPaused: !state.isPaused })),
-  resetGame: () => set(() => createInitialGameState()),
-  clearAnimationStates: () => set({ placedPositions: [], clearingLines: [] })
-}))
-```
+Framer Motionライブラリを活用した包括的なアニメーション設計を採用しています。新しいピース出現時のスプリングアニメーション、ピース回転時の360度回転エフェクト、ライン消去時のフラッシュ・パルス・グロー効果、スコア更新時のスプリングアニメーション、UI遷移のフェード・モーダル効果など、ゲーム体験を向上させる多様なアニメーションを実装しています。
 
-### 4. ゲームロジック実装
+### 国際化対応
 
-**`src/game/game.ts`** - メインゲームロジック
-```typescript
-export function createInitialGameState(): GameState {
-  const nextPiece = createRandomTetromino()
-  return {
-    board: createEmptyBoard(),
-    currentPiece: createRandomTetromino(),
-    nextPiece,
-    score: 0,
-    lines: 0,
-    level: 1,
-    isGameOver: false,
-    isPaused: false,
-    placedPositions: [],
-    clearingLines: [],
-    rotationKey: crypto.randomUUID()
-  }
-}
+i18nextライブラリによる多言語対応システムを構築しています。デフォルト言語は日本語、フォールバック言語は英語に設定し、ゲーム用語、操作方法、UI文言を含む構造化された言語リソースファイルを管理しています。実行時の言語切り替え機能を提供し、UIリテラルのソースコード埋め込みを完全に排除しています。
 
-export function movePieceLeft(state: GameState): GameState
-export function movePieceRight(state: GameState): GameState
-export function movePieceDown(state: GameState): GameState
-export function rotatePiece(state: GameState): GameState
-export function dropPiece(state: GameState): GameState
-// ... その他のゲーム関数
-```
+### スタイリングシステム
 
-**`src/game/tetrominos.ts`** - テトリスピース定義
-```typescript
-export const TETROMINOS: Record<TetrominoType, number[][]> = {
-  I: [[1, 1, 1, 1]],
-  O: [[1, 1], [1, 1]],
-  T: [[0, 1, 0], [1, 1, 1]],
-  // ... 他のピース形状
-}
+Tailwind CSS 4.1の最新記法を採用し、カスタムテトリス色（各ピース専用色）をテーマシステムで定義しています。shadcn/uiコンポーネントとの統合のためのCSS変数設定、事前生成されるクラスの最適化、全画面固定レイアウトの実装を行っています。モバイルファーストのレスポンシブデザインアプローチを採用し、デバイス別の最適化を図っています。
 
-export function getTetrominoShape(type: TetrominoType): number[][] {
-  return TETROMINOS[type].map(row => [...row])
-}
+## 品質保証と最適化
 
-export function rotateTetromino(shape: number[][]): number[][] {
-  // 90度時計回り回転アルゴリズム
-}
-```
+### テスト戦略
 
-**`src/game/board.ts`** - ボード操作
-```typescript
-export function createEmptyBoard(): number[][] {
-  return Array(20).fill(null).map(() => Array(10).fill(0))
-}
+Vitest + TypeScriptによるテスト駆動開発（TDD）アプローチを採用しています。ボードロジック、ゲームロジック、テトリスピース操作に対する包括的なテストを実装し、純粋関数による実装により高いテスト可能性を確保しています。
 
-export function isValidPosition(board: number[][], piece: Tetromino): boolean
-export function placeTetromino(board: number[][], piece: Tetromino): number[][]
-export function clearLines(board: number[][]): { newBoard: number[][]; clearedLines: number[] }
-```
+### パフォーマンス最適化
 
-### 5. カスタムHooks
+React.memoによる不要な再レンダリング防止、アニメーション状態の定期的クリア、requestAnimationFrameによるスムーズなゲームループ、Zustandでのimmutable更新パターン、必要時のみのリソース読み込みなど、多層的なパフォーマンス最適化を実装しています。
 
-**`src/hooks/useGameLoop.ts`**
-```typescript
-export function useGameLoop() {
-  const gameState = useGameStore()
-  
-  useEffect(() => {
-    let animationId: number
-    
-    const gameLoop = () => {
-      if (!gameState.isPaused && !gameState.isGameOver) {
-        gameState.moveDown()
-      }
-      
-      setTimeout(() => {
-        animationId = requestAnimationFrame(gameLoop)
-      }, getGameSpeed(gameState.level))
-    }
-    
-    animationId = requestAnimationFrame(gameLoop)
-    return () => cancelAnimationFrame(animationId)
-  }, [gameState])
-}
-```
+### セキュリティ配慮
 
-**`src/hooks/useKeyboardControls.ts`**
-```typescript
-export function useKeyboardControls() {
-  const gameState = useGameStore()
-  
-  useHotkeys('ArrowLeft', gameState.moveLeft)
-  useHotkeys('ArrowRight', gameState.moveRight)
-  useHotkeys('ArrowDown', gameState.moveDown)
-  useHotkeys('ArrowUp', gameState.rotate)
-  useHotkeys('space', gameState.drop)
-  useHotkeys('p', gameState.togglePause, { 
-    enableOnFormTags: true,
-    preventDefault: true 
-  }, [gameState.togglePause])
-  // Enter キーでゲームリセット（ゲームオーバー時のみ）
-}
-```
+Reactの自動エスケープによるXSS対策、インラインスタイル・スクリプト回避によるCSP対応、TypeScriptによる型安全性確保、定期的な依存関係管理により、セキュリティリスクを最小化しています。
 
-### 6. UIコンポーネント詳細
-
-**`src/components/Game.tsx`** - メインゲームコンテナ
-```typescript
-export default function Game() {
-  useGameLoop()
-  useKeyboardControls()
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-4">
-      <div className="mx-auto max-w-6xl">
-        {/* デスクトップレイアウト（グリッド） */}
-        <div className="hidden md:grid md:grid-cols-4 md:gap-8">
-          <LanguageSelector />
-          <ScoreBoard />
-          <div className="col-span-2 row-span-2 flex justify-center">
-            <Board />
-          </div>
-          <NextPiece />
-          <Controls />
-        </div>
-        
-        {/* モバイルレイアウト（縦スタック） */}
-        <div className="md:hidden space-y-6">
-          {/* モバイル用レイアウト */}
-        </div>
-      </div>
-      <GameOverlay />
-    </div>
-  )
-}
-```
-
-**`src/components/Board.tsx`** - ゲームボード
-```typescript
-export default React.memo(function Board() {
-  const { board, currentPiece, placedPositions, clearingLines, rotationKey } = useGameStore()
-
-  return (
-    <div className="inline-block bg-slate-900 p-2 rounded-lg shadow-2xl border border-slate-700">
-      <div className="grid grid-cols-10 gap-0.5">
-        {board.map((row, y) =>
-          row.map((cell, x) => {
-            const isCurrentPiece = /* ピース位置チェック */
-            const isPlacedPosition = /* 配置アニメーション位置チェック */
-            const isClearingLine = /* ライン消去アニメーション */
-            
-            return (
-              <motion.div
-                key={`${x}-${y}`}
-                className={`w-[30px] h-[30px] border border-slate-600 ${getCellColor(cell, isCurrentPiece, currentPiece?.type)}`}
-                animate={/* アニメーション設定 */}
-                // Framer Motionアニメーション設定
-              />
-            )
-          })
-        )}
-      </div>
-    </div>
-  )
-})
-```
-
-### 7. アニメーションシステム
-
-**ピース落下アニメーション**
-```typescript
-// 新しいピース出現時
-animate={{
-  y: ['-100%', '0%'],
-  transition: { type: 'spring', damping: 15, stiffness: 300 }
-}}
-```
-
-**ピース回転アニメーション**
-```typescript
-// 回転時の360度エフェクト
-animate={{
-  rotate: [0, 360, 0],
-  transition: { duration: 0.3, ease: 'easeInOut' }
-}}
-```
-
-**ライン消去アニメーション**
-```typescript
-// フラッシュ・パルス・グロー効果
-animate={{
-  scale: [1, 1.1, 1],
-  backgroundColor: ['#ffffff', '#fbbf24', '#ffffff'],
-  boxShadow: ['0 0 0px #fbbf24', '0 0 20px #fbbf24', '0 0 0px #fbbf24'],
-  transition: { duration: 0.5, repeat: 2 }
-}}
-```
-
-### 8. 国際化システム
-
-**`src/i18n/config.ts`**
-```typescript
-import i18n from 'i18next'
-import { initReactI18next } from 'react-i18next'
-import ja from '../locales/ja.json'
-import en from '../locales/en.json'
-
-i18n.use(initReactI18next).init({
-  resources: { ja: { translation: ja }, en: { translation: en } },
-  lng: 'ja',
-  fallbackLng: 'en',
-  interpolation: { escapeValue: false }
-})
-```
-
-**言語リソース例 (`src/locales/ja.json`)**
-```json
-{
-  "score": "スコア",
-  "lines": "ライン",
-  "level": "レベル",
-  "next": "次",
-  "gameOver": "ゲームオーバー",
-  "paused": "一時停止",
-  "newGame": "新しいゲーム",
-  "resume": "再開",
-  "controls": {
-    "move": "移動",
-    "rotate": "回転",
-    "softDrop": "ソフトドロップ",
-    "hardDrop": "ハードドロップ",
-    "pause": "一時停止"
-  }
-}
-```
-
-### 9. スタイリングシステム
-
-**`src/index.css`** - Tailwind CSS 4.1新記法
-```css
-@import "tailwindcss";
-
-@theme {
-  /* カスタムTetris色定義 */
-  --color-tetris-i: #00f5ff;
-  --color-tetris-o: #ffff00;
-  --color-tetris-t: #800080;
-  --color-tetris-s: #00ff00;
-  --color-tetris-z: #ff0000;
-  --color-tetris-j: #0000ff;
-  --color-tetris-l: #ffa500;
-}
-
-@source inline() {
-  /* 事前生成するクラス */
-  .bg-tetris-i { background-color: theme(colors.tetris.i); }
-  .bg-tetris-o { background-color: theme(colors.tetris.o); }
-  /* ... 他のテトリス色クラス */
-}
-
-/* shadcn/ui CSS変数 */
-:root {
-  --background: 210 40% 98%;
-  --foreground: 222.2 84% 4.9%;
-  /* ... */
-}
-
-/* 全画面固定 */
-html, body { height: 100%; overflow: hidden; }
-```
-
-## テスト実装
-
-現在、以下のテストファイルが実装されています：
-
-- `src/game/board.test.ts` - ボードロジックのテスト
-- `src/game/game.test.ts` - ゲームロジックのテスト  
-- `src/game/tetrominos.test.ts` - テトリスピースのテスト
-
-すべてVitest + TypeScriptで実装され、TDD approach を採用しています。
-
-## パフォーマンス最適化
-
-1. **React.memo**: Board コンポーネントで不要な再レンダリングを防止
-2. **アニメーション状態管理**: 定期的なアニメーション状態クリア
-3. **requestAnimationFrame**: スムーズなゲームループ
-4. **immutable更新**: Zustand での状態管理
-5. **遅延読み込み**: 必要な時のみリソース読み込み
-
-## セキュリティ考慮事項
-
-1. **XSS対策**: React の自動エスケープ
-2. **CSP対応**: インラインスタイル/スクリプトの回避
-3. **型安全性**: TypeScript による実行時エラー防止
-4. **依存関係管理**: 定期的なパッケージ更新
-
-この実装は、現代的なWeb開発のベストプラクティスを採用し、保守性、パフォーマンス、ユーザビリティを重視した設計となっています。
+この実装は、現代的なWeb開発のベストプラクティスに基づき、保守性、拡張性、パフォーマンス、ユーザビリティを総合的に考慮した設計となっています。
 
