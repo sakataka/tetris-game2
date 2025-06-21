@@ -27,6 +27,6 @@
     "lineWidth": 100
   },
   "files": {
-    "includes": ["**", "!**/node_modules", "!**/dist", "!**/.next"]
+    "includes": ["**", "!**/node_modules", "!**/dist", "!**/.next", "!**/coverage"]
   }
 }
