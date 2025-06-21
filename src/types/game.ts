@@ -25,12 +25,6 @@ export interface Tetromino {
 // Board matrix type for better type safety
 export type BoardMatrix = number[][];
 
-// Game status type for pattern matching
-export type GameStatus =
-  | { type: "playing" }
-  | { type: "paused" }
-  | { type: "gameOver"; finalScore: number };
-
 export interface GameState {
   board: BoardMatrix;
   currentPiece: Tetromino | null;

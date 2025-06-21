@@ -15,7 +15,6 @@ export const SPEED_DECREASE_PER_LEVEL = 100;
  * UI layout constants
  */
 export const BOARD_CELL_SIZE_PX = 30;
-export const NEXT_PIECE_CELL_SIZE_PX = 20;
 export const NEXT_PIECE_GRID_SIZE = 4;
 
 /**
@@ -23,25 +22,3 @@ export const NEXT_PIECE_GRID_SIZE = 4;
  */
 export const LINES_PER_LEVEL = 10;
 export const BASE_SCORES = [0, 100, 300, 500, 800] as const;
-
-/**
- * Animation timing constants (in milliseconds)
- */
-export const ANIMATION_DURATION = {
-  CELL_PLACEMENT: 150,
-  LINE_CLEAR: 600,
-  PIECE_DROP: 250,
-  SCORE_UPDATE: 200,
-} as const;
-
-/**
- * Keyboard input debounce timing
- */
-export const INPUT_DEBOUNCE_MS = 200;
-
-/**
- * Game state validation constants
- */
-export const MAX_ROTATION_STATES = 4;
-export const INITIAL_PIECE_X_OFFSET = Math.floor(BOARD_WIDTH / 2);
-export const INITIAL_PIECE_Y_POSITION = 0;
