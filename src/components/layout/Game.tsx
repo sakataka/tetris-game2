@@ -12,32 +12,35 @@ export function Game() {
       <LanguageSelector />
 
       {/* Desktop Layout - Grid */}
-      <div className="hidden md:grid md:grid-cols-[240px_1fr] md:gap-8 md:place-items-center md:min-h-[calc(100vh-2rem)]">
-        <div className="flex flex-col gap-4 w-full">
+      <main
+        className="hidden md:grid md:grid-cols-[240px_1fr] md:gap-8 md:place-items-center md:min-h-[calc(100vh-2rem)]"
+        aria-label="Tetris Game"
+      >
+        <aside className="flex flex-col gap-4 w-full" aria-label="Game Information">
           <ScoreBoard />
           <NextPiece />
           <Controls />
-        </div>
-        <div className="relative">
+        </aside>
+        <section className="relative" aria-label="Game Board Area">
           <Board />
           <GameOverlay />
-        </div>
-      </div>
+        </section>
+      </main>
 
       {/* Mobile Layout - Vertical Stack */}
-      <div className="md:hidden flex flex-col items-center gap-6 pt-12">
-        <div className="flex flex-col gap-4 w-full max-w-sm">
+      <main className="md:hidden flex flex-col items-center gap-6 pt-12" aria-label="Tetris Game">
+        <aside className="flex flex-col gap-4 w-full max-w-sm" aria-label="Game Information">
           <ScoreBoard />
           <NextPiece />
-        </div>
-        <div className="relative">
+        </aside>
+        <section className="relative" aria-label="Game Board Area">
           <Board />
           <GameOverlay />
-        </div>
-        <div className="w-full max-w-sm">
+        </section>
+        <section className="w-full max-w-sm" aria-label="Game Controls">
           <Controls />
-        </div>
-      </div>
+        </section>
+      </main>
     </div>
   );
 }

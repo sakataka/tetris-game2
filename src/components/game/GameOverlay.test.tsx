@@ -91,10 +91,10 @@ describe("GameOverlay", () => {
     });
 
     it("should render game over dialog", () => {
-      const { getByTestId, getByText } = render(<GameOverlay />);
+      const { getByTestId } = render(<GameOverlay />);
 
       expect(getByTestId("dialog")).toHaveAttribute("data-open", "true");
-      expect(getByText("GAME OVER")).toBeInTheDocument();
+      expect(getByTestId("dialog-title")).toHaveTextContent("GAME OVER");
     });
 
     it("should render new game button", () => {
@@ -135,10 +135,10 @@ describe("GameOverlay", () => {
     });
 
     it("should render paused dialog", () => {
-      const { getByTestId, getByText } = render(<GameOverlay />);
+      const { getByTestId } = render(<GameOverlay />);
 
       expect(getByTestId("dialog")).toHaveAttribute("data-open", "true");
-      expect(getByText("PAUSED")).toBeInTheDocument();
+      expect(getByTestId("dialog-title")).toHaveTextContent("PAUSED");
     });
 
     it("should render resume hint text", () => {
@@ -266,7 +266,7 @@ describe("GameOverlay", () => {
       const { getByTestId, getByText } = render(<GameOverlay />);
 
       expect(getByTestId("dialog")).toHaveAttribute("data-open", "true");
-      expect(getByText("GAME OVER")).toBeInTheDocument();
+      expect(getByTestId("dialog-title")).toHaveTextContent("GAME OVER");
       expect(getByText("NEW GAME")).toBeInTheDocument();
       // Both states are shown when both flags are true
       expect(getByText("RESUME")).toBeInTheDocument();

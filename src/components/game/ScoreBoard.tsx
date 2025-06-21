@@ -20,6 +20,11 @@ export function ScoreBoard() {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+        {/* Live region for important score updates (level changes) */}
+        <div aria-live="polite" aria-atomic="true" className="sr-only">
+          {t("game.level")} {level}
+        </div>
+
         <AnimatedScoreItem
           label={t("game.score")}
           value={score}

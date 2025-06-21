@@ -9,55 +9,63 @@ export function GameOverlay() {
   const { t } = useTranslation();
 
   return (
-    <Dialog open={isGameOver || isPaused}>
-      <DialogContent
-        className="sm:max-w-md bg-gray-900/95 border-gray-700 backdrop-blur-sm"
-        hideCloseButton={true}
-        onOpenAutoFocus={(e) => e.preventDefault()}
-      >
-        <DialogHeader className="text-center">
-          <DialogTitle className="text-3xl font-bold text-white mb-4 text-center">
-            {isGameOver ? (
-              <span className="text-red-400">{t("game.gameOver")}</span>
-            ) : (
-              t("game.paused")
-            )}
-          </DialogTitle>
-        </DialogHeader>
+    <>
+      {/* Live region for game state announcements */}
+      <div aria-live="assertive" aria-atomic="true" className="sr-only">
+        {isGameOver && t("game.gameOver")}
+        {isPaused && !isGameOver && t("game.paused")}
+      </div>
 
-        {isGameOver && (
-          <div className="flex justify-center">
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button
-                onClick={resetGame}
-                variant="destructive"
-                size="lg"
-                className="bg-red-600 hover:bg-red-700 text-white"
-              >
-                {t("game.newGame")}
-              </Button>
-            </motion.div>
-          </div>
-        )}
+      <Dialog open={isGameOver || isPaused}>
+        <DialogContent
+          className="sm:max-w-md bg-gray-900/95 border-gray-700 backdrop-blur-sm"
+          hideCloseButton={true}
+          onOpenAutoFocus={(e) => e.preventDefault()}
+        >
+          <DialogHeader className="text-center">
+            <DialogTitle className="text-3xl font-bold text-white mb-4 text-center">
+              {isGameOver ? (
+                <span className="text-red-400">{t("game.gameOver")}</span>
+              ) : (
+                t("game.paused")
+              )}
+            </DialogTitle>
+          </DialogHeader>
 
-        {isPaused && (
-          <div className="space-y-4">
-            <p className="text-center text-gray-300">{t("game.resumeHint")}</p>
+          {isGameOver && (
             <div className="flex justify-center">
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Button
-                  onClick={togglePause}
-                  variant="default"
+                  onClick={resetGame}
+                  variant="destructive"
                   size="lg"
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                  className="bg-red-600 hover:bg-red-700 text-white"
                 >
-                  {t("game.resume")}
+                  {t("game.newGame")}
                 </Button>
               </motion.div>
             </div>
-          </div>
-        )}
-      </DialogContent>
-    </Dialog>
+          )}
+
+          {isPaused && (
+            <div className="space-y-4">
+              <p className="text-center text-gray-300">{t("game.resumeHint")}</p>
+              <div className="flex justify-center">
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Button
+                    onClick={togglePause}
+                    variant="default"
+                    size="lg"
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    {t("game.resume")}
+                  </Button>
+                </motion.div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
