@@ -8,6 +8,7 @@
     "gameOver": "Game Over",
     "paused": "Paused",
     "newGame": "New Game",
+    "resume": "Resume",
     "resumeHint": "Press P to resume",
     "controls": {
       "title": "Controls",

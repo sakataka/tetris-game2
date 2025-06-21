@@ -8,6 +8,7 @@
     "gameOver": "ゲームオーバー",
     "paused": "一時停止中",
     "newGame": "新しいゲーム",
+    "resume": "再開",
     "resumeHint": "Pキーで再開",
     "controls": {
       "title": "操作方法",

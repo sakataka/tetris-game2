@@ -2,7 +2,6 @@ import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { getTetrominoShape } from "../game/tetrominos";
 import { useGameStore } from "../store/gameStore";
-import { Badge } from "./ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 
 export function NextPiece() {
@@ -33,27 +32,11 @@ export function NextPiece() {
     }
   };
 
-  const getPieceType = (piece: string) => {
-    const types = {
-      I: "Line",
-      O: "Square",
-      T: "T-Shape",
-      S: "S-Shape",
-      Z: "Z-Shape",
-      J: "J-Shape",
-      L: "L-Shape",
-    };
-    return types[piece as keyof typeof types] || piece;
-  };
-
   return (
     <Card className="bg-gray-900/50 backdrop-blur-sm border-gray-700 shadow-xl hover:bg-gray-900/60 hover:border-gray-600 transition-all duration-300 hover:shadow-2xl">
       <CardHeader className="pb-3">
-        <CardTitle className="text-lg font-bold text-gray-300 text-center flex items-center justify-center gap-2">
+        <CardTitle className="text-lg font-bold text-gray-300 text-center">
           {t("game.next")}
-          <Badge variant="outline" className="border-gray-600 text-gray-400">
-            {getPieceType(nextPiece)}
-          </Badge>
         </CardTitle>
       </CardHeader>
       <CardContent>
