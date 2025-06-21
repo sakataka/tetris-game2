@@ -2,7 +2,6 @@ import { motion } from "framer-motion";
 import { memo, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useGameStore } from "../store/gameStore";
-import { Badge } from "./ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 
 export const ScoreBoard = memo(function ScoreBoard() {
@@ -40,11 +39,8 @@ export const ScoreBoard = memo(function ScoreBoard() {
   return (
     <Card className="bg-gray-900/50 backdrop-blur-sm border-gray-700 shadow-xl hover:bg-gray-900/60 hover:border-gray-600 transition-all duration-300 hover:shadow-2xl">
       <CardHeader className="pb-3">
-        <CardTitle className="text-lg font-bold text-gray-300 flex items-center justify-between">
+        <CardTitle className="text-lg font-bold text-gray-300 text-center">
           {t("game.score")}
-          <Badge variant="secondary" className="bg-gray-800 text-gray-300">
-            Live
-          </Badge>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -76,20 +72,15 @@ export const ScoreBoard = memo(function ScoreBoard() {
 
         <div className="space-y-1">
           <p className="text-sm font-medium text-gray-400">{t("game.level")}</p>
-          <div className="flex items-center gap-2">
-            <motion.p
-              key={`level-${levelKey}`}
-              initial={{ scale: 1.5, opacity: 0.5, rotate: -10 }}
-              animate={{ scale: 1, opacity: 1, rotate: 0 }}
-              transition={{ type: "spring", stiffness: 250, damping: 12 }}
-              className="text-2xl font-bold text-tetris-purple"
-            >
-              {level}
-            </motion.p>
-            <Badge variant="outline" className="border-tetris-purple text-tetris-purple">
-              Level {level}
-            </Badge>
-          </div>
+          <motion.p
+            key={`level-${levelKey}`}
+            initial={{ scale: 1.5, opacity: 0.5, rotate: -10 }}
+            animate={{ scale: 1, opacity: 1, rotate: 0 }}
+            transition={{ type: "spring", stiffness: 250, damping: 12 }}
+            className="text-2xl font-bold text-tetris-purple"
+          >
+            {level}
+          </motion.p>
         </div>
       </CardContent>
     </Card>
