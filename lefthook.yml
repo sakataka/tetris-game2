@@ -22,7 +22,7 @@ commit-msg:
     commitlint:
       run: |
         # Check commit message format
-        if ! echo "$1" | grep -qE "^(feat|fix|docs|style|refactor|test|chore)(\(.+\))?: .{1,50}"; then
+        if ! echo "$1" | grep -qE "^(feat|fix|docs|style|refactor|test|chore)(\(.+\))?: .+"; then
           echo "❌ Commit message must follow format: type(scope): description"
           echo "   Types: feat, fix, docs, style, refactor, test, chore"
           echo "   Example: feat(game): add tetris piece rotation"
