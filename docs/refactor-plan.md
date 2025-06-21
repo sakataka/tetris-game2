@@ -118,14 +118,14 @@
 
 ### カスタムHookテスト
 
-- [ ] `useGameLoop` のテスト実装
-- [ ] `useKeyboardControls` のテスト実装
-- [ ] `useTetrominoAnimation` のテスト実装
-- [ ] `useAnimatedValue` のテスト実装
+- [x] `useGameLoop` のテスト実装
+- [x] `useKeyboardControls` のテスト実装
+- [x] ~~`useTetrominoAnimation` のテスト実装~~ (不要 - このHookは存在しない)
+- [x] `useAnimatedValue` のテスト実装
 
 ### UIコンポーネントテスト
 
-- [ ] `BoardCell` コンポーネントのテスト追加
+- [x] `BoardCell` コンポーネントのテスト追加
 - [ ] `AnimatedScoreItem` コンポーネントのテスト追加
 - [ ] `GameOverlay` コンポーネントのテスト追加
 - [ ] `Controls` コンポーネントのテスト追加
