@@ -1,15 +1,7 @@
 {
-  "entry": [
-    "src/main.tsx"
-  ],
-  "project": [
-    "src/**/*.{ts,tsx}",
-    "*.{ts,js}"
-  ],
-  "ignore": [
-    "dist/**",
-    "node_modules/**"
-  ],
+  "entry": ["src/main.tsx"],
+  "project": ["src/**/*.{ts,tsx}", "*.{ts,js}"],
+  "ignore": ["dist/**", "node_modules/**"],
   "ignoreExportsUsedInFile": true,
   "includeEntryExports": false
 }
