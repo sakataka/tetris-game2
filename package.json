@@ -12,7 +12,8 @@
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
     "knip": "knip",
-    "prepare": "lefthook install"
+    "prepare": "lefthook install",
+    "vercel-build": "pnpm run build"
   },
   "keywords": [],
   "author": "",

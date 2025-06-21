@@ -119,10 +119,13 @@ React: 19.1.0
 
 ## スタイリング・UI
 - Tailwind CSS: 4.1.10
-- shadcn/ui 
+- shadcn/ui 2.7.0
 
 # 状態管理・データ処理
 - Zustand: 5.0.5 (状態管理)
+
+# TypeScriptのためのスキーマ宣言とデータ検証のためのライブラリ
+- Zod 4
 
 # 国際化
 - i18next: 25.2.1
@@ -140,3 +143,10 @@ React: 19.1.0
 # ソース管理
 - git 2.50
 - gh 2.74.2
+
+# デプロイメントターゲット
+- Vercel
+
+# CI/CDワークフロー
+- GitHub Actions
+
