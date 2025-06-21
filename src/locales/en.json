@@ -1,0 +1,21 @@
+{
+  "game": {
+    "title": "Tetris",
+    "score": "Score",
+    "lines": "Lines",
+    "level": "Level",
+    "next": "Next",
+    "gameOver": "Game Over",
+    "paused": "Paused",
+    "newGame": "New Game",
+    "resumeHint": "Press P to resume",
+    "controls": {
+      "title": "Controls",
+      "move": "Move",
+      "softDrop": "Soft Drop",
+      "rotate": "Rotate",
+      "hardDrop": "Hard Drop",
+      "pause": "Pause"
+    }
+  }
+}

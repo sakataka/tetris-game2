@@ -1,0 +1,21 @@
+{
+  "game": {
+    "title": "テトリス",
+    "score": "スコア",
+    "lines": "ライン",
+    "level": "レベル",
+    "next": "次のピース",
+    "gameOver": "ゲームオーバー",
+    "paused": "一時停止中",
+    "newGame": "新しいゲーム",
+    "resumeHint": "Pキーで再開",
+    "controls": {
+      "title": "操作方法",
+      "move": "移動",
+      "softDrop": "ソフトドロップ",
+      "rotate": "回転",
+      "hardDrop": "ハードドロップ",
+      "pause": "一時停止"
+    }
+  }
+}

@@ -1,0 +1,30 @@
+# Lefthook configuration for Tetris Game
+# https://github.com/evilmartians/lefthook
+
+pre-commit:
+  parallel: true
+  commands:
+    lint:
+      glob: "*.{js,ts,jsx,tsx}"
+      run: pnpm run lint
+      stage_fixed: true
+    
+    test:
+      glob: "*.{js,ts,jsx,tsx}"
+      run: pnpm run test
+    
+    typecheck:
+      glob: "*.{ts,tsx}"
+      run: tsc --noEmit
+
+commit-msg:
+  commands:
+    commitlint:
+      run: |
+        # Check commit message format
+        if ! echo "$1" | grep -qE "^(feat|fix|docs|style|refactor|test|chore)(\(.+\))?: .{1,50}"; then
+          echo "❌ Commit message must follow format: type(scope): description"
+          echo "   Types: feat, fix, docs, style, refactor, test, chore"
+          echo "   Example: feat(game): add tetris piece rotation"
+          exit 1
+        fi
