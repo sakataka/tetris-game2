@@ -1,8 +1,8 @@
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import { useGameStore } from "../store/gameStore";
-import { Button } from "./ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
+import { useGameStore } from "../../store/gameStore";
+import { Button } from "../ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 
 export function GameOverlay() {
   const { isGameOver, isPaused, resetGame, togglePause } = useGameStore();

@@ -1,11 +1,12 @@
 import { motion } from "framer-motion";
 import { memo } from "react";
 import { cn } from "@/lib/utils";
-import { useGameStore } from "../store/gameStore";
-import { BOARD_HEIGHT, BOARD_WIDTH, getTetrominoColorIndex } from "../types/game";
-import { Card } from "./ui/card";
-
-const CELL_SIZE = 30;
+import { useGameStore } from "../../store/gameStore";
+import { getTetrominoColorIndex } from "../../types/game";
+import { getCellColor } from "../../utils/colors";
+import { BOARD_CELL_SIZE_PX, BOARD_HEIGHT, BOARD_WIDTH } from "../../utils/constants";
+import { BOARD_STYLES, CARD_STYLES, combineStyles } from "../../utils/styles";
+import { Card } from "../ui/card";
 
 export const Board = memo(function Board() {
   const { board, currentPiece, placedPositions, clearingLines, rotationKey, clearAnimationStates } =
@@ -29,39 +30,21 @@ export const Board = memo(function Board() {
     });
   }
 
-  // Color mapping function using Tailwind colors
-  const getCellColor = (cell: number) => {
-    switch (cell) {
-      case 0:
-        return "bg-slate-900"; // Empty
-      case 1:
-        return "bg-tetris-cyan"; // I piece
-      case 2:
-        return "bg-tetris-yellow"; // O piece
-      case 3:
-        return "bg-tetris-purple"; // T piece
-      case 4:
-        return "bg-tetris-green"; // S piece
-      case 5:
-        return "bg-tetris-red"; // Z piece
-      case 6:
-        return "bg-tetris-blue"; // J piece
-      case 7:
-        return "bg-tetris-orange"; // L piece
-      default:
-        return "bg-slate-900";
-    }
-  };
-
   return (
-    <Card className="bg-gray-900/50 backdrop-blur-sm border-gray-700 p-6 min-w-[320px] min-h-[620px] shadow-2xl hover:shadow-3xl hover:border-gray-600 transition-all duration-300">
+    <Card
+      className={combineStyles(
+        CARD_STYLES.base,
+        CARD_STYLES.hover,
+        "p-6 min-w-[320px] min-h-[620px] shadow-2xl hover:shadow-3xl",
+      )}
+    >
       <div
-        className="grid gap-[1px] bg-gray-700 p-1 rounded-sm"
+        className={BOARD_STYLES.container}
         aria-label="Tetris game board"
         role="img"
         style={{
-          gridTemplateColumns: `repeat(${BOARD_WIDTH}, ${CELL_SIZE}px)`,
-          gridTemplateRows: `repeat(${BOARD_HEIGHT}, ${CELL_SIZE}px)`,
+          gridTemplateColumns: `repeat(${BOARD_WIDTH}, ${BOARD_CELL_SIZE_PX}px)`,
+          gridTemplateRows: `repeat(${BOARD_HEIGHT}, ${BOARD_CELL_SIZE_PX}px)`,
         }}
       >
         {displayBoard.map((row, y) =>
@@ -135,12 +118,12 @@ export const Board = memo(function Board() {
                   }
                 }}
                 className={cn(
-                  "w-[30px] h-[30px] rounded-sm transition-all duration-150",
+                  BOARD_STYLES.cell,
                   getCellColor(cell),
-                  cell !== 0 && "border border-white/20 shadow-sm",
-                  cell === 0 && "border border-gray-700/50",
-                  isCurrentPiece && "shadow-white/50 shadow-lg ring-1 ring-white/30",
-                  isClearingLine && "shadow-white/80 shadow-xl ring-2 ring-white/50 animate-pulse",
+                  cell !== 0 && BOARD_STYLES.cellBorder,
+                  cell === 0 && BOARD_STYLES.emptyCellBorder,
+                  isCurrentPiece && BOARD_STYLES.activePiece,
+                  isClearingLine && BOARD_STYLES.clearingLine,
                 )}
               />
             );

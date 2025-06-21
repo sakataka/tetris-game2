@@ -1,7 +1,7 @@
 import { Globe } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Badge } from "./ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { Badge } from "../ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 
 export function LanguageSelector() {
   const { i18n } = useTranslation();

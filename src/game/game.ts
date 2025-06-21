@@ -1,11 +1,18 @@
 import {
   type GameState,
   getTetrominoColorIndex,
-  INITIAL_SPEED,
   TETROMINO_TYPES,
   type Tetromino,
   type TetrominoType,
 } from "../types/game";
+import {
+  BASE_SCORES,
+  BOARD_WIDTH,
+  INITIAL_DROP_SPEED_MS,
+  LINES_PER_LEVEL,
+  MIN_DROP_SPEED_MS,
+  SPEED_DECREASE_PER_LEVEL,
+} from "../utils/constants";
 import { clearLines, createEmptyBoard, isValidPosition, placeTetromino } from "./board";
 import { getTetrominoShape, rotateTetromino } from "./tetrominos";
 
@@ -17,7 +24,7 @@ function createTetromino(type: TetrominoType): Tetromino {
   const shape = getTetrominoShape(type);
   return {
     type,
-    position: { x: Math.floor(10 / 2) - Math.floor(shape[0].length / 2), y: 0 },
+    position: { x: Math.floor(BOARD_WIDTH / 2) - Math.floor(shape[0].length / 2), y: 0 },
     rotation: 0,
     shape,
   };
@@ -146,7 +153,7 @@ function lockPiece(state: GameState): GameState {
 
   const { board: clearedBoard, linesCleared, clearedLineIndices } = clearLines(newBoard);
   const newLines = state.lines + linesCleared;
-  const newLevel = Math.floor(newLines / 10) + 1;
+  const newLevel = Math.floor(newLines / LINES_PER_LEVEL) + 1;
   const newScore = state.score + calculateScore(linesCleared, state.level);
 
   const newPiece = createTetromino(state.nextPiece);
@@ -167,10 +174,12 @@ function lockPiece(state: GameState): GameState {
 }
 
 export function calculateScore(linesCleared: number, level: number): number {
-  const baseScores = [0, 100, 300, 500, 800];
-  return baseScores[linesCleared] * level;
+  return BASE_SCORES[linesCleared] * level;
 }
 
 export function getGameSpeed(level: number): number {
-  return Math.max(100, INITIAL_SPEED - (level - 1) * 100);
+  return Math.max(
+    MIN_DROP_SPEED_MS,
+    INITIAL_DROP_SPEED_MS - (level - 1) * SPEED_DECREASE_PER_LEVEL,
+  );
 }

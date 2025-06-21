@@ -9,23 +9,23 @@
 
 ### 重複コード削除
 
-- [ ] `src/utils/colors.ts` 作成：Board.tsx と NextPiece.tsx の色彩ロジック統合
-- [ ] `src/utils/constants.ts` 作成：プロジェクト全体の定数を集約
-- [ ] `src/utils/styles.ts` 作成：共通の Tailwind CSS パターンを定数化
-- [ ] Board.tsx と NextPiece.tsx から重複する `getCellColor` 関数を削除
+- [x] `src/utils/colors.ts` 作成：Board.tsx と NextPiece.tsx の色彩ロジック統合
+- [x] `src/utils/constants.ts` 作成：プロジェクト全体の定数を集約
+- [x] `src/utils/styles.ts` 作成：共通の Tailwind CSS パターンを定数化
+- [x] Board.tsx と NextPiece.tsx から重複する `getCellColor` 関数を削除
 
 ### ディレクトリ構造の整理
 
-- [ ] `src/components/game/` ディレクトリ作成（ゲーム固有コンポーネント用）
-- [ ] `src/components/layout/` ディレクトリ作成（レイアウトコンポーネント用）
-- [ ] ゲーム関連コンポーネントを適切なディレクトリに移動
-- [ ] Import 文の整理とパス更新
+- [x] `src/components/game/` ディレクトリ作成（ゲーム固有コンポーネント用）
+- [x] `src/components/layout/` ディレクトリ作成（レイアウトコンポーネント用）
+- [x] ゲーム関連コンポーネントを適切なディレクトリに移動
+- [x] Import 文の整理とパス更新
 
 ### ユーティリティ関数の統一
 
-- [ ] 位置計算関連の処理を `src/utils/position.ts` に集約
-- [ ] アニメーション共通処理を `src/utils/animation.ts` に抽出
-- [ ] 不要なファイルや未使用のコードを `knip` で検出・削除
+- [x] 位置計算関連の処理を `src/utils/position.ts` に集約
+- [x] アニメーション共通処理を `src/utils/animation.ts` に抽出
+- [x] 不要なファイルや未使用のコードを `knip` で検出・削除
 
 ## Step 2: 最新技術適用
 
@@ -93,7 +93,6 @@
 - [ ] 複雑な条件分岐の簡素化（Board.tsx のアニメーション制御）
 - [ ] 純粋関数の抽出と単一責任原則の適用
 - [ ] ネストした条件文の flat 化
-- [ ] 長い関数の分割（150行超の関数）
 
 ## Step 5: 品質向上・テスト
 
@@ -115,7 +114,6 @@
 ### アクセシビリティ向上
 
 - [ ] キーボードナビゲーションの改善
-- [ ] スクリーンリーダー対応の強化
 - [ ] コントラスト比の検証・改善
 - [ ] ARIA ラベルの適切な設定
 

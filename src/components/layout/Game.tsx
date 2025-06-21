@@ -1,11 +1,7 @@
-import { useGameLoop } from "../hooks/useGameLoop";
-import { useKeyboardControls } from "../hooks/useKeyboardControls";
-import { Board } from "./Board";
-import { Controls } from "./Controls";
-import { GameOverlay } from "./GameOverlay";
+import { useGameLoop } from "../../hooks/useGameLoop";
+import { useKeyboardControls } from "../../hooks/useKeyboardControls";
+import { Board, Controls, GameOverlay, NextPiece, ScoreBoard } from "../game";
 import { LanguageSelector } from "./LanguageSelector";
-import { NextPiece } from "./NextPiece";
-import { ScoreBoard } from "./ScoreBoard";
 
 export function Game() {
   useGameLoop();

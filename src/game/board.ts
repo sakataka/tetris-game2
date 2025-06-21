@@ -1,4 +1,5 @@
-import { BOARD_HEIGHT, BOARD_WIDTH, type Position } from "../types/game";
+import type { Position } from "../types/game";
+import { BOARD_HEIGHT, BOARD_WIDTH } from "../utils/constants";
 
 export function createEmptyBoard(): number[][] {
   return Array(BOARD_HEIGHT)

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { BOARD_HEIGHT, BOARD_WIDTH } from "../types/game";
+import { BOARD_HEIGHT, BOARD_WIDTH } from "../utils/constants";
 import { calculateScore, createInitialGameState, dropPiece, movePiece, rotatePiece } from "./game";
 
 describe("Game Logic", () => {
