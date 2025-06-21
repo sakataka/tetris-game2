@@ -1,6 +1,20 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+/* Define custom tetris colors using @theme */
+@theme {
+  --color-tetris-cyan: rgb(34 211 238);
+  --color-tetris-yellow: rgb(250 204 21);
+  --color-tetris-purple: rgb(168 85 247);
+  --color-tetris-green: rgb(34 197 94);
+  --color-tetris-red: rgb(239 68 68);
+  --color-tetris-blue: rgb(59 130 246);
+  --color-tetris-orange: rgb(249 115 22);
+}
+
+/* Safelist dynamic tetris classes using @source inline() */
+@source inline("bg-tetris-{cyan,yellow,purple,green,red,blue,orange}");
+@source inline("text-tetris-{cyan,yellow,purple,green,red,blue,orange}");
+@source inline("border-tetris-{cyan,yellow,purple,green,red,blue,orange}");
 
 @layer base {
   :root {

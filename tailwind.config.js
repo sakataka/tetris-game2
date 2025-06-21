@@ -37,15 +37,6 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        tetris: {
-          cyan: "rgb(34, 211, 238)", // I piece
-          yellow: "rgb(250, 204, 21)", // O piece
-          purple: "rgb(168, 85, 247)", // T piece
-          green: "rgb(34, 197, 94)", // S piece
-          red: "rgb(239, 68, 68)", // Z piece
-          blue: "rgb(59, 130, 246)", // J piece
-          orange: "rgb(249, 115, 22)", // L piece
-        },
       },
       borderRadius: {
         lg: "var(--radius)",
