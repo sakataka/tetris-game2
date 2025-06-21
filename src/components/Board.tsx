@@ -57,8 +57,8 @@ export const Board = memo(function Board() {
     <Card className="bg-gray-900/50 backdrop-blur-sm border-gray-700 p-6 min-w-[320px] min-h-[620px] shadow-2xl hover:shadow-3xl hover:border-gray-600 transition-all duration-300">
       <div
         className="grid gap-[1px] bg-gray-700 p-1 rounded-sm"
-        role="grid"
         aria-label="Tetris game board"
+        role="img"
         style={{
           gridTemplateColumns: `repeat(${BOARD_WIDTH}, ${CELL_SIZE}px)`,
           gridTemplateRows: `repeat(${BOARD_HEIGHT}, ${CELL_SIZE}px)`,
