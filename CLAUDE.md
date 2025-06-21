@@ -32,12 +32,13 @@ Web上で実行できるテトリスを作成する。
 
 - **関数型コンポーネント**: React Hooksを活用したモダンなコンポーネント設計
 - **コンポーネント分離**: UI要素を独立したコンポーネントに分割
-  - Game.tsx: メインゲームコンテナ
-  - Board.tsx: ゲームボード表示
-  - ScoreBoard.tsx: スコア・レベル表示
-  - Controls.tsx: 操作説明
-  - NextPiece.tsx: 次のピース表示
-  - GameOverlay.tsx: ゲームオーバー・一時停止画面
+  - layout/Game.tsx: メインゲームコンテナ
+  - game/Board.tsx: ゲームボード表示
+  - game/ScoreBoard.tsx: スコア・レベル表示
+  - game/Controls.tsx: 操作説明
+  - game/NextPiece.tsx: 次のピース表示
+  - game/GameOverlay.tsx: ゲームオーバー・一時停止画面
+  - layout/LanguageSelector.tsx: 言語選択コンポーネント
 
 ### ゲームロジック
 
@@ -67,16 +68,20 @@ Web上で実行できるテトリスを作成する。
 - **index.html**: HTMLエントリーポイント
 - **src/main.tsx**: Reactアプリケーションの起点
 - **src/App.tsx**: アプリケーションのルートコンポーネント
-- **src/components/Game.tsx**: ゲームのメインコンポーネント
+- **src/components/layout/Game.tsx**: ゲームのメインコンポーネント
 
 ## フォルダ構造
 
 ```
 src/
 ├── components/          # UIコンポーネント
+│   ├── game/           # ゲーム関連UIコンポーネント
+│   ├── layout/         # レイアウトコンポーネント
+│   └── ui/             # 汎用UIコンポーネント（shadcn/ui）
 ├── game/               # ゲームロジック（純粋関数）
 ├── hooks/              # カスタムHooks
 ├── i18n/               # 国際化設定
+├── lib/                # ライブラリユーティリティ
 ├── locales/            # 言語ファイル
 ├── store/              # 状態管理（Zustand）
 ├── test/               # テスト設定
@@ -195,9 +200,6 @@ src/
 
 - Zustand: 5.0.5 (状態管理)
 
-## スキーマ宣言・データ検証
-
-- Zod: 4 (将来のハイスコア保存機能・設定データ永続化での使用予定)
 
 ## キーボード入力ハンドリング
 
@@ -209,7 +211,7 @@ src/
 
 ## コード品質・リンティング
 
-- Biome: 2.0.2 (リンティング・フォーマッティング)
+- Biome: 2.0.4 (リンティング・フォーマッティング)
 - Lefthook: 1.11.14 (Gitフック管理)
 
 ## テスト
