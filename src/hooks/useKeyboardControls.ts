@@ -1,9 +1,11 @@
+import { useRef } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useGameStore } from "../store/gameStore";
 
 export function useKeyboardControls() {
   const { moveLeft, moveRight, moveDown, rotate, drop, togglePause, isPaused, isGameOver } =
     useGameStore();
+  const lastPauseTime = useRef(0);
 
   // Left/right movement and soft drop - enable key repeat (default keydown: true)
   useHotkeys(
@@ -54,7 +56,18 @@ export function useKeyboardControls() {
   );
 
   // Pause toggle - works even when paused, but not when game over
-  useHotkeys(["p", "P"], () => {
-    if (!isGameOver) togglePause();
-  });
+  useHotkeys(
+    ["p", "P"],
+    (e) => {
+      const now = Date.now();
+      if (now - lastPauseTime.current < 200) return; // 200ms debounce
+      lastPauseTime.current = now;
+
+      if (!isGameOver) {
+        e.preventDefault();
+        togglePause();
+      }
+    },
+    { keydown: true },
+  );
 }
