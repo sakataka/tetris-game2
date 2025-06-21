@@ -1,13 +1,28 @@
-import type { Position } from "../types/game";
+import type { BoardMatrix, Position } from "../types/game";
 import { BOARD_HEIGHT, BOARD_WIDTH } from "../utils/constants";
 
-export function createEmptyBoard(): number[][] {
-  return Array(BOARD_HEIGHT)
-    .fill(null)
-    .map(() => Array(BOARD_WIDTH).fill(0));
+// Type guard to ensure board dimensions
+function isBoardMatrix(board: number[][]): board is BoardMatrix {
+  return board.length === BOARD_HEIGHT && board.every((row) => row.length === BOARD_WIDTH);
 }
 
-export function isValidPosition(board: number[][], shape: number[][], position: Position): boolean {
+export function createEmptyBoard(): BoardMatrix {
+  const board = Array(BOARD_HEIGHT)
+    .fill(null)
+    .map(() => Array(BOARD_WIDTH).fill(0));
+
+  if (!isBoardMatrix(board)) {
+    throw new Error("Invalid board dimensions");
+  }
+
+  return board;
+}
+
+export function isValidPosition(
+  board: BoardMatrix,
+  shape: number[][],
+  position: Position,
+): boolean {
   for (let y = 0; y < shape.length; y++) {
     for (let x = 0; x < shape[y].length; x++) {
       if (shape[y][x]) {
@@ -30,12 +45,12 @@ export function isValidPosition(board: number[][], shape: number[][], position: 
 }
 
 export function placeTetromino(
-  board: number[][],
+  board: BoardMatrix,
   shape: number[][],
   position: Position,
   colorIndex: number,
-): number[][] {
-  const newBoard = board.map((row) => [...row]);
+): BoardMatrix {
+  const newBoard = board.map((row) => [...row]) as BoardMatrix;
 
   for (let y = 0; y < shape.length; y++) {
     for (let x = 0; x < shape[y].length; x++) {
@@ -52,35 +67,27 @@ export function placeTetromino(
   return newBoard;
 }
 
-export function clearLines(board: number[][]): {
-  board: number[][];
+export function clearLines(board: BoardMatrix): {
+  board: BoardMatrix;
   linesCleared: number;
   clearedLineIndices: number[];
 } {
-  const clearedLineIndices: number[] = [];
-  board.forEach((row, y) => {
-    if (row.every((cell) => cell !== 0)) {
-      clearedLineIndices.push(y);
-    }
-  });
+  // Use ES2024 array methods for better performance
+  const clearedLineIndices = board
+    .map((row, index) => ({ row, index }))
+    .filter(({ row }) => row.every((cell) => cell !== 0))
+    .map(({ index }) => index);
 
   if (clearedLineIndices.length === 0) {
     return { board, linesCleared: 0, clearedLineIndices: [] };
   }
 
-  // 新しい空のボードを作成
-  const newBoard = createEmptyBoard();
-  let newBoardRowIndex = BOARD_HEIGHT - 1;
-
-  // 元のボードを下から上に走査する
-  for (let y = BOARD_HEIGHT - 1; y >= 0; y--) {
-    // 消去対象でない行の場合
-    if (!clearedLineIndices.includes(y)) {
-      // 新しいボードの下から詰めていく（深いコピーで配列参照を避ける）
-      newBoard[newBoardRowIndex] = [...board[y]];
-      newBoardRowIndex--;
-    }
-  }
+  // Create new board using modern array methods
+  const remainingRows = board.filter((_, index) => !clearedLineIndices.includes(index));
+  const emptyRows = Array.from({ length: clearedLineIndices.length }, () =>
+    Array(BOARD_WIDTH).fill(0),
+  );
+  const newBoard = [...emptyRows, ...remainingRows] as BoardMatrix;
 
   return {
     board: newBoard,

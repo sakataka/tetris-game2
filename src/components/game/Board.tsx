@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import { memo } from "react";
 import { cn } from "@/lib/utils";
 import { useGameStore } from "../../store/gameStore";
 import { getTetrominoColorIndex } from "../../types/game";
@@ -8,7 +7,7 @@ import { BOARD_CELL_SIZE_PX, BOARD_HEIGHT, BOARD_WIDTH } from "../../utils/const
 import { BOARD_STYLES, CARD_STYLES, combineStyles } from "../../utils/styles";
 import { Card } from "../ui/card";
 
-export const Board = memo(function Board() {
+export function Board() {
   const { board, currentPiece, placedPositions, clearingLines, rotationKey, clearAnimationStates } =
     useGameStore();
 
@@ -132,4 +131,4 @@ export const Board = memo(function Board() {
       </div>
     </Card>
   );
-});
+}

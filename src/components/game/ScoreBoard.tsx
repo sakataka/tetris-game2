@@ -1,10 +1,10 @@
 import { motion } from "framer-motion";
-import { memo, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useGameStore } from "../../store/gameStore";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 
-export const ScoreBoard = memo(function ScoreBoard() {
+export function ScoreBoard() {
   const { score, lines, level } = useGameStore();
   const { t } = useTranslation();
 
@@ -85,4 +85,4 @@ export const ScoreBoard = memo(function ScoreBoard() {
       </CardContent>
     </Card>
   );
-});
+}

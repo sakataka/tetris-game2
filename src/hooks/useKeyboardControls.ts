@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useTransition } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useGameStore } from "../store/gameStore";
 
@@ -15,12 +15,17 @@ export function useKeyboardControls() {
     isGameOver,
   } = useGameStore();
   const lastPauseTime = useRef(0);
+  const [, startTransition] = useTransition();
 
   // Left/right movement and soft drop - enable key repeat (default keydown: true)
   useHotkeys(
     "arrowleft",
     () => {
-      if (!isGameOver && !isPaused) moveLeft();
+      if (!isGameOver && !isPaused) {
+        startTransition(() => {
+          moveLeft();
+        });
+      }
     },
     { keydown: true },
   );
@@ -28,7 +33,11 @@ export function useKeyboardControls() {
   useHotkeys(
     "arrowright",
     () => {
-      if (!isGameOver && !isPaused) moveRight();
+      if (!isGameOver && !isPaused) {
+        startTransition(() => {
+          moveRight();
+        });
+      }
     },
     { keydown: true },
   );
@@ -36,7 +45,11 @@ export function useKeyboardControls() {
   useHotkeys(
     "arrowdown",
     () => {
-      if (!isGameOver && !isPaused) moveDown();
+      if (!isGameOver && !isPaused) {
+        startTransition(() => {
+          moveDown();
+        });
+      }
     },
     { keydown: true },
   );
@@ -47,7 +60,9 @@ export function useKeyboardControls() {
     (e) => {
       if (!isGameOver && !isPaused) {
         e.preventDefault();
-        rotate();
+        startTransition(() => {
+          rotate();
+        });
       }
     },
     { keydown: true },
@@ -58,6 +73,7 @@ export function useKeyboardControls() {
     (e) => {
       if (!isGameOver && !isPaused) {
         e.preventDefault();
+        // Drop is urgent, don't use transition
         drop();
       }
     },
@@ -86,7 +102,9 @@ export function useKeyboardControls() {
     (e) => {
       if (isGameOver) {
         e.preventDefault();
-        resetGame();
+        startTransition(() => {
+          resetGame();
+        });
       }
     },
     { keydown: true },

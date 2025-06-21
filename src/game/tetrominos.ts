@@ -1,6 +1,6 @@
-import type { TetrominoType } from "../types/game";
+import type { TetrominoTypeName } from "../types/game";
 
-export const TETROMINOS: Record<TetrominoType, number[][]> = {
+export const TETROMINOS: Record<TetrominoTypeName, number[][]> = {
   I: [
     [0, 0, 0, 0],
     [1, 1, 1, 1],
@@ -38,7 +38,7 @@ export const TETROMINOS: Record<TetrominoType, number[][]> = {
   ],
 };
 
-export function getTetrominoShape(type: TetrominoType): number[][] {
+export function getTetrominoShape(type: TetrominoTypeName): number[][] {
   return TETROMINOS[type].map((row) => [...row]);
 }
 

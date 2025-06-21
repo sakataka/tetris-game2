@@ -31,23 +31,23 @@
 
 ### React 19 機能の活用
 
-- [ ] `React.memo` を削除し、React Compiler の自動最適化に移行
-- [ ] `useTransition` を活用してゲームループのパフォーマンス最適化
-- [ ] Concurrent 機能を使用した非同期ゲーム状態更新の改善
-- [ ] React 19 の新しい Hook パターンの調査・適用
+- [x] `React.memo` を削除し、React Compiler の自動最適化に移行
+- [x] `useTransition` を活用してゲームループのパフォーマンス最適化
+- [x] Concurrent 機能を使用した非同期ゲーム状態更新の改善
+- [x] React 19 の新しい Hook パターンの調査・適用
 
 ### TypeScript 5.8 機能の強化
 
-- [ ] `TetrominoType` の型定義を判別可能ユニオン型に更新
-- [ ] `GameState` にパターンマッチング的な型定義を追加
-- [ ] Switch 式を使用した `getCellColor` 関数の改善
-- [ ] より厳密な型定義でランタイムエラーを防止
+- [x] `TetrominoType` の型定義を判別可能ユニオン型に更新
+- [x] `GameState` にパターンマッチング的な型定義を追加
+- [x] Switch 式を使用した `getCellColor` 関数の改善
+- [x] より厳密な型定義でランタイムエラーを防止
 
 ### ES2024 新機能の活用
 
-- [ ] `clearLines` 関数で最新の Array メソッドを使用
-- [ ] Iterator ヘルパー関数の活用検討
-- [ ] 非同期処理の改善（Promise.withResolvers など）
+- [x] `clearLines` 関数で最新の Array メソッドを使用
+- [x] Iterator ヘルパー関数の活用検討
+- [x] 非同期処理の改善（Promise.withResolvers など）
 
 ## Step 3: 意図の明確化
 

@@ -3,7 +3,7 @@ import {
   getTetrominoColorIndex,
   TETROMINO_TYPES,
   type Tetromino,
-  type TetrominoType,
+  type TetrominoTypeName,
 } from "../types/game";
 import {
   BASE_SCORES,
@@ -16,11 +16,11 @@ import {
 import { clearLines, createEmptyBoard, isValidPosition, placeTetromino } from "./board";
 import { getTetrominoShape, rotateTetromino } from "./tetrominos";
 
-function getRandomTetrominoType(): TetrominoType {
+function getRandomTetrominoType(): TetrominoTypeName {
   return TETROMINO_TYPES[Math.floor(Math.random() * TETROMINO_TYPES.length)];
 }
 
-function createTetromino(type: TetrominoType): Tetromino {
+function createTetromino(type: TetrominoTypeName): Tetromino {
   const shape = getTetrominoShape(type);
   return {
     type,

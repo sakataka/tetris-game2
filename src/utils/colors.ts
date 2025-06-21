@@ -1,10 +1,10 @@
-import type { TetrominoType } from "../types/game";
+import { TETROMINO_COLOR_MAP, type TetrominoTypeName } from "../types/game";
 
 /**
  * Tetris piece color mapping using Tailwind CSS classes
  * Maps tetromino types to their respective colors
  */
-export const TETROMINO_COLORS: Record<TetrominoType, string> = {
+export const TETROMINO_COLORS: Record<TetrominoTypeName, string> = {
   I: "bg-tetris-cyan",
   O: "bg-tetris-yellow",
   T: "bg-tetris-purple",
@@ -32,7 +32,7 @@ export const COLOR_BY_INDEX: Record<number, string> = {
 /**
  * Get Tailwind CSS class for a tetromino type
  */
-export function getTetrominoColor(type: TetrominoType): string {
+export function getTetrominoColor(type: TetrominoTypeName): string {
   return TETROMINO_COLORS[type];
 }
 
@@ -41,22 +41,33 @@ export function getTetrominoColor(type: TetrominoType): string {
  * Used by the game board to display colored cells
  */
 export function getCellColor(colorIndex: number): string {
-  return COLOR_BY_INDEX[colorIndex] ?? "bg-slate-900";
+  // Use switch expression for better performance and type safety
+  switch (colorIndex) {
+    case 0:
+      return "bg-slate-900";
+    case 1:
+      return TETROMINO_COLORS.I;
+    case 2:
+      return TETROMINO_COLORS.O;
+    case 3:
+      return TETROMINO_COLORS.T;
+    case 4:
+      return TETROMINO_COLORS.S;
+    case 5:
+      return TETROMINO_COLORS.Z;
+    case 6:
+      return TETROMINO_COLORS.J;
+    case 7:
+      return TETROMINO_COLORS.L;
+    default:
+      return "bg-slate-900";
+  }
 }
 
 /**
  * Get color index for a tetromino type
  * Useful for converting tetromino type to board representation
  */
-export function getTetrominoColorIndex(type: TetrominoType): number {
-  const typeToIndex: Record<TetrominoType, number> = {
-    I: 1,
-    O: 2,
-    T: 3,
-    S: 4,
-    Z: 5,
-    J: 6,
-    L: 7,
-  };
-  return typeToIndex[type];
+export function getTetrominoColorIndex(type: TetrominoTypeName): number {
+  return TETROMINO_COLOR_MAP[type];
 }
