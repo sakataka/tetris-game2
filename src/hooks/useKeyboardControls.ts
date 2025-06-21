@@ -3,8 +3,17 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { useGameStore } from "../store/gameStore";
 
 export function useKeyboardControls() {
-  const { moveLeft, moveRight, moveDown, rotate, drop, togglePause, isPaused, isGameOver } =
-    useGameStore();
+  const {
+    moveLeft,
+    moveRight,
+    moveDown,
+    rotate,
+    drop,
+    togglePause,
+    resetGame,
+    isPaused,
+    isGameOver,
+  } = useGameStore();
   const lastPauseTime = useRef(0);
 
   // Left/right movement and soft drop - enable key repeat (default keydown: true)
@@ -66,6 +75,18 @@ export function useKeyboardControls() {
       if (!isGameOver) {
         e.preventDefault();
         togglePause();
+      }
+    },
+    { keydown: true },
+  );
+
+  // New game on Enter - only when game is over
+  useHotkeys(
+    "enter",
+    (e) => {
+      if (isGameOver) {
+        e.preventDefault();
+        resetGame();
       }
     },
     { keydown: true },
