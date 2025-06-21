@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useBoardData, useGameActions } from "../../hooks/useGameSelectors";
 import { getTetrominoColorIndex } from "../../types/game";
 import { BOARD_CELL_SIZE_PX, BOARD_HEIGHT, BOARD_WIDTH } from "../../utils/constants";
@@ -11,23 +12,55 @@ export function Board() {
 
   const { clearAnimationStates } = useGameActions();
 
-  // Create display board with current piece
-  const displayBoard = board.map((row) => [...row]);
+  // Create display board with current piece - memoized for performance
+  const displayBoard = useMemo(() => {
+    const newBoard = board.map((row) => [...row]);
 
-  if (currentPiece) {
-    const colorIndex = getTetrominoColorIndex(currentPiece.type);
+    if (currentPiece) {
+      const colorIndex = getTetrominoColorIndex(currentPiece.type);
+      currentPiece.shape.forEach((row, y) => {
+        row.forEach((cell, x) => {
+          if (cell) {
+            const boardY = currentPiece.position.y + y;
+            const boardX = currentPiece.position.x + x;
+            if (boardY >= 0 && boardY < BOARD_HEIGHT && boardX >= 0 && boardX < BOARD_WIDTH) {
+              newBoard[boardY][boardX] = colorIndex;
+            }
+          }
+        });
+      });
+    }
+
+    return newBoard;
+  }, [board, currentPiece]);
+
+  // Pre-compute current piece positions for O(1) lookup
+  const currentPiecePositions = useMemo(() => {
+    if (!currentPiece) return new Set<string>();
+
+    const positions = new Set<string>();
     currentPiece.shape.forEach((row, y) => {
       row.forEach((cell, x) => {
         if (cell) {
           const boardY = currentPiece.position.y + y;
           const boardX = currentPiece.position.x + x;
           if (boardY >= 0 && boardY < BOARD_HEIGHT && boardX >= 0 && boardX < BOARD_WIDTH) {
-            displayBoard[boardY][boardX] = colorIndex;
+            positions.add(`${boardX},${boardY}`);
           }
         }
       });
     });
-  }
+    return positions;
+  }, [currentPiece]);
+
+  // Pre-compute placed positions for O(1) lookup
+  const placedPositionsSet = useMemo(() => {
+    const positions = new Set<string>();
+    placedPositions.forEach((pos) => {
+      positions.add(`${pos.x},${pos.y}`);
+    });
+    return positions;
+  }, [placedPositions]);
 
   return (
     <Card
@@ -48,17 +81,9 @@ export function Board() {
       >
         {displayBoard.map((row, y) =>
           row.map((cell, x) => {
-            const isCurrentPiece =
-              currentPiece?.shape.some((shapeRow, shapeY) =>
-                shapeRow.some(
-                  (shapeCell, shapeX) =>
-                    shapeCell &&
-                    currentPiece.position.y + shapeY === y &&
-                    currentPiece.position.x + shapeX === x,
-                ),
-              ) ?? false;
-
-            const isPlacedPiece = placedPositions.some((pos) => pos.x === x && pos.y === y);
+            const positionKey = `${x},${y}`;
+            const isCurrentPiece = currentPiecePositions.has(positionKey);
+            const isPlacedPiece = placedPositionsSet.has(positionKey);
             const isClearingLine = clearingLines.includes(y);
 
             return (
@@ -75,7 +100,7 @@ export function Board() {
                   if (isClearingLine) {
                     clearAnimationStates();
                   } else if (isPlacedPiece) {
-                    setTimeout(() => clearAnimationStates(), 50);
+                    requestAnimationFrame(() => clearAnimationStates());
                   }
                 }}
               />
