@@ -64,7 +64,11 @@ export function Board() {
             const isClearingLine = clearingLines.includes(y);
 
             // Ensure animation states don't interfere with static cells
-            const shouldAnimate = (isCurrentPiece || isPlacedPiece || isClearingLine) && cell !== 0;
+            // Only animate if cell has content OR if it's currently clearing
+            const shouldAnimate = 
+              (isCurrentPiece && cell !== 0) || 
+              (isPlacedPiece && cell !== 0) || 
+              (isClearingLine && cell !== 0);
 
             return (
               <motion.div
@@ -105,9 +109,14 @@ export function Board() {
                     : {}
                 }
                 onAnimationComplete={() => {
-                  // Clear animation states after any animation completes with a delay
-                  if (shouldAnimate && (isPlacedPiece || isClearingLine)) {
-                    setTimeout(() => clearAnimationStates(), 100);
+                  // Clear animation states after any animation completes
+                  if (shouldAnimate) {
+                    // Immediate clear for clearing lines to prevent color mixing
+                    if (isClearingLine) {
+                      clearAnimationStates();
+                    } else if (isPlacedPiece) {
+                      setTimeout(() => clearAnimationStates(), 50);
+                    }
                   }
                 }}
                 style={{

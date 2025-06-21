@@ -56,28 +56,33 @@ export function clearLines(board: number[][]): {
   linesCleared: number;
   clearedLineIndices: number[];
 } {
-  const newBoard = board.map((row) => [...row]);
   const clearedLineIndices: number[] = [];
-
-  // Find all complete lines
-  for (let y = 0; y < BOARD_HEIGHT; y++) {
-    if (newBoard[y].every((cell) => cell !== 0)) {
+  board.forEach((row, y) => {
+    if (row.every((cell) => cell !== 0)) {
       clearedLineIndices.push(y);
+    }
+  });
+
+  if (clearedLineIndices.length === 0) {
+    return { board, linesCleared: 0, clearedLineIndices: [] };
+  }
+
+  // 新しい空のボードを作成
+  const newBoard = createEmptyBoard();
+  let newBoardRowIndex = BOARD_HEIGHT - 1;
+
+  // 元のボードを下から上に走査する
+  for (let y = BOARD_HEIGHT - 1; y >= 0; y--) {
+    // 消去対象でない行の場合
+    if (!clearedLineIndices.includes(y)) {
+      // 新しいボードの下から詰めていく（深いコピーで配列参照を避ける）
+      newBoard[newBoardRowIndex] = [...board[y]];
+      newBoardRowIndex--;
     }
   }
 
-  // Remove complete lines and create new board with proper gravity
-  const remainingRows = newBoard.filter((_, y) => !clearedLineIndices.includes(y));
-
-  // Add empty rows at the top to maintain board height
-  const emptyRows = Array(clearedLineIndices.length)
-    .fill(null)
-    .map(() => Array(BOARD_WIDTH).fill(0));
-
-  const finalBoard = [...emptyRows, ...remainingRows];
-
   return {
-    board: finalBoard,
+    board: newBoard,
     linesCleared: clearedLineIndices.length,
     clearedLineIndices,
   };

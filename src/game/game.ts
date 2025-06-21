@@ -162,7 +162,7 @@ function lockPiece(state: GameState): GameState {
     level: newLevel,
     isGameOver,
     placedPositions,
-    clearingLines: clearedLineIndices || [],
+    clearingLines: clearedLineIndices.length > 0 ? clearedLineIndices : [],
   };
 }
 
