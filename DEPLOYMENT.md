@@ -1,88 +1,103 @@
 # Deployment Setup
 
-## Vercel Deployment Configuration
+## Vercel Deployment Configuration (推奨方法)
 
-### 1. Vercel Project Setup
+このプロジェクトでは、**Vercelの公式GitHubインテグレーション**を使用して自動デプロイを行います。これは最もシンプルで確実な方法です。
 
-1. Install Vercel CLI:
+### 1. Vercel Dashboard でのプロジェクトセットアップ
+
+1. **Vercelにログイン**
+   - https://vercel.com/ にアクセスしてログイン
+
+2. **プロジェクトをインポート**
+   - 「Add New... > Project」をクリック
+   - GitHubリポジトリから `tetris-game2` を選択
+   - 「Import」をクリック
+
+3. **ビルド設定を確認・設定**
+   - **Framework Preset**: `Vite` を選択
+   - **Build Command**: `pnpm run build`
+   - **Output Directory**: `dist`
+   - **Install Command**: `pnpm install`
+   - **Node.js Version**: `24.x`
+
+4. **デプロイ実行**
+   - 「Deploy」をクリックして初回デプロイを実行
+
+### 2. 自動デプロイの仕組み
+
+設定完了後、以下の流れで自動デプロイが実行されます：
+
+1. **mainブランチにプッシュ**
+2. **GitHub Actions CI** が実行される（テスト、リント、ビルド）
+3. **Vercelが自動検知**してデプロイを開始
+4. **本番環境に反映**
+
+### 3. CI/CD構成
+
+- **CI (GitHub Actions)**: `.github/workflows/ci.yml`
+  - テスト実行
+  - リント検査
+  - ビルド確認
+  - デッドコード検出
+
+- **CD (Vercel Integration)**: 自動デプロイ
+  - mainブランチプッシュ時に自動実行
+  - Vercelダッシュボードで詳細ログ確認可能
+
+### 4. 環境変数の設定（必要に応じて）
+
+アプリケーションが環境変数を必要とする場合：
+- Vercel Dashboard > Project > Settings > Environment Variables で設定
+
+### 5. デプロイ状況の確認
+
+- **Vercelダッシュボード**: https://vercel.com/dashboard
+- **GitHub Actions**: リポジトリの「Actions」タブ
+- **デプロイURL**: Vercelから提供される本番URL
+
+## 手動デプロイ（開発時）
+
+開発時に手動でデプロイしたい場合：
+
+1. Vercel CLIをインストール:
    ```bash
    npm install -g vercel
    ```
 
-2. Login to Vercel:
+2. ログインしてデプロイ:
    ```bash
    vercel login
-   ```
-
-3. Link the project to Vercel:
-   ```bash
-   vercel link
-   ```
-
-4. Deploy manually for the first time:
-   ```bash
    vercel --prod
    ```
 
-### 2. GitHub Secrets Configuration
+## トラブルシューティング
 
-After linking your project to Vercel, you need to configure GitHub Secrets for automated deployment.
+### ビルドエラーが発生した場合
+1. ローカルで `pnpm run build` を実行して問題を特定
+2. Vercelダッシュボードの「Functions」タブでログを確認
+3. package.jsonの依存関係を確認
 
-Go to your GitHub repository: **Settings > Secrets and variables > Actions**
+### デプロイが実行されない場合
+1. Vercelダッシュボードでリポジトリが正しく連携されているか確認
+2. GitHub ActionsのCIが成功しているか確認
+3. mainブランチにプッシュされているか確認
 
-Add the following secrets:
+## GitHub Secretsのクリーンアップ
 
-#### Required Secrets:
+**重要**: Vercel公式インテグレーションを使用するため、以下のGitHub Secretsは**不要**になりました：
 
-1. **`VERCEL_TOKEN`**
-   - Go to [Vercel Dashboard > Settings > Tokens](https://vercel.com/account/tokens)
-   - Create a new token with appropriate scope
-   - Copy the token value
+- `VERCEL_TOKEN`
+- `VERCEL_ORG_ID` 
+- `VERCEL_PROJECT_ID`
 
-2. **`VERCEL_ORG_ID`**
-   - After running `vercel link`, check `.vercel/project.json`
-   - Copy the `orgId` value
+これらのSecretsは削除して構いません：
+1. GitHubリポジトリの「Settings > Secrets and variables > Actions」へ移動
+2. 上記3つのSecretsを削除
 
-3. **`VERCEL_PROJECT_ID`**
-   - After running `vercel link`, check `.vercel/project.json`  
-   - Copy the `projectId` value
+## 移行完了後の構成
 
-### 3. Enable Automatic Deployment
-
-Once the secrets are configured, uncomment the following lines in `.github/workflows/deploy.yml`:
-
-```yaml
-on:
-  workflow_dispatch: # Manual trigger only
-  push:
-    branches: [main]  # Uncomment these lines
-```
-
-### 4. Vercel Project Settings
-
-Ensure your Vercel project has the correct settings:
-
-- **Framework Preset**: Vite
-- **Build Command**: `pnpm run build`
-- **Output Directory**: `dist`
-- **Install Command**: `pnpm install`
-- **Node.js Version**: 24.x
-
-### 5. Environment Variables (if needed)
-
-If your application requires environment variables, add them in:
-- Vercel Dashboard > Project > Settings > Environment Variables
-
-## Workflow Overview
-
-- **CI**: Runs on every push and pull request (test, lint, build, knip)
-- **Deploy**: Runs on push to main branch (after secrets are configured)
-
-## Manual Deployment
-
-You can always deploy manually using:
-```bash
-vercel --prod
-```
-
-Or trigger the GitHub Action manually from the Actions tab.
+✅ **CI (GitHub Actions)**: テスト・リント・ビルド確認  
+✅ **CD (Vercel Integration)**: mainブランチプッシュ時の自動デプロイ  
+❌ **手動デプロイワークフロー**: 削除済み（不要）  
+❌ **GitHub Secrets**: 削除済み（不要）
