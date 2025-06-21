@@ -1,5 +1,10 @@
 import { create } from "zustand";
-import { createInitialGameState, dropPiece, movePiece, rotatePiece } from "../game/game";
+import {
+  createInitialGameState,
+  hardDropTetromino,
+  moveTetrominoBy,
+  rotateTetrominoCW,
+} from "../game/game";
 import type { GameState } from "../types/game";
 
 interface GameStore extends GameState {
@@ -16,11 +21,11 @@ interface GameStore extends GameState {
 export const useGameStore = create<GameStore>((set) => ({
   ...createInitialGameState(),
 
-  moveLeft: () => set((state) => movePiece(state, -1, 0)),
-  moveRight: () => set((state) => movePiece(state, 1, 0)),
-  moveDown: () => set((state) => movePiece(state, 0, 1)),
-  rotate: () => set((state) => rotatePiece(state)),
-  drop: () => set((state) => dropPiece(state)),
+  moveLeft: () => set((state) => moveTetrominoBy(state, -1, 0)),
+  moveRight: () => set((state) => moveTetrominoBy(state, 1, 0)),
+  moveDown: () => set((state) => moveTetrominoBy(state, 0, 1)),
+  rotate: () => set((state) => rotateTetrominoCW(state)),
+  drop: () => set((state) => hardDropTetromino(state)),
 
   togglePause: () => set((state) => ({ isPaused: !state.isPaused })),
   resetGame: () => set(createInitialGameState()),

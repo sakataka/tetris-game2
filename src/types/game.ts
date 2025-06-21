@@ -1,4 +1,7 @@
-// Discriminated union for tetromino types
+/**
+ * Discriminated union type for tetromino pieces with their associated color indices.
+ * Each piece type has a unique shape and color representation.
+ */
 export type TetrominoType =
   | { type: "I"; colorIndex: 1 }
   | { type: "O"; colorIndex: 2 }
@@ -10,21 +13,33 @@ export type TetrominoType =
 
 export type TetrominoTypeName = TetrominoType["type"];
 
+/**
+ * Represents a 2D coordinate position on the game board.
+ */
 export interface Position {
   x: number;
   y: number;
 }
 
+/**
+ * Represents a falling tetromino piece with its current state.
+ */
 export interface Tetromino {
   type: TetrominoTypeName;
   position: Position;
-  rotation: number;
-  shape: number[][];
+  rotation: number; // 0-3, representing 90-degree rotations
+  shape: number[][]; // 2D matrix representing the piece shape
 }
 
-// Board matrix type for better type safety
+/**
+ * 2D matrix representing the game board where each cell contains:
+ * 0 = empty, 1-7 = tetromino color indices
+ */
 export type BoardMatrix = number[][];
 
+/**
+ * Complete game state containing all information needed to render and update the game.
+ */
 export interface GameState {
   board: BoardMatrix;
   currentPiece: Tetromino | null;
@@ -36,7 +51,7 @@ export interface GameState {
   isPaused: boolean;
   placedPositions: Position[];
   clearingLines: number[];
-  rotationKey: number;
+  animationTriggerKey: number;
 }
 
 export const TETROMINO_TYPES: TetrominoTypeName[] = ["I", "O", "T", "S", "Z", "J", "L"];

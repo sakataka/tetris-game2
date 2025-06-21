@@ -8,8 +8,14 @@ import { BOARD_STYLES, CARD_STYLES, combineStyles } from "../../utils/styles";
 import { Card } from "../ui/card";
 
 export function Board() {
-  const { board, currentPiece, placedPositions, clearingLines, rotationKey, clearAnimationStates } =
-    useGameStore();
+  const {
+    board,
+    currentPiece,
+    placedPositions,
+    clearingLines,
+    animationTriggerKey,
+    clearAnimationStates,
+  } = useGameStore();
 
   // Create display board with current piece
   const displayBoard = board.map((row) => [...row]);
@@ -69,7 +75,7 @@ export function Board() {
 
             return (
               <motion.div
-                key={`cell-${y * BOARD_WIDTH + x}-${isCurrentPiece ? rotationKey : "static"}`}
+                key={`cell-${y * BOARD_WIDTH + x}-${isCurrentPiece ? animationTriggerKey : "static"}`}
                 initial={
                   shouldAnimate
                     ? isCurrentPiece

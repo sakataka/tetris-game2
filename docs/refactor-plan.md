@@ -53,24 +53,24 @@
 
 ### 命名規則の統一
 
-- [ ] 関数名の改善（`movePiece` → `moveTetrominoBy` など）
-- [ ] 定数名の統一（`CELL_SIZE` → `BOARD_CELL_SIZE_PX` など）
-- [ ] 型定義名の改善（`number[][]` → `BoardMatrix` など）
-- [ ] アニメーション関連の命名統一（`rotationKey` → `animationTriggerKey`）
+- [x] 関数名の改善（`movePiece` → `moveTetrominoBy` など）
+- [x] 定数名の統一（`CELL_SIZE` → `BOARD_CELL_SIZE_PX` など）
+- [x] 型定義名の改善（`number[][]` → `BoardMatrix` など）
+- [x] アニメーション関連の命名統一（`rotationKey` → `animationTriggerKey`）
 
 ### Import/Export パターンの統一
 
-- [ ] 全コンポーネントを named export に統一
-- [ ] Import 順序の統一（外部ライブラリ → 内部モジュール → 型定義）
-- [ ] 型定義のimport/export パターン統一
-- [ ] barrel export（index.ts）の適切な使用
+- [x] 全コンポーネントを named export に統一
+- [x] Import 順序の統一（外部ライブラリ → 内部モジュール → 型定義）
+- [x] 型定義のimport/export パターン統一
+- [x] barrel export（index.ts）の適切な使用
 
 ### ドキュメンテーション強化
 
-- [ ] 重要なビジネスロジックにコメント追加（ゲームオーバー判定など）
-- [ ] 型定義に JSDoc コメント追加
-- [ ] 複雑なアルゴリズム（スコア計算、ライン消去）の説明追加
-- [ ] README の技術仕様セクション更新
+- [x] 重要なビジネスロジックにコメント追加（ゲームオーバー判定など）
+- [x] 型定義に JSDoc コメント追加
+- [x] 複雑なアルゴリズム（スコア計算、ライン消去）の説明追加
+- [x] README の技術仕様セクション更新
 
 ## Step 4: シンプルさの追求
 

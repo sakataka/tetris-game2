@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { BOARD_HEIGHT, BOARD_WIDTH } from "../utils/constants";
-import { calculateScore, createInitialGameState, dropPiece, movePiece, rotatePiece } from "./game";
+import {
+  calculateScore,
+  createInitialGameState,
+  hardDropTetromino,
+  moveTetrominoBy,
+  rotateTetrominoCW,
+} from "./game";
 
 describe("Game Logic", () => {
   describe("createInitialGameState", () => {
@@ -18,25 +24,25 @@ describe("Game Logic", () => {
     });
   });
 
-  describe("movePiece", () => {
+  describe("moveTetrominoBy", () => {
     it("should move piece left", () => {
       const state = createInitialGameState();
       const initialX = state.currentPiece?.position.x ?? 0;
-      const newState = movePiece(state, -1, 0);
+      const newState = moveTetrominoBy(state, -1, 0);
       expect(newState.currentPiece?.position.x).toBe(initialX - 1);
     });
 
     it("should move piece right", () => {
       const state = createInitialGameState();
       const initialX = state.currentPiece?.position.x ?? 0;
-      const newState = movePiece(state, 1, 0);
+      const newState = moveTetrominoBy(state, 1, 0);
       expect(newState.currentPiece?.position.x).toBe(initialX + 1);
     });
 
     it("should move piece down", () => {
       const state = createInitialGameState();
       const initialY = state.currentPiece?.position.y ?? 0;
-      const newState = movePiece(state, 0, 1);
+      const newState = moveTetrominoBy(state, 0, 1);
       expect(newState.currentPiece?.position.y).toBe(initialY + 1);
     });
 
@@ -45,27 +51,27 @@ describe("Game Logic", () => {
       // Move piece to left edge
       let newState = state;
       for (let i = 0; i < BOARD_WIDTH; i++) {
-        newState = movePiece(newState, -1, 0);
+        newState = moveTetrominoBy(newState, -1, 0);
       }
       // Try to move further left
-      const finalState = movePiece(newState, -1, 0);
+      const finalState = moveTetrominoBy(newState, -1, 0);
       expect(finalState.currentPiece?.position.x).toBe(newState.currentPiece?.position.x);
     });
   });
 
-  describe("rotatePiece", () => {
+  describe("rotateTetrominoCW", () => {
     it("should rotate current piece", () => {
       const state = createInitialGameState();
       const initialRotation = state.currentPiece?.rotation ?? 0;
-      const newState = rotatePiece(state);
+      const newState = rotateTetrominoCW(state);
       expect(newState.currentPiece?.rotation).toBe((initialRotation + 1) % 4);
     });
   });
 
-  describe("dropPiece", () => {
+  describe("hardDropTetromino", () => {
     it("should drop piece to bottom", () => {
       const state = createInitialGameState();
-      const newState = dropPiece(state);
+      const newState = hardDropTetromino(state);
       // The piece should be placed on the board
       expect(newState.currentPiece).not.toBe(state.currentPiece);
     });

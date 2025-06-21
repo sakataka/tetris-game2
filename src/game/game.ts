@@ -43,11 +43,11 @@ export function createInitialGameState(): GameState {
     isPaused: false,
     placedPositions: [],
     clearingLines: [],
-    rotationKey: 0,
+    animationTriggerKey: 0,
   };
 }
 
-export function movePiece(state: GameState, dx: number, dy: number): GameState {
+export function moveTetrominoBy(state: GameState, dx: number, dy: number): GameState {
   if (!state.currentPiece || state.isGameOver || state.isPaused) return state;
 
   const newPosition = {
@@ -67,13 +67,13 @@ export function movePiece(state: GameState, dx: number, dy: number): GameState {
 
   // If moving down failed, lock the piece
   if (dy > 0) {
-    return lockPiece(state);
+    return lockCurrentTetromino(state);
   }
 
   return state;
 }
 
-export function rotatePiece(state: GameState): GameState {
+export function rotateTetrominoCW(state: GameState): GameState {
   if (!state.currentPiece || state.isGameOver || state.isPaused) return state;
 
   const rotatedShape = rotateTetromino(state.currentPiece.shape);
@@ -86,14 +86,14 @@ export function rotatePiece(state: GameState): GameState {
         shape: rotatedShape,
         rotation: (state.currentPiece.rotation + 1) % 4,
       },
-      rotationKey: state.rotationKey + 1,
+      animationTriggerKey: state.animationTriggerKey + 1,
     };
   }
 
   return state;
 }
 
-export function dropPiece(state: GameState): GameState {
+export function hardDropTetromino(state: GameState): GameState {
   if (!state.currentPiece || state.isGameOver || state.isPaused) return state;
 
   const currentPiece = state.currentPiece;
@@ -123,10 +123,14 @@ export function dropPiece(state: GameState): GameState {
   };
 
   // Lock the piece at the final position
-  return lockPiece(newState);
+  return lockCurrentTetromino(newState);
 }
 
-function lockPiece(state: GameState): GameState {
+/**
+ * Locks the current tetromino in place, clears complete lines, and spawns the next piece.
+ * This is the core game state transition when a piece can no longer move down.
+ */
+function lockCurrentTetromino(state: GameState): GameState {
   if (!state.currentPiece) return state;
 
   const colorIndex = getTetrominoColorIndex(state.currentPiece.type);
@@ -157,6 +161,7 @@ function lockPiece(state: GameState): GameState {
   const newScore = state.score + calculateScore(linesCleared, state.level);
 
   const newPiece = createTetromino(state.nextPiece);
+  // Game over occurs when the new piece cannot be placed at its starting position
   const isGameOver = !isValidPosition(clearedBoard, newPiece.shape, newPiece.position);
 
   return {
@@ -173,6 +178,11 @@ function lockPiece(state: GameState): GameState {
   };
 }
 
+/**
+ * Calculates the score based on lines cleared and current level.
+ * Uses the classic Tetris scoring system: 1 Line = 100, 2 Lines = 300, 3 Lines = 500, 4 Lines (Tetris) = 800
+ * Score is multiplied by the current level for progressive difficulty reward.
+ */
 export function calculateScore(linesCleared: number, level: number): number {
   return BASE_SCORES[linesCleared] * level;
 }
