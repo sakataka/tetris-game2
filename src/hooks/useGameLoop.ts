@@ -3,7 +3,7 @@ import { getGameSpeed } from "../game/game";
 import { useGameStore } from "../store/gameStore";
 
 export function useGameLoop() {
-  const { moveDown, isPaused, isGameOver, level } = useGameStore();
+  const { moveDown, isPaused, isGameOver, level, clearAnimationStates } = useGameStore();
   const lastUpdateTime = useRef(0);
 
   useEffect(() => {
@@ -14,6 +14,8 @@ export function useGameLoop() {
     const gameLoop = (currentTime: number) => {
       if (currentTime - lastUpdateTime.current >= gameSpeed) {
         moveDown();
+        // Clear any lingering animation states periodically
+        clearAnimationStates();
         lastUpdateTime.current = currentTime;
       }
 

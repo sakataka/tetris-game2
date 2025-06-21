@@ -1,9 +1,13 @@
-import { type GameState, INITIAL_SPEED, type Tetromino, type TetrominoType } from "../types/game";
+import {
+  type GameState,
+  getTetrominoColorIndex,
+  INITIAL_SPEED,
+  TETROMINO_TYPES,
+  type Tetromino,
+  type TetrominoType,
+} from "../types/game";
 import { clearLines, createEmptyBoard, isValidPosition, placeTetromino } from "./board";
 import { getTetrominoShape, rotateTetromino } from "./tetrominos";
-
-const TETROMINO_TYPES: TetrominoType[] = ["I", "O", "T", "S", "Z", "J", "L"];
-const COLORS = [1, 2, 3, 4, 5, 6, 7];
 
 function getRandomTetrominoType(): TetrominoType {
   return TETROMINO_TYPES[Math.floor(Math.random() * TETROMINO_TYPES.length)];
@@ -30,6 +34,9 @@ export function createInitialGameState(): GameState {
     level: 1,
     isGameOver: false,
     isPaused: false,
+    placedPositions: [],
+    clearingLines: [],
+    rotationKey: 0,
   };
 }
 
@@ -72,6 +79,7 @@ export function rotatePiece(state: GameState): GameState {
         shape: rotatedShape,
         rotation: (state.currentPiece.rotation + 1) % 4,
       },
+      rotationKey: state.rotationKey + 1,
     };
   }
 
@@ -114,7 +122,21 @@ export function dropPiece(state: GameState): GameState {
 function lockPiece(state: GameState): GameState {
   if (!state.currentPiece) return state;
 
-  const colorIndex = COLORS[TETROMINO_TYPES.indexOf(state.currentPiece.type)];
+  const colorIndex = getTetrominoColorIndex(state.currentPiece.type);
+
+  // Record placed positions for animation
+  const placedPositions: { x: number; y: number }[] = [];
+  state.currentPiece.shape.forEach((row, y) => {
+    row.forEach((cell, x) => {
+      if (cell) {
+        placedPositions.push({
+          x: state.currentPiece!.position.x + x,
+          y: state.currentPiece!.position.y + y,
+        });
+      }
+    });
+  });
+
   const newBoard = placeTetromino(
     state.board,
     state.currentPiece.shape,
@@ -122,7 +144,7 @@ function lockPiece(state: GameState): GameState {
     colorIndex,
   );
 
-  const { board: clearedBoard, linesCleared } = clearLines(newBoard);
+  const { board: clearedBoard, linesCleared, clearedLineIndices } = clearLines(newBoard);
   const newLines = state.lines + linesCleared;
   const newLevel = Math.floor(newLines / 10) + 1;
   const newScore = state.score + calculateScore(linesCleared, state.level);
@@ -139,6 +161,8 @@ function lockPiece(state: GameState): GameState {
     lines: newLines,
     level: newLevel,
     isGameOver,
+    placedPositions,
+    clearingLines: clearedLineIndices || [],
   };
 }
 

@@ -51,18 +51,34 @@ export function placeTetromino(
   return newBoard;
 }
 
-export function clearLines(board: number[][]): { board: number[][]; linesCleared: number } {
-  const newBoard = [...board];
-  let linesCleared = 0;
+export function clearLines(board: number[][]): {
+  board: number[][];
+  linesCleared: number;
+  clearedLineIndices: number[];
+} {
+  const newBoard = board.map((row) => [...row]);
+  const clearedLineIndices: number[] = [];
 
-  for (let y = BOARD_HEIGHT - 1; y >= 0; y--) {
+  // Find all complete lines
+  for (let y = 0; y < BOARD_HEIGHT; y++) {
     if (newBoard[y].every((cell) => cell !== 0)) {
-      newBoard.splice(y, 1);
-      newBoard.unshift(Array(BOARD_WIDTH).fill(0));
-      linesCleared++;
-      y++; // Check the same row again
+      clearedLineIndices.push(y);
     }
   }
 
-  return { board: newBoard, linesCleared };
+  // Remove complete lines and create new board with proper gravity
+  const remainingRows = newBoard.filter((_, y) => !clearedLineIndices.includes(y));
+
+  // Add empty rows at the top to maintain board height
+  const emptyRows = Array(clearedLineIndices.length)
+    .fill(null)
+    .map(() => Array(BOARD_WIDTH).fill(0));
+
+  const finalBoard = [...emptyRows, ...remainingRows];
+
+  return {
+    board: finalBoard,
+    linesCleared: clearedLineIndices.length,
+    clearedLineIndices,
+  };
 }

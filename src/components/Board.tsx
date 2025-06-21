@@ -1,16 +1,18 @@
+import { motion } from "framer-motion";
 import { useGameStore } from "../store/gameStore";
-import { BOARD_HEIGHT, BOARD_WIDTH } from "../types/game";
+import { BOARD_HEIGHT, BOARD_WIDTH, getTetrominoColorIndex } from "../types/game";
 
 const CELL_SIZE = 30;
 
 export function Board() {
-  const { board, currentPiece } = useGameStore();
+  const { board, currentPiece, placedPositions, clearingLines, rotationKey, clearAnimationStates } =
+    useGameStore();
 
   // Create display board with current piece
   const displayBoard = board.map((row) => [...row]);
 
   if (currentPiece) {
-    const colorIndex = ["I", "O", "T", "S", "Z", "J", "L"].indexOf(currentPiece.type) + 1;
+    const colorIndex = getTetrominoColorIndex(currentPiece.type);
     currentPiece.shape.forEach((row, y) => {
       row.forEach((cell, x) => {
         if (cell) {
@@ -46,33 +48,100 @@ export function Board() {
         }}
       >
         {displayBoard.map((row, y) =>
-          row.map((cell, x) => (
-            <div
-              key={`cell-${y * BOARD_WIDTH + x}`}
-              style={{
-                width: `${CELL_SIZE}px`,
-                height: `${CELL_SIZE}px`,
-                background:
-                  cell === 0
-                    ? "rgb(31, 41, 55)"
-                    : cell === 1
-                      ? "rgb(34, 211, 238)"
-                      : cell === 2
-                        ? "rgb(250, 204, 21)"
-                        : cell === 3
-                          ? "rgb(168, 85, 247)"
-                          : cell === 4
-                            ? "rgb(34, 197, 94)"
-                            : cell === 5
-                              ? "rgb(239, 68, 68)"
-                              : cell === 6
-                                ? "rgb(59, 130, 246)"
-                                : "rgb(249, 115, 22)",
-                border: cell !== 0 ? "1px solid rgba(255,255,255,0.2)" : "none",
-                transition: "all 0.1s",
-              }}
-            />
-          )),
+          row.map((cell, x) => {
+            const isCurrentPiece =
+              currentPiece &&
+              currentPiece.shape.some((shapeRow, shapeY) =>
+                shapeRow.some(
+                  (shapeCell, shapeX) =>
+                    shapeCell &&
+                    currentPiece.position.y + shapeY === y &&
+                    currentPiece.position.x + shapeX === x,
+                ),
+              );
+
+            const isPlacedPiece = placedPositions.some((pos) => pos.x === x && pos.y === y);
+            const isClearingLine = clearingLines.includes(y);
+
+            // Ensure animation states don't interfere with static cells
+            const shouldAnimate = (isCurrentPiece || isPlacedPiece || isClearingLine) && cell !== 0;
+
+            return (
+              <motion.div
+                key={`cell-${y * BOARD_WIDTH + x}-${isCurrentPiece ? rotationKey : "static"}`}
+                initial={
+                  shouldAnimate
+                    ? isCurrentPiece
+                      ? { y: -8, opacity: 0.9 }
+                      : isPlacedPiece
+                        ? { scale: 0.9 }
+                        : false
+                    : false
+                }
+                animate={
+                  shouldAnimate
+                    ? isCurrentPiece
+                      ? { y: 0, opacity: 1 }
+                      : isPlacedPiece
+                        ? { scale: 1 }
+                        : isClearingLine
+                          ? { opacity: [1, 0.3, 1, 0.3, 1], scale: [1, 1.1, 1] }
+                          : {}
+                    : {}
+                }
+                transition={
+                  shouldAnimate
+                    ? isCurrentPiece
+                      ? {
+                          type: "spring",
+                          stiffness: 500,
+                          damping: 30,
+                          duration: 0.25,
+                        }
+                      : {
+                          duration: isClearingLine ? 0.6 : 0.15,
+                          repeat: isClearingLine ? 2 : 0,
+                        }
+                    : {}
+                }
+                onAnimationComplete={() => {
+                  // Clear animation states after any animation completes with a delay
+                  if (shouldAnimate && (isPlacedPiece || isClearingLine)) {
+                    setTimeout(() => clearAnimationStates(), 100);
+                  }
+                }}
+                style={{
+                  width: `${CELL_SIZE}px`,
+                  height: `${CELL_SIZE}px`,
+                  background:
+                    cell === 0
+                      ? "rgb(15, 23, 42)"
+                      : cell === 1
+                        ? "rgb(34, 211, 238)"
+                        : cell === 2
+                          ? "rgb(250, 204, 21)"
+                          : cell === 3
+                            ? "rgb(168, 85, 247)"
+                            : cell === 4
+                              ? "rgb(34, 197, 94)"
+                              : cell === 5
+                                ? "rgb(239, 68, 68)"
+                                : cell === 6
+                                  ? "rgb(59, 130, 246)"
+                                  : "rgb(249, 115, 22)",
+                  border:
+                    cell !== 0
+                      ? "1px solid rgba(255,255,255,0.2)"
+                      : "1px solid rgba(55, 65, 81, 0.5)",
+                  boxShadow: isCurrentPiece
+                    ? "0 0 10px rgba(255,255,255,0.5)"
+                    : isClearingLine
+                      ? "0 0 15px rgba(255,255,255,0.8)"
+                      : "none",
+                }}
+              />
+            );
+          }),
         )}
       </div>
     </div>

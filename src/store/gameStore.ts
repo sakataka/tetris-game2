@@ -10,6 +10,7 @@ interface GameStore extends GameState {
   drop: () => void;
   togglePause: () => void;
   resetGame: () => void;
+  clearAnimationStates: () => void;
 }
 
 export const useGameStore = create<GameStore>((set) => ({
@@ -23,4 +24,10 @@ export const useGameStore = create<GameStore>((set) => ({
 
   togglePause: () => set((state) => ({ isPaused: !state.isPaused })),
   resetGame: () => set(createInitialGameState()),
+  clearAnimationStates: () =>
+    set((state) => ({
+      ...state,
+      placedPositions: [],
+      clearingLines: [],
+    })),
 }));

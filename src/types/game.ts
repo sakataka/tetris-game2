@@ -21,8 +21,18 @@ export interface GameState {
   level: number;
   isGameOver: boolean;
   isPaused: boolean;
+  placedPositions: Position[];
+  clearingLines: number[];
+  rotationKey: number;
 }
 
 export const BOARD_WIDTH = 10;
 export const BOARD_HEIGHT = 20;
 export const INITIAL_SPEED = 1000;
+
+export const TETROMINO_TYPES: TetrominoType[] = ["I", "O", "T", "S", "Z", "J", "L"];
+export const TETROMINO_COLORS = [1, 2, 3, 4, 5, 6, 7];
+
+export function getTetrominoColorIndex(type: TetrominoType): number {
+  return TETROMINO_COLORS[TETROMINO_TYPES.indexOf(type)];
+}
