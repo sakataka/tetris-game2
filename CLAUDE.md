@@ -187,3 +187,401 @@ src/
 
 - GitHub Actions
 
+# 現在のソースコード実装詳細
+
+## 詳細なアーキテクチャ分析
+
+### 1. エントリーポイント構成
+
+**`src/main.tsx`**
+```typescript
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App'
+import './index.css'
+import './i18n/config'
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+)
+```
+- React 19 StrictModeでアプリケーション初期化
+- i18n設定の自動読み込み
+- グローバルCSS適用
+
+**`src/App.tsx`**
+```typescript
+import Game from './components/Game'
+
+function App() {
+  return <Game />
+}
+
+export default App
+```
+- 最小限の構成でGameコンポーネントをレンダリング
+
+### 2. 型システム (`src/types/game.ts`)
+
+```typescript
+export type TetrominoType = 'I' | 'O' | 'T' | 'S' | 'Z' | 'J' | 'L'
+
+export interface Position {
+  x: number
+  y: number
+}
+
+export interface Tetromino {
+  type: TetrominoType
+  position: Position
+  rotation: number
+  shape: number[][]
+}
+
+export interface GameState {
+  board: number[][]
+  currentPiece: Tetromino | null
+  nextPiece: Tetromino
+  score: number
+  lines: number
+  level: number
+  isGameOver: boolean
+  isPaused: boolean
+  placedPositions: Position[]
+  clearingLines: number[]
+  rotationKey: string
+}
+```
+
+### 3. 状態管理 (`src/store/gameStore.ts`)
+
+```typescript
+import { create } from 'zustand'
+import { GameState } from '../types/game'
+// ゲーム操作関数をインポート
+
+interface GameStore extends GameState {
+  moveLeft: () => void
+  moveRight: () => void
+  moveDown: () => void
+  rotate: () => void
+  drop: () => void
+  togglePause: () => void
+  resetGame: () => void
+  clearAnimationStates: () => void
+}
+
+export const useGameStore = create<GameStore>((set, get) => ({
+  // 初期状態
+  ...createInitialGameState(),
+  
+  // ゲーム操作メソッド
+  moveLeft: () => set(state => ({ ...movePieceLeft(state) })),
+  moveRight: () => set(state => ({ ...movePieceRight(state) })),
+  moveDown: () => set(state => ({ ...movePieceDown(state) })),
+  rotate: () => set(state => ({ ...rotatePiece(state) })),
+  drop: () => set(state => ({ ...dropPiece(state) })),
+  togglePause: () => set(state => ({ isPaused: !state.isPaused })),
+  resetGame: () => set(() => createInitialGameState()),
+  clearAnimationStates: () => set({ placedPositions: [], clearingLines: [] })
+}))
+```
+
+### 4. ゲームロジック実装
+
+**`src/game/game.ts`** - メインゲームロジック
+```typescript
+export function createInitialGameState(): GameState {
+  const nextPiece = createRandomTetromino()
+  return {
+    board: createEmptyBoard(),
+    currentPiece: createRandomTetromino(),
+    nextPiece,
+    score: 0,
+    lines: 0,
+    level: 1,
+    isGameOver: false,
+    isPaused: false,
+    placedPositions: [],
+    clearingLines: [],
+    rotationKey: crypto.randomUUID()
+  }
+}
+
+export function movePieceLeft(state: GameState): GameState
+export function movePieceRight(state: GameState): GameState
+export function movePieceDown(state: GameState): GameState
+export function rotatePiece(state: GameState): GameState
+export function dropPiece(state: GameState): GameState
+// ... その他のゲーム関数
+```
+
+**`src/game/tetrominos.ts`** - テトリスピース定義
+```typescript
+export const TETROMINOS: Record<TetrominoType, number[][]> = {
+  I: [[1, 1, 1, 1]],
+  O: [[1, 1], [1, 1]],
+  T: [[0, 1, 0], [1, 1, 1]],
+  // ... 他のピース形状
+}
+
+export function getTetrominoShape(type: TetrominoType): number[][] {
+  return TETROMINOS[type].map(row => [...row])
+}
+
+export function rotateTetromino(shape: number[][]): number[][] {
+  // 90度時計回り回転アルゴリズム
+}
+```
+
+**`src/game/board.ts`** - ボード操作
+```typescript
+export function createEmptyBoard(): number[][] {
+  return Array(20).fill(null).map(() => Array(10).fill(0))
+}
+
+export function isValidPosition(board: number[][], piece: Tetromino): boolean
+export function placeTetromino(board: number[][], piece: Tetromino): number[][]
+export function clearLines(board: number[][]): { newBoard: number[][]; clearedLines: number[] }
+```
+
+### 5. カスタムHooks
+
+**`src/hooks/useGameLoop.ts`**
+```typescript
+export function useGameLoop() {
+  const gameState = useGameStore()
+  
+  useEffect(() => {
+    let animationId: number
+    
+    const gameLoop = () => {
+      if (!gameState.isPaused && !gameState.isGameOver) {
+        gameState.moveDown()
+      }
+      
+      setTimeout(() => {
+        animationId = requestAnimationFrame(gameLoop)
+      }, getGameSpeed(gameState.level))
+    }
+    
+    animationId = requestAnimationFrame(gameLoop)
+    return () => cancelAnimationFrame(animationId)
+  }, [gameState])
+}
+```
+
+**`src/hooks/useKeyboardControls.ts`**
+```typescript
+export function useKeyboardControls() {
+  const gameState = useGameStore()
+  
+  useHotkeys('ArrowLeft', gameState.moveLeft)
+  useHotkeys('ArrowRight', gameState.moveRight)
+  useHotkeys('ArrowDown', gameState.moveDown)
+  useHotkeys('ArrowUp', gameState.rotate)
+  useHotkeys('space', gameState.drop)
+  useHotkeys('p', gameState.togglePause, { 
+    enableOnFormTags: true,
+    preventDefault: true 
+  }, [gameState.togglePause])
+  // Enter キーでゲームリセット（ゲームオーバー時のみ）
+}
+```
+
+### 6. UIコンポーネント詳細
+
+**`src/components/Game.tsx`** - メインゲームコンテナ
+```typescript
+export default function Game() {
+  useGameLoop()
+  useKeyboardControls()
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-4">
+      <div className="mx-auto max-w-6xl">
+        {/* デスクトップレイアウト（グリッド） */}
+        <div className="hidden md:grid md:grid-cols-4 md:gap-8">
+          <LanguageSelector />
+          <ScoreBoard />
+          <div className="col-span-2 row-span-2 flex justify-center">
+            <Board />
+          </div>
+          <NextPiece />
+          <Controls />
+        </div>
+        
+        {/* モバイルレイアウト（縦スタック） */}
+        <div className="md:hidden space-y-6">
+          {/* モバイル用レイアウト */}
+        </div>
+      </div>
+      <GameOverlay />
+    </div>
+  )
+}
+```
+
+**`src/components/Board.tsx`** - ゲームボード
+```typescript
+export default React.memo(function Board() {
+  const { board, currentPiece, placedPositions, clearingLines, rotationKey } = useGameStore()
+
+  return (
+    <div className="inline-block bg-slate-900 p-2 rounded-lg shadow-2xl border border-slate-700">
+      <div className="grid grid-cols-10 gap-0.5">
+        {board.map((row, y) =>
+          row.map((cell, x) => {
+            const isCurrentPiece = /* ピース位置チェック */
+            const isPlacedPosition = /* 配置アニメーション位置チェック */
+            const isClearingLine = /* ライン消去アニメーション */
+            
+            return (
+              <motion.div
+                key={`${x}-${y}`}
+                className={`w-[30px] h-[30px] border border-slate-600 ${getCellColor(cell, isCurrentPiece, currentPiece?.type)}`}
+                animate={/* アニメーション設定 */}
+                // Framer Motionアニメーション設定
+              />
+            )
+          })
+        )}
+      </div>
+    </div>
+  )
+})
+```
+
+### 7. アニメーションシステム
+
+**ピース落下アニメーション**
+```typescript
+// 新しいピース出現時
+animate={{
+  y: ['-100%', '0%'],
+  transition: { type: 'spring', damping: 15, stiffness: 300 }
+}}
+```
+
+**ピース回転アニメーション**
+```typescript
+// 回転時の360度エフェクト
+animate={{
+  rotate: [0, 360, 0],
+  transition: { duration: 0.3, ease: 'easeInOut' }
+}}
+```
+
+**ライン消去アニメーション**
+```typescript
+// フラッシュ・パルス・グロー効果
+animate={{
+  scale: [1, 1.1, 1],
+  backgroundColor: ['#ffffff', '#fbbf24', '#ffffff'],
+  boxShadow: ['0 0 0px #fbbf24', '0 0 20px #fbbf24', '0 0 0px #fbbf24'],
+  transition: { duration: 0.5, repeat: 2 }
+}}
+```
+
+### 8. 国際化システム
+
+**`src/i18n/config.ts`**
+```typescript
+import i18n from 'i18next'
+import { initReactI18next } from 'react-i18next'
+import ja from '../locales/ja.json'
+import en from '../locales/en.json'
+
+i18n.use(initReactI18next).init({
+  resources: { ja: { translation: ja }, en: { translation: en } },
+  lng: 'ja',
+  fallbackLng: 'en',
+  interpolation: { escapeValue: false }
+})
+```
+
+**言語リソース例 (`src/locales/ja.json`)**
+```json
+{
+  "score": "スコア",
+  "lines": "ライン",
+  "level": "レベル",
+  "next": "次",
+  "gameOver": "ゲームオーバー",
+  "paused": "一時停止",
+  "newGame": "新しいゲーム",
+  "resume": "再開",
+  "controls": {
+    "move": "移動",
+    "rotate": "回転",
+    "softDrop": "ソフトドロップ",
+    "hardDrop": "ハードドロップ",
+    "pause": "一時停止"
+  }
+}
+```
+
+### 9. スタイリングシステム
+
+**`src/index.css`** - Tailwind CSS 4.1新記法
+```css
+@import "tailwindcss";
+
+@theme {
+  /* カスタムTetris色定義 */
+  --color-tetris-i: #00f5ff;
+  --color-tetris-o: #ffff00;
+  --color-tetris-t: #800080;
+  --color-tetris-s: #00ff00;
+  --color-tetris-z: #ff0000;
+  --color-tetris-j: #0000ff;
+  --color-tetris-l: #ffa500;
+}
+
+@source inline() {
+  /* 事前生成するクラス */
+  .bg-tetris-i { background-color: theme(colors.tetris.i); }
+  .bg-tetris-o { background-color: theme(colors.tetris.o); }
+  /* ... 他のテトリス色クラス */
+}
+
+/* shadcn/ui CSS変数 */
+:root {
+  --background: 210 40% 98%;
+  --foreground: 222.2 84% 4.9%;
+  /* ... */
+}
+
+/* 全画面固定 */
+html, body { height: 100%; overflow: hidden; }
+```
+
+## テスト実装
+
+現在、以下のテストファイルが実装されています：
+
+- `src/game/board.test.ts` - ボードロジックのテスト
+- `src/game/game.test.ts` - ゲームロジックのテスト  
+- `src/game/tetrominos.test.ts` - テトリスピースのテスト
+
+すべてVitest + TypeScriptで実装され、TDD approach を採用しています。
+
+## パフォーマンス最適化
+
+1. **React.memo**: Board コンポーネントで不要な再レンダリングを防止
+2. **アニメーション状態管理**: 定期的なアニメーション状態クリア
+3. **requestAnimationFrame**: スムーズなゲームループ
+4. **immutable更新**: Zustand での状態管理
+5. **遅延読み込み**: 必要な時のみリソース読み込み
+
+## セキュリティ考慮事項
+
+1. **XSS対策**: React の自動エスケープ
+2. **CSP対応**: インラインスタイル/スクリプトの回避
+3. **型安全性**: TypeScript による実行時エラー防止
+4. **依存関係管理**: 定期的なパッケージ更新
+
+この実装は、現代的なWeb開発のベストプラクティスを採用し、保守性、パフォーマンス、ユーザビリティを重視した設計となっています。
+
