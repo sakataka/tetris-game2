@@ -1,9 +1,11 @@
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useGameStore } from "../store/gameStore";
+import { Badge } from "./ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 
-export function ScoreBoard() {
+export const ScoreBoard = memo(function ScoreBoard() {
   const { score, lines, level } = useGameStore();
   const { t } = useTranslation();
 
@@ -36,80 +38,60 @@ export function ScoreBoard() {
   }, [level, prevLevel]);
 
   return (
-    <div
-      style={{
-        background: "rgba(17, 24, 39, 0.5)",
-        backdropFilter: "blur(4px)",
-        padding: "20px",
-        borderRadius: "16px",
-        border: "1px solid rgb(55, 65, 81)",
-        color: "white",
-        boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)",
-      }}
-    >
-      <div style={{ marginBottom: "12px" }}>
-        <h3
-          style={{
-            fontSize: "0.875rem",
-            fontWeight: "bold",
-            marginBottom: "2px",
-            color: "rgb(156, 163, 175)",
-          }}
-        >
+    <Card className="bg-gray-900/50 backdrop-blur-sm border-gray-700 shadow-xl hover:bg-gray-900/60 hover:border-gray-600 transition-all duration-300 hover:shadow-2xl">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-lg font-bold text-gray-300 flex items-center justify-between">
           {t("game.score")}
-        </h3>
-        <motion.p
-          key={`score-${scoreKey}`}
-          initial={{ scale: 1.3, opacity: 0.7 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ type: "spring", stiffness: 300, damping: 15 }}
-          style={{ fontSize: "1.5rem", fontWeight: "bold", color: "rgb(34, 211, 238)" }}
-        >
-          {score.toLocaleString()}
-        </motion.p>
-      </div>
-      <div style={{ marginBottom: "12px" }}>
-        <h3
-          style={{
-            fontSize: "0.875rem",
-            fontWeight: "bold",
-            marginBottom: "2px",
-            color: "rgb(156, 163, 175)",
-          }}
-        >
-          {t("game.lines")}
-        </h3>
-        <motion.p
-          key={`lines-${linesKey}`}
-          initial={{ scale: 1.2, opacity: 0.8, y: -10 }}
-          animate={{ scale: 1, opacity: 1, y: 0 }}
-          transition={{ type: "spring", stiffness: 400, damping: 20 }}
-          style={{ fontSize: "1.5rem", fontWeight: "bold", color: "rgb(250, 204, 21)" }}
-        >
-          {lines}
-        </motion.p>
-      </div>
-      <div>
-        <h3
-          style={{
-            fontSize: "0.875rem",
-            fontWeight: "bold",
-            marginBottom: "2px",
-            color: "rgb(156, 163, 175)",
-          }}
-        >
-          {t("game.level")}
-        </h3>
-        <motion.p
-          key={`level-${levelKey}`}
-          initial={{ scale: 1.5, opacity: 0.5, rotate: -10 }}
-          animate={{ scale: 1, opacity: 1, rotate: 0 }}
-          transition={{ type: "spring", stiffness: 250, damping: 12 }}
-          style={{ fontSize: "1.5rem", fontWeight: "bold", color: "rgb(168, 85, 247)" }}
-        >
-          {level}
-        </motion.p>
-      </div>
-    </div>
+          <Badge variant="secondary" className="bg-gray-800 text-gray-300">
+            Live
+          </Badge>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="space-y-1">
+          <p className="text-sm font-medium text-gray-400">{t("game.score")}</p>
+          <motion.p
+            key={`score-${scoreKey}`}
+            initial={{ scale: 1.3, opacity: 0.7 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 300, damping: 15 }}
+            className="text-2xl font-bold text-tetris-cyan"
+          >
+            {score.toLocaleString()}
+          </motion.p>
+        </div>
+
+        <div className="space-y-1">
+          <p className="text-sm font-medium text-gray-400">{t("game.lines")}</p>
+          <motion.p
+            key={`lines-${linesKey}`}
+            initial={{ scale: 1.2, opacity: 0.8, y: -10 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            transition={{ type: "spring", stiffness: 400, damping: 20 }}
+            className="text-2xl font-bold text-tetris-yellow"
+          >
+            {lines}
+          </motion.p>
+        </div>
+
+        <div className="space-y-1">
+          <p className="text-sm font-medium text-gray-400">{t("game.level")}</p>
+          <div className="flex items-center gap-2">
+            <motion.p
+              key={`level-${levelKey}`}
+              initial={{ scale: 1.5, opacity: 0.5, rotate: -10 }}
+              animate={{ scale: 1, opacity: 1, rotate: 0 }}
+              transition={{ type: "spring", stiffness: 250, damping: 12 }}
+              className="text-2xl font-bold text-tetris-purple"
+            >
+              {level}
+            </motion.p>
+            <Badge variant="outline" className="border-tetris-purple text-tetris-purple">
+              Level {level}
+            </Badge>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
-}
+});

@@ -1,6 +1,9 @@
 import { useTranslation } from "react-i18next";
+import { cn } from "@/lib/utils";
 import { getTetrominoShape } from "../game/tetrominos";
 import { useGameStore } from "../store/gameStore";
+import { Badge } from "./ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 
 export function NextPiece() {
   const { nextPiece } = useGameStore();
@@ -8,72 +11,71 @@ export function NextPiece() {
   const shape = getTetrominoShape(nextPiece);
   const colorIndex = ["I", "O", "T", "S", "Z", "J", "L"].indexOf(nextPiece) + 1;
 
+  // Color mapping function using Tailwind colors
+  const getCellColor = (colorIndex: number) => {
+    switch (colorIndex) {
+      case 1:
+        return "bg-tetris-cyan"; // I piece
+      case 2:
+        return "bg-tetris-yellow"; // O piece
+      case 3:
+        return "bg-tetris-purple"; // T piece
+      case 4:
+        return "bg-tetris-green"; // S piece
+      case 5:
+        return "bg-tetris-red"; // Z piece
+      case 6:
+        return "bg-tetris-blue"; // J piece
+      case 7:
+        return "bg-tetris-orange"; // L piece
+      default:
+        return "bg-gray-800";
+    }
+  };
+
+  const getPieceType = (piece: string) => {
+    const types = {
+      I: "Line",
+      O: "Square",
+      T: "T-Shape",
+      S: "S-Shape",
+      Z: "Z-Shape",
+      J: "J-Shape",
+      L: "L-Shape",
+    };
+    return types[piece as keyof typeof types] || piece;
+  };
+
   return (
-    <div
-      style={{
-        background: "rgba(17, 24, 39, 0.5)",
-        backdropFilter: "blur(4px)",
-        padding: "20px",
-        borderRadius: "16px",
-        border: "1px solid rgb(55, 65, 81)",
-        boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)",
-      }}
-    >
-      <h3
-        style={{
-          fontSize: "0.875rem",
-          fontWeight: "bold",
-          marginBottom: "12px",
-          color: "rgb(156, 163, 175)",
-          textAlign: "center",
-        }}
-      >
-        {t("game.next")}
-      </h3>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(4, 20px)",
-          gridTemplateRows: "repeat(4, 20px)",
-          gap: "1px",
-          background: "rgb(55, 65, 81)",
-          borderRadius: "8px",
-          overflow: "hidden",
-          margin: "0 auto",
-          width: "fit-content",
-        }}
-      >
-        {Array.from({ length: 4 }).map((_, y) =>
-          Array.from({ length: 4 }).map((_, x) => {
-            const isActive = shape[y]?.[x] === 1;
-            return (
-              <div
-                key={`next-${y * 4 + x}`}
-                style={{
-                  width: "20px",
-                  height: "20px",
-                  background: isActive
-                    ? colorIndex === 1
-                      ? "rgb(34, 211, 238)"
-                      : colorIndex === 2
-                        ? "rgb(250, 204, 21)"
-                        : colorIndex === 3
-                          ? "rgb(168, 85, 247)"
-                          : colorIndex === 4
-                            ? "rgb(34, 197, 94)"
-                            : colorIndex === 5
-                              ? "rgb(239, 68, 68)"
-                              : colorIndex === 6
-                                ? "rgb(59, 130, 246)"
-                                : "rgb(249, 115, 22)"
-                    : "rgb(31, 41, 55)",
-                  border: isActive ? "1px solid rgba(255,255,255,0.2)" : "none",
-                }}
-              />
-            );
-          }),
-        )}
-      </div>
-    </div>
+    <Card className="bg-gray-900/50 backdrop-blur-sm border-gray-700 shadow-xl hover:bg-gray-900/60 hover:border-gray-600 transition-all duration-300 hover:shadow-2xl">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-lg font-bold text-gray-300 text-center flex items-center justify-center gap-2">
+          {t("game.next")}
+          <Badge variant="outline" className="border-gray-600 text-gray-400">
+            {getPieceType(nextPiece)}
+          </Badge>
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-4 grid-rows-4 gap-[1px] bg-gray-700 rounded-lg overflow-hidden w-fit mx-auto p-1">
+          {Array.from({ length: 4 }).map((_, y) =>
+            Array.from({ length: 4 }).map((_, x) => {
+              const isActive = shape[y]?.[x] === 1;
+              return (
+                <div
+                  key={`next-${y * 4 + x}`}
+                  className={cn(
+                    "w-5 h-5 rounded-sm transition-all duration-200",
+                    isActive
+                      ? cn(getCellColor(colorIndex), "border border-white/20 shadow-sm")
+                      : "bg-gray-800",
+                  )}
+                />
+              );
+            }),
+          )}
+        </div>
+      </CardContent>
+    </Card>
   );
 }

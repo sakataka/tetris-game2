@@ -1,98 +1,71 @@
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useGameStore } from "../store/gameStore";
+import { Badge } from "./ui/badge";
+import { Button } from "./ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "./ui/dialog";
 
 export function GameOverlay() {
   const { isGameOver, isPaused, resetGame } = useGameStore();
   const { t } = useTranslation();
 
   return (
-    <AnimatePresence>
-      {(isGameOver || isPaused) && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: "rgba(0, 0, 0, 0.75)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0, y: 20 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.8, opacity: 0, y: 20 }}
-            transition={{
-              type: "spring",
-              stiffness: 300,
-              damping: 25,
-              delay: 0.1,
-            }}
-            style={{
-              background: "rgb(31, 41, 55)",
-              padding: "32px",
-              borderRadius: "8px",
-              textAlign: "center",
-              color: "white",
-              boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)",
-            }}
-          >
-            <motion.h2
-              initial={{ y: -10, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.2 }}
-              style={{
-                fontSize: "2.5rem",
-                fontWeight: "bold",
-                marginBottom: "16px",
-              }}
-            >
-              {isGameOver ? t("game.gameOver") : t("game.paused")}
-            </motion.h2>
-            {isGameOver && (
-              <motion.button
-                initial={{ y: 10, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.3 }}
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.95 }}
-                type="button"
+    <Dialog open={isGameOver || isPaused}>
+      <DialogContent className="sm:max-w-md bg-gray-900/95 border-gray-700 backdrop-blur-sm">
+        <DialogHeader className="text-center">
+          <DialogTitle className="text-3xl font-bold text-white mb-4 flex items-center justify-center gap-2">
+            {isGameOver ? (
+              <>
+                {t("game.gameOver")}
+                <Badge variant="destructive" className="bg-red-600 text-white">
+                  Game Over
+                </Badge>
+              </>
+            ) : (
+              <>
+                {t("game.paused")}
+                <Badge variant="secondary" className="bg-yellow-600 text-white">
+                  Paused
+                </Badge>
+              </>
+            )}
+          </DialogTitle>
+
+          {isGameOver && (
+            <DialogDescription className="text-gray-300 mb-6">
+              {t("game.gameOverMessage") || "Better luck next time! Try again?"}
+            </DialogDescription>
+          )}
+
+          {isPaused && (
+            <DialogDescription className="text-gray-300 mb-6 text-lg">
+              {t("game.resumeHint")}
+            </DialogDescription>
+          )}
+        </DialogHeader>
+
+        {isGameOver && (
+          <div className="flex justify-center">
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button
                 onClick={resetGame}
-                style={{
-                  padding: "12px 24px",
-                  background: "rgb(37, 99, 235)",
-                  borderRadius: "8px",
-                  fontWeight: "bold",
-                  border: "none",
-                  color: "white",
-                  cursor: "pointer",
-                  boxShadow: "0 4px 14px rgba(37, 99, 235, 0.4)",
-                }}
+                size="lg"
+                className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/25 min-w-[120px]"
               >
                 {t("game.newGame")}
-              </motion.button>
-            )}
-            {isPaused && (
-              <motion.p
-                initial={{ y: 10, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.3 }}
-                style={{ fontSize: "1.25rem" }}
-              >
-                {t("game.resumeHint")}
-              </motion.p>
-            )}
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+              </Button>
+            </motion.div>
+          </div>
+        )}
+
+        {isPaused && (
+          <div className="text-center">
+            <Badge variant="outline" className="border-gray-600 text-gray-400">
+              Press P to Resume
+            </Badge>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
   );
 }

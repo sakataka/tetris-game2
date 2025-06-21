@@ -1,10 +1,13 @@
 import { motion } from "framer-motion";
+import { memo } from "react";
+import { cn } from "@/lib/utils";
 import { useGameStore } from "../store/gameStore";
 import { BOARD_HEIGHT, BOARD_WIDTH, getTetrominoColorIndex } from "../types/game";
+import { Card } from "./ui/card";
 
 const CELL_SIZE = 30;
 
-export function Board() {
+export const Board = memo(function Board() {
   const { board, currentPiece, placedPositions, clearingLines, rotationKey, clearAnimationStates } =
     useGameStore();
 
@@ -26,25 +29,39 @@ export function Board() {
     });
   }
 
+  // Color mapping function using Tailwind colors
+  const getCellColor = (cell: number) => {
+    switch (cell) {
+      case 0:
+        return "bg-slate-900"; // Empty
+      case 1:
+        return "bg-tetris-cyan"; // I piece
+      case 2:
+        return "bg-tetris-yellow"; // O piece
+      case 3:
+        return "bg-tetris-purple"; // T piece
+      case 4:
+        return "bg-tetris-green"; // S piece
+      case 5:
+        return "bg-tetris-red"; // Z piece
+      case 6:
+        return "bg-tetris-blue"; // J piece
+      case 7:
+        return "bg-tetris-orange"; // L piece
+      default:
+        return "bg-slate-900";
+    }
+  };
+
   return (
-    <div
-      style={{
-        background: "rgba(17, 24, 39, 0.5)",
-        backdropFilter: "blur(4px)",
-        padding: "24px",
-        borderRadius: "16px",
-        border: "1px solid rgb(55, 65, 81)",
-        minWidth: "320px",
-        minHeight: "620px",
-      }}
-    >
+    <Card className="bg-gray-900/50 backdrop-blur-sm border-gray-700 p-6 min-w-[320px] min-h-[620px] shadow-2xl hover:shadow-3xl hover:border-gray-600 transition-all duration-300">
       <div
+        className="grid gap-[1px] bg-gray-700 p-1 rounded-sm"
+        role="grid"
+        aria-label="Tetris game board"
         style={{
-          display: "grid",
           gridTemplateColumns: `repeat(${BOARD_WIDTH}, ${CELL_SIZE}px)`,
           gridTemplateRows: `repeat(${BOARD_HEIGHT}, ${CELL_SIZE}px)`,
-          gap: "1px",
-          background: "rgb(55, 65, 81)",
         }}
       >
         {displayBoard.map((row, y) =>
@@ -117,40 +134,19 @@ export function Board() {
                     }
                   }
                 }}
-                style={{
-                  width: `${CELL_SIZE}px`,
-                  height: `${CELL_SIZE}px`,
-                  background:
-                    cell === 0
-                      ? "rgb(15, 23, 42)"
-                      : cell === 1
-                        ? "rgb(34, 211, 238)"
-                        : cell === 2
-                          ? "rgb(250, 204, 21)"
-                          : cell === 3
-                            ? "rgb(168, 85, 247)"
-                            : cell === 4
-                              ? "rgb(34, 197, 94)"
-                              : cell === 5
-                                ? "rgb(239, 68, 68)"
-                                : cell === 6
-                                  ? "rgb(59, 130, 246)"
-                                  : "rgb(249, 115, 22)",
-                  border:
-                    cell !== 0
-                      ? "1px solid rgba(255,255,255,0.2)"
-                      : "1px solid rgba(55, 65, 81, 0.5)",
-                  boxShadow: isCurrentPiece
-                    ? "0 0 10px rgba(255,255,255,0.5)"
-                    : isClearingLine
-                      ? "0 0 15px rgba(255,255,255,0.8)"
-                      : "none",
-                }}
+                className={cn(
+                  "w-[30px] h-[30px] rounded-sm transition-all duration-150",
+                  getCellColor(cell),
+                  cell !== 0 && "border border-white/20 shadow-sm",
+                  cell === 0 && "border border-gray-700/50",
+                  isCurrentPiece && "shadow-white/50 shadow-lg ring-1 ring-white/30",
+                  isClearingLine && "shadow-white/80 shadow-xl ring-2 ring-white/50 animate-pulse",
+                )}
               />
             );
           }),
         )}
       </div>
-    </div>
+    </Card>
   );
-}
+});

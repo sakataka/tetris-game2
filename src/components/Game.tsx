@@ -12,29 +12,34 @@ export function Game() {
   useKeyboardControls();
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background:
-          "linear-gradient(to bottom right, rgb(15, 23, 42), rgb(88, 28, 135), rgb(15, 23, 42))",
-        color: "white",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "16px",
-        position: "relative",
-      }}
-    >
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white p-4 relative">
       <LanguageSelector />
-      <div style={{ display: "flex", gap: "32px" }}>
-        <div style={{ display: "flex", flexDirection: "column", gap: "16px", width: "200px" }}>
+
+      {/* Desktop Layout - Grid */}
+      <div className="hidden md:grid md:grid-cols-[240px_1fr] md:gap-8 md:place-items-center md:min-h-[calc(100vh-2rem)]">
+        <div className="flex flex-col gap-4 w-full">
           <ScoreBoard />
           <NextPiece />
           <Controls />
         </div>
-        <div style={{ position: "relative" }}>
+        <div className="relative">
           <Board />
           <GameOverlay />
+        </div>
+      </div>
+
+      {/* Mobile Layout - Vertical Stack */}
+      <div className="md:hidden flex flex-col items-center gap-6 pt-12">
+        <div className="flex flex-col gap-4 w-full max-w-sm">
+          <ScoreBoard />
+          <NextPiece />
+        </div>
+        <div className="relative">
+          <Board />
+          <GameOverlay />
+        </div>
+        <div className="w-full max-w-sm">
+          <Controls />
         </div>
       </div>
     </div>
