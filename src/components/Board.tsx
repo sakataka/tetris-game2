@@ -49,16 +49,14 @@ export function Board() {
       >
         {displayBoard.map((row, y) =>
           row.map((cell, x) => {
-            const isCurrentPiece =
-              currentPiece &&
-              currentPiece.shape.some((shapeRow, shapeY) =>
-                shapeRow.some(
-                  (shapeCell, shapeX) =>
-                    shapeCell &&
-                    currentPiece.position.y + shapeY === y &&
-                    currentPiece.position.x + shapeX === x,
-                ),
-              );
+            const isCurrentPiece = currentPiece?.shape.some((shapeRow, shapeY) =>
+              shapeRow.some(
+                (shapeCell, shapeX) =>
+                  shapeCell &&
+                  currentPiece.position.y + shapeY === y &&
+                  currentPiece.position.x + shapeX === x,
+              ),
+            );
 
             const isPlacedPiece = placedPositions.some((pos) => pos.x === x && pos.y === y);
             const isClearingLine = clearingLines.includes(y);

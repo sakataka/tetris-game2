@@ -130,8 +130,8 @@ function lockPiece(state: GameState): GameState {
     row.forEach((cell, x) => {
       if (cell) {
         placedPositions.push({
-          x: state.currentPiece!.position.x + x,
-          y: state.currentPiece!.position.y + y,
+          x: (state.currentPiece as NonNullable<typeof state.currentPiece>).position.x + x,
+          y: (state.currentPiece as NonNullable<typeof state.currentPiece>).position.y + y,
         });
       }
     });
