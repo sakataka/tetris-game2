@@ -76,23 +76,23 @@
 
 ### コンポーネント分割
 
-- [ ] `BoardCell` コンポーネントを Board.tsx から抽出
-- [ ] `AnimatedScoreItem` コンポーネントを ScoreBoard.tsx から抽出
-- [ ] `CellAnimationLogic` カスタムHook の作成
-- [ ] `useAnimatedValue` カスタムHook の作成（スコア用）
+- [x] `BoardCell` コンポーネントを Board.tsx から抽出
+- [x] `AnimatedScoreItem` コンポーネントを ScoreBoard.tsx から抽出
+- [x] `CellAnimationLogic` カスタムHook の作成
+- [x] `useAnimatedValue` カスタムHook の作成（スコア用）
 
 ### 状態管理の簡素化
 
-- [ ] GameStore を機能別に分割（`useGameState`, `useGameActions`, `useAnimationState`）
-- [ ] アニメーション専用 Hook `useTetrominoAnimation` の作成
-- [ ] 状態更新ロジックの簡素化
-- [ ] 不要な状態の削除
+- [x] GameStore を機能別に分割（`useGameState`, `useGameActions`, `useAnimationState`）
+- [x] アニメーション専用 Hook `useTetrominoAnimation` の作成
+- [x] 状態更新ロジックの簡素化
+- [x] 不要な状態の削除
 
 ### 関数の簡素化
 
-- [ ] 複雑な条件分岐の簡素化（Board.tsx のアニメーション制御）
-- [ ] 純粋関数の抽出と単一責任原則の適用
-- [ ] ネストした条件文の flat 化
+- [x] 複雑な条件分岐の簡素化（Board.tsx のアニメーション制御）
+- [x] 純粋関数の抽出と単一責任原則の適用
+- [x] ネストした条件文の flat 化
 
 ## Step 5: 品質向上・テスト
 
@@ -152,4 +152,4 @@
 
 **📅 作成日**: 2025-06-21  
 **👤 担当者**: Claude Code  
-**📍 状態**: 計画策定完了 - 実行準備中
+**📍 状態**: Step 4 完了 - シンプルさの追求達成
