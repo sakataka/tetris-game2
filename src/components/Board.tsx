@@ -65,9 +65,9 @@ export function Board() {
 
             // Ensure animation states don't interfere with static cells
             // Only animate if cell has content OR if it's currently clearing
-            const shouldAnimate = 
-              (isCurrentPiece && cell !== 0) || 
-              (isPlacedPiece && cell !== 0) || 
+            const shouldAnimate =
+              (isCurrentPiece && cell !== 0) ||
+              (isPlacedPiece && cell !== 0) ||
               (isClearingLine && cell !== 0);
 
             return (

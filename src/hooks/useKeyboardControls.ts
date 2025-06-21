@@ -1,43 +1,60 @@
-import { useEffect } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 import { useGameStore } from "../store/gameStore";
 
 export function useKeyboardControls() {
   const { moveLeft, moveRight, moveDown, rotate, drop, togglePause, isPaused, isGameOver } =
     useGameStore();
 
-  useEffect(() => {
-    const handleKeyPress = (e: KeyboardEvent) => {
-      if (isGameOver) return;
+  // Left/right movement and soft drop - enable key repeat (default keydown: true)
+  useHotkeys(
+    "arrowleft",
+    () => {
+      if (!isGameOver && !isPaused) moveLeft();
+    },
+    { keydown: true },
+  );
 
-      // Prevent default scrolling behavior for game keys
-      if (["ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp", " "].includes(e.key)) {
+  useHotkeys(
+    "arrowright",
+    () => {
+      if (!isGameOver && !isPaused) moveRight();
+    },
+    { keydown: true },
+  );
+
+  useHotkeys(
+    "arrowdown",
+    () => {
+      if (!isGameOver && !isPaused) moveDown();
+    },
+    { keydown: true },
+  );
+
+  // Rotation and hard drop - single actions with preventDefault
+  useHotkeys(
+    "arrowup",
+    (e) => {
+      if (!isGameOver && !isPaused) {
         e.preventDefault();
+        rotate();
       }
+    },
+    { keydown: true },
+  );
 
-      switch (e.key) {
-        case "ArrowLeft":
-          if (!isPaused) moveLeft();
-          break;
-        case "ArrowRight":
-          if (!isPaused) moveRight();
-          break;
-        case "ArrowDown":
-          if (!isPaused) moveDown();
-          break;
-        case "ArrowUp":
-          if (!isPaused) rotate();
-          break;
-        case " ":
-          if (!isPaused) drop();
-          break;
-        case "p":
-        case "P":
-          togglePause();
-          break;
+  useHotkeys(
+    "space",
+    (e) => {
+      if (!isGameOver && !isPaused) {
+        e.preventDefault();
+        drop();
       }
-    };
+    },
+    { keydown: true },
+  );
 
-    window.addEventListener("keydown", handleKeyPress);
-    return () => window.removeEventListener("keydown", handleKeyPress);
-  }, [moveLeft, moveRight, moveDown, rotate, drop, togglePause, isPaused, isGameOver]);
+  // Pause toggle - works even when paused, but not when game over
+  useHotkeys(["p", "P"], () => {
+    if (!isGameOver) togglePause();
+  });
 }

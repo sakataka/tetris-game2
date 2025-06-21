@@ -25,5 +25,5 @@ export function useGameLoop() {
     const animationId = requestAnimationFrame(gameLoop);
 
     return () => cancelAnimationFrame(animationId);
-  }, [moveDown, isPaused, isGameOver, level]);
+  }, [moveDown, isPaused, isGameOver, level, clearAnimationStates]);
 }

@@ -48,7 +48,7 @@ Web上で実行できるテトリスを作成する。
 ### カスタムHooks
 
 - **useGameLoop**: ゲームの自動進行を管理
-- **useKeyboardControls**: キーボード入力の処理
+- **useKeyboardControls**: react-hotkeys-hookを使用したキーボード入力の宣言的な処理
 
 ## アニメーションシステム
 
@@ -152,7 +152,8 @@ src/
 - Zod: 4 (将来のハイスコア保存機能・設定データ永続化での使用予定)
 
 ## キーボード入力ハンドリング
-- react-hotkeys-hook
+
+- react-hotkeys-hook: 5.1.0 (宣言的なキーボード入力管理)
 
 ## 国際化
 
