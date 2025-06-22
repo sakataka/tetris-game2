@@ -51,7 +51,6 @@
     "jsdom": "26.1.0",
     "knip": "^5.61.2",
     "lefthook": "1.11.14",
-    "postcss": "^8.5.6",
     "tailwindcss": "4.1.10",
     "typescript": "5.8.3",
     "vite": "6.3.5",
