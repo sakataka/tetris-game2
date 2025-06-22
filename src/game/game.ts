@@ -1,19 +1,16 @@
-import { type GameState, type Tetromino, type TetrominoTypeName } from "../types/game";
+import type { GameState, Tetromino, TetrominoTypeName } from "../types/game";
 import {
   BASE_SCORES,
-  BOARD_WIDTH,
   INITIAL_DROP_SPEED_MS,
   LINES_PER_LEVEL,
   MIN_DROP_SPEED_MS,
   SPEED_DECREASE_PER_LEVEL,
-  TETROMINO_TYPES,
 } from "../utils/constants";
 import { clearLines, createEmptyBoard, isValidPosition, placeTetromino } from "./board";
 import {
   createTetromino,
   getRandomTetrominoType,
   getTetrominoColorIndex,
-  getTetrominoShape,
   rotateTetromino,
 } from "./tetrominos";
 

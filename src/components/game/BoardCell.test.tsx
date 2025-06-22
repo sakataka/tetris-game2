@@ -12,12 +12,19 @@ vi.mock("../../hooks/useCellAnimation", () => ({
   })),
 }));
 
+vi.mock("../../hooks/useAnimationCompletionHandler", () => ({
+  useAnimationCompletionHandler: () => ({
+    handleAnimationComplete: vi.fn(),
+  }),
+}));
+
 vi.mock("../../utils/colors", () => ({
   getCellColor: vi.fn(() => "bg-gray-200"),
 }));
 
-vi.mock("../../utils/constants", async (importOriginal) => {
-  const actual = await importOriginal();
+vi.mock("../../utils/constants", async () => {
+  const actual =
+    await vi.importActual<typeof import("../../utils/constants")>("../../utils/constants");
   return {
     ...actual,
     BOARD_WIDTH: 10, // Keep this specific mock if needed for tests
@@ -129,11 +136,8 @@ describe("BoardCell", () => {
     expect(cell.className).toContain("clearing-line");
   });
 
-  it("should render with animation callback", () => {
-    const onAnimationComplete = vi.fn();
-    const { getByTestId } = render(
-      <BoardCell {...defaultProps} onAnimationComplete={onAnimationComplete} />,
-    );
+  it("should render with animation handler", () => {
+    const { getByTestId } = render(<BoardCell {...defaultProps} />);
 
     expect(getByTestId("board-cell")).toBeInTheDocument();
   });
