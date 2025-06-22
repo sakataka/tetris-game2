@@ -7,12 +7,12 @@ export function useAnimationCompletionHandler() {
   const handleAnimationComplete = useCallback(
     (isClearingLine: boolean, isPlacedPiece: boolean) => {
       if (isClearingLine) {
-        // ラインクリアアニメーションの場合、即座に状態をクリア
+        // For line clear animation, clear the state immediately
         clearAnimationStates();
       } else if (isPlacedPiece) {
-        // ピース配置アニメーションの場合、次のフレームで状態をクリア
-        // これにより、複数のセルが同時にアニメーションを完了した場合の
-        // clearAnimationStates の連続呼び出しを避ける試み
+        // For piece placement animation, clear the state in the next frame
+        // This attempts to avoid consecutive calls to clearAnimationStates
+        // when multiple cells complete animations simultaneously
         requestAnimationFrame(() => {
           clearAnimationStates();
         });

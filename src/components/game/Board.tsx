@@ -10,8 +10,6 @@ export function Board() {
   const { board, currentPiece, placedPositions, clearingLines, animationTriggerKey } =
     useBoardData();
 
-  // const { clearAnimationStates } = useGameActions(); // Removed
-
   // Create display board with current piece - memoized for performance
   const displayBoard = useMemo(() => {
     const newBoard = board.map((row) => [...row]);
