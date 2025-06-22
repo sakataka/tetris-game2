@@ -1,34 +1,18 @@
-import {
-  type GameState,
-  getTetrominoColorIndex,
-  TETROMINO_TYPES,
-  type Tetromino,
-  type TetrominoTypeName,
-} from "../types/game";
+import type { GameState, Tetromino, TetrominoTypeName } from "../types/game";
 import {
   BASE_SCORES,
-  BOARD_WIDTH,
   INITIAL_DROP_SPEED_MS,
   LINES_PER_LEVEL,
   MIN_DROP_SPEED_MS,
   SPEED_DECREASE_PER_LEVEL,
 } from "../utils/constants";
 import { clearLines, createEmptyBoard, isValidPosition, placeTetromino } from "./board";
-import { getTetrominoShape, rotateTetromino } from "./tetrominos";
-
-function getRandomTetrominoType(): TetrominoTypeName {
-  return TETROMINO_TYPES[Math.floor(Math.random() * TETROMINO_TYPES.length)];
-}
-
-function createTetromino(type: TetrominoTypeName): Tetromino {
-  const shape = getTetrominoShape(type);
-  return {
-    type,
-    position: { x: Math.floor(BOARD_WIDTH / 2) - Math.floor(shape[0].length / 2), y: 0 },
-    rotation: 0,
-    shape,
-  };
-}
+import {
+  createTetromino,
+  getRandomTetrominoType,
+  getTetrominoColorIndex,
+  rotateTetromino,
+} from "./tetrominos";
 
 export function createInitialGameState(): GameState {
   const currentType = getRandomTetrominoType();
@@ -126,6 +110,72 @@ export function hardDropTetromino(state: GameState): GameState {
   return lockCurrentTetromino(newState);
 }
 
+// Helper function to record placed positions for animation
+function _getPlacedPositions(currentPiece: Tetromino): { x: number; y: number }[] {
+  const positions: { x: number; y: number }[] = [];
+  currentPiece.shape.forEach((row, y) => {
+    row.forEach((cell, x) => {
+      if (cell) {
+        positions.push({
+          x: currentPiece.position.x + x,
+          y: currentPiece.position.y + y,
+        });
+      }
+    });
+  });
+  return positions;
+}
+
+// Helper function to handle piece locking and board update
+function _lockPiece(state: GameState): Pick<GameState, "board" | "placedPositions"> {
+  if (!state.currentPiece) return { board: state.board, placedPositions: [] };
+
+  const colorIndex = getTetrominoColorIndex(state.currentPiece.type);
+  const placedPositions = _getPlacedPositions(state.currentPiece);
+  const newBoard = placeTetromino(
+    state.board,
+    state.currentPiece.shape,
+    state.currentPiece.position,
+    colorIndex,
+  );
+  return { board: newBoard, placedPositions };
+}
+
+// Helper function to handle line clearing and scoring
+function _handleLineClearing(
+  board: GameState["board"],
+  currentScore: number,
+  currentLines: number,
+  currentLevel: number,
+): Pick<GameState, "board" | "score" | "lines" | "level" | "clearingLines"> {
+  const { board: clearedBoard, linesCleared, clearedLineIndices } = clearLines(board);
+  const newLines = currentLines + linesCleared;
+  const newLevel = Math.floor(newLines / LINES_PER_LEVEL) + 1;
+  const newScore = currentScore + calculateScore(linesCleared, currentLevel);
+
+  return {
+    board: clearedBoard,
+    score: newScore,
+    lines: newLines,
+    level: newLevel,
+    clearingLines: clearedLineIndices.length > 0 ? clearedLineIndices : [],
+  };
+}
+
+// Helper function to spawn a new piece and check for game over
+function _spawnNewPiece(
+  board: GameState["board"],
+  nextPieceType: TetrominoTypeName,
+): Pick<GameState, "currentPiece" | "nextPiece" | "isGameOver"> {
+  const newPiece = createTetromino(nextPieceType);
+  const isGameOver = !isValidPosition(board, newPiece.shape, newPiece.position);
+  return {
+    currentPiece: isGameOver ? null : newPiece,
+    nextPiece: getRandomTetrominoType(),
+    isGameOver,
+  };
+}
+
 /**
  * Locks the current tetromino in place, clears complete lines, and spawns the next piece.
  * This is the core game state transition when a piece can no longer move down.
@@ -133,48 +183,29 @@ export function hardDropTetromino(state: GameState): GameState {
 function lockCurrentTetromino(state: GameState): GameState {
   if (!state.currentPiece) return state;
 
-  const colorIndex = getTetrominoColorIndex(state.currentPiece.type);
+  const { board: boardAfterLock, placedPositions } = _lockPiece(state);
 
-  // Record placed positions for animation
-  const placedPositions: { x: number; y: number }[] = [];
-  state.currentPiece.shape.forEach((row, y) => {
-    row.forEach((cell, x) => {
-      if (cell) {
-        placedPositions.push({
-          x: (state.currentPiece as NonNullable<typeof state.currentPiece>).position.x + x,
-          y: (state.currentPiece as NonNullable<typeof state.currentPiece>).position.y + y,
-        });
-      }
-    });
-  });
+  const {
+    board: boardAfterClear,
+    score,
+    lines,
+    level,
+    clearingLines,
+  } = _handleLineClearing(boardAfterLock, state.score, state.lines, state.level);
 
-  const newBoard = placeTetromino(
-    state.board,
-    state.currentPiece.shape,
-    state.currentPiece.position,
-    colorIndex,
-  );
-
-  const { board: clearedBoard, linesCleared, clearedLineIndices } = clearLines(newBoard);
-  const newLines = state.lines + linesCleared;
-  const newLevel = Math.floor(newLines / LINES_PER_LEVEL) + 1;
-  const newScore = state.score + calculateScore(linesCleared, state.level);
-
-  const newPiece = createTetromino(state.nextPiece);
-  // Game over occurs when the new piece cannot be placed at its starting position
-  const isGameOver = !isValidPosition(clearedBoard, newPiece.shape, newPiece.position);
+  const { currentPiece, nextPiece, isGameOver } = _spawnNewPiece(boardAfterClear, state.nextPiece);
 
   return {
     ...state,
-    board: clearedBoard,
-    currentPiece: isGameOver ? null : newPiece,
-    nextPiece: getRandomTetrominoType(),
-    score: newScore,
-    lines: newLines,
-    level: newLevel,
+    board: boardAfterClear,
+    currentPiece,
+    nextPiece,
+    score,
+    lines,
+    level,
     isGameOver,
     placedPositions,
-    clearingLines: clearedLineIndices.length > 0 ? clearedLineIndices : [],
+    clearingLines,
   };
 }
 

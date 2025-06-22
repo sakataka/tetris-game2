@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { useAnimationCompletionHandler } from "../../hooks/useAnimationCompletionHandler";
 import { useCellAnimation } from "../../hooks/useCellAnimation";
 import { getCellColor } from "../../utils/colors";
 import { BOARD_WIDTH } from "../../utils/constants";
@@ -13,7 +14,7 @@ interface BoardCellProps {
   isPlacedPiece: boolean;
   isClearingLine: boolean;
   animationTriggerKey: string | number;
-  onAnimationComplete?: () => void;
+  // onAnimationComplete is now handled internally by useAnimationCompletionHandler
 }
 
 /**
@@ -27,7 +28,6 @@ export function BoardCell({
   isPlacedPiece,
   isClearingLine,
   animationTriggerKey,
-  onAnimationComplete,
 }: BoardCellProps) {
   const { initialAnimation, animateProps, transitionProps } = useCellAnimation({
     isCurrentPiece,
@@ -35,6 +35,7 @@ export function BoardCell({
     isClearingLine,
     cellValue,
   });
+  const { handleAnimationComplete } = useAnimationCompletionHandler();
 
   return (
     <motion.div
@@ -42,7 +43,7 @@ export function BoardCell({
       initial={initialAnimation}
       animate={animateProps}
       transition={transitionProps}
-      onAnimationComplete={onAnimationComplete}
+      onAnimationComplete={() => handleAnimationComplete(isClearingLine, isPlacedPiece)}
       className={cn(
         BOARD_STYLES.cell,
         getCellColor(cellValue),
