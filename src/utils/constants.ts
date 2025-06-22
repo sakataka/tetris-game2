@@ -22,3 +22,8 @@ export const NEXT_PIECE_GRID_SIZE = 4;
  */
 export const LINES_PER_LEVEL = 10;
 export const BASE_SCORES = [0, 100, 300, 500, 800] as const;
+
+/**
+ * Tetromino specific constants
+ */
+export const TETROMINO_TYPES = ["I", "O", "T", "S", "Z", "J", "L"] as const;

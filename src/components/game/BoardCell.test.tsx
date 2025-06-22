@@ -16,9 +16,14 @@ vi.mock("../../utils/colors", () => ({
   getCellColor: vi.fn(() => "bg-gray-200"),
 }));
 
-vi.mock("../../utils/constants", () => ({
-  BOARD_WIDTH: 10,
-}));
+vi.mock("../../utils/constants", async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    BOARD_WIDTH: 10, // Keep this specific mock if needed for tests
+    // TETROMINO_TYPES will be taken from the actual module
+  };
+});
 
 vi.mock("../../utils/styles", () => ({
   BOARD_STYLES: {

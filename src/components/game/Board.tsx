@@ -1,6 +1,6 @@
 import { useMemo } from "react";
-import { useBoardData, useGameActions } from "../../hooks/useGameSelectors";
-import { getTetrominoColorIndex } from "../../types/game";
+import { useBoardData } from "../../hooks/useGameSelectors"; // useGameActions removed
+import { getTetrominoColorIndex } from "../../game/tetrominos";
 import { BOARD_CELL_SIZE_PX, BOARD_HEIGHT, BOARD_WIDTH } from "../../utils/constants";
 import { BOARD_STYLES, CARD_STYLES, combineStyles } from "../../utils/styles";
 import { Card } from "../ui/card";
@@ -10,7 +10,7 @@ export function Board() {
   const { board, currentPiece, placedPositions, clearingLines, animationTriggerKey } =
     useBoardData();
 
-  const { clearAnimationStates } = useGameActions();
+  // const { clearAnimationStates } = useGameActions(); // Removed
 
   // Create display board with current piece - memoized for performance
   const displayBoard = useMemo(() => {
@@ -96,13 +96,7 @@ export function Board() {
                 isPlacedPiece={isPlacedPiece}
                 isClearingLine={isClearingLine}
                 animationTriggerKey={animationTriggerKey}
-                onAnimationComplete={() => {
-                  if (isClearingLine) {
-                    clearAnimationStates();
-                  } else if (isPlacedPiece) {
-                    requestAnimationFrame(() => clearAnimationStates());
-                  }
-                }}
+                // onAnimationComplete is now handled by useAnimationCompletionHandler in BoardCell
               />
             );
           }),

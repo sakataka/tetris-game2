@@ -1,4 +1,20 @@
-import type { TetrominoTypeName } from "../types/game";
+import type { Tetromino, TetrominoTypeName } from "../types/game";
+import { BOARD_WIDTH, TETROMINO_TYPES } from "../utils/constants";
+
+// Type-safe color index mapping
+export const TETROMINO_COLOR_MAP = {
+  I: 1,
+  O: 2,
+  T: 3,
+  S: 4,
+  Z: 5,
+  J: 6,
+  L: 7,
+} as const satisfies Record<TetrominoTypeName, number>;
+
+export function getTetrominoColorIndex(type: TetrominoTypeName): number {
+  return TETROMINO_COLOR_MAP[type];
+}
 
 export const TETROMINOS: Record<TetrominoTypeName, number[][]> = {
   I: [
@@ -55,4 +71,18 @@ export function rotateTetromino(shape: number[][]): number[][] {
   }
 
   return rotated;
+}
+
+export function getRandomTetrominoType(): TetrominoTypeName {
+  return TETROMINO_TYPES[Math.floor(Math.random() * TETROMINO_TYPES.length)];
+}
+
+export function createTetromino(type: TetrominoTypeName): Tetromino {
+  const shape = getTetrominoShape(type);
+  return {
+    type,
+    position: { x: Math.floor(BOARD_WIDTH / 2) - Math.floor(shape[0].length / 2), y: 0 },
+    rotation: 0,
+    shape,
+  };
 }

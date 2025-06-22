@@ -53,20 +53,3 @@ export interface GameState {
   clearingLines: number[];
   animationTriggerKey: number;
 }
-
-export const TETROMINO_TYPES: TetrominoTypeName[] = ["I", "O", "T", "S", "Z", "J", "L"];
-
-// Type-safe color index mapping
-export const TETROMINO_COLOR_MAP = {
-  I: 1,
-  O: 2,
-  T: 3,
-  S: 4,
-  Z: 5,
-  J: 6,
-  L: 7,
-} as const satisfies Record<TetrominoTypeName, number>;
-
-export function getTetrominoColorIndex(type: TetrominoTypeName): number {
-  return TETROMINO_COLOR_MAP[type];
-}
