@@ -52,4 +52,5 @@ export interface GameState {
   placedPositions: Position[];
   clearingLines: number[];
   animationTriggerKey: number;
+  ghostPosition: Position | null;
 }

@@ -21,6 +21,7 @@ export const BOARD_STYLES = {
   cellBorder: "border border-white/20 shadow-sm",
   emptyCellBorder: "border border-gray-700/50",
   activePiece: "shadow-white/50 shadow-lg ring-1 ring-white/30",
+  ghostPiece: "opacity-30 border border-white/30 shadow-sm bg-gray-400/20",
   clearingLine: "shadow-white/80 shadow-xl ring-2 ring-white/50 animate-pulse",
 } as const;
 

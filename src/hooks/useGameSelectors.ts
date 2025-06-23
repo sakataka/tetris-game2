@@ -43,6 +43,7 @@ export const useGameActions = () => {
 export const useBoardData = () => {
   const board = useGameStore((state) => state.board);
   const currentPiece = useGameStore((state) => state.currentPiece);
+  const ghostPosition = useGameStore((state) => state.ghostPosition);
   const placedPositions = useGameStore((state) => state.placedPositions);
   const clearingLines = useGameStore((state) => state.clearingLines);
   const animationTriggerKey = useGameStore((state) => state.animationTriggerKey);
@@ -80,25 +81,50 @@ export const useBoardData = () => {
     return positions;
   }, [placedPositions]);
 
+  // Pre-compute ghost piece positions for O(1) lookup
+  const ghostPiecePositions = useMemo(() => {
+    const positions = new Set<string>();
+
+    if (currentPiece && ghostPosition) {
+      currentPiece.shape.forEach((row, y) => {
+        row.forEach((cell, x) => {
+          if (cell) {
+            const boardY = ghostPosition.y + y;
+            const boardX = ghostPosition.x + x;
+            if (boardY >= 0 && boardY < BOARD_HEIGHT && boardX >= 0 && boardX < BOARD_WIDTH) {
+              positions.add(`${boardX},${boardY}`);
+            }
+          }
+        });
+      });
+    }
+
+    return positions;
+  }, [currentPiece, ghostPosition]);
+
   return useMemo(
     () => ({
       board,
       currentPiece,
+      ghostPosition,
       placedPositions,
       clearingLines,
       animationTriggerKey,
       displayBoard,
       currentPiecePositions,
+      ghostPiecePositions,
       placedPositionsSet,
     }),
     [
       board,
       currentPiece,
+      ghostPosition,
       placedPositions,
       clearingLines,
       animationTriggerKey,
       displayBoard,
       currentPiecePositions,
+      ghostPiecePositions,
       placedPositionsSet,
     ],
   );

@@ -16,17 +16,17 @@ export function ScoreBoard() {
     <Card className="bg-gray-900/50 backdrop-blur-sm border-gray-700 shadow-xl hover:bg-gray-900/60 hover:border-gray-600 transition-all duration-300 hover:shadow-2xl">
       <CardHeader className="pb-3">
         <CardTitle className="text-lg font-bold text-gray-300 text-center">
-          {t("game.score")}
+          {t("game.score.title")}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Live region for important score updates (level changes) */}
         <div aria-live="polite" aria-atomic="true" className="sr-only">
-          {t("game.level")} {level}
+          {t("game.score.level")} {level}
         </div>
 
         <AnimatedScoreItem
-          label={t("game.score")}
+          label={t("game.score.title")}
           value={score}
           animationKey={`score-${scoreKey}`}
           className="text-2xl font-bold text-tetris-cyan"
@@ -34,7 +34,7 @@ export function ScoreBoard() {
         />
 
         <AnimatedScoreItem
-          label={t("game.lines")}
+          label={t("game.score.lines")}
           value={lines}
           animationKey={`lines-${linesKey}`}
           className="text-2xl font-bold text-tetris-yellow"
@@ -42,7 +42,7 @@ export function ScoreBoard() {
         />
 
         <AnimatedScoreItem
-          label={t("game.level")}
+          label={t("game.score.level")}
           value={level}
           animationKey={`level-${levelKey}`}
           className="text-2xl font-bold text-tetris-purple"

@@ -8,6 +8,7 @@ export function Board() {
   const {
     displayBoard,
     currentPiecePositions,
+    ghostPiecePositions,
     placedPositionsSet,
     clearingLines,
     animationTriggerKey,
@@ -34,6 +35,7 @@ export function Board() {
           row.map((cell, x) => {
             const positionKey = `${x},${y}`;
             const isCurrentPiece = currentPiecePositions.has(positionKey);
+            const isGhostPiece = ghostPiecePositions.has(positionKey) && !isCurrentPiece;
             const isPlacedPiece = placedPositionsSet.has(positionKey);
             const isClearingLine = clearingLines.includes(y);
 
@@ -47,6 +49,7 @@ export function Board() {
                 x={x}
                 y={y}
                 isCurrentPiece={isCurrentPiece}
+                isGhostPiece={isGhostPiece}
                 isPlacedPiece={isPlacedPiece}
                 isClearingLine={isClearingLine}
                 animationTriggerKey={animationTriggerKey}

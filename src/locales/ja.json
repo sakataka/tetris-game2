@@ -1,7 +1,11 @@
 {
   "game": {
     "title": "テトリス",
-    "score": "スコア",
+    "score": {
+      "title": "スコア",
+      "lines": "ライン",
+      "level": "レベル"
+    },
     "lines": "ライン",
     "level": "レベル",
     "next": "次のピース",
@@ -10,6 +14,12 @@
     "newGame": "新しいゲーム",
     "resume": "再開",
     "resumeHint": "Pキーで再開",
+    "highScore": {
+      "title": "ハイスコア",
+      "topScores": "トップスコア",
+      "noScore": "スコアがありません",
+      "noScores": "スコアがありません"
+    },
     "controls": {
       "title": "操作方法",
       "move": "移動",

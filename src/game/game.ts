@@ -1,4 +1,4 @@
-import type { GameState, Tetromino, TetrominoTypeName } from "../types/game";
+import type { GameState, Position, Tetromino, TetrominoTypeName } from "../types/game";
 import {
   BASE_SCORES,
   INITIAL_DROP_SPEED_MS,
@@ -16,7 +16,7 @@ import {
 
 export function createInitialGameState(): GameState {
   const currentType = getRandomTetrominoType();
-  return {
+  const state = {
     board: createEmptyBoard(),
     currentPiece: createTetromino(currentType),
     nextPiece: getRandomTetrominoType(),
@@ -28,7 +28,12 @@ export function createInitialGameState(): GameState {
     placedPositions: [],
     clearingLines: [],
     animationTriggerKey: 0,
+    ghostPosition: null as Position | null,
   };
+
+  // Calculate initial ghost position
+  state.ghostPosition = calculateGhostPosition(state);
+  return state;
 }
 
 export function moveTetrominoBy(state: GameState, dx: number, dy: number): GameState {
@@ -40,13 +45,13 @@ export function moveTetrominoBy(state: GameState, dx: number, dy: number): GameS
   };
 
   if (isValidPosition(state.board, state.currentPiece.shape, newPosition)) {
-    return {
+    return updateGhostPosition({
       ...state,
       currentPiece: {
         ...state.currentPiece,
         position: newPosition,
       },
-    };
+    });
   }
 
   // If moving down failed, lock the piece
@@ -63,7 +68,7 @@ export function rotateTetrominoCW(state: GameState): GameState {
   const rotatedShape = rotateTetromino(state.currentPiece.shape);
 
   if (isValidPosition(state.board, rotatedShape, state.currentPiece.position)) {
-    return {
+    return updateGhostPosition({
       ...state,
       currentPiece: {
         ...state.currentPiece,
@@ -71,7 +76,7 @@ export function rotateTetrominoCW(state: GameState): GameState {
         rotation: (state.currentPiece.rotation + 1) % 4,
       },
       animationTriggerKey: state.animationTriggerKey + 1,
-    };
+    });
   }
 
   return state;
@@ -195,7 +200,7 @@ function lockCurrentTetromino(state: GameState): GameState {
 
   const { currentPiece, nextPiece, isGameOver } = _spawnNewPiece(boardAfterClear, state.nextPiece);
 
-  return {
+  return updateGhostPosition({
     ...state,
     board: boardAfterClear,
     currentPiece,
@@ -206,7 +211,7 @@ function lockCurrentTetromino(state: GameState): GameState {
     isGameOver,
     placedPositions,
     clearingLines,
-  };
+  });
 }
 
 /**
@@ -223,4 +228,42 @@ export function getGameSpeed(level: number): number {
     MIN_DROP_SPEED_MS,
     INITIAL_DROP_SPEED_MS - (level - 1) * SPEED_DECREASE_PER_LEVEL,
   );
+}
+
+/**
+ * Calculates the ghost position where the current piece would land if dropped.
+ * Returns null if the piece is already at the bottom or no valid position exists.
+ */
+export function calculateGhostPosition(state: GameState): Position | null {
+  if (!state.currentPiece || state.isGameOver) return null;
+
+  let ghostY = state.currentPiece.position.y;
+  const ghostX = state.currentPiece.position.x;
+
+  // Move down until we can't anymore
+  while (
+    isValidPosition(state.board, state.currentPiece.shape, {
+      x: ghostX,
+      y: ghostY + 1,
+    })
+  ) {
+    ghostY++;
+  }
+
+  // If ghost position is the same as current position, don't show ghost
+  if (ghostY === state.currentPiece.position.y) {
+    return null;
+  }
+
+  return { x: ghostX, y: ghostY };
+}
+
+/**
+ * Helper function to update ghost position in game state
+ */
+function updateGhostPosition(state: GameState): GameState {
+  return {
+    ...state,
+    ghostPosition: calculateGhostPosition(state),
+  };
 }

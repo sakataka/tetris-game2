@@ -11,6 +11,7 @@ interface BoardCellProps {
   x: number;
   y: number;
   isCurrentPiece: boolean;
+  isGhostPiece: boolean;
   isPlacedPiece: boolean;
   isClearingLine: boolean;
   animationTriggerKey: string | number;
@@ -25,6 +26,7 @@ export function BoardCell({
   x,
   y,
   isCurrentPiece,
+  isGhostPiece,
   isPlacedPiece,
   isClearingLine,
   animationTriggerKey,
@@ -37,18 +39,22 @@ export function BoardCell({
   });
   const { handleAnimationComplete } = useAnimationCompletionHandler();
 
+  // For ghost pieces, we don't want animation
+  const shouldDisableAnimation = isGhostPiece;
+
   return (
     <motion.div
-      key={`cell-${y * BOARD_WIDTH + x}-${isCurrentPiece ? animationTriggerKey : "static"}-${isClearingLine ? "clearing" : "normal"}-${cellValue}`}
-      initial={initialAnimation}
-      animate={animateProps}
-      transition={transitionProps}
+      key={`cell-${y * BOARD_WIDTH + x}-${isCurrentPiece ? animationTriggerKey : "static"}-${isClearingLine ? "clearing" : "normal"}-${cellValue}-${isGhostPiece ? "ghost" : ""}`}
+      initial={shouldDisableAnimation ? false : initialAnimation}
+      animate={shouldDisableAnimation ? {} : animateProps}
+      transition={shouldDisableAnimation ? {} : transitionProps}
       onAnimationComplete={() => handleAnimationComplete(isClearingLine, isPlacedPiece)}
       className={cn(
         BOARD_STYLES.cell,
-        getCellColor(cellValue),
-        cellValue !== 0 && BOARD_STYLES.cellBorder,
-        cellValue === 0 && BOARD_STYLES.emptyCellBorder,
+        !isGhostPiece && getCellColor(cellValue),
+        isGhostPiece && BOARD_STYLES.ghostPiece,
+        cellValue !== 0 && !isGhostPiece && BOARD_STYLES.cellBorder,
+        cellValue === 0 && !isGhostPiece && BOARD_STYLES.emptyCellBorder,
         isCurrentPiece && BOARD_STYLES.activePiece,
         isClearingLine && BOARD_STYLES.clearingLine,
       )}
