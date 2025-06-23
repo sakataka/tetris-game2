@@ -16,8 +16,6 @@
     "knip": "bun x knip",
     "check": "bun run typecheck && bun run knip",
     "ci": "bun run format && bun run lint && bun run typecheck && bun test && bun run build",
-    "info": "bun info",
-    "vercel-build": "bun run build",
     "prepare": "lefthook install"
   },
   "keywords": [],
