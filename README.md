@@ -1,6 +1,6 @@
 # 🎮 Tetris Game
 
-モダンなWebテクノロジーで構築された美しいテトリスゲーム。React 19、TypeScript、Bun v1.2.17を使用し、高速な開発体験と滑らかなゲームプレイを実現。
+モダンなWebテクノロジーで構築された美しいテトリスゲーム。React 19、TypeScript、Rolldown-Vite、Bun v1.2.17を使用し、高速な開発体験と滑らかなゲームプレイを実現。
 
 ## ✨ 特徴
 
@@ -12,21 +12,21 @@
 
 ## 🚀 パフォーマンス
 
-Bun v1.2.17移行により大幅な性能向上を実現：
+最新技術スタック移行により大幅な性能向上を実現：
 
-| 項目 | 改善前 | 改善後 | 向上率 |
-|------|--------|--------|--------|
-| パッケージインストール | - | 2.64s | **85%高速化** |
-| テスト実行時間 | 909ms | 154ms | **83%高速化** |
-| 開発サーバー起動 | 731ms | 263ms | **64%高速化** |
-| ビルド時間 | 1.03s | 955ms | 7%改善 |
+| 項目 | 従来 | 現在 | 向上率 |
+|------|-----|------|--------|
+| ビルド時間 | 1.07s | 178ms | **82%高速化** |
+| 開発サーバー起動 | 731ms | 142ms | **81%高速化** |
+| テスト実行時間 | 909ms | 115ms | **87%高速化** |
+| TypeScript型チェック | 661ms | 455ms | **31%高速化** |
 
 ## 🛠 技術スタック
 
 ### コア技術
 - **Runtime**: Bun 1.2.17 (Package Manager + Test Runner)
 - **Frontend**: React 19.1.0 + TypeScript 5.8.3
-- **Bundler**: Vite 6.3.5 (ハイブリッド構成)
+- **Bundler**: Rolldown-Vite 6.3.21 (Rust製高性能バンドラー)
 - **Styling**: Tailwind CSS 4.1.10 + shadcn/ui
 - **Animation**: Framer Motion 12.18.1
 
@@ -84,8 +84,11 @@ bun test --watch               # ウォッチモード
 bun test src/game/             # 特定ディレクトリのテスト
 bun run lint                   # Biome lint実行
 bun run format                 # Biome format実行
-bun run typecheck              # TypeScript型チェック
+bun run typecheck              # TypeScript型チェック（incremental対応）
 bun run knip                   # デッドコード検出
+
+# 統合品質チェック
+/make                          # 全品質チェック + ビルド（パイプライン実行）
 
 # パッケージ管理
 bun add <package>              # パッケージ追加
@@ -146,10 +149,8 @@ git push origin main  # 自動デプロイ
 
 ## 📚 ドキュメント
 
-- [`docs/bun-migration.md`](docs/bun-migration.md): Bun移行ガイド（詳細手順）
-- [`docs/bun-migration-checklist.md`](docs/bun-migration-checklist.md): 移行チェックリスト
 - [`CLAUDE.md`](CLAUDE.md): プロジェクト仕様書（開発方針・アーキテクチャ）
-- [`docs/migration-configs/`](docs/migration-configs/): 設定ファイル例集
+- [`.claude/commands/make.md`](.claude/commands/make.md): 統合ビルドパイプライン仕様
 
 ## 🤝 コントリビューション
 
@@ -179,4 +180,4 @@ git push origin main  # 自動デプロイ
 
 ---
 
-⭐ このプロジェクトが気に入ったら、ぜひスターをつけてください！
+🎮 楽しいテトリス体験をお楽しみください！
