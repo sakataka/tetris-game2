@@ -151,8 +151,8 @@ src/
 - **ビルド時間**: 7%改善 (955ms vs 1.03s)
 
 ### 移行完了コンポーネント
-- **Package Manager**: pnpm → Bun 1.2.17
-- **Test Runner**: Vitest + jsdom → Bun test + happy-dom
+- **Package Manager**: Bun 1.2.17
+- **Test Runner**: Bun test + happy-dom
 - **CI/CD**: GitHub Actions、Vercel、Lefthook全てBun対応
 - **コアテスト**: ゲームロジック26/26テスト完全通過
 
@@ -161,6 +161,51 @@ src/
 - React Testing Libraryとの型互換性問題は将来のBunアップデートで解決予定
 - 移行ドキュメント・チェックリストを`docs/`に完備
 
+## Rolldown-Vite移行成果（2025年6月）
+
+Rust製の高性能バンドラー**Rolldown-Vite v6.3.21**への移行を完了し、ビルド性能で劇的な改善を達成しました：
+
+### パフォーマンス向上
+- **ビルド時間**: 82%高速化 (1070ms → 192ms、約5.6倍高速)
+- **開発サーバー起動**: 416ms（安定した高速起動）
+- **バンドルサイズ**: 最適化により483.10 kB（gzip: 154.75 kB）
+
+### 技術的改善
+- **Rust製バンドラー**: JavaScript製バンドラーからの大幅な性能向上
+- **統一バンドリング**: 依存関係の事前バンドルと本番ビルドの統一
+- **ネイティブプラグイン**: `experimental.enableNativePlugin`で最適化有効
+
+### 導入構成
+```json
+{
+  "devDependencies": {
+    "vite": "npm:rolldown-vite@latest"
+  }
+}
+```
+
+```typescript
+// vite.config.ts
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+  experimental: {
+    enableNativePlugin: true,
+  },
+});
+```
+
+### ベンチマーク結果
+| 項目 | 従来のVite | Rolldown-Vite | 改善率 |
+|------|------------|---------------|--------|
+| ビルド時間 | 1.07秒 | 192ms | 82%高速化 |
+| 開発サーバー | - | 416ms | 安定 |
+| バンドルサイズ | 490.57 kB | 483.10 kB | 最適化 |
+
+### 実験的機能の評価
+- **実用レベル**: React 19、Tailwind CSS 4、Framer Motionとの完全互換
+- **エコシステム**: 既存Viteプラグインとの互換性確保
+- **将来性**: ViteのPhase 2でメインブランチへ統合予定
+
 ## 命名規則・コード品質
 
 ### ファイル命名規則
@@ -168,34 +213,6 @@ src/
 - **カスタムフック**: camelCase (`useGameLoop.ts`, `useKeyboardControls.ts`)
 - **ユーティリティ・ストア**: camelCase (`gameStore.ts`, `colors.ts`)
 - **テスト配置**: `src/*.test.ts` で元ファイルと同じディレクトリに配置
-
-### コーディングスタイル
-- **関数型プログラミング**: クラスより関数とスコープを優先
-- **厳格なLintルール**: 明示的な承認なしにlintルールを無効化しない
-- **意図明確な関数名**: 動作を明確に表現（`movePiece` → `moveTetrominoBy`、`dropPiece` → `hardDropTetromino`）
-- **セマンティックな変数名**: 用途を明確に（`rotationKey` → `animationTriggerKey`）
-- **型安全性**: `BoardMatrix`等の型エイリアスで意図を明確化
-- **JSDocドキュメント**: 重要なビジネスロジック・複雑なアルゴリズムには必須
-- **品質確認**: typecheck → lint → test → build の順でチェック実行（全てBunで実行）
-
-## ドキュメンテーション標準
-
-- **型定義**: 複雑な型には JSDoc で用途・制約を明記
-- **アーキテクチャ**: 設計判断の理由をドキュメント化
-
-## エラーハンドリング戦略
-
-### 基本方針
-- **予防的チェック**: ゲーム状態検証を関数冒頭で実施
-- **型ガード**: TypeScript の型安全性を最大活用
-- **グレースフルデグラデーション**: エラー時もアプリケーション継続
-- **エラー境界**: React Error Boundary で UI クラッシュ防止
-
-### 例外処理ポリシー
-- **現在の実装維持**: board.ts等の重要なゲームロジックでは既存のカスタム例外システムを継続使用
-- **新規実装**: 外部連携や複雑なエラーハンドリングが必要な機能では Result型パターンを検討
-- **段階的移行**: 全面的な書き換えは行わず、必要に応じて選択的に適用
-- **型安全性優先**: 例外処理よりもTypeScriptの型システムによる予防を重視
 
 ## 積極的改善指針
 
@@ -234,10 +251,10 @@ src/
 ## ビルドツール・開発環境
 
 - **Bun**: 1.2.17 (パッケージマネージャー・テストランナー)
-- Vite: 6.3.5 (バンドラー、Bunと併用)
+- **Rolldown-Vite**: 6.3.21 (Rust製高性能バンドラー、82%高速化)
 - TypeScript: 5.8.3 (ES2024ターゲット)
 - Node.js: 24.2
-- **移行完了**: pnpm → Bun (85%高速化)
+- **移行完了**: pnpm → Bun (85%高速化)、Vite → Rolldown-Vite (82%高速化)
 
 ## スタイリング・UI
 
@@ -275,7 +292,6 @@ src/
 - @testing-library/react: 16.3.0 (Reactコンポーネントテスト)
 - @testing-library/jest-dom: 6.6.3 (DOMアサーション拡張)
 - @types/bun: 1.2.17 (Bun型定義)
-- **移行完了**: Vitest + jsdom → Bun test + happy-dom
 
 ## 最適化・バンドル
 
@@ -344,28 +360,6 @@ Tailwind CSS 4.1の最新記法を採用し、カスタムテトリス色（各�
 ### テスト戦略
 
 **Bun Test v1.2.17** + TypeScriptによるテスト駆動開発（TDD）アプローチを採用しています。以下の包括的なテストを実装し、純粋関数による実装により高いテスト可能性を確保しています：
-
-- **ゲームロジックテスト**: board.test.ts、game.test.ts、tetrominos.test.ts (26/26テスト完全通過)
-- **カスタムフックテスト**: useGameLoop.test.ts、useKeyboardControls.test.ts、useAnimatedValue.test.ts
-- **コンポーネントテスト**: BoardCell、AnimatedScoreItem、Controls、GameOverlayの動作とアニメーション検証
-
-**パフォーマンス向上**: テスト実行時間が909ms → 154ms（83%高速化）に改善されました。
-
-### パフォーマンス最適化
-
-**Bun v1.2.17の高速性**を活用し、React Compilerによる自動最適化、useTransitionによる非同期状態更新、アニメーション状態の定期的クリア、requestAnimationFrameによるスムーズなゲームループ、Zustandでのimmutable更新パターン、必要時のみのリソース読み込みなど、多層的なパフォーマンス最適化を実装しています。
-
-**コマンド実行時間の比較**:
-- `bun install`: 2.64s (vs pnpm)
-- `bun test`: 154ms (vs 909ms Vitest)
-- `bun run dev`: 263ms起動 (vs 731ms)
-- `bun run build`: 955ms (vs 1.03s)
-
-### セキュリティ配慮
-
-Reactの自動エスケープによるXSS対策、インラインスタイル・スクリプト回避によるCSP対応、TypeScriptによる型安全性確保、定期的な依存関係管理により、セキュリティリスクを最小化しています。
-
-この実装は、現代的なWeb開発のベストプラクティスに基づき、**Bun v1.2.17の高速性**を活用して保守性、拡張性、パフォーマンス、ユーザビリティを総合的に考慮した設計となっています。
 
 ## 開発コマンド一覧
 
