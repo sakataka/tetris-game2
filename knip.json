@@ -1,7 +1,14 @@
 {
   "entry": ["src/main.tsx"],
   "project": ["src/**/*.{ts,tsx}", "*.{ts,js}"],
-  "ignore": ["dist/**", "node_modules/**"],
+  "ignore": ["dist/**", "node_modules/**", "**/*.test.{ts,tsx}", "src/test/setup.ts"],
   "ignoreExportsUsedInFile": true,
-  "includeEntryExports": false
+  "includeEntryExports": false,
+  "ignoreDependencies": [
+    "@biomejs/biome",
+    "happy-dom",
+    "bun-types",
+    "@happy-dom/global-registrator",
+    "@testing-library/jest-dom"
+  ]
 }
