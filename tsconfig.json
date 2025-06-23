@@ -5,6 +5,7 @@
     "lib": ["ES2024", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
+    "incremental": true,
     "types": ["bun-types"],
 
     /* Bundler mode */
@@ -29,6 +30,6 @@
     "forceConsistentCasingInFileNames": true
   },
   "include": ["src"],
-  "exclude": ["**/*.test.ts", "**/*.test.tsx"],
+  "exclude": ["dist", "build", "node_modules", "**/*.test.ts", "**/*.test.tsx"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

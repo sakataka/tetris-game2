@@ -17,26 +17,11 @@ allowed-tools: Bash(bun:*)
 ## 実行
 
 ```bash
-# 1. デッドコード検出
-bun run knip
-
-# 2. フォーマット
-bun run format
-
-# 3. リント
-bun run lint
-
-# 4. タイプチェック
-bun run typecheck
-
-# 5. テスト（ゲームロジックのみ）
-bun test src/game/
-
-# 6. ビルド
-bun run build
+# パイプライン実行（エラー時即座に停止・実行時間計測）
+time (bun run knip && bun run format && bun run lint && bun run typecheck && bun test src/game/ && bun run build)
 ```
 
-各ステップでエラーが発生した場合は処理を停止し、エラー内容を報告します。
+各ステップでエラーが発生した場合は`&&`演算子により即座に処理を停止し、エラー内容を報告します。
 
 ## 処理順序の理由
 
@@ -46,16 +31,3 @@ bun run build
 4. **typecheck**: 型の整合性を確認
 5. **test**: コードが正しく動作することを確認（ゲームロジックに限定）
 6. **build**: すべてのチェックをパスしたコードをビルド
-
-## Bun v1.2.17による高速化
-
-- **テスト実行**: 150-250ms (従来比83%高速化)
-- **フォーマット・リント**: 20-40ms合計
-- **ビルド時間**: 約1秒
-- **全体実行時間**: 2-3秒以内で完了
-
-## 注意事項
-
-- React Testing LibraryのテストはBunとの互換性問題があるため、ゲームロジックテストのみ実行
-- knip設定はBun環境用に最適化済み（`knip.json`参照）
-- すべてのコマンドはBun経由で実行され、高速化の恩恵を受けます

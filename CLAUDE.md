@@ -1,14 +1,12 @@
-# ゲーム内容
+# Tetris Game Project
 
-Web上で実行できるテトリスを作成する。
+Web上で実行できる美しいテトリスゲーム
 
-- 美しいUI
-- 1画面に収まる
-- 言語選択（日本語、英語）
+## ゲーム概要
 
-# プロジェクト概要
-
-このプロジェクトは、モダンなWebテクノロジーを使用したテトリスゲームです。React 19とTypeScriptで構築され、美しいUI、多言語対応（日本語・英語）、レスポンシブデザインを特徴としています。
+- **美しいUI**: モダンなWebデザインとスムーズなアニメーション
+- **レスポンシブ**: 1画面に収まる完全なレイアウト
+- **多言語対応**: 日本語・英語の言語選択機能
 
 ## 主な機能
 
@@ -31,16 +29,6 @@ Web上で実行できるテトリスを作成する。
 ### コンポーネント設計
 
 - **関数型コンポーネント**: React Hooksを活用したモダンなコンポーネント設計
-- **コンポーネント分離**: UI要素を独立したコンポーネントに分割
-  - layout/Game.tsx: メインゲームコンテナ
-  - game/Board.tsx: ゲームボード表示
-  - game/BoardCell.tsx: 個別セルコンポーネント（アニメーション統合）
-  - game/ScoreBoard.tsx: スコア・レベル表示
-  - game/AnimatedScoreItem.tsx: スコア項目のアニメーション表示
-  - game/Controls.tsx: 操作説明
-  - game/NextPiece.tsx: 次のピース表示
-  - game/GameOverlay.tsx: ゲームオーバー・一時停止画面
-  - layout/LanguageSelector.tsx: 言語選択コンポーネント
 
 ### ゲームロジック
 
@@ -175,36 +163,7 @@ Rust製の高性能バンドラー**Rolldown-Vite v6.3.21**への移行を完了
 - **統一バンドリング**: 依存関係の事前バンドルと本番ビルドの統一
 - **ネイティブプラグイン**: `experimental.enableNativePlugin`で最適化有効
 
-### 導入構成
-```json
-{
-  "devDependencies": {
-    "vite": "npm:rolldown-vite@latest"
-  }
-}
-```
-
-```typescript
-// vite.config.ts
-export default defineConfig({
-  plugins: [react(), tailwindcss()],
-  experimental: {
-    enableNativePlugin: true,
-  },
-});
-```
-
-### ベンチマーク結果
-| 項目 | 従来のVite | Rolldown-Vite | 改善率 |
-|------|------------|---------------|--------|
-| ビルド時間 | 1.07秒 | 192ms | 82%高速化 |
-| 開発サーバー | - | 416ms | 安定 |
-| バンドルサイズ | 490.57 kB | 483.10 kB | 最適化 |
-
-### 実験的機能の評価
-- **実用レベル**: React 19、Tailwind CSS 4、Framer Motionとの完全互換
-- **エコシステム**: 既存Viteプラグインとの互換性確保
-- **将来性**: ViteのPhase 2でメインブランチへ統合予定
+---
 
 ## 命名規則・コード品質
 
@@ -244,68 +203,66 @@ export default defineConfig({
 
 ## フロントエンドフレームワーク
 
-- React: 19.1.0
-- @types/react: 19.1.8
-- @types/react-dom: 19.1.6
+- **React**: 19.1.0
+- **@types/react**: 19.1.8
+- **@types/react-dom**: 19.1.6
 
 ## ビルドツール・開発環境
 
 - **Bun**: 1.2.17 (パッケージマネージャー・テストランナー)
 - **Rolldown-Vite**: 6.3.21 (Rust製高性能バンドラー、82%高速化)
-- TypeScript: 5.8.3 (ES2024ターゲット)
-- Node.js: 24.2
-- **移行完了**: pnpm → Bun (85%高速化)、Vite → Rolldown-Vite (82%高速化)
+- **TypeScript**: 5.8.3 (ES2024ターゲット)
+- **Node.js**: 24.2
 
 ## スタイリング・UI
 
-- Tailwind CSS: 4.1.10
-- @tailwindcss/vite: 4.1.10 (Vite専用プラグイン - PostCSS設定不要)
-- shadcn/ui: Radix UIコンポーネント群として実装 (dialog, select, slot等)
-- Framer Motion: 12.18.1 (アニメーション)
-- class-variance-authority: 0.7.1 (CVA - コンポーネントバリアント管理)
-- clsx: 2.1.1, tailwind-merge: 3.3.1 (スタイルユーティリティ)
-- lucide-react: 0.522.0 (アイコン)
+- **Tailwind CSS**: 4.1.10
+- **@tailwindcss/vite**: 4.1.10 (Vite専用プラグイン - PostCSS設定不要)
+- **shadcn/ui**: Radix UIコンポーネント群として実装 (dialog, select, slot等)
+- **Framer Motion**: 12.18.1 (アニメーション)
+- **class-variance-authority**: 0.7.1 (CVA - コンポーネントバリアント管理)
+- **clsx**: 2.1.1, **tailwind-merge**: 3.3.1 (スタイルユーティリティ)
+- **lucide-react**: 0.522.0 (アイコン)
 
 ## 状態管理・データ処理
 
-- Zustand: 5.0.5 (状態管理)
-
+- **Zustand**: 5.0.5 (状態管理)
 
 ## キーボード入力ハンドリング
 
-- react-hotkeys-hook: 5.1.0 (宣言的なキーボード入力管理)
+- **react-hotkeys-hook**: 5.1.0 (宣言的なキーボード入力管理)
 
 ## 国際化
 
-- i18next: 25.2.1
-- react-i18next: 15.5.3 (React統合)
+- **i18next**: 25.2.1
+- **react-i18next**: 15.5.3 (React統合)
 
 ## コード品質・リンティング
 
-- Biome: 2.0.4 (リンティング・フォーマッティング)
-- Lefthook: 1.11.14 (Gitフック管理)
+- **Biome**: 2.0.4 (リンティング・フォーマッティング)
+- **Lefthook**: 1.11.14 (Gitフック管理)
 
 ## テスト
 
-- **Bun Test**: v1.2.17 (高速テストランナー、83%高速化)
+- **Bun Test**: v1.2.17 (高速テストランナー)
 - **happy-dom**: 18.0.1 (Bun最適化DOMシミュレーション)
-- @testing-library/react: 16.3.0 (Reactコンポーネントテスト)
-- @testing-library/jest-dom: 6.6.3 (DOMアサーション拡張)
-- @types/bun: 1.2.17 (Bun型定義)
+- **@testing-library/react**: 16.3.0 (Reactコンポーネントテスト)
+- **@testing-library/jest-dom**: 6.6.3 (DOMアサーション拡張)
+- **@types/bun**: 1.2.17 (Bun型定義)
 
 ## 最適化・バンドル
 
-- knip: 5.61.2 (デッドコード検出)
+- **knip**: 5.61.2 (デッドコード検出)
 - **Bun最適化**: パッケージインストール、テスト実行で大幅な性能向上
 
 ## ソース管理
 
-- git: 2.50
-- gh: 2.74.2
+- **git**: 2.50
+- **gh**: 2.74.2
 
 ## デプロイメント
 
-- Vercel
+- **Vercel**: クラウドホスティング
 
 ## CI/CDワークフロー
 
@@ -359,7 +316,7 @@ Tailwind CSS 4.1の最新記法を採用し、カスタムテトリス色（各�
 
 ### テスト戦略
 
-**Bun Test v1.2.17** + TypeScriptによるテスト駆動開発（TDD）アプローチを採用しています。以下の包括的なテストを実装し、純粋関数による実装により高いテスト可能性を確保しています：
+Bun Test + TypeScriptによるテスト駆動開発（TDD）アプローチを採用しています。
 
 ## 開発コマンド一覧
 
