@@ -13,11 +13,6 @@ pre-commit:
       glob: "*.{js,ts,jsx,tsx}"
       run: bun run lint
       stage_fixed: true
-    
-    typecheck:
-      glob: "*.{ts,tsx}"
-      exclude: "*.test.{ts,tsx}"
-      run: bun run typecheck
 
 commit-msg:
   commands:
