@@ -16,12 +16,6 @@ export interface GameSettings {
   showGhostPiece: boolean;
 }
 
-export interface StorageData {
-  highScores: HighScore[];
-  currentHighScore: HighScore | null;
-  settings: GameSettings;
-}
-
 const STORAGE_KEYS = {
   HIGH_SCORES: "tetris-high-scores",
   CURRENT_HIGH_SCORE: "tetris-current-high-score",
@@ -180,36 +174,4 @@ export function clearAllData(): boolean {
   } catch {
     return false;
   }
-}
-
-/**
- * Gets all storage data for backup/export purposes
- */
-export function getAllData(): StorageData {
-  return {
-    highScores: getHighScoresList(),
-    currentHighScore: getCurrentHighScore(),
-    settings: getSettings(),
-  };
-}
-
-/**
- * Restores all storage data from backup/import
- */
-export function restoreAllData(data: Partial<StorageData>): boolean {
-  let success = true;
-
-  if (data.highScores) {
-    success = setStorageItem(STORAGE_KEYS.HIGH_SCORES, data.highScores) && success;
-  }
-
-  if (data.currentHighScore) {
-    success = setStorageItem(STORAGE_KEYS.CURRENT_HIGH_SCORE, data.currentHighScore) && success;
-  }
-
-  if (data.settings) {
-    success = setStorageItem(STORAGE_KEYS.SETTINGS, data.settings) && success;
-  }
-
-  return success;
 }

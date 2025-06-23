@@ -52,10 +52,3 @@ export function useHighScore() {
     refreshKey,
   };
 }
-
-/**
- * Helper function to trigger high score refresh across components
- */
-export function triggerHighScoreUpdate() {
-  window.dispatchEvent(new CustomEvent("tetris-high-score-update"));
-}
