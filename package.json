@@ -1,12 +1,12 @@
 {
   "name": "tetris-game2",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "type": "module",
+  "packageManager": "bun@1.2.17",
+  "license": "ISC",
   "scripts": {
     "dev": "bun --bun vite",
-    "build": "bun --bun run build:vite",
-    "build:vite": "bun x vite build",
+    "build": "bun x vite build",
     "test": "bun test",
     "test:watch": "bun test --watch",
     "lint": "bun x biome check --write",
@@ -18,11 +18,6 @@
     "ci": "bun run format && bun run lint && bun run typecheck && bun test && bun run build",
     "prepare": "lefthook install"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "packageManager": "bun@1.2.17",
-  "type": "module",
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.14",
     "@radix-ui/react-select": "^2.2.5",
