@@ -10,9 +10,10 @@ export function Board() {
   const { board, currentPiece, placedPositions, clearingLines, animationTriggerKey } =
     useBoardData();
 
-  // Create display board with current piece - memoized for performance
-  const displayBoard = useMemo(() => {
+  // Unified current piece processing - compute both display board and positions
+  const { displayBoard, currentPiecePositions } = useMemo(() => {
     const newBoard = board.map((row) => [...row]);
+    const positions = new Set<string>();
 
     if (currentPiece) {
       const colorIndex = getTetrominoColorIndex(currentPiece.type);
@@ -23,33 +24,15 @@ export function Board() {
             const boardX = currentPiece.position.x + x;
             if (boardY >= 0 && boardY < BOARD_HEIGHT && boardX >= 0 && boardX < BOARD_WIDTH) {
               newBoard[boardY][boardX] = colorIndex;
+              positions.add(`${boardX},${boardY}`);
             }
           }
         });
       });
     }
 
-    return newBoard;
+    return { displayBoard: newBoard, currentPiecePositions: positions };
   }, [board, currentPiece]);
-
-  // Pre-compute current piece positions for O(1) lookup
-  const currentPiecePositions = useMemo(() => {
-    if (!currentPiece) return new Set<string>();
-
-    const positions = new Set<string>();
-    currentPiece.shape.forEach((row, y) => {
-      row.forEach((cell, x) => {
-        if (cell) {
-          const boardY = currentPiece.position.y + y;
-          const boardX = currentPiece.position.x + x;
-          if (boardY >= 0 && boardY < BOARD_HEIGHT && boardX >= 0 && boardX < BOARD_WIDTH) {
-            positions.add(`${boardX},${boardY}`);
-          }
-        }
-      });
-    });
-    return positions;
-  }, [currentPiece]);
 
   // Pre-compute placed positions for O(1) lookup
   const placedPositionsSet = useMemo(() => {
