@@ -2,22 +2,8 @@ import { describe, expect, mock, test } from "bun:test";
 import { render } from "@testing-library/react";
 import { Controls } from "./Controls";
 
-// Mock react-i18next
-mock.module("react-i18next", () => ({
-  useTranslation: () => ({
-    t: (key: string) => {
-      const translations: Record<string, string> = {
-        "game.controls.ttestle": "Controls",
-        "game.controls.move": "Move",
-        "game.controls.softDrop": "Soft Drop",
-        "game.controls.rotate": "Rotate",
-        "game.controls.hardDrop": "Hard Drop",
-        "game.controls.pause": "Pause",
-      };
-      return translations[key] || key;
-    },
-  }),
-}));
+// Mock react-i18next using shared mock
+mock.module("react-i18next", () => import("../../test/__mocks__/react-i18next"));
 
 // Mock UI components
 mock.module("../ui/badge", () => ({

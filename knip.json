@@ -1,7 +1,13 @@
 {
   "entry": ["src/main.tsx"],
   "project": ["src/**/*.{ts,tsx}", "*.{ts,js}"],
-  "ignore": ["dist/**", "node_modules/**", "**/*.test.{ts,tsx}", "src/test/setup.ts"],
+  "ignore": [
+    "dist/**",
+    "node_modules/**",
+    "**/*.test.{ts,tsx}",
+    "src/test/setup.ts",
+    "src/test/__mocks__/**"
+  ],
   "ignoreExportsUsedInFile": true,
   "includeEntryExports": false,
   "ignoreDependencies": [

@@ -25,8 +25,8 @@ jobs:
       - name: Run linting
         run: bun run lint
 
-      - name: Run tests (game logic only)
-        run: bun test src/game/
+      - name: Run tests
+        run: bun test
 
       - name: Run type check
         run: bun run typecheck

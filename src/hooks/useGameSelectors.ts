@@ -1,5 +1,7 @@
 import { useMemo } from "react";
+import { getTetrominoColorIndex } from "../game/tetrominos";
 import { useGameStore } from "../store/gameStore";
+import { BOARD_HEIGHT, BOARD_WIDTH } from "../utils/constants";
 
 /**
  * Game state selectors - optimized with useMemo to prevent infinite loops
@@ -45,6 +47,39 @@ export const useBoardData = () => {
   const clearingLines = useGameStore((state) => state.clearingLines);
   const animationTriggerKey = useGameStore((state) => state.animationTriggerKey);
 
+  // Unified current piece processing - compute both display board and positions
+  const { displayBoard, currentPiecePositions } = useMemo(() => {
+    const newBoard = board.map((row) => [...row]);
+    const positions = new Set<string>();
+
+    if (currentPiece) {
+      const colorIndex = getTetrominoColorIndex(currentPiece.type);
+      currentPiece.shape.forEach((row, y) => {
+        row.forEach((cell, x) => {
+          if (cell) {
+            const boardY = currentPiece.position.y + y;
+            const boardX = currentPiece.position.x + x;
+            if (boardY >= 0 && boardY < BOARD_HEIGHT && boardX >= 0 && boardX < BOARD_WIDTH) {
+              newBoard[boardY][boardX] = colorIndex;
+              positions.add(`${boardX},${boardY}`);
+            }
+          }
+        });
+      });
+    }
+
+    return { displayBoard: newBoard, currentPiecePositions: positions };
+  }, [board, currentPiece]);
+
+  // Pre-compute placed positions for O(1) lookup
+  const placedPositionsSet = useMemo(() => {
+    const positions = new Set<string>();
+    placedPositions.forEach((pos) => {
+      positions.add(`${pos.x},${pos.y}`);
+    });
+    return positions;
+  }, [placedPositions]);
+
   return useMemo(
     () => ({
       board,
@@ -52,7 +87,19 @@ export const useBoardData = () => {
       placedPositions,
       clearingLines,
       animationTriggerKey,
+      displayBoard,
+      currentPiecePositions,
+      placedPositionsSet,
     }),
-    [board, currentPiece, placedPositions, clearingLines, animationTriggerKey],
+    [
+      board,
+      currentPiece,
+      placedPositions,
+      clearingLines,
+      animationTriggerKey,
+      displayBoard,
+      currentPiecePositions,
+      placedPositionsSet,
+    ],
   );
 };

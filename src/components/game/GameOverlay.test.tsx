@@ -13,20 +13,7 @@ mock.module("../../store/gameStore", () => ({
   })),
 }));
 
-mock.module("react-i18next", () => ({
-  useTranslation: () => ({
-    t: (key: string) => {
-      const translations: Record<string, string> = {
-        "game.gameOver": "GAME OVER",
-        "game.paused": "PAUSED",
-        "game.newGame": "NEW GAME",
-        "game.resume": "RESUME",
-        "game.resumeHint": "Press P to resume or click the button below",
-      };
-      return translations[key] || key;
-    },
-  }),
-}));
+mock.module("react-i18next", () => import("../../test/__mocks__/react-i18next"));
 
 // Mock UI components
 mock.module("../ui/button", () => ({
