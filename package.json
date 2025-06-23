@@ -29,7 +29,7 @@
     "@radix-ui/react-slot": "^1.2.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "framer-motion": "^12.18.2",
+    "framer-motion": "^12.19.1",
     "i18next": "25.2.1",
     "lucide-react": "^0.522.0",
     "react": "19.1.0",
@@ -40,7 +40,7 @@
     "zustand": "5.0.5"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.0.4",
+    "@biomejs/biome": "2.0.5",
     "@happy-dom/global-registrator": "^18.0.1",
     "@tailwindcss/vite": "^4.1.10",
     "@testing-library/dom": "^10.4.0",
@@ -49,7 +49,7 @@
     "@types/bun": "^1.2.17",
     "@types/react": "19.1.8",
     "@types/react-dom": "19.1.6",
-    "@vitejs/plugin-react": "4.6.0",
+    "@vitejs/plugin-react-oxc": "^0.2.3",
     "happy-dom": "^18.0.1",
     "knip": "^5.61.2",
     "lefthook": "1.11.14",

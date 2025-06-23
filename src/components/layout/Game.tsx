@@ -21,48 +21,41 @@ export function Game() {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white p-4 relative">
       <LanguageSelector />
 
-      {/* Desktop Layout - Grid */}
       <main
-        className="hidden md:grid md:grid-cols-[240px_1fr] md:gap-8 md:place-items-center md:min-h-[calc(100vh-2rem)]"
+        className="flex flex-col md:grid md:grid-cols-[240px_1fr] gap-6 md:gap-8 md:place-items-center md:min-h-[calc(100vh-2rem)] pt-12 md:pt-0"
         aria-label="Tetris Game"
       >
-        <aside className="flex flex-col gap-4 w-full" aria-label="Game Information">
+        {/* Sidebar - Top on mobile, left side on desktop */}
+        <aside
+          className="flex flex-col gap-4 w-full max-w-sm md:max-w-none mx-auto md:mx-0 order-1 md:order-none"
+          aria-label="Game Information"
+        >
           <ScoreBoard />
           <HighScore />
           <NextPiece />
-          <Controls />
+          <div className="hidden md:block">
+            <Controls />
+          </div>
         </aside>
-        <section
-          className="relative"
-          aria-label="Game Board Area"
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
-        >
-          <Board />
-          <GameOverlay />
-        </section>
-      </main>
 
-      {/* Mobile Layout - Vertical Stack */}
-      <main className="md:hidden flex flex-col items-center gap-6 pt-12" aria-label="Tetris Game">
-        <aside className="flex flex-col gap-4 w-full max-w-sm" aria-label="Game Information">
-          <ScoreBoard />
-          <HighScore />
-          <NextPiece />
-        </aside>
-        <section
-          className="relative"
-          aria-label="Game Board Area"
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
-        >
-          <Board />
-          <GameOverlay />
-        </section>
-        <section className="w-full max-w-sm" aria-label="Game Controls">
-          <TouchControls className="mb-4" />
-          <Controls />
-        </section>
+        {/* Game board area */}
+        <div className="order-2 md:order-none flex flex-col items-center md:items-start">
+          <section
+            className="relative"
+            aria-label="Game Board Area"
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+          >
+            <Board />
+            <GameOverlay />
+          </section>
+
+          {/* Mobile controls */}
+          <section className="w-full max-w-sm mt-6 md:hidden" aria-label="Game Controls">
+            <TouchControls className="mb-4" />
+            <Controls />
+          </section>
+        </div>
       </main>
     </div>
   );
