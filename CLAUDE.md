@@ -34,7 +34,9 @@ Web上で実行できるテトリスを作成する。
 - **コンポーネント分離**: UI要素を独立したコンポーネントに分割
   - layout/Game.tsx: メインゲームコンテナ
   - game/Board.tsx: ゲームボード表示
+  - game/BoardCell.tsx: 個別セルコンポーネント（アニメーション統合）
   - game/ScoreBoard.tsx: スコア・レベル表示
+  - game/AnimatedScoreItem.tsx: スコア項目のアニメーション表示
   - game/Controls.tsx: 操作説明
   - game/NextPiece.tsx: 次のピース表示
   - game/GameOverlay.tsx: ゲームオーバー・一時停止画面
@@ -50,6 +52,10 @@ Web上で実行できるテトリスを作成する。
 
 - **useGameLoop**: ゲームの自動進行を管理
 - **useKeyboardControls**: react-hotkeys-hookを使用したキーボード入力の宣言的な処理
+- **useAnimatedValue**: アニメーション値の管理とスプリングアニメーション制御
+- **useAnimationCompletionHandler**: アニメーション完了時の状態管理
+- **useCellAnimation**: 個別セルのアニメーション状態管理
+- **useGameSelectors**: ゲーム状態の効率的な選択とメモ化
 
 ## アニメーションシステム
 
@@ -87,6 +93,9 @@ src/
 ├── test/               # テスト設定
 ├── types/              # TypeScript型定義
 └── utils/              # ユーティリティ関数
+    ├── constants.ts    # ゲーム定数（ボードサイズ、速度等）
+    ├── styles.ts       # スタイルユーティリティ（CSS結合）
+    └── colors.ts       # テトリスピース色定義
 ```
 
 ## データモデル
@@ -211,8 +220,11 @@ src/
 
 - Tailwind CSS: 4.1.10
 - @tailwindcss/vite: 4.1.10 (Vite専用プラグイン - PostCSS設定不要)
-- shadcn/ui: 2.7.0
+- shadcn/ui: Radix UIコンポーネント群として実装 (dialog, select, slot等)
 - Framer Motion: 12.18.1 (アニメーション)
+- class-variance-authority: 0.7.1 (CVA - コンポーネントバリアント管理)
+- clsx: 2.1.1, tailwind-merge: 3.3.1 (スタイルユーティリティ)
+- lucide-react: 0.522.0 (アイコン)
 
 ## 状態管理・データ処理
 
@@ -226,6 +238,7 @@ src/
 ## 国際化
 
 - i18next: 25.2.1
+- react-i18next: 15.5.3 (React統合)
 
 ## コード品質・リンティング
 
@@ -235,6 +248,9 @@ src/
 ## テスト
 
 - Vitest: 3.2.4 (テストフレームワーク)
+- @testing-library/react: Reactコンポーネントテスト
+- @testing-library/jest-dom: DOMアサーション拡張
+- jsdom: 26.1.0 (DOMシミュレーション)
 
 ## 最適化・バンドル
 
@@ -299,7 +315,11 @@ Tailwind CSS 4.1の最新記法を採用し、カスタムテトリス色（各�
 
 ### テスト戦略
 
-Vitest + TypeScriptによるテスト駆動開発（TDD）アプローチを採用しています。ボードロジック、ゲームロジック、テトリスピース操作に対する包括的なテストを実装し、純粋関数による実装により高いテスト可能性を確保しています。
+Vitest + TypeScriptによるテスト駆動開発（TDD）アプローチを採用しています。以下の包括的なテストを実装し、純粋関数による実装により高いテスト可能性を確保しています：
+
+- **ゲームロジックテスト**: board.test.ts、game.test.ts、tetrominos.test.ts
+- **カスタムフックテスト**: useGameLoop.test.ts、useKeyboardControls.test.ts、useAnimatedValue.test.ts
+- **コンポーネントテスト**: BoardCell、AnimatedScoreItem、Controls、GameOverlayの動作とアニメーション検証
 
 ### パフォーマンス最適化
 

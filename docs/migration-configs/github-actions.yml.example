@@ -1,0 +1,89 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  test:
+    name: Test & Build
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v2
+      with:
+        bun-version: 1.2.17
+        
+    - name: Cache Bun dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.bun/install/cache
+        key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}
+        restore-keys: |
+          ${{ runner.os }}-bun-
+          
+    - name: Install dependencies
+      run: bun install --frozen-lockfile
+      
+    - name: Type check
+      run: bun run typecheck
+      
+    - name: Lint check
+      run: bun run lint
+      
+    - name: Format check
+      run: bun run format
+      
+    - name: Run tests
+      run: bun test
+      
+    - name: Build for production
+      run: bun run build
+      
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: dist-bun-v1.2.17-${{ github.sha }}
+        path: dist/
+        retention-days: 30
+        
+    - name: Check bundle size and Bun v1.2.17 features
+      run: |
+        echo "=== Bun v1.2.17 Bundle Analysis ==="
+        bun --version
+        echo "Bundle size:"
+        du -sh dist/
+        echo "Bundle files:"
+        ls -la dist/
+        echo "Memory usage info (Timer optimization in v1.2.17):"
+        echo "Bun v1.2.17 reduces timer memory usage by 8-15%"
+        
+  deploy:
+    name: Deploy to Vercel
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: dist-bun-v1.2.17-${{ github.sha }}
+        path: dist/
+        
+    - name: Deploy to Vercel
+      uses: vercel/action@v1
+      with:
+        vercel-token: ${{ secrets.VERCEL_TOKEN }}
+        vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+        vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+        vercel-args: '--prod'

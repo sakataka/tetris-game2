@@ -1,5 +1,5 @@
+import { beforeEach, describe, expect, mock, spyOn, test } from "bun:test";
 import { renderHook } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getGameSpeed } from "../game/game";
 import { useGameStore } from "../store/gameStore";
 import { useGameLoop } from "./useGameLoop";
@@ -14,31 +14,37 @@ type MockGameStoreSubset = {
 };
 
 // Mock dependencies
-vi.mock("../game/game");
-vi.mock("../store/gameStore");
+mock.module("../game/game", () => ({
+  getGameSpeed: mock(() => 1000),
+}));
+
+mock.module("../store/gameStore", () => ({
+  useGameStore: mock(() => ({
+    moveDown: mock(),
+    isPaused: false,
+    isGameOver: false,
+    level: 1,
+    clearAnimationStates: mock(),
+  })),
+}));
 
 // Mock React hooks
-const mockStartTransition = vi.fn((callback) => callback());
-vi.mock("react", async () => {
-  const actual = await vi.importActual("react");
-  return {
-    ...actual,
-    useTransition: () => [false, mockStartTransition],
-  };
-});
+const mockStartTransition = mock((callback) => callback());
+mock.module("react", () => ({
+  ...require("react"),
+  useTransition: () => [false, mockStartTransition],
+}));
 
 describe("useGameLoop", () => {
-  const mockMoveDown = vi.fn();
-  const mockClearAnimationStates = vi.fn();
+  const mockMoveDown = mock();
+  const mockClearAnimationStates = mock();
 
   beforeEach(() => {
-    vi.clearAllMocks();
-    vi.clearAllTimers();
-    vi.useFakeTimers();
+    mock.restore();
 
     // Setup default mock implementations
-    vi.mocked(getGameSpeed).mockReturnValue(1000);
-    vi.mocked(useGameStore).mockReturnValue({
+    getGameSpeed.mockReturnValue(1000);
+    useGameStore.mockReturnValue({
       moveDown: mockMoveDown,
       isPaused: false,
       isGameOver: false,
@@ -47,21 +53,21 @@ describe("useGameLoop", () => {
     } as MockGameStoreSubset);
 
     // Mock requestAnimationFrame
-    global.requestAnimationFrame = vi.fn((callback) => {
+    global.requestAnimationFrame = mock((callback) => {
       const id = setTimeout(() => callback(Date.now()), 16);
       return id as unknown as number;
     });
-    global.cancelAnimationFrame = vi.fn((id) => clearTimeout(id));
+    global.cancelAnimationFrame = mock((id) => clearTimeout(id));
   });
 
-  it("should start game loop when not paused and not game over", () => {
+  test("should start game loop when not paused and not game over", () => {
     renderHook(() => useGameLoop());
 
     expect(requestAnimationFrame).toHaveBeenCalled();
   });
 
-  it("should not start game loop when paused", () => {
-    vi.mocked(useGameStore).mockReturnValue({
+  test("should not start game loop when paused", () => {
+    useGameStore.mockReturnValue({
       moveDown: mockMoveDown,
       isPaused: true,
       isGameOver: false,
@@ -74,8 +80,8 @@ describe("useGameLoop", () => {
     expect(requestAnimationFrame).not.toHaveBeenCalled();
   });
 
-  it("should not start game loop when game is over", () => {
-    vi.mocked(useGameStore).mockReturnValue({
+  test("should not start game loop when game is over", () => {
+    useGameStore.mockReturnValue({
       moveDown: mockMoveDown,
       isPaused: false,
       isGameOver: true,
@@ -88,23 +94,23 @@ describe("useGameLoop", () => {
     expect(requestAnimationFrame).not.toHaveBeenCalled();
   });
 
-  it("should call moveDown with correct timing", async () => {
+  test("should call moveDown with correct timing", async () => {
     const gameSpeed = 500;
-    vi.mocked(getGameSpeed).mockReturnValue(gameSpeed);
+    getGameSpeed.mockReturnValue(gameSpeed);
 
     renderHook(() => useGameLoop());
 
     // Fast-forward time to trigger game loop
-    vi.advanceTimersByTime(gameSpeed + 100);
+    await Bun.sleep(gameSpeed + 100);
 
     expect(mockStartTransition).toHaveBeenCalled();
     expect(mockMoveDown).toHaveBeenCalled();
     expect(mockClearAnimationStates).toHaveBeenCalled();
   });
 
-  it("should use game speed based on level", () => {
+  test("should use game speed based on level", () => {
     const testLevel = 5;
-    vi.mocked(useGameStore).mockReturnValue({
+    useGameStore.mockReturnValue({
       moveDown: mockMoveDown,
       isPaused: false,
       isGameOver: false,
@@ -117,22 +123,22 @@ describe("useGameLoop", () => {
     expect(getGameSpeed).toHaveBeenCalledWith(testLevel);
   });
 
-  it("should cancel animation frame on unmount", () => {
+  test("should cancel animation frame on unmount", () => {
     const { unmount } = renderHook(() => useGameLoop());
 
-    const cancelSpy = vi.spyOn(global, "cancelAnimationFrame");
+    const cancelSpy = spyOn(global, "cancelAnimationFrame");
     unmount();
 
     expect(cancelSpy).toHaveBeenCalled();
   });
 
-  it("should restart loop when dependencies change", () => {
+  test("should restart loop when dependencies change", () => {
     const { rerender } = renderHook(() => useGameLoop());
 
-    const initialCallCount = vi.mocked(requestAnimationFrame).mock.calls.length;
+    const initialCallCount = requestAnimationFrame.mock.calls.length;
 
     // Change level to trigger re-render
-    vi.mocked(useGameStore).mockReturnValue({
+    useGameStore.mockReturnValue({
       moveDown: mockMoveDown,
       isPaused: false,
       isGameOver: false,
@@ -142,12 +148,12 @@ describe("useGameLoop", () => {
 
     rerender();
 
-    expect(vi.mocked(requestAnimationFrame).mock.calls.length).toBeGreaterThan(initialCallCount);
+    expect(requestAnimationFrame.mock.calls.length).toBeGreaterThan(initialCallCount);
   });
 
-  it("should call getGameSpeed with correct level", () => {
+  test("should call getGameSpeed with correct level", () => {
     const testLevel = 3;
-    vi.mocked(useGameStore).mockReturnValue({
+    useGameStore.mockReturnValue({
       moveDown: mockMoveDown,
       isPaused: false,
       isGameOver: false,

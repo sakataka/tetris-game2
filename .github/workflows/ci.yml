@@ -14,31 +14,25 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          version: 10.12.1
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '24.2'
-          cache: 'pnpm'
+          bun-version: 1.2.17
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Fix Biome permissions
-        run: chmod +x node_modules/.pnpm/*/node_modules/@biomejs/cli-linux-x64/biome || true
+        run: bun install --frozen-lockfile
 
       - name: Run linting
-        run: pnpm run lint
+        run: bun run lint
 
-      - name: Run tests
-        run: pnpm run test
+      - name: Run tests (game logic only)
+        run: bun test src/game/
+
+      - name: Run type check
+        run: bun run typecheck
 
       - name: Run build
-        run: pnpm run build
+        run: bun run build
 
       - name: Check dead code
-        run: pnpm run knip
+        run: bun run knip

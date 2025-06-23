@@ -1,11 +1,19 @@
+import { beforeEach, describe, expect, mock, test } from "bun:test";
 import { fireEvent, render } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useGameStore } from "../../store/gameStore";
 import { GameOverlay } from "./GameOverlay";
 
 // Mock dependencies
-vi.mock("../../store/gameStore");
-vi.mock("react-i18next", () => ({
+mock.module("../../store/gameStore", () => ({
+  useGameStore: mock(() => ({
+    isGameOver: false,
+    isPaused: false,
+    resetGame: mock(),
+    togglePause: mock(),
+  })),
+}));
+
+mock.module("react-i18next", () => ({
   useTranslation: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -21,31 +29,31 @@ vi.mock("react-i18next", () => ({
 }));
 
 // Mock UI components
-vi.mock("../ui/button", () => ({
-  Button: vi.fn(({ children, onClick, className, ...props }) => (
+mock.module("../ui/button", () => ({
+  Button: mock(({ children, onClick, className, ...props }) => (
     <button onClick={onClick} className={className} data-testid="game-button" {...props}>
       {children}
     </button>
   )),
 }));
 
-vi.mock("../ui/dialog", () => ({
-  Dialog: vi.fn(({ children, open }) => (
+mock.module("../ui/dialog", () => ({
+  Dialog: mock(({ children, open }) => (
     <div data-testid="dialog" data-open={open}>
       {open && children}
     </div>
   )),
-  DialogContent: vi.fn(({ children, className }) => (
+  DialogContent: mock(({ children, className }) => (
     <div data-testid="dialog-content" className={className}>
       {children}
     </div>
   )),
-  DialogHeader: vi.fn(({ children, className }) => (
+  DialogHeader: mock(({ children, className }) => (
     <div data-testid="dialog-header" className={className}>
       {children}
     </div>
   )),
-  DialogTitle: vi.fn(({ children, className }) => (
+  DialogTitle: mock(({ children, className }) => (
     <h2 data-testid="dialog-title" className={className}>
       {children}
     </h2>
@@ -53,9 +61,9 @@ vi.mock("../ui/dialog", () => ({
 }));
 
 // Mock framer-motion
-vi.mock("framer-motion", () => ({
+mock.module("framer-motion", () => ({
   motion: {
-    div: vi.fn(({ children, ...props }) => (
+    div: mock(({ children, ...props }) => (
       <div data-testid="motion-div" {...props}>
         {children}
       </div>
@@ -67,16 +75,16 @@ describe("GameOverlay", () => {
   const mockGameStore = {
     isGameOver: false,
     isPaused: false,
-    resetGame: vi.fn(),
-    togglePause: vi.fn(),
+    resetGame: mock(),
+    togglePause: mock(),
   };
 
   beforeEach(() => {
-    vi.clearAllMocks();
-    vi.mocked(useGameStore).mockReturnValue(mockGameStore);
+    mock.restore();
+    useGameStore.mockReturnValue(mockGameStore);
   });
 
-  it("should not render dialog when game is not over and not paused", () => {
+  test("should not render dialog when game is not over and not paused", () => {
     const { getByTestId } = render(<GameOverlay />);
 
     expect(getByTestId("dialog")).toHaveAttribute("data-open", "false");
@@ -84,26 +92,26 @@ describe("GameOverlay", () => {
 
   describe("game over state", () => {
     beforeEach(() => {
-      vi.mocked(useGameStore).mockReturnValue({
+      useGameStore.mockReturnValue({
         ...mockGameStore,
         isGameOver: true,
       });
     });
 
-    it("should render game over dialog", () => {
+    test("should render game over dialog", () => {
       const { getByTestId } = render(<GameOverlay />);
 
       expect(getByTestId("dialog")).toHaveAttribute("data-open", "true");
       expect(getByTestId("dialog-title")).toHaveTextContent("GAME OVER");
     });
 
-    it("should render new game button", () => {
+    test("should render new game button", () => {
       const { getByText } = render(<GameOverlay />);
 
       expect(getByText("NEW GAME")).toBeInTheDocument();
     });
 
-    it("should call resetGame when new game button is clicked", () => {
+    test("should call resetGame when new game button is clicked", () => {
       const { getByText } = render(<GameOverlay />);
 
       fireEvent.click(getByText("NEW GAME"));
@@ -111,14 +119,14 @@ describe("GameOverlay", () => {
       expect(mockGameStore.resetGame).toHaveBeenCalledTimes(1);
     });
 
-    it("should not render pause controls", () => {
+    test("should not render pause controls", () => {
       const { queryByText } = render(<GameOverlay />);
 
       expect(queryByText("Press P to resume or click the button below")).not.toBeInTheDocument();
       expect(queryByText("RESUME")).not.toBeInTheDocument();
     });
 
-    it("should apply game over button styling", () => {
+    test("should apply game over button styling", () => {
       const { getByTestId } = render(<GameOverlay />);
 
       const button = getByTestId("game-button");
@@ -128,32 +136,32 @@ describe("GameOverlay", () => {
 
   describe("paused state", () => {
     beforeEach(() => {
-      vi.mocked(useGameStore).mockReturnValue({
+      useGameStore.mockReturnValue({
         ...mockGameStore,
         isPaused: true,
       });
     });
 
-    it("should render paused dialog", () => {
+    test("should render paused dialog", () => {
       const { getByTestId } = render(<GameOverlay />);
 
       expect(getByTestId("dialog")).toHaveAttribute("data-open", "true");
       expect(getByTestId("dialog-title")).toHaveTextContent("PAUSED");
     });
 
-    it("should render resume hint text", () => {
+    test("should render resume hint text", () => {
       const { getByText } = render(<GameOverlay />);
 
       expect(getByText("Press P to resume or click the button below")).toBeInTheDocument();
     });
 
-    it("should render resume button", () => {
+    test("should render resume button", () => {
       const { getByText } = render(<GameOverlay />);
 
       expect(getByText("RESUME")).toBeInTheDocument();
     });
 
-    it("should call togglePause when resume button is clicked", () => {
+    test("should call togglePause when resume button is clicked", () => {
       const { getByText } = render(<GameOverlay />);
 
       fireEvent.click(getByText("RESUME"));
@@ -161,13 +169,13 @@ describe("GameOverlay", () => {
       expect(mockGameStore.togglePause).toHaveBeenCalledTimes(1);
     });
 
-    it("should not render game over controls", () => {
+    test("should not render game over controls", () => {
       const { queryByText } = render(<GameOverlay />);
 
       expect(queryByText("NEW GAME")).not.toBeInTheDocument();
     });
 
-    it("should apply paused button styling", () => {
+    test("should apply paused button styling", () => {
       const { getByTestId } = render(<GameOverlay />);
 
       const button = getByTestId("game-button");
@@ -176,8 +184,8 @@ describe("GameOverlay", () => {
   });
 
   describe("dialog properties", () => {
-    it("should render with correct dialog content styling", () => {
-      vi.mocked(useGameStore).mockReturnValue({
+    test("should render with correct dialog content styling", () => {
+      useGameStore.mockReturnValue({
         ...mockGameStore,
         isGameOver: true,
       });
@@ -190,8 +198,8 @@ describe("GameOverlay", () => {
       );
     });
 
-    it("should render with correct header styling", () => {
-      vi.mocked(useGameStore).mockReturnValue({
+    test("should render with correct header styling", () => {
+      useGameStore.mockReturnValue({
         ...mockGameStore,
         isGameOver: true,
       });
@@ -202,8 +210,8 @@ describe("GameOverlay", () => {
       expect(dialogHeader).toHaveClass("text-center");
     });
 
-    it("should render with correct title styling", () => {
-      vi.mocked(useGameStore).mockReturnValue({
+    test("should render with correct title styling", () => {
+      useGameStore.mockReturnValue({
         ...mockGameStore,
         isGameOver: true,
       });
@@ -216,8 +224,8 @@ describe("GameOverlay", () => {
   });
 
   describe("game over title styling", () => {
-    it("should apply red color to game over text", () => {
-      vi.mocked(useGameStore).mockReturnValue({
+    test("should apply red color to game over text", () => {
+      useGameStore.mockReturnValue({
         ...mockGameStore,
         isGameOver: true,
       });
@@ -229,8 +237,8 @@ describe("GameOverlay", () => {
       expect(gameOverSpan).toHaveTextContent("GAME OVER");
     });
 
-    it("should not apply red color to paused text", () => {
-      vi.mocked(useGameStore).mockReturnValue({
+    test("should not apply red color to paused text", () => {
+      useGameStore.mockReturnValue({
         ...mockGameStore,
         isPaused: true,
       });
@@ -243,8 +251,8 @@ describe("GameOverlay", () => {
   });
 
   describe("motion animations", () => {
-    it("should wrap buttons in motion divs", () => {
-      vi.mocked(useGameStore).mockReturnValue({
+    test("should wrap buttons in motion divs", () => {
+      useGameStore.mockReturnValue({
         ...mockGameStore,
         isGameOver: true,
       });
@@ -256,8 +264,8 @@ describe("GameOverlay", () => {
   });
 
   describe("edge cases", () => {
-    it("should handle both isGameOver and isPaused being true", () => {
-      vi.mocked(useGameStore).mockReturnValue({
+    test("should handle both isGameOver and isPaused being true", () => {
+      useGameStore.mockReturnValue({
         ...mockGameStore,
         isGameOver: true,
         isPaused: true,

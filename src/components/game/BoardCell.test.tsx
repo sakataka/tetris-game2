@@ -1,10 +1,10 @@
+import { beforeEach, describe, expect, mock, test } from "bun:test";
 import { render } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { BoardCell } from "./BoardCell";
 
 // Mock all dependencies at module level
-vi.mock("../../hooks/useCellAnimation", () => ({
-  useCellAnimation: vi.fn(() => ({
+mock.module("../../hooks/useCellAnimation", () => ({
+  useCellAnimation: mock(() => ({
     shouldAnimate: true,
     initialAnimation: { opacity: 0 },
     animateProps: { opacity: 1 },
@@ -12,19 +12,18 @@ vi.mock("../../hooks/useCellAnimation", () => ({
   })),
 }));
 
-vi.mock("../../hooks/useAnimationCompletionHandler", () => ({
+mock.module("../../hooks/useAnimationCompletionHandler", () => ({
   useAnimationCompletionHandler: () => ({
-    handleAnimationComplete: vi.fn(),
+    handleAnimationComplete: mock(),
   }),
 }));
 
-vi.mock("../../utils/colors", () => ({
-  getCellColor: vi.fn(() => "bg-gray-200"),
+mock.module("../../utils/colors", () => ({
+  getCellColor: mock(() => "bg-gray-200"),
 }));
 
-vi.mock("../../utils/constants", async () => {
-  const actual =
-    await vi.importActual<typeof import("../../utils/constants")>("../../utils/constants");
+mock.module("../../utils/constants", async () => {
+  const actual = await import("../../utils/constants");
   return {
     ...actual,
     BOARD_WIDTH: 10, // Keep this specific mock if needed for tests
@@ -32,7 +31,7 @@ vi.mock("../../utils/constants", async () => {
   };
 });
 
-vi.mock("../../utils/styles", () => ({
+mock.module("../../utils/styles", () => ({
   BOARD_STYLES: {
     cell: "cell-base",
     cellBorder: "cell-border",
@@ -42,14 +41,14 @@ vi.mock("../../utils/styles", () => ({
   },
 }));
 
-vi.mock("@/lib/utils", () => ({
-  cn: vi.fn((...classes) => classes.filter(Boolean).join(" ")),
+mock.module("@/lib/utils", () => ({
+  cn: mock((...classes) => classes.filter(Boolean).join(" ")),
 }));
 
 // Mock framer-motion
-vi.mock("framer-motion", () => ({
+mock.module("framer-motion", () => ({
   motion: {
-    div: vi.fn().mockImplementation((props) => (
+    div: mock().mockImplementation((props) => (
       <div data-testid="board-cell" className={props.className}>
         {props.children}
       </div>
@@ -69,16 +68,16 @@ describe("BoardCell", () => {
   };
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    mock.restore();
   });
 
-  it("should render without errors", () => {
+  test("should render without errors", () => {
     const { getByTestId } = render(<BoardCell {...defaultProps} />);
 
     expect(getByTestId("board-cell")).toBeInTheDocument();
   });
 
-  it("should apply basic cell classes", () => {
+  test("should apply basic cell classes", () => {
     const { getByTestId } = render(<BoardCell {...defaultProps} />);
     const cell = getByTestId("board-cell");
 
@@ -86,7 +85,7 @@ describe("BoardCell", () => {
     expect(cell.className).toContain("bg-gray-200");
   });
 
-  it("should apply empty cell border for empty cells", () => {
+  test("should apply empty cell border for empty cells", () => {
     const { getByTestId } = render(<BoardCell {...defaultProps} cellValue={0} />);
     const cell = getByTestId("board-cell");
 
@@ -94,7 +93,7 @@ describe("BoardCell", () => {
     expect(cell.className).not.toContain("cell-border");
   });
 
-  it("should apply cell border for filled cells", () => {
+  test("should apply cell border for filled cells", () => {
     const { getByTestId } = render(<BoardCell {...defaultProps} cellValue={1} />);
     const cell = getByTestId("board-cell");
 
@@ -102,21 +101,21 @@ describe("BoardCell", () => {
     expect(cell.className).not.toContain("empty-border");
   });
 
-  it("should apply active piece styles when isCurrentPiece is true", () => {
+  test("should apply active piece styles when isCurrentPiece is true", () => {
     const { getByTestId } = render(<BoardCell {...defaultProps} isCurrentPiece={true} />);
     const cell = getByTestId("board-cell");
 
     expect(cell.className).toContain("active-piece");
   });
 
-  it("should apply clearing line styles when isClearingLine is true", () => {
+  test("should apply clearing line styles when isClearingLine is true", () => {
     const { getByTestId } = render(<BoardCell {...defaultProps} isClearingLine={true} />);
     const cell = getByTestId("board-cell");
 
     expect(cell.className).toContain("clearing-line");
   });
 
-  it("should render with different cell values", () => {
+  test("should render with different cell values", () => {
     const { rerender, getByTestId } = render(<BoardCell {...defaultProps} cellValue={0} />);
     expect(getByTestId("board-cell")).toBeInTheDocument();
 
@@ -124,7 +123,7 @@ describe("BoardCell", () => {
     expect(getByTestId("board-cell")).toBeInTheDocument();
   });
 
-  it("should combine multiple conditional classes", () => {
+  test("should combine multiple conditional classes", () => {
     const { getByTestId } = render(
       <BoardCell {...defaultProps} cellValue={3} isCurrentPiece={true} isClearingLine={true} />,
     );
@@ -136,7 +135,7 @@ describe("BoardCell", () => {
     expect(cell.className).toContain("clearing-line");
   });
 
-  it("should render with animation handler", () => {
+  test("should render with animation handler", () => {
     const { getByTestId } = render(<BoardCell {...defaultProps} />);
 
     expect(getByTestId("board-cell")).toBeInTheDocument();

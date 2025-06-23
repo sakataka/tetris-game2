@@ -1,5 +1,5 @@
+import { beforeEach, describe, expect, mock, spyOn, test } from "bun:test";
 import { renderHook } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useGameStore } from "../store/gameStore";
 import { useKeyboardControls } from "./useKeyboardControls";
 
@@ -31,28 +31,36 @@ type MockGameStoreSubset = {
 };
 
 // Mock dependencies
-vi.mock("../store/gameStore");
-vi.mock("react-hotkeys-hook");
+mock.module("../store/gameStore", () => ({
+  useGameStore: mock(() => ({
+    moveLeft: mock(),
+    moveRight: mock(),
+    moveDown: mock(),
+    rotate: mock(),
+    drop: mock(),
+    togglePause: mock(),
+    resetGame: mock(),
+    isPaused: false,
+    isGameOver: false,
+  })),
+}));
 
 // Mock React hooks
-const mockStartTransition = vi.fn((callback) => callback());
-vi.mock("react", async () => {
-  const actual = await vi.importActual("react");
-  return {
-    ...actual,
-    useTransition: () => [false, mockStartTransition],
-  };
-});
+const mockStartTransition = mock((callback) => callback());
+mock.module("react", () => ({
+  ...require("react"),
+  useTransition: () => [false, mockStartTransition],
+}));
 
 describe("useKeyboardControls", () => {
   const mockGameActions = {
-    moveLeft: vi.fn(),
-    moveRight: vi.fn(),
-    moveDown: vi.fn(),
-    rotate: vi.fn(),
-    drop: vi.fn(),
-    togglePause: vi.fn(),
-    resetGame: vi.fn(),
+    moveLeft: mock(),
+    moveRight: mock(),
+    moveDown: mock(),
+    rotate: mock(),
+    drop: mock(),
+    togglePause: mock(),
+    resetGame: mock(),
     isPaused: false,
     isGameOver: false,
   };
@@ -63,25 +71,24 @@ describe("useKeyboardControls", () => {
   } = {};
 
   beforeEach(async () => {
-    vi.clearAllMocks();
-    vi.clearAllTimers();
-    vi.useFakeTimers();
+    mock.restore();
 
     // Mock useGameStore
-    vi.mocked(useGameStore).mockReturnValue(mockGameActions);
+    useGameStore.mockReturnValue(mockGameActions);
 
     // Mock useHotkeys to capture handlers
-    const { useHotkeys } = await import("react-hotkeys-hook");
-    vi.mocked(useHotkeys).mockImplementation((keys, handler) => {
-      const keyArray = Array.isArray(keys) ? keys : [keys];
-      keyArray.forEach((key) => {
-        hotkeyHandlers[key.toLowerCase()] = handler;
-      });
-      return { current: null };
-    });
+    mock.module("react-hotkeys-hook", () => ({
+      useHotkeys: mock((keys, handler) => {
+        const keyArray = Array.isArray(keys) ? keys : [keys];
+        keyArray.forEach((key) => {
+          hotkeyHandlers[key.toLowerCase()] = handler;
+        });
+        return { current: null };
+      }),
+    }));
   });
 
-  it("should initialize keyboard controls", () => {
+  test("should initialize keyboard controls", () => {
     renderHook(() => useKeyboardControls());
 
     // Should have handlers registered for all keys
@@ -93,29 +100,29 @@ describe("useKeyboardControls", () => {
       renderHook(() => useKeyboardControls());
     });
 
-    it("should move left on ArrowLeft", () => {
+    test("should move left on ArrowLeft", () => {
       hotkeyHandlers.arrowleft({} as KeyboardEvent, {} as HotkeysEvent);
 
       expect(mockStartTransition).toHaveBeenCalled();
       expect(mockGameActions.moveLeft).toHaveBeenCalled();
     });
 
-    it("should move right on ArrowRight", () => {
+    test("should move right on ArrowRight", () => {
       hotkeyHandlers.arrowright({} as KeyboardEvent, {} as HotkeysEvent);
 
       expect(mockStartTransition).toHaveBeenCalled();
       expect(mockGameActions.moveRight).toHaveBeenCalled();
     });
 
-    it("should move down on ArrowDown", () => {
+    test("should move down on ArrowDown", () => {
       hotkeyHandlers.arrowdown({} as KeyboardEvent, {} as HotkeysEvent);
 
       expect(mockStartTransition).toHaveBeenCalled();
       expect(mockGameActions.moveDown).toHaveBeenCalled();
     });
 
-    it("should not move when game is paused", () => {
-      vi.mocked(useGameStore).mockReturnValue({
+    test("should not move when game is paused", () => {
+      useGameStore.mockReturnValue({
         ...mockGameActions,
         isPaused: true,
       } as MockGameStoreSubset);
@@ -126,8 +133,8 @@ describe("useKeyboardControls", () => {
       expect(mockGameActions.moveLeft).not.toHaveBeenCalled();
     });
 
-    it("should not move when game is over", () => {
-      vi.mocked(useGameStore).mockReturnValue({
+    test("should not move when game is over", () => {
+      useGameStore.mockReturnValue({
         ...mockGameActions,
         isGameOver: true,
       } as MockGameStoreSubset);
@@ -140,14 +147,14 @@ describe("useKeyboardControls", () => {
   });
 
   describe("rotation and drop controls", () => {
-    const mockEvent = { preventDefault: vi.fn() } as unknown as KeyboardEvent;
+    const mockEvent = { preventDefault: mock() } as unknown as KeyboardEvent;
 
     beforeEach(() => {
       renderHook(() => useKeyboardControls());
-      vi.mocked(mockEvent.preventDefault).mockClear();
+      mockEvent.preventDefault.mockClear();
     });
 
-    it("should rotate on ArrowUp", () => {
+    test("should rotate on ArrowUp", () => {
       hotkeyHandlers.arrowup(mockEvent, {} as HotkeysEvent);
 
       expect(mockEvent.preventDefault).toHaveBeenCalled();
@@ -155,7 +162,7 @@ describe("useKeyboardControls", () => {
       expect(mockGameActions.rotate).toHaveBeenCalled();
     });
 
-    it("should drop on Space", () => {
+    test("should drop on Space", () => {
       hotkeyHandlers.space(mockEvent, {} as HotkeysEvent);
 
       expect(mockEvent.preventDefault).toHaveBeenCalled();
@@ -164,8 +171,8 @@ describe("useKeyboardControls", () => {
       expect(mockStartTransition).not.toHaveBeenCalled();
     });
 
-    it("should not rotate when game is paused", () => {
-      vi.mocked(useGameStore).mockReturnValue({
+    test("should not rotate when game is paused", () => {
+      useGameStore.mockReturnValue({
         ...mockGameActions,
         isPaused: true,
       } as MockGameStoreSubset);
@@ -178,29 +185,29 @@ describe("useKeyboardControls", () => {
   });
 
   describe("pause control", () => {
-    const mockEvent = { preventDefault: vi.fn() } as unknown as KeyboardEvent;
+    const mockEvent = { preventDefault: mock() } as unknown as KeyboardEvent;
 
     beforeEach(() => {
-      vi.spyOn(Date, "now").mockReturnValue(1000);
+      spyOn(Date, "now").mockReturnValue(1000);
       renderHook(() => useKeyboardControls());
-      vi.mocked(mockEvent.preventDefault).mockClear();
+      mockEvent.preventDefault.mockClear();
     });
 
-    it("should toggle pause on P key", () => {
+    test("should toggle pause on P key", () => {
       hotkeyHandlers.p(mockEvent, {} as HotkeysEvent);
 
       expect(mockEvent.preventDefault).toHaveBeenCalled();
       expect(mockGameActions.togglePause).toHaveBeenCalled();
     });
 
-    it("should toggle pause on lowercase p key", () => {
+    test("should toggle pause on lowercase p key", () => {
       hotkeyHandlers.p(mockEvent, {} as HotkeysEvent);
 
       expect(mockGameActions.togglePause).toHaveBeenCalled();
     });
 
-    it("should not pause when game is over", () => {
-      vi.mocked(useGameStore).mockReturnValue({
+    test("should not pause when game is over", () => {
+      useGameStore.mockReturnValue({
         ...mockGameActions,
         isGameOver: true,
       } as MockGameStoreSubset);
@@ -211,32 +218,32 @@ describe("useKeyboardControls", () => {
       expect(mockGameActions.togglePause).not.toHaveBeenCalled();
     });
 
-    it("should debounce pause toggle", () => {
+    test("should debounce pause toggle", () => {
       // First call
       hotkeyHandlers.p(mockEvent, {} as HotkeysEvent);
       expect(mockGameActions.togglePause).toHaveBeenCalledTimes(1);
 
       // Second call within debounce period (200ms)
-      vi.mocked(Date.now).mockReturnValue(1100); // 100ms later
+      Date.now.mockReturnValue(1100); // 100ms later
       hotkeyHandlers.p(mockEvent, {} as HotkeysEvent);
       expect(mockGameActions.togglePause).toHaveBeenCalledTimes(1); // Still 1
 
       // Third call after debounce period
-      vi.mocked(Date.now).mockReturnValue(1300); // 300ms from start
+      Date.now.mockReturnValue(1300); // 300ms from start
       hotkeyHandlers.p(mockEvent, {} as HotkeysEvent);
       expect(mockGameActions.togglePause).toHaveBeenCalledTimes(2); // Now 2
     });
   });
 
   describe("reset control", () => {
-    const mockEvent = { preventDefault: vi.fn() } as unknown as KeyboardEvent;
+    const mockEvent = { preventDefault: mock() } as unknown as KeyboardEvent;
 
     beforeEach(() => {
-      vi.mocked(mockEvent.preventDefault).mockClear();
+      mockEvent.preventDefault.mockClear();
     });
 
-    it("should reset game on Enter when game is over", () => {
-      vi.mocked(useGameStore).mockReturnValue({
+    test("should reset game on Enter when game is over", () => {
+      useGameStore.mockReturnValue({
         ...mockGameActions,
         isGameOver: true,
       } as MockGameStoreSubset);
@@ -250,7 +257,7 @@ describe("useKeyboardControls", () => {
       expect(mockGameActions.resetGame).toHaveBeenCalled();
     });
 
-    it("should not reset game on Enter when game is not over", () => {
+    test("should not reset game on Enter when game is not over", () => {
       renderHook(() => useKeyboardControls());
 
       hotkeyHandlers.enter(mockEvent, {} as HotkeysEvent);
@@ -259,20 +266,20 @@ describe("useKeyboardControls", () => {
     });
   });
 
-  it("should work with different game states", () => {
+  test("should work with different game states", () => {
     // Test paused state
-    vi.mocked(useGameStore).mockReturnValue({
+    useGameStore.mockReturnValue({
       ...mockGameActions,
       isPaused: true,
     } as MockGameStoreSubset);
 
     const { rerender } = renderHook(() => useKeyboardControls());
 
-    hotkeyHandlers.p({ preventDefault: vi.fn() } as unknown as KeyboardEvent, {} as HotkeysEvent);
+    hotkeyHandlers.p({ preventDefault: mock() } as unknown as KeyboardEvent, {} as HotkeysEvent);
     expect(mockGameActions.togglePause).toHaveBeenCalled();
 
     // Test game over state
-    vi.mocked(useGameStore).mockReturnValue({
+    useGameStore.mockReturnValue({
       ...mockGameActions,
       isGameOver: true,
     } as MockGameStoreSubset);
@@ -280,7 +287,7 @@ describe("useKeyboardControls", () => {
     rerender();
 
     hotkeyHandlers.enter(
-      { preventDefault: vi.fn() } as unknown as KeyboardEvent,
+      { preventDefault: mock() } as unknown as KeyboardEvent,
       {} as HotkeysEvent,
     );
     expect(mockGameActions.resetGame).toHaveBeenCalled();

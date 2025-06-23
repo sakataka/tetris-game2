@@ -1,0 +1,158 @@
+import { $ } from "bun";
+
+// Development server using Bun's frontend dev server
+export const dev = async () => {
+  console.log("🚀 Starting Bun development server...");
+  
+  // Bun's frontend dev server (Bun 1.2 feature)
+  const proc = Bun.spawn([
+    "bun", 
+    "run", 
+    "index.html"
+  ], {
+    env: { 
+      ...process.env, 
+      NODE_ENV: "development",
+      BUN_ENV: "development"
+    },
+    stdio: ["inherit", "inherit", "inherit"],
+  });
+  
+  await proc.exited;
+};
+
+// Production build using Bun.build
+export const build = async () => {
+  console.log("🏗️ Building for production with Bun bundler...");
+  
+  try {
+    // TypeScript type check
+    console.log("📝 Type checking...");
+    await $`bun x tsc --noEmit`;
+    
+    // Clean and prepare dist directory
+    console.log("🧹 Cleaning dist directory...");
+    await $`rm -rf dist`;
+    await $`mkdir -p dist`;
+    
+    // Bundle JavaScript/TypeScript with Bun
+    console.log("📦 Bundling JavaScript...");
+    const result = await Bun.build({
+      entrypoints: ["./src/main.tsx"],
+      outdir: "./dist",
+      splitting: true,        // Enable code splitting
+      minify: true,          // Minify output
+      target: "browser",     // Target browser environment
+      format: "esm",         // Use ES modules
+      publicPath: "/",       // Public path for assets
+      naming: {
+        entry: "[dir]/[name].[hash].[ext]",
+        chunk: "[name].[hash].[ext]",
+        asset: "[name].[hash].[ext]",
+      },
+      external: [],          // No external dependencies
+      sourcemap: "external", // Generate source maps
+    });
+    
+    if (!result.success) {
+      console.error("❌ Bundle failed:");
+      for (const log of result.logs) {
+        console.error(log);
+      }
+      process.exit(1);
+    }
+    
+    // Copy static assets
+    console.log("📁 Copying static assets...");
+    await $`cp index.html dist/`;
+    await $`cp -r public/* dist/ 2>/dev/null || true`;
+    
+    // Process CSS (Tailwind)
+    console.log("🎨 Processing CSS...");
+    const cssContent = await Bun.file("src/index.css").text();
+    await Bun.write("dist/index.css", cssContent);
+    
+    // Update index.html with hashed asset references
+    console.log("🔗 Updating asset references...");
+    const html = await Bun.file("dist/index.html").text();
+    
+    // Find the main JS file
+    const mainJsFile = result.outputs.find(output => 
+      output.path.includes("main") && output.path.endsWith(".js")
+    );
+    
+    if (!mainJsFile) {
+      throw new Error("Main JS file not found in build output");
+    }
+    
+    const updatedHtml = html
+      .replace('./src/main.tsx', `/${mainJsFile.path.split('/').pop()}`)
+      .replace('/src/index.css', '/index.css');
+    
+    await Bun.write("dist/index.html", updatedHtml);
+    
+    // Build summary
+    console.log("✅ Build completed successfully!");
+    console.log(`📦 Generated ${result.outputs.length} files:`);
+    for (const output of result.outputs) {
+      console.log(`   - ${output.path} (${Math.round(output.size / 1024)}KB)`);
+    }
+    
+    // Calculate total size
+    const totalSize = result.outputs.reduce((sum, output) => sum + output.size, 0);
+    console.log(`📊 Total bundle size: ${Math.round(totalSize / 1024)}KB`);
+    
+  } catch (error) {
+    console.error("❌ Build failed:", error);
+    process.exit(1);
+  }
+};
+
+// Preview built files
+export const preview = async () => {
+  console.log("👀 Starting preview server...");
+  
+  // Use a simple static server for preview
+  const proc = Bun.spawn([
+    "bun", 
+    "run", 
+    "--cwd", 
+    "dist",
+    "../node_modules/.bin/serve",
+    "."
+  ], {
+    stdio: ["inherit", "inherit", "inherit"],
+  });
+  
+  await proc.exited;
+};
+
+// Main execution logic
+const command = process.argv[2];
+
+switch (command) {
+  case "dev":
+    await dev();
+    break;
+  case "build":
+    await build();
+    break;
+  case "preview":
+    await preview();
+    break;
+  default:
+    console.log(`
+Usage: bun run bun.build.ts [command]
+
+Commands:
+  dev     Start development server
+  build   Build for production
+  preview Preview production build
+
+Examples:
+  bun run bun.build.ts dev
+  bun run bun.build.ts build
+  bun run bun.build.ts preview
+    `);
+    process.exit(1);
+}

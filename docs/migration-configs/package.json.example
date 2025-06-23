@@ -1,24 +1,24 @@
 {
   "name": "tetris-game2",
   "version": "1.0.0",
-  "description": "",
+  "description": "Modern Tetris game built with React 19, TypeScript, and Bun v1.2.17",
   "main": "index.js",
   "scripts": {
-    "dev": "bun --bun vite",
-    "build": "bun --bun run build:vite",
-    "build:vite": "bun x vite build",
+    "dev": "bun run bun.build.ts dev",
+    "build": "bun run bun.build.ts build",
     "test": "bun test",
     "test:watch": "bun test --watch",
+    "test:coverage": "bun test --coverage",
     "lint": "bun x biome check --write",
     "format": "bun x biome format --write",
     "typecheck": "bun x tsc --noEmit",
-    "preview": "bun x vite preview",
+    "preview": "bun run --cwd dist ../node_modules/.bin/serve .",
     "knip": "bun x knip",
     "info": "bun info",
-    "vercel-build": "bun run build",
-    "prepare": "lefthook install"
+    "prepare": "lefthook install",
+    "vercel-build": "bun run build"
   },
-  "keywords": [],
+  "keywords": ["tetris", "game", "react", "typescript", "bun", "v1.2.17"],
   "author": "",
   "license": "ISC",
   "packageManager": "bun@1.2.17",
@@ -41,20 +41,16 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.0.4",
-    "@happy-dom/global-registrator": "^18.0.1",
+    "@happy-dom/global-registrator": "^15.11.7",
     "@tailwindcss/vite": "^4.1.10",
-    "@testing-library/dom": "^10.4.0",
-    "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^16.3.0",
-    "@types/bun": "^1.2.17",
+    "@testing-library/jest-dom": "6.6.3",
+    "@testing-library/react": "16.3.0",
     "@types/react": "19.1.8",
     "@types/react-dom": "19.1.6",
-    "@vitejs/plugin-react": "4.5.2",
-    "happy-dom": "^18.0.1",
+    "happy-dom": "^15.11.7",
     "knip": "^5.61.2",
     "lefthook": "1.11.14",
     "tailwindcss": "4.1.10",
-    "typescript": "5.8.3",
-    "vite": "6.3.5"
+    "typescript": "5.8.3"
   }
 }
