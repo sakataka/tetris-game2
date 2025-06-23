@@ -5,7 +5,6 @@
     "ms-vscode.vscode-typescript-next",
     "oven.bun-vscode",
     "ms-vscode.vscode-json",
-    "usernamehw.errorlens",
-    "esbenp.prettier-vscode"
+    "usernamehw.errorlens"
   ]
 }
