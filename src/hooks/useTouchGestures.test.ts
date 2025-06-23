@@ -44,7 +44,7 @@ describe("useTouchGestures", () => {
     pageY: clientY,
     screenX: clientX,
     screenY: clientY,
-    target: null as any,
+    target: null,
     radiusX: 0,
     radiusY: 0,
     rotationAngle: 0,
