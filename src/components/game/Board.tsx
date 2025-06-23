@@ -84,10 +84,13 @@ export function Board() {
             const isPlacedPiece = placedPositionsSet.has(positionKey);
             const isClearingLine = clearingLines.includes(y);
 
+            // Force cell value to 0 for clearing lines to prevent color bleeding
+            const cellValue = isClearingLine ? 0 : cell;
+
             return (
               <BoardCell
                 key={`cell-${y * BOARD_WIDTH + x}`}
-                cellValue={cell}
+                cellValue={cellValue}
                 x={x}
                 y={y}
                 isCurrentPiece={isCurrentPiece}

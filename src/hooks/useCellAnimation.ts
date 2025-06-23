@@ -36,7 +36,7 @@ export function useCellAnimation({
     if (!shouldAnimate) return {};
     if (isCurrentPiece) return { y: 0, opacity: 1 };
     if (isPlacedPiece) return { scale: 1 };
-    if (isClearingLine) return { opacity: [1, 0.3, 1, 0.3, 1], scale: [1, 1.1, 1] };
+    if (isClearingLine) return { opacity: [1, 0.3, 1, 0.3, 0], scale: [1, 1.1, 1, 1.1, 1] };
     return {};
   }, [shouldAnimate, isCurrentPiece, isPlacedPiece, isClearingLine]);
 

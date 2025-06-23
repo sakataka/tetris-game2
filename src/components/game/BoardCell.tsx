@@ -39,7 +39,7 @@ export function BoardCell({
 
   return (
     <motion.div
-      key={`cell-${y * BOARD_WIDTH + x}-${isCurrentPiece ? animationTriggerKey : "static"}`}
+      key={`cell-${y * BOARD_WIDTH + x}-${isCurrentPiece ? animationTriggerKey : "static"}-${isClearingLine ? "clearing" : "normal"}-${cellValue}`}
       initial={initialAnimation}
       animate={animateProps}
       transition={transitionProps}
