@@ -32,3 +32,6 @@ coverage
 *.lcov
 .nyc_output
 .vercel
+
+# TypeScript
+*.tsbuildinfo
