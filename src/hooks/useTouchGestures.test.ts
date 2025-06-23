@@ -121,14 +121,11 @@ describe("useTouchGestures", () => {
     const touchStart = createTouchEvent("touchstart", [createTouch(100, 100)]);
     result.current.handleTouchStart(touchStart);
 
-    // Small delay to simulate tap
-    setTimeout(() => {
-      // Touch end at same position - tap
-      const touchEnd = createTouchEvent("touchend", [createTouch(105, 105)]);
-      result.current.handleTouchEnd(touchEnd);
+    // Touch end at same position immediately - tap
+    const touchEnd = createTouchEvent("touchend", [createTouch(105, 105)]);
+    result.current.handleTouchEnd(touchEnd);
 
-      expect(mockGameStore.rotate).toHaveBeenCalled();
-    }, 50);
+    expect(mockGameStore.rotate).toHaveBeenCalled();
   });
 
   it("ignores gestures when game is paused", () => {
