@@ -76,7 +76,7 @@ describe("useKeyboardControls", () => {
     // Clear all mock call histories
     Object.values(mockGameActions).forEach((mockFn) => {
       if (typeof mockFn === "function" && "mockClear" in mockFn) {
-        (mockFn as any).mockClear();
+        (mockFn as { mockClear: () => void }).mockClear();
       }
     });
     mockStartTransition.mockClear();
