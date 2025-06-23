@@ -73,6 +73,18 @@ describe("useKeyboardControls", () => {
   beforeEach(async () => {
     mock.restore();
 
+    // Clear all mock call histories
+    Object.values(mockGameActions).forEach((mockFn) => {
+      if (typeof mockFn === "function" && "mockClear" in mockFn) {
+        (mockFn as any).mockClear();
+      }
+    });
+    mockStartTransition.mockClear();
+
+    // Reset game state to default
+    mockGameActions.isPaused = false;
+    mockGameActions.isGameOver = false;
+
     // Mock useGameStore
     useGameStore.mockReturnValue(mockGameActions);
 

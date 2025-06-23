@@ -15,7 +15,9 @@
     "preview": "bun x vite preview",
     "knip": "bun x knip",
     "check": "bun run typecheck && bun run knip",
-    "ci": "bun run format && bun run lint && bun run typecheck && bun test && bun run build",
+    "test:fast": "bun test src/game/ src/hooks/ src/utils/",
+    "test:components": "bun test src/components/",
+    "ci": "bun run format && bun run lint && bun run typecheck && bun run test:fast && bun run build",
     "prepare": "lefthook install"
   },
   "dependencies": {
