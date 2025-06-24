@@ -1,6 +1,7 @@
 import { describe, expect, mock, test } from "bun:test";
 import { render } from "@testing-library/react";
 import "@testing-library/jest-dom";
+import type React from "react";
 import { BoardCell } from "./BoardCell";
 
 // Simple, focused mocks
@@ -43,7 +44,7 @@ mock.module("@/lib/utils", () => ({
 
 mock.module("framer-motion", () => ({
   motion: {
-    div: (props: any) => (
+    div: (props: { className?: string; children?: React.ReactNode }) => (
       <div data-testid="board-cell" className={props.className}>
         {props.children}
       </div>
