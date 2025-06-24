@@ -10,6 +10,9 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    target: "baseline-widely-available",
+  },
   experimental: {
     enableNativePlugin: true,
   },
