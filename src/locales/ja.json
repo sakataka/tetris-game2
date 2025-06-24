@@ -27,6 +27,15 @@
       "rotate": "回転",
       "hardDrop": "ハードドロップ",
       "pause": "一時停止"
+    },
+    "settings": {
+      "title": "設定",
+      "language": "言語",
+      "current": "現在",
+      "ghostPiece": "ゴーストピース",
+      "ghostPieceDescription": "ゴーストピース表示",
+      "enabled": "有効",
+      "disabled": "無効"
     }
   }
 }

@@ -10,8 +10,10 @@ import { useBoardData } from "./useGameSelectors";
 const originalLocalStorage = global.localStorage;
 
 beforeEach(() => {
-  // Reset the game store before each test
-  useGameStore.setState(createInitialGameState());
+  // Reset the game store before each test using the resetGame action
+  if (useGameStore?.getState?.()?.resetGame) {
+    useGameStore.getState().resetGame();
+  }
 
   // Mock localStorage
   const mockStorage: { [key: string]: string } = {};
@@ -47,10 +49,15 @@ describe("useBoardData", () => {
       shape: getTetrominoShape("T"),
     };
 
-    useGameStore.setState({
-      currentPiece,
-      ghostPosition: { x: 4, y: 18 }, // Ghost position at bottom
-    });
+    // Manually set the current piece and ghost position using the store's setState
+    if (useGameStore?.setState) {
+      const store = useGameStore.getState();
+      useGameStore.setState({
+        ...store,
+        currentPiece,
+        ghostPosition: { x: 4, y: 18 }, // Ghost position at bottom
+      });
+    }
 
     const { result } = renderHook(() => useBoardData());
 
@@ -69,10 +76,15 @@ describe("useBoardData", () => {
       shape: getTetrominoShape("T"),
     };
 
-    useGameStore.setState({
-      currentPiece,
-      ghostPosition: { x: 4, y: 18 }, // Ghost position at bottom
-    });
+    // Manually set the current piece and ghost position using the store's setState
+    if (useGameStore?.setState) {
+      const store = useGameStore.getState();
+      useGameStore.setState({
+        ...store,
+        currentPiece,
+        ghostPosition: { x: 4, y: 18 }, // Ghost position at bottom
+      });
+    }
 
     const { result } = renderHook(() => useBoardData());
 
@@ -84,10 +96,15 @@ describe("useBoardData", () => {
     // Set showGhostPiece to true
     updateSettings({ showGhostPiece: true });
 
-    useGameStore.setState({
-      currentPiece: null,
-      ghostPosition: null,
-    });
+    // Set no current piece and no ghost position
+    if (useGameStore?.setState) {
+      const store = useGameStore.getState();
+      useGameStore.setState({
+        ...store,
+        currentPiece: null,
+        ghostPosition: null,
+      });
+    }
 
     const { result } = renderHook(() => useBoardData());
 
@@ -105,10 +122,15 @@ describe("useBoardData", () => {
       shape: getTetrominoShape("T"),
     };
 
-    useGameStore.setState({
-      currentPiece,
-      ghostPosition: null, // No ghost position
-    });
+    // Set current piece but no ghost position
+    if (useGameStore?.setState) {
+      const store = useGameStore.getState();
+      useGameStore.setState({
+        ...store,
+        currentPiece,
+        ghostPosition: null, // No ghost position
+      });
+    }
 
     const { result } = renderHook(() => useBoardData());
 

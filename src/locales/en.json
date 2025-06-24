@@ -27,6 +27,15 @@
       "rotate": "Rotate",
       "hardDrop": "Hard Drop",
       "pause": "Pause"
+    },
+    "settings": {
+      "title": "Settings",
+      "language": "Language",
+      "current": "Current",
+      "ghostPiece": "Ghost Piece",
+      "ghostPieceDescription": "Ghost Piece Display",
+      "enabled": "Enabled",
+      "disabled": "Disabled"
     }
   }
 }

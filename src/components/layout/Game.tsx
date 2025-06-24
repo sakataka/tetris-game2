@@ -10,7 +10,7 @@ import {
   ScoreBoard,
   TouchControls,
 } from "../game";
-import { LanguageSelector } from "./LanguageSelector";
+import { GameSettings } from "./GameSettings";
 
 export function Game() {
   useGameLoop();
@@ -19,7 +19,7 @@ export function Game() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white p-4 relative">
-      <LanguageSelector />
+      <GameSettings />
 
       <main
         className="flex flex-col md:grid md:grid-cols-[240px_1fr] gap-6 md:gap-8 md:items-start md:justify-center md:min-h-[calc(100vh-2rem)] pt-12 md:pt-4"
