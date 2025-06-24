@@ -50,9 +50,15 @@ export const useGameStore = create<GameStore>((set) => ({
   togglePause: () => set((state) => ({ isPaused: !state.isPaused })),
   resetGame: () => set(createInitialGameState()),
   clearAnimationStates: () =>
-    set((state) => ({
-      ...state,
-      placedPositions: [],
-      clearingLines: [],
-    })),
+    set((state) => {
+      // Prevent unnecessary updates if animation states are already empty
+      if (state.placedPositions.length === 0 && state.clearingLines.length === 0) {
+        return state;
+      }
+      return {
+        ...state,
+        placedPositions: [],
+        clearingLines: [],
+      };
+    }),
 }));

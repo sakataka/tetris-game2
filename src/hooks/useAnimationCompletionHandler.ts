@@ -1,22 +1,40 @@
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { useGameActions } from "./useGameSelectors";
 
 export function useAnimationCompletionHandler() {
   const { clearAnimationStates } = useGameActions();
+  const clearTimeoutRef = useRef<number | null>(null);
+  const clearRequestRef = useRef<number | null>(null);
 
   const handleAnimationComplete = useCallback(
     (isClearingLine: boolean, isPlacedPiece: boolean) => {
       if (isClearingLine) {
+        // Cancel any pending clear operations to prevent duplicate calls
+        if (clearTimeoutRef.current) {
+          clearTimeout(clearTimeoutRef.current);
+        }
+        if (clearRequestRef.current) {
+          cancelAnimationFrame(clearRequestRef.current);
+        }
+
         // For line clear animation, delay clearing to ensure animation completes
-        setTimeout(() => {
+        clearTimeoutRef.current = window.setTimeout(() => {
           clearAnimationStates();
+          clearTimeoutRef.current = null;
         }, 50); // Small delay to ensure animation DOM updates complete
       } else if (isPlacedPiece) {
+        // Cancel any pending clear operations to prevent duplicate calls
+        if (clearTimeoutRef.current) {
+          clearTimeout(clearTimeoutRef.current);
+        }
+        if (clearRequestRef.current) {
+          cancelAnimationFrame(clearRequestRef.current);
+        }
+
         // For piece placement animation, clear the state in the next frame
-        // This attempts to avoid consecutive calls to clearAnimationStates
-        // when multiple cells complete animations simultaneously
-        requestAnimationFrame(() => {
+        clearRequestRef.current = requestAnimationFrame(() => {
           clearAnimationStates();
+          clearRequestRef.current = null;
         });
       }
     },
