@@ -33,6 +33,26 @@ export function isValidPosition(
   return true;
 }
 
+/**
+ * Helper function to iterate over each filled cell of a tetromino piece
+ * Calls the callback for each filled cell with board coordinates
+ */
+export function forEachPieceCell(
+  shape: number[][],
+  position: Position,
+  callback: (boardX: number, boardY: number, shapeX: number, shapeY: number) => void,
+): void {
+  for (let y = 0; y < shape.length; y++) {
+    for (let x = 0; x < shape[y].length; x++) {
+      if (shape[y][x]) {
+        const boardY = position.y + y;
+        const boardX = position.x + x;
+        callback(boardX, boardY, x, y);
+      }
+    }
+  }
+}
+
 export function placeTetromino(
   board: BoardMatrix,
   shape: number[][],
@@ -41,17 +61,11 @@ export function placeTetromino(
 ): BoardMatrix {
   const newBoard = board.map((row) => [...row]) as BoardMatrix;
 
-  for (let y = 0; y < shape.length; y++) {
-    for (let x = 0; x < shape[y].length; x++) {
-      if (shape[y][x]) {
-        const boardY = position.y + y;
-        const boardX = position.x + x;
-        if (boardY >= 0 && boardY < BOARD_HEIGHT && boardX >= 0 && boardX < BOARD_WIDTH) {
-          newBoard[boardY][boardX] = colorIndex;
-        }
-      }
+  forEachPieceCell(shape, position, (boardX, boardY) => {
+    if (boardY >= 0 && boardY < BOARD_HEIGHT && boardX >= 0 && boardX < BOARD_WIDTH) {
+      newBoard[boardY][boardX] = colorIndex;
     }
-  }
+  });
 
   return newBoard;
 }

@@ -6,7 +6,13 @@ import {
   MIN_DROP_SPEED_MS,
   SPEED_DECREASE_PER_LEVEL,
 } from "../utils/constants";
-import { clearLines, createEmptyBoard, isValidPosition, placeTetromino } from "./board";
+import {
+  clearLines,
+  createEmptyBoard,
+  forEachPieceCell,
+  isValidPosition,
+  placeTetromino,
+} from "./board";
 import {
   createTetromino,
   getRandomTetrominoType,
@@ -118,15 +124,8 @@ export function hardDropTetromino(state: GameState): GameState {
 // Helper function to record placed positions for animation
 function _getPlacedPositions(currentPiece: Tetromino): { x: number; y: number }[] {
   const positions: { x: number; y: number }[] = [];
-  currentPiece.shape.forEach((row, y) => {
-    row.forEach((cell, x) => {
-      if (cell) {
-        positions.push({
-          x: currentPiece.position.x + x,
-          y: currentPiece.position.y + y,
-        });
-      }
-    });
+  forEachPieceCell(currentPiece.shape, currentPiece.position, (boardX, boardY) => {
+    positions.push({ x: boardX, y: boardY });
   });
   return positions;
 }

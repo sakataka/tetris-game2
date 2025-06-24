@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { forEachPieceCell } from "../game/board";
 import { getTetrominoColorIndex } from "../game/tetrominos";
 import { useGameStore } from "../store/gameStore";
 import { BOARD_HEIGHT, BOARD_WIDTH } from "../utils/constants";
@@ -55,17 +56,11 @@ export const useBoardData = () => {
 
     if (currentPiece) {
       const colorIndex = getTetrominoColorIndex(currentPiece.type);
-      currentPiece.shape.forEach((row, y) => {
-        row.forEach((cell, x) => {
-          if (cell) {
-            const boardY = currentPiece.position.y + y;
-            const boardX = currentPiece.position.x + x;
-            if (boardY >= 0 && boardY < BOARD_HEIGHT && boardX >= 0 && boardX < BOARD_WIDTH) {
-              newBoard[boardY][boardX] = colorIndex;
-              positions.add(`${boardX},${boardY}`);
-            }
-          }
-        });
+      forEachPieceCell(currentPiece.shape, currentPiece.position, (boardX, boardY) => {
+        if (boardY >= 0 && boardY < BOARD_HEIGHT && boardX >= 0 && boardX < BOARD_WIDTH) {
+          newBoard[boardY][boardX] = colorIndex;
+          positions.add(`${boardX},${boardY}`);
+        }
       });
     }
 
@@ -86,16 +81,10 @@ export const useBoardData = () => {
     const positions = new Set<string>();
 
     if (currentPiece && ghostPosition) {
-      currentPiece.shape.forEach((row, y) => {
-        row.forEach((cell, x) => {
-          if (cell) {
-            const boardY = ghostPosition.y + y;
-            const boardX = ghostPosition.x + x;
-            if (boardY >= 0 && boardY < BOARD_HEIGHT && boardX >= 0 && boardX < BOARD_WIDTH) {
-              positions.add(`${boardX},${boardY}`);
-            }
-          }
-        });
+      forEachPieceCell(currentPiece.shape, ghostPosition, (boardX, boardY) => {
+        if (boardY >= 0 && boardY < BOARD_HEIGHT && boardX >= 0 && boardX < BOARD_WIDTH) {
+          positions.add(`${boardX},${boardY}`);
+        }
       });
     }
 
