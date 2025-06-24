@@ -17,10 +17,16 @@ interface GameStore extends GameState {
   togglePause: () => void;
   resetGame: () => void;
   clearAnimationStates: () => void;
-  saveHighScoreIfNeeded: () => void;
 }
 
-export const useGameStore = create<GameStore>((set, get) => ({
+// Helper function to save high score when game transitions to game over
+const saveHighScoreOnGameOver = (oldState: GameState, newState: GameState): void => {
+  if (!oldState.isGameOver && newState.isGameOver) {
+    setHighScore(newState.score, newState.lines, newState.level);
+  }
+};
+
+export const useGameStore = create<GameStore>((set) => ({
   ...createInitialGameState(),
 
   moveLeft: () => set((state) => moveTetrominoBy(state, -1, 0)),
@@ -28,10 +34,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   moveDown: () => {
     set((state) => {
       const newState = moveTetrominoBy(state, 0, 1);
-      // Save high score if game just ended
-      if (!state.isGameOver && newState.isGameOver) {
-        setHighScore(newState.score, newState.lines, newState.level);
-      }
+      saveHighScoreOnGameOver(state, newState);
       return newState;
     });
   },
@@ -39,10 +42,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   drop: () => {
     set((state) => {
       const newState = hardDropTetromino(state);
-      // Save high score if game just ended
-      if (!state.isGameOver && newState.isGameOver) {
-        setHighScore(newState.score, newState.lines, newState.level);
-      }
+      saveHighScoreOnGameOver(state, newState);
       return newState;
     });
   },
@@ -55,10 +55,4 @@ export const useGameStore = create<GameStore>((set, get) => ({
       placedPositions: [],
       clearingLines: [],
     })),
-  saveHighScoreIfNeeded: () => {
-    const state = get();
-    if (state.isGameOver) {
-      setHighScore(state.score, state.lines, state.level);
-    }
-  },
 }));
