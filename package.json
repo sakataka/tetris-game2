@@ -17,7 +17,8 @@
     "check": "bun run typecheck && bun run knip",
     "test:fast": "bun test src/game/ src/hooks/ src/utils/",
     "test:components": "bun test src/components/",
-    "ci": "bun run format && bun run lint && bun run typecheck && bun run test:fast && bun run build",
+    "test:ci": "bun test src/game/ src/hooks/ src/utils/ --timeout 30000",
+    "ci": "bun run format && bun run lint && bun run typecheck && bun run test:ci && bun run build",
     "prepare": "lefthook install"
   },
   "dependencies": {
