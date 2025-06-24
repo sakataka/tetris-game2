@@ -27,6 +27,8 @@ describe("useTouchGestures", () => {
     mockGameStore.moveDown.mockClear();
     mockGameStore.rotate.mockClear();
     mockGameStore.drop.mockClear();
+
+    // Note: Bun test doesn't have timer control like Jest
   });
   const createTouchEvent = (type: string, touches: Touch[]) => {
     return {
@@ -114,8 +116,10 @@ describe("useTouchGestures", () => {
     expect(mockGameStore.drop).toHaveBeenCalled();
   });
 
-  it("handles tap to rotate", () => {
-    const { result } = renderHook(() => useTouchGestures({ tapTime: 200, minSwipeDistance: 30 }));
+  it("handles tap to rotate", async () => {
+    const { result } = renderHook(() =>
+      useTouchGestures({ tapTime: 200, minSwipeDistance: 30, doubleTapTime: 50 }),
+    );
 
     // Touch start at position (100, 100)
     const touchStart = createTouchEvent("touchstart", [createTouch(100, 100)]);
@@ -125,7 +129,76 @@ describe("useTouchGestures", () => {
     const touchEnd = createTouchEvent("touchend", [createTouch(105, 105)]);
     result.current.handleTouchEnd(touchEnd);
 
+    // Wait for single tap timeout to complete
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
     expect(mockGameStore.rotate).toHaveBeenCalled();
+  });
+
+  it("handles double tap to hard drop", () => {
+    // Ensure game is not paused or over
+    mockGameStore.isPaused = false;
+    mockGameStore.isGameOver = false;
+
+    const { result } = renderHook(() =>
+      useTouchGestures({ tapTime: 200, minSwipeDistance: 30, doubleTapTime: 500 }),
+    );
+
+    // Mock Date.now to control timing
+    const originalDateNow = Date.now;
+    let currentTime = 1000;
+    Date.now = () => currentTime;
+
+    try {
+      // First tap
+      const touchStart1 = createTouchEvent("touchstart", [createTouch(100, 100)]);
+      result.current.handleTouchStart(touchStart1);
+      const touchEnd1 = createTouchEvent("touchend", [createTouch(105, 105)]);
+      result.current.handleTouchEnd(touchEnd1);
+
+      // Advance time slightly (within double tap window)
+      currentTime += 100;
+
+      // Second tap within double tap time
+      const touchStart2 = createTouchEvent("touchstart", [createTouch(100, 100)]);
+      result.current.handleTouchStart(touchStart2);
+      const touchEnd2 = createTouchEvent("touchend", [createTouch(105, 105)]);
+      result.current.handleTouchEnd(touchEnd2);
+
+      // Double tap should trigger drop immediately
+      expect(mockGameStore.drop).toHaveBeenCalledTimes(1);
+      expect(mockGameStore.rotate).not.toHaveBeenCalled();
+    } finally {
+      Date.now = originalDateNow;
+    }
+  });
+
+  it("handles two separated taps as individual rotations", async () => {
+    const { result } = renderHook(() =>
+      useTouchGestures({ tapTime: 200, minSwipeDistance: 30, doubleTapTime: 50 }),
+    );
+
+    // First tap
+    const touchStart1 = createTouchEvent("touchstart", [createTouch(100, 100)]);
+    result.current.handleTouchStart(touchStart1);
+    const touchEnd1 = createTouchEvent("touchend", [createTouch(105, 105)]);
+    result.current.handleTouchEnd(touchEnd1);
+
+    // Wait longer than double tap time
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    // Second tap after double tap time has passed
+    const touchStart2 = createTouchEvent("touchstart", [createTouch(100, 100)]);
+    result.current.handleTouchStart(touchStart2);
+    const touchEnd2 = createTouchEvent("touchend", [createTouch(105, 105)]);
+    result.current.handleTouchEnd(touchEnd2);
+
+    // Wait for second tap timeout to complete
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    // Both taps should trigger rotate, no drop
+    expect(mockGameStore.rotate).toHaveBeenCalledTimes(2);
+    expect(mockGameStore.drop).not.toHaveBeenCalled();
   });
 
   it("ignores gestures when game is paused", () => {

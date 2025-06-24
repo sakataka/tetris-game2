@@ -11,14 +11,14 @@ allowed-tools: Bash(bun:*)
 2. **フォーマット** - コードフォーマットを適用
 3. **リント** - コード品質チェック
 4. **タイプチェック** - TypeScript型チェック
-5. **テスト** - ゲームロジックテストの実行
+5. **テスト** - 全テストの実行
 6. **ビルド** - プロダクションビルド
 
 ## 実行
 
 ```bash
 # パイプライン実行（エラー時即座に停止・実行時間計測）
-time (bun run knip && bun run format && bun run lint && bun run typecheck && bun test src/game/ && bun run build)
+time (bun run knip && bun run format && bun run lint && bun run typecheck && bun test && bun run build)
 ```
 
 各ステップでエラーが発生した場合は`&&`演算子により即座に処理を停止し、エラー内容を報告します。
@@ -29,5 +29,5 @@ time (bun run knip && bun run format && bun run lint && bun run typecheck && bun
 2. **format**: コードスタイルを統一してから品質チェックを実行
 3. **lint**: フォーマット済みのコードに対して品質チェック
 4. **typecheck**: 型の整合性を確認
-5. **test**: コードが正しく動作することを確認（ゲームロジックに限定）
+5. **test**: コードが正しく動作することを確認（全テスト実行）
 6. **build**: すべてのチェックをパスしたコードをビルド

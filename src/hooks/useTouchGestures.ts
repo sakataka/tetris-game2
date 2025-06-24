@@ -1,4 +1,4 @@
-import { useRef, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import { useGameStore } from "../store/gameStore";
 
 interface TouchPoint {
@@ -11,15 +11,18 @@ interface TouchGestureOptions {
   minSwipeDistance?: number;
   maxSwipeTime?: number;
   tapTime?: number;
+  doubleTapTime?: number;
 }
 
 export function useTouchGestures(options: TouchGestureOptions = {}) {
-  const { minSwipeDistance = 30, maxSwipeTime = 500, tapTime = 200 } = options;
+  const { minSwipeDistance = 30, maxSwipeTime = 500, tapTime = 200, doubleTapTime = 300 } = options;
 
   const { moveLeft, moveRight, moveDown, rotate, drop, isPaused, isGameOver } = useGameStore();
 
   const [, startTransition] = useTransition();
   const touchStartRef = useRef<TouchPoint | null>(null);
+  const [lastTapTime, setLastTapTime] = useState<number>(0);
+  const singleTapTimeoutRef = useRef<number | null>(null);
 
   // Helper for game actions with common conditions
   const executeGameAction = (action: () => void, useTransitionWrapper = true) => {
@@ -62,8 +65,26 @@ export function useTouchGestures(options: TouchGestureOptions = {}) {
 
     // Check if it's a tap (short time, small distance)
     if (deltaTime < tapTime && distance < minSwipeDistance) {
-      // Double tap for hard drop, single tap for rotate
-      executeGameAction(rotate);
+      // Handle double tap detection
+      const now = Date.now();
+      const timeSinceLastTap = now - lastTapTime;
+
+      if (lastTapTime > 0 && timeSinceLastTap < doubleTapTime) {
+        // Double tap detected - cancel single tap timeout and execute hard drop
+        if (singleTapTimeoutRef.current) {
+          clearTimeout(singleTapTimeoutRef.current);
+          singleTapTimeoutRef.current = null;
+        }
+        executeGameAction(drop, false);
+      } else {
+        // Potential single tap - delay execution to check for double tap
+        singleTapTimeoutRef.current = window.setTimeout(() => {
+          executeGameAction(rotate);
+          singleTapTimeoutRef.current = null;
+        }, doubleTapTime);
+      }
+
+      setLastTapTime(now);
       return;
     }
 
