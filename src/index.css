@@ -73,16 +73,37 @@
   }
 }
 
-/* Prevent scrolling for the game */
+/* Allow vertical scrolling on small screens */
 html,
 body {
-  overflow: hidden;
   height: 100%;
   margin: 0;
   padding: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 #root {
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100vh;
+}
+
+/* Custom scrollbar for sidebar */
+@media (min-width: 768px) {
+  aside::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  aside::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+  }
+
+  aside::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+  }
+
+  aside::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
 }

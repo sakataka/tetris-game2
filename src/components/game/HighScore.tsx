@@ -25,8 +25,8 @@ export function HighScore({ className, showFullList = false }: HighScoreProps) {
   if (!showFullList && !currentHighScore) {
     return (
       <Card className={`bg-gray-900/50 backdrop-blur-sm border-gray-700 shadow-xl ${className}`}>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg font-bold text-gray-300 text-center flex items-center justify-center gap-2">
+        <CardHeader>
+          <CardTitle className="text-base font-bold text-gray-300 text-center flex items-center justify-center gap-2">
             <Trophy className="h-5 w-5 text-yellow-500" />
             {t("game.highScore.title")}
           </CardTitle>
@@ -41,8 +41,8 @@ export function HighScore({ className, showFullList = false }: HighScoreProps) {
   if (showFullList) {
     return (
       <Card className={`bg-gray-900/50 backdrop-blur-sm border-gray-700 shadow-xl ${className}`}>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg font-bold text-gray-300 text-center flex items-center justify-center gap-2">
+        <CardHeader>
+          <CardTitle className="text-base font-bold text-gray-300 text-center flex items-center justify-center gap-2">
             <Trophy className="h-5 w-5 text-yellow-500" />
             {t("game.highScore.topScores")}
           </CardTitle>
@@ -102,30 +102,30 @@ export function HighScore({ className, showFullList = false }: HighScoreProps) {
     <Card
       className={`bg-gray-900/50 backdrop-blur-sm border-gray-700 shadow-xl hover:bg-gray-900/60 hover:border-gray-600 transition-all duration-300 hover:shadow-2xl ${className}`}
     >
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg font-bold text-gray-300 text-center flex items-center justify-center gap-2">
+      <CardHeader>
+        <CardTitle className="text-base font-bold text-gray-300 text-center flex items-center justify-center gap-2">
           <Trophy className="h-5 w-5 text-yellow-500" />
           {t("game.highScore.title")}
         </CardTitle>
       </CardHeader>
       <CardContent>
         {currentHighScore && (
-          <div className="space-y-3">
+          <div className="space-y-2">
             <div className="text-center">
-              <div className="text-2xl font-bold text-yellow-400 mb-1">
+              <div className="text-xl font-bold text-yellow-400 mb-1">
                 {formatScore(currentHighScore.score)}
               </div>
               <div className="text-sm text-gray-400">{formatDate(currentHighScore.date)}</div>
             </div>
             <div className="grid grid-cols-2 gap-2 text-center">
-              <div className="bg-gray-800/30 rounded-md p-2">
+              <div className="bg-gray-800/30 rounded-md p-1.5">
                 <div className="text-xs text-gray-400 flex items-center justify-center gap-1">
                   <Target className="h-3 w-3" />
                   {t("game.score.lines")}
                 </div>
                 <div className="text-sm font-semibold text-white">{currentHighScore.lines}</div>
               </div>
-              <div className="bg-gray-800/30 rounded-md p-2">
+              <div className="bg-gray-800/30 rounded-md p-1.5">
                 <div className="text-xs text-gray-400 flex items-center justify-center gap-1">
                   <TrendingUp className="h-3 w-3" />
                   {t("game.score.level")}

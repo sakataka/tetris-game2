@@ -15,7 +15,7 @@ export function AnimatedScoreItem({
   label,
   value,
   animationKey,
-  className = "text-2xl font-bold text-tetris-cyan",
+  className = "text-xl font-bold text-tetris-cyan",
   animation = "score",
 }: AnimatedScoreItemProps) {
   const getAnimationPreset = () => {
@@ -50,7 +50,7 @@ export function AnimatedScoreItem({
   const animationProps = getAnimationPreset();
 
   return (
-    <div className="space-y-1">
+    <div className="flex items-center justify-between">
       <p className="text-sm font-medium text-gray-400">{label}</p>
       <motion.p
         key={animationKey}

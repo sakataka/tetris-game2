@@ -22,12 +22,12 @@ export function Game() {
       <LanguageSelector />
 
       <main
-        className="flex flex-col md:grid md:grid-cols-[240px_1fr] gap-6 md:gap-8 md:place-items-center md:min-h-[calc(100vh-2rem)] pt-12 md:pt-0"
+        className="flex flex-col md:grid md:grid-cols-[240px_1fr] gap-6 md:gap-8 md:items-start md:justify-center md:min-h-[calc(100vh-2rem)] pt-12 md:pt-4"
         aria-label="Tetris Game"
       >
         {/* Sidebar - Top on mobile, left side on desktop */}
         <aside
-          className="flex flex-col gap-4 w-full max-w-sm md:max-w-none mx-auto md:mx-0 order-1 md:order-none"
+          className="flex flex-col gap-3 w-full max-w-sm md:max-w-none mx-auto md:mx-0 order-1 md:order-none md:sticky md:top-4 md:max-h-[calc(100vh-2rem)] md:overflow-y-auto md:pr-2"
           aria-label="Game Information"
         >
           <ScoreBoard />
@@ -39,7 +39,7 @@ export function Game() {
         </aside>
 
         {/* Game board area */}
-        <div className="order-2 md:order-none flex flex-col items-center md:items-start">
+        <div className="order-2 md:order-none flex flex-col items-center md:justify-center">
           <section
             className="relative"
             aria-label="Game Board Area"
