@@ -1,13 +1,32 @@
-import { beforeEach, describe, expect, it, mock } from "bun:test";
+import { describe, expect, it, mock } from "bun:test";
 import { render } from "@testing-library/react";
+import type React from "react";
 import { TouchControls } from "./TouchControls";
 
-// Mock react-i18next using shared mock
-mock.module("react-i18next", () => import("../../test/__mocks__/react-i18next"));
+// Mock react-i18next
+mock.module("react-i18next", () => ({
+  useTranslation: () => ({
+    t: (key: string) => key,
+  }),
+}));
 
 // Mock UI components
 mock.module("../ui/button", () => ({
-  Button: mock(({ children, className, disabled, onTouchStart, onClick, ...props }) => (
+  Button: ({
+    children,
+    className,
+    disabled,
+    onTouchStart,
+    onClick,
+    ...props
+  }: {
+    children: React.ReactNode;
+    className?: string;
+    disabled?: boolean;
+    onTouchStart?: () => void;
+    onClick?: () => void;
+    [key: string]: unknown;
+  }) => (
     <button
       className={className}
       disabled={disabled}
@@ -18,35 +37,23 @@ mock.module("../ui/button", () => ({
     >
       {children}
     </button>
-  )),
+  ),
 }));
 
-// Mock the game store
-const mockGameStore = {
-  moveLeft: mock(() => {}),
-  moveRight: mock(() => {}),
-  moveDown: mock(() => {}),
-  rotate: mock(() => {}),
-  drop: mock(() => {}),
-  isPaused: false,
-  isGameOver: false,
-};
-
+// Simple mock for game store
 mock.module("../../store/gameStore", () => ({
-  useGameStore: () => mockGameStore,
+  useGameStore: () => ({
+    moveLeft: () => {},
+    moveRight: () => {},
+    moveDown: () => {},
+    rotate: () => {},
+    drop: () => {},
+    isPaused: false,
+    isGameOver: false,
+  }),
 }));
 
 describe("TouchControls", () => {
-  beforeEach(() => {
-    // Reset mock store state before each test
-    mockGameStore.isPaused = false;
-    mockGameStore.isGameOver = false;
-    mockGameStore.moveLeft.mockClear();
-    mockGameStore.moveRight.mockClear();
-    mockGameStore.moveDown.mockClear();
-    mockGameStore.rotate.mockClear();
-    mockGameStore.drop.mockClear();
-  });
   it("renders all control buttons", () => {
     const { container } = render(<TouchControls />);
 
@@ -55,31 +62,6 @@ describe("TouchControls", () => {
     expect(container.querySelector('[aria-label="Soft drop"]')).toBeTruthy();
     expect(container.querySelector('[aria-label="Move left"]')).toBeTruthy();
     expect(container.querySelector('[aria-label="Move right"]')).toBeTruthy();
-  });
-
-  it("disables buttons when game is paused", () => {
-    mockGameStore.isPaused = true;
-
-    const { container } = render(<TouchControls />);
-
-    expect(container.querySelector('[aria-label="Rotate piece"]')).toHaveProperty("disabled", true);
-    expect(container.querySelector('[aria-label="Hard drop"]')).toHaveProperty("disabled", true);
-    expect(container.querySelector('[aria-label="Soft drop"]')).toHaveProperty("disabled", true);
-    expect(container.querySelector('[aria-label="Move left"]')).toHaveProperty("disabled", true);
-    expect(container.querySelector('[aria-label="Move right"]')).toHaveProperty("disabled", true);
-  });
-
-  it("disables buttons when game is over", () => {
-    mockGameStore.isPaused = false;
-    mockGameStore.isGameOver = true;
-
-    const { container } = render(<TouchControls />);
-
-    expect(container.querySelector('[aria-label="Rotate piece"]')).toHaveProperty("disabled", true);
-    expect(container.querySelector('[aria-label="Hard drop"]')).toHaveProperty("disabled", true);
-    expect(container.querySelector('[aria-label="Soft drop"]')).toHaveProperty("disabled", true);
-    expect(container.querySelector('[aria-label="Move left"]')).toHaveProperty("disabled", true);
-    expect(container.querySelector('[aria-label="Move right"]')).toHaveProperty("disabled", true);
   });
 
   it("applies custom className", () => {

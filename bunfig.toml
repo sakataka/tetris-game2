@@ -1,3 +1,6 @@
 [test]
 preload = ["./src/test/setup.ts"]
 timeout = 30000
+root = "./"
+# Use happy-dom as test environment
+dom = { library = "happy-dom" }
