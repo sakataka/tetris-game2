@@ -49,27 +49,28 @@
 
 ### ビルド・開発環境
 - **Bun**: 1.2.17（パッケージ管理・テスト実行）
-- **Rolldown-Vite**: 6.3.21（Rust製高性能バンドラー）
+- **Rolldown-Vite**: 7.0.0（Rust製高性能バンドラー）
 
 ### スタイリング・UI
 - **Tailwind CSS**: 4.1.10（@tailwindcss/viteプラグイン使用）
-- **Framer Motion**: 12.18.2（アニメーション）
+- **Framer Motion**: 12.19.1（アニメーション）
 - **shadcn/ui**: Radix UIベースコンポーネント（Dialog, Select, Button等）
 - **class-variance-authority**: 0.7.1（コンポーネントバリアント管理）
-- **clsx + tailwind-merge**: 3.3.1（スタイルユーティリティ）
-- **lucide-react**: 0.522.0（アイコン）
+- **clsx + tailwind-merge**: 2.1.1/3.3.1（スタイルユーティリティ）
+- **lucide-react**: 0.523.0（アイコン）
 
 ### 機能ライブラリ
 - **react-hotkeys-hook**: 5.1.0（キーボード入力管理）
 - **i18next + react-i18next**: 25.2.1/15.5.3（国際化）
 
 ### 開発・品質管理
-- **Biome**: 2.0.4（リンティング・フォーマッティング）
+- **Biome**: 2.0.5（リンティング・フォーマッティング）
 - **Bun Test**: 1.2.17（テストランナー）
 - **happy-dom**: 18.0.1（DOM環境シミュレーション）
 - **Testing Library**: React 16.3.0（コンポーネントテスト）
 - **Lefthook**: 1.11.14（Gitフック管理）
 - **knip**: 5.61.2（デッドコード検出）
+- **@vitejs/plugin-react-oxc**: 0.2.3（高速Reactプラグイン）
 
 ## アーキテクチャ設計
 
@@ -131,7 +132,8 @@ src/
 │   │   ├── HighScore.tsx
 │   │   ├── NextPiece.tsx
 │   │   ├── ScoreBoard.tsx
-│   │   └── TouchControls.tsx
+│   │   ├── TouchControls.tsx
+│   │   └── index.ts       # エクスポート管理
 │   ├── layout/            # レイアウトコンポーネント
 │   │   ├── Game.tsx
 │   │   └── LanguageSelector.tsx
@@ -144,7 +146,8 @@ src/
 ├── game/                  # ゲームロジック（純粋関数）
 │   ├── board.ts
 │   ├── game.ts
-│   └── tetrominos.ts
+│   ├── tetrominos.ts
+│   └── ghost.test.ts      # ゴーストピース専用テスト
 ├── hooks/                 # カスタムHooks
 │   ├── useAnimatedValue.ts
 │   ├── useAnimationCompletionHandler.ts
@@ -154,11 +157,17 @@ src/
 │   ├── useHighScore.ts
 │   ├── useKeyboardControls.ts
 │   └── useTouchGestures.ts
+├── lib/                   # ユーティリティライブラリ
+│   └── utils.ts           # shadcn/ui汎用ユーティリティ
 ├── store/                 # Zustand状態管理
 │   └── gameStore.ts
+├── test/                  # テスト設定・モック
+│   ├── __mocks__/
+│   │   └── react-i18next.ts
+│   └── setup.ts           # テスト環境設定
 ├── types/                 # TypeScript型定義
 │   └── game.ts
-├── utils/                 # ユーティリティ
+├── utils/                 # ゲーム専用ユーティリティ
 │   ├── colors.ts
 │   ├── constants.ts
 │   ├── localStorage.ts
@@ -166,8 +175,10 @@ src/
 ├── locales/               # 国際化リソース
 │   ├── en.json
 │   └── ja.json
-└── i18n/                  # 国際化設定
-    └── config.ts
+├── i18n/                  # 国際化設定
+│   └── config.ts
+├── index.css              # グローバルスタイル
+└── main.tsx               # アプリケーションエントリーポイント
 ```
 
 ## カスタムHooks設計
@@ -294,10 +305,14 @@ bun run preview                # ビルド結果プレビュー
 bun test                       # 全テスト実行
 bun test --watch               # ウォッチモード
 bun test src/game/             # 特定ディレクトリのテスト
+bun run test:fast              # 高速テスト（game, hooks, utils）
+bun run test:components        # コンポーネントテスト
 bun run lint                   # Biome lint実行
 bun run format                 # Biome format実行
 bun run typecheck              # TypeScript型チェック
 bun run knip                   # デッドコード検出
+bun run check                  # 型チェック + デッドコード検出
+bun run ci                     # CI用統合チェック
 
 # パッケージ管理
 bun install                    # 依存関係インストール
