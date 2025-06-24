@@ -52,6 +52,11 @@ export const useBoardData = () => {
 
   // Unified current piece processing - compute both display board and positions
   const { displayBoard, currentPiecePositions } = useMemo(() => {
+    // Safety check for board existence
+    if (!board || !Array.isArray(board)) {
+      return { displayBoard: [], currentPiecePositions: new Set<string>() };
+    }
+
     const newBoard = board.map((row) => [...row]);
     const positions = new Set<string>();
 

@@ -27,7 +27,14 @@
 - ハイスコア一覧表示
 - 操作説明
 - ゲームオーバー・一時停止画面
-- 言語切り替えセレクター
+- ゲーム設定UI（言語切り替え・ゴーストピース表示ON/OFF）
+
+### ゲーム設定機能
+- **統合設定パネル**: 設定ボタンからドロップダウン形式でアクセス
+- **言語切り替え**: 日本語・英語の動的切り替え（即座に反映）
+- **ゴーストピース制御**: 落下予測位置表示のON/OFF切り替え
+- **設定永続化**: ローカルストレージに自動保存
+- **視覚的フィードバック**: トグルスイッチ・現在設定の表示
 
 ### モバイル対応
 - タッチ操作（スワイプ・タップ）
@@ -54,7 +61,7 @@
 ### スタイリング・UI
 - **Tailwind CSS**: 4.1.10（@tailwindcss/viteプラグイン使用）
 - **Framer Motion**: 12.19.1（アニメーション）
-- **shadcn/ui**: Radix UIベースコンポーネント（Dialog, Select, Button等）
+- **shadcn/ui**: Radix UIベースコンポーネント（Dialog, Button, Card, Badge等）
 - **class-variance-authority**: 0.7.1（コンポーネントバリアント管理）
 - **clsx + tailwind-merge**: 2.1.1/3.3.1（スタイルユーティリティ）
 - **lucide-react**: 0.523.0（アイコン）
@@ -85,7 +92,6 @@ interface GameStore extends GameState {
   togglePause: () => void;
   resetGame: () => void;
   clearAnimationStates: () => void;
-  saveHighScoreIfNeeded: () => void;
 }
 ```
 
@@ -136,13 +142,12 @@ src/
 │   │   └── index.ts       # エクスポート管理
 │   ├── layout/            # レイアウトコンポーネント
 │   │   ├── Game.tsx
-│   │   └── LanguageSelector.tsx
+│   │   └── GameSettings.tsx
 │   └── ui/                # shadcn/ui汎用コンポーネント
 │       ├── badge.tsx
 │       ├── button.tsx
 │       ├── card.tsx
-│       ├── dialog.tsx
-│       └── select.tsx
+│       └── dialog.tsx
 ├── game/                  # ゲームロジック（純粋関数）
 │   ├── board.ts
 │   ├── game.ts
@@ -200,11 +205,12 @@ src/
 ## ゲームロジック（純粋関数）
 
 ### game/game.ts
-- `createInitialGameState()`: 初期ゲーム状態生成
-- `moveTetrominoBy()`: ピース移動処理
-- `rotateTetrominoCW()`: 時計回り回転処理
+- `createInitialGameState()`: 初期ゲーム状態生成（ゴーストピース位置含む）
+- `moveTetrominoBy()`: ピース移動処理（ゴーストピース位置更新）
+- `rotateTetrominoCW()`: 時計回り回転処理（ゴーストピース位置更新）
 - `hardDropTetromino()`: ハードドロップ処理
-- `calculateGhostPosition()`: ゴーストピース位置計算
+- `calculateGhostPosition()`: ゴーストピース位置計算（落下予測）
+- `updateGhostPosition()`: ゲーム状態のゴーストピース位置更新
 
 ### game/board.ts
 - `createEmptyBoard()`: 空ボード生成
@@ -227,11 +233,19 @@ interface HighScore {
   level: number;
   date: string;
 }
+
+interface GameSettings {
+  language: "ja" | "en";
+  volume: number;
+  showGhostPiece: boolean;
+}
 ```
 
-- ハイスコア一覧の保存・取得
+- ハイスコア一覧の保存・取得・管理
+- ゲーム設定の永続化（言語・音量・ゴーストピース表示）
 - 型安全なJSON操作
 - エラーハンドリング
+- カスタムイベント（ハイスコア更新通知）
 
 ## アニメーションシステム
 
@@ -249,7 +263,7 @@ interface HighScore {
 - デフォルト言語: 日本語
 - フォールバック言語: 英語
 - 実行時言語切り替え
-- 構造化リソースファイル（ゲーム用語、操作説明、UI文言）
+- 構造化リソースファイル（ゲーム用語、操作説明、UI文言、設定項目）
 
 ## モバイル対応
 
