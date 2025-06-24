@@ -1,35 +1,30 @@
-import { beforeEach, describe, expect, mock, test } from "bun:test";
+import { describe, expect, mock, test } from "bun:test";
 import { render } from "@testing-library/react";
+import "@testing-library/jest-dom";
 import { BoardCell } from "./BoardCell";
 
-// Mock all dependencies at module level
+// Simple, focused mocks
 mock.module("../../hooks/useCellAnimation", () => ({
-  useCellAnimation: mock(() => ({
-    shouldAnimate: true,
-    initialAnimation: { opacity: 0 },
-    animateProps: { opacity: 1 },
-    transitionProps: { duration: 0.3 },
-  })),
+  useCellAnimation: () => ({
+    initialAnimation: {},
+    animateProps: {},
+    transitionProps: {},
+  }),
 }));
 
 mock.module("../../hooks/useAnimationCompletionHandler", () => ({
   useAnimationCompletionHandler: () => ({
-    handleAnimationComplete: mock(),
+    handleAnimationComplete: () => {},
   }),
 }));
 
 mock.module("../../utils/colors", () => ({
-  getCellColor: mock(() => "bg-gray-200"),
+  getCellColor: () => "bg-gray-200",
 }));
 
-mock.module("../../utils/constants", async () => {
-  const actual = await import("../../utils/constants");
-  return {
-    ...actual,
-    BOARD_WIDTH: 10, // Keep this specific mock if needed for tests
-    // TETROMINO_TYPES will be taken from the actual module
-  };
-});
+mock.module("../../utils/constants", () => ({
+  BOARD_WIDTH: 10,
+}));
 
 mock.module("../../utils/styles", () => ({
   BOARD_STYLES: {
@@ -38,21 +33,21 @@ mock.module("../../utils/styles", () => ({
     emptyCellBorder: "empty-border",
     activePiece: "active-piece",
     clearingLine: "clearing-line",
+    ghostPiece: "ghost-piece",
   },
 }));
 
 mock.module("@/lib/utils", () => ({
-  cn: mock((...classes) => classes.filter(Boolean).join(" ")),
+  cn: (...classes: string[]) => classes.filter(Boolean).join(" "),
 }));
 
-// Mock framer-motion
 mock.module("framer-motion", () => ({
   motion: {
-    div: mock().mockImplementation((props) => (
+    div: (props: any) => (
       <div data-testid="board-cell" className={props.className}>
         {props.children}
       </div>
-    )),
+    ),
   },
 }));
 
@@ -62,14 +57,11 @@ describe("BoardCell", () => {
     x: 0,
     y: 0,
     isCurrentPiece: false,
+    isGhostPiece: false,
     isPlacedPiece: false,
     isClearingLine: false,
     animationTriggerKey: "test-key",
   };
-
-  beforeEach(() => {
-    mock.restore();
-  });
 
   test("should render without errors", () => {
     const { getByTestId } = render(<BoardCell {...defaultProps} />);

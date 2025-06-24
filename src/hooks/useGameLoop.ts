@@ -3,7 +3,7 @@ import { getGameSpeed } from "../game/game";
 import { useGameStore } from "../store/gameStore";
 
 export function useGameLoop() {
-  const { moveDown, isPaused, isGameOver, level, clearAnimationStates } = useGameStore();
+  const { moveDown, isPaused, isGameOver, level } = useGameStore();
   const lastUpdateTime = useRef(0);
   const [, startTransition] = useTransition();
 
@@ -17,8 +17,6 @@ export function useGameLoop() {
         // Use transition for non-urgent game state updates
         startTransition(() => {
           moveDown();
-          // Clear any lingering animation states periodically
-          clearAnimationStates();
         });
         lastUpdateTime.current = currentTime;
       }
@@ -29,5 +27,5 @@ export function useGameLoop() {
     const animationId = requestAnimationFrame(gameLoop);
 
     return () => cancelAnimationFrame(animationId);
-  }, [moveDown, isPaused, isGameOver, level, clearAnimationStates]);
+  }, [moveDown, isPaused, isGameOver, level]);
 }
