@@ -3,6 +3,7 @@ import { forEachPieceCell } from "../game/board";
 import { getTetrominoColorIndex } from "../game/tetrominos";
 import { useGameStore } from "../store/gameStore";
 import { BOARD_HEIGHT, BOARD_WIDTH } from "../utils/constants";
+import { getSettings } from "../utils/localStorage";
 
 /**
  * Game state selectors - optimized with useMemo to prevent infinite loops
@@ -78,15 +79,19 @@ export const useBoardData = () => {
 
   // Pre-compute ghost piece positions for O(1) lookup
   const ghostPiecePositions = useMemo(() => {
+    const settings = getSettings();
     const positions = new Set<string>();
 
-    if (currentPiece && ghostPosition) {
-      forEachPieceCell(currentPiece.shape, ghostPosition, (boardX, boardY) => {
-        if (boardY >= 0 && boardY < BOARD_HEIGHT && boardX >= 0 && boardX < BOARD_WIDTH) {
-          positions.add(`${boardX},${boardY}`);
-        }
-      });
+    // Check if ghost piece display is enabled in settings
+    if (!settings.showGhostPiece || !currentPiece || !ghostPosition) {
+      return positions;
     }
+
+    forEachPieceCell(currentPiece.shape, ghostPosition, (boardX, boardY) => {
+      if (boardY >= 0 && boardY < BOARD_HEIGHT && boardX >= 0 && boardX < BOARD_WIDTH) {
+        positions.add(`${boardX},${boardY}`);
+      }
+    });
 
     return positions;
   }, [currentPiece, ghostPosition]);

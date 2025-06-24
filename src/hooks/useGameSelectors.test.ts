@@ -1,0 +1,118 @@
+import { afterEach, beforeEach, describe, expect, test } from "bun:test";
+import { renderHook } from "@testing-library/react";
+import { createInitialGameState } from "../game/game";
+import { getTetrominoShape } from "../game/tetrominos";
+import { useGameStore } from "../store/gameStore";
+import { updateSettings } from "../utils/localStorage";
+import { useBoardData } from "./useGameSelectors";
+
+// Mock localStorage for testing
+const originalLocalStorage = global.localStorage;
+
+beforeEach(() => {
+  // Reset the game store before each test
+  useGameStore.setState(createInitialGameState());
+
+  // Mock localStorage
+  const mockStorage: { [key: string]: string } = {};
+  global.localStorage = {
+    getItem: (key: string) => mockStorage[key] || null,
+    setItem: (key: string, value: string) => {
+      mockStorage[key] = value;
+    },
+    removeItem: (key: string) => {
+      delete mockStorage[key];
+    },
+    clear: () => {
+      Object.keys(mockStorage).forEach((key) => delete mockStorage[key]);
+    },
+    length: Object.keys(mockStorage).length,
+    key: (index: number) => Object.keys(mockStorage)[index] || null,
+  };
+});
+
+afterEach(() => {
+  global.localStorage = originalLocalStorage;
+});
+
+describe("useBoardData", () => {
+  test("should return empty ghost piece positions when showGhostPiece is false", () => {
+    // Set showGhostPiece to false
+    updateSettings({ showGhostPiece: false });
+
+    // Set up a game state with a current piece and ghost position
+    const currentPiece = {
+      type: "T" as const,
+      position: { x: 4, y: 0 },
+      shape: getTetrominoShape("T"),
+    };
+
+    useGameStore.setState({
+      currentPiece,
+      ghostPosition: { x: 4, y: 18 }, // Ghost position at bottom
+    });
+
+    const { result } = renderHook(() => useBoardData());
+
+    // Ghost piece positions should be empty when showGhostPiece is false
+    expect(result.current.ghostPiecePositions.size).toBe(0);
+  });
+
+  test("should return ghost piece positions when showGhostPiece is true", () => {
+    // Set showGhostPiece to true (default)
+    updateSettings({ showGhostPiece: true });
+
+    // Set up a game state with a current piece and ghost position
+    const currentPiece = {
+      type: "T" as const,
+      position: { x: 4, y: 0 },
+      shape: getTetrominoShape("T"),
+    };
+
+    useGameStore.setState({
+      currentPiece,
+      ghostPosition: { x: 4, y: 18 }, // Ghost position at bottom
+    });
+
+    const { result } = renderHook(() => useBoardData());
+
+    // Ghost piece positions should contain the ghost piece cells
+    expect(result.current.ghostPiecePositions.size).toBeGreaterThan(0);
+  });
+
+  test("should return empty ghost piece positions when no current piece", () => {
+    // Set showGhostPiece to true
+    updateSettings({ showGhostPiece: true });
+
+    useGameStore.setState({
+      currentPiece: null,
+      ghostPosition: null,
+    });
+
+    const { result } = renderHook(() => useBoardData());
+
+    // Ghost piece positions should be empty when no current piece
+    expect(result.current.ghostPiecePositions.size).toBe(0);
+  });
+
+  test("should return empty ghost piece positions when no ghost position", () => {
+    // Set showGhostPiece to true
+    updateSettings({ showGhostPiece: true });
+
+    const currentPiece = {
+      type: "T" as const,
+      position: { x: 4, y: 0 },
+      shape: getTetrominoShape("T"),
+    };
+
+    useGameStore.setState({
+      currentPiece,
+      ghostPosition: null, // No ghost position
+    });
+
+    const { result } = renderHook(() => useBoardData());
+
+    // Ghost piece positions should be empty when no ghost position
+    expect(result.current.ghostPiecePositions.size).toBe(0);
+  });
+});
