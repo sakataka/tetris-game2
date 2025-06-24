@@ -22,7 +22,6 @@ export function useTouchGestures(options: TouchGestureOptions = {}) {
   const [, startTransition] = useTransition();
   const touchStartRef = useRef<TouchPoint | null>(null);
   const [lastTapTime, setLastTapTime] = useState<number>(0);
-  const singleTapTimeoutRef = useRef<number | null>(null);
 
   // Helper for game actions with common conditions
   const executeGameAction = (action: () => void, useTransitionWrapper = true) => {
@@ -70,21 +69,24 @@ export function useTouchGestures(options: TouchGestureOptions = {}) {
       const timeSinceLastTap = now - lastTapTime;
 
       if (lastTapTime > 0 && timeSinceLastTap < doubleTapTime) {
-        // Double tap detected - cancel single tap timeout and execute hard drop
-        if (singleTapTimeoutRef.current) {
-          clearTimeout(singleTapTimeoutRef.current);
-          singleTapTimeoutRef.current = null;
-        }
+        // Double tap detected - execute hard drop immediately
         executeGameAction(drop, false);
+        setLastTapTime(0); // Reset to prevent triple tap
       } else {
-        // Potential single tap - delay execution to check for double tap
-        singleTapTimeoutRef.current = window.setTimeout(() => {
-          executeGameAction(rotate);
-          singleTapTimeoutRef.current = null;
+        // First tap - just record the time, no action yet
+        setLastTapTime(now);
+        // Schedule single tap action after double tap timeout
+        setTimeout(() => {
+          setLastTapTime((prevTime) => {
+            // Only execute rotate if this is still the last tap
+            if (prevTime === now) {
+              executeGameAction(rotate);
+              return 0;
+            }
+            return prevTime;
+          });
         }, doubleTapTime);
       }
-
-      setLastTapTime(now);
       return;
     }
 
