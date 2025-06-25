@@ -20,8 +20,11 @@ interface GameStore extends GameState {
   clearAnimationStates: () => void;
 }
 
+// Create initial state once outside the store to avoid recreation on each access
+const INITIAL_STATE = createInitialGameState();
+
 export const useGameStore = create<GameStore>((set) => ({
-  ...createInitialGameState(),
+  ...INITIAL_STATE,
 
   moveLeft: () => set((state) => moveTetrominoBy(state, -1, 0)),
   moveRight: () => set((state) => moveTetrominoBy(state, 1, 0)),

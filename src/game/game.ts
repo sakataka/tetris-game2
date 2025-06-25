@@ -114,8 +114,11 @@ export function hardDropTetromino(state: GameState): GameState {
   const currentPiece = state.currentPiece;
   let finalPosition = currentPiece.position;
 
-  // Find the lowest valid position
-  while (true) {
+  // Find the lowest valid position (with safety limit to prevent infinite loop)
+  let iterations = 0;
+  const maxIterations = 30; // Safety limit: more than enough for any valid board position
+
+  while (iterations < maxIterations) {
     const nextPosition = {
       x: finalPosition.x,
       y: finalPosition.y + 1,
@@ -123,6 +126,7 @@ export function hardDropTetromino(state: GameState): GameState {
 
     if (isValidPosition(state.board, currentPiece.shape, nextPosition)) {
       finalPosition = nextPosition;
+      iterations++;
     } else {
       break;
     }
@@ -276,14 +280,19 @@ export function calculateGhostPosition(state: GameState): Position | null {
   let ghostY = state.currentPiece.position.y;
   const ghostX = state.currentPiece.position.x;
 
-  // Move down until we can't anymore
+  // Move down until we can't anymore (with safety limit to prevent infinite loop)
+  let iterations = 0;
+  const maxIterations = 30; // Safety limit: more than enough for any valid board position
+
   while (
+    iterations < maxIterations &&
     isValidPosition(state.board, state.currentPiece.shape, {
       x: ghostX,
       y: ghostY + 1,
     })
   ) {
     ghostY++;
+    iterations++;
   }
 
   // If ghost position is the same as current position, don't show ghost
