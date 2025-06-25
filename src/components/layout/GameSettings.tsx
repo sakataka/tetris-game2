@@ -1,8 +1,7 @@
 import { Settings } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useGameStore } from "../../store/gameStore";
-import { updateSettings } from "../../utils/localStorage";
+import { useSettingsStore } from "../../store/settingsStore";
 import { CONTROL_STYLES, MODAL_STYLES } from "../../utils/styles";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
@@ -10,8 +9,9 @@ import { Card } from "../ui/card";
 
 export function GameSettings() {
   const { i18n, t } = useTranslation();
-  const showGhostPiece = useGameStore((state) => state.showGhostPiece);
-  const toggleGhostPiece = useGameStore((state) => state.toggleGhostPiece);
+  const showGhostPiece = useSettingsStore((state) => state.showGhostPiece);
+  const toggleShowGhostPiece = useSettingsStore((state) => state.toggleShowGhostPiece);
+  const setLanguage = useSettingsStore((state) => state.setLanguage);
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -34,12 +34,12 @@ export function GameSettings() {
 
   const handleLanguageChange = (value: string) => {
     i18n.changeLanguage(value);
-    updateSettings({ language: value as "ja" | "en" });
+    setLanguage(value as "ja" | "en");
     setIsOpen(false);
   };
 
   const handleGhostPieceToggle = () => {
-    toggleGhostPiece();
+    toggleShowGhostPiece();
   };
 
   return (

@@ -56,6 +56,5 @@ export interface GameState {
   clearingLines: number[];
   animationTriggerKey: number;
   ghostPosition: Position | null;
-  showGhostPiece: boolean;
   pieceBag: TetrominoTypeName[]; // 7-Bag system: current bag state
 }

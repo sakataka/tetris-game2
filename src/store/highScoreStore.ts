@@ -1,30 +1,45 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 import type { HighScore } from "../utils/localStorage";
-import { getCurrentHighScore, getHighScoresList } from "../utils/localStorage";
 
 interface HighScoreStore {
   currentHighScore: HighScore | null;
   highScoresList: HighScore[];
-  refreshKey: number;
-  refreshHighScores: () => void;
-  updateHighScore: () => void;
+  addNewHighScore: (score: number, lines: number, level: number) => void;
 }
 
-export const useHighScoreStore = create<HighScoreStore>((set, get) => ({
-  currentHighScore: null,
-  highScoresList: [],
-  refreshKey: 0,
+export const useHighScoreStore = create<HighScoreStore>()(
+  persist(
+    (set, get) => ({
+      currentHighScore: null,
+      highScoresList: [],
 
-  refreshHighScores: () => {
-    set({
-      currentHighScore: getCurrentHighScore(),
-      highScoresList: getHighScoresList(),
-      refreshKey: get().refreshKey + 1,
-    });
-  },
+      addNewHighScore: (score: number, lines: number, level: number) => {
+        const currentHighScore = get().currentHighScore;
 
-  updateHighScore: () => {
-    // This will be called when a new high score is set
-    get().refreshHighScores();
-  },
-}));
+        // Check if this is a new high score
+        if (!currentHighScore || score > currentHighScore.score) {
+          const newHighScore: HighScore = {
+            score,
+            lines,
+            level,
+            date: new Date().toISOString(),
+          };
+
+          // Update current high score
+          set({ currentHighScore: newHighScore });
+
+          // Add to high scores list and keep top 10
+          const updatedList = [...get().highScoresList, newHighScore]
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 10);
+
+          set({ highScoresList: updatedList });
+        }
+      },
+    }),
+    {
+      name: "tetris-high-scores",
+    },
+  ),
+);

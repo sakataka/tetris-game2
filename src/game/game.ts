@@ -38,7 +38,6 @@ export function createInitialGameState(): GameState {
     clearingLines: [],
     animationTriggerKey: 0,
     ghostPosition: null as Position | null,
-    showGhostPiece: true,
     pieceBag: pieceBagManager.getBag(),
   };
 

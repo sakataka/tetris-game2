@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { forEachPieceCell } from "../game/board";
 import { getTetrominoColorIndex } from "../game/tetrominos";
 import { useGameStore } from "../store/gameStore";
+import { useSettingsStore } from "../store/settingsStore";
 import { BOARD_HEIGHT, BOARD_WIDTH } from "../utils/constants";
 
 /**
@@ -49,7 +50,7 @@ export const useBoardData = () => {
   const placedPositions = useGameStore((state) => state.placedPositions);
   const clearingLines = useGameStore((state) => state.clearingLines);
   const animationTriggerKey = useGameStore((state) => state.animationTriggerKey);
-  const showGhostPiece = useGameStore((state) => state.showGhostPiece);
+  const showGhostPiece = useSettingsStore((state) => state.showGhostPiece);
 
   // Unified current piece processing - compute both display board and positions
   const { displayBoard, currentPiecePositions } = useMemo(() => {

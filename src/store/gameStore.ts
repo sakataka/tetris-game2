@@ -7,7 +7,6 @@ import {
   rotateTetrominoCW,
 } from "../game/game";
 import type { GameState } from "../types/game";
-import { getSettings } from "../utils/localStorage";
 
 interface GameStore extends GameState {
   moveLeft: () => void;
@@ -19,12 +18,10 @@ interface GameStore extends GameState {
   togglePause: () => void;
   resetGame: () => void;
   clearAnimationStates: () => void;
-  toggleGhostPiece: () => void;
 }
 
 export const useGameStore = create<GameStore>((set) => ({
   ...createInitialGameState(),
-  showGhostPiece: getSettings().showGhostPiece,
 
   moveLeft: () => set((state) => moveTetrominoBy(state, -1, 0)),
   moveRight: () => set((state) => moveTetrominoBy(state, 1, 0)),
@@ -37,7 +34,6 @@ export const useGameStore = create<GameStore>((set) => ({
   resetGame: () =>
     set(() => ({
       ...createInitialGameState(),
-      showGhostPiece: getSettings().showGhostPiece,
     })),
   clearAnimationStates: () =>
     set((state) => {
@@ -56,5 +52,4 @@ export const useGameStore = create<GameStore>((set) => ({
         boardBeforeClear: null,
       };
     }),
-  toggleGhostPiece: () => set((state) => ({ showGhostPiece: !state.showGhostPiece })),
 }));
