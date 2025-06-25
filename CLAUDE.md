@@ -1,349 +1,327 @@
 # Tetris Game Project
 
-モダンなWeb技術で構築された完全なテトリスゲーム
+A complete Tetris game built with modern web technologies
 
-## ゲーム概要
+## Game Overview
 
-- **完全なテトリス体験**: 7種類のピース、ライン消去、レベルアップシステム
-- **美しいアニメーション**: Framer Motionによるスムーズなエフェクト
-- **モバイル対応**: タッチ操作・レスポンシブデザイン
-- **ハイスコア記録**: ローカルストレージでのスコア保存
-- **多言語対応**: 日本語・英語の動的切り替え
-- **ゴーストピース**: 落下予測位置の表示
-- **ホールド機能**: ピース保存・交換システム
+- **Complete Tetris Experience**: 7 piece types, line clearing, level progression system
+- **Beautiful Animations**: Smooth effects powered by Framer Motion
+- **Mobile Support**: Touch controls and responsive design
+- **High Score Tracking**: Local storage-based score persistence
+- **Multi-language Support**: Dynamic Japanese/English switching
+- **Ghost Piece**: Visual preview of drop position
+- **Hold System**: Piece saving and swapping functionality
 
-## 実装機能
+## Implemented Features
 
-### コアゲーム機能
-- 7種類のテトリスピース（I, O, T, S, Z, J, L）
-- ピース移動・回転・ハードドロップ
-- ホールド機能（ピース保存・交換）
-- ライン消去とスコアリング
-- レベルアップによる速度上昇
-- ゲーム一時停止・再開・リセット
-- ゴーストピース（落下予測位置）表示
+### Core Game Mechanics
+- 7 tetromino types (I, O, T, S, Z, J, L)
+- Piece movement, rotation, and hard drop
+- Hold functionality (piece saving and swapping)
+- Line clearing and scoring system
+- Level progression with increasing drop speed
+- Game pause, resume, and reset
+- Ghost piece display (drop position preview)
+- **7-Bag System**: Fair piece distribution ensuring all 7 pieces appear exactly once before any repeats
+- **SRS Wall Kick System**: Super Rotation System for enhanced piece rotation with wall kick compensation
 
-### ユーザーインターフェース
-- リアルタイムスコア・ライン・レベル表示
-- 次のピース表示
-- ホールドピース表示（使用可能状態の視覚的表示）
-- ハイスコア一覧表示
-- 操作説明
-- ゲームオーバー・一時停止画面
-- ゲーム設定UI（言語切り替え・ゴーストピース表示ON/OFF）
+### User Interface
+- Real-time score, lines, and level display
+- Next piece preview
+- Hold piece display with availability status indication
+- High score leaderboard
+- Control instructions
+- Game over and pause screens
+- Settings UI (language switching, ghost piece toggle)
 
-### ゲーム設定機能
-- **統合設定パネル**: 設定ボタンからドロップダウン形式でアクセス
-- **言語切り替え**: 日本語・英語の動的切り替え（即座に反映）
-- **ゴーストピース制御**: 落下予測位置表示のON/OFF切り替え
-- **設定永続化**: ローカルストレージに自動保存
-- **視覚的フィードバック**: トグルスイッチ・現在設定の表示
+### Game Settings
+- **Unified Settings Panel**: Dropdown-style access from settings button
+- **Language Switching**: Dynamic Japanese/English switching with immediate effect
+- **Ghost Piece Control**: Toggle for drop position preview display
+- **Settings Persistence**: Auto-save to local storage
+- **Visual Feedback**: Toggle switches and current setting indicators
 
-### モバイル対応
-- タッチ操作（スワイプ・タップ）
-- レスポンシブレイアウト
-- デスクトップ・モバイル両対応
+### Mobile Support
+- Touch controls (swipe and tap gestures)
+- Responsive layout design
+- Desktop and mobile compatibility
 
-### アニメーション
-- ピース落下・配置・回転アニメーション
-- ライン消去フラッシュエフェクト
-- スコア更新スプリングアニメーション
-- UI遷移エフェクト
+### Animation System
+- Piece drop, placement, and rotation animations
+- Line clear flash effects
+- Score update spring animations
+- UI transition effects
 
-## 技術スタック
+## Tech Stack
 
-### フロントエンド
-- **React**: 19.1.0（関数型コンポーネント・Hooks）
-- **TypeScript**: 5.8.3（ES2024、厳密な型定義）
-- **Zustand**: 5.0.5（軽量状態管理）
+### Frontend
+- **React**: 19.1.0 (functional components with Hooks)
+- **TypeScript**: 5.8.3 (ES2024 target, strict type definitions)
+- **Zustand**: 5.0.5 (lightweight state management)
 
-### ビルド・開発環境
-- **Bun**: 1.2.17（パッケージ管理・テスト実行）
-- **Rolldown-Vite**: 7.0.0（Rust製高性能バンドラー）
+### Build & Development
+- **Bun**: 1.2.17 (package management and test runner)
+- **Rolldown-Vite**: 7.0.0 (Rust-powered high-performance bundler)
 
-### スタイリング・UI
-- **Tailwind CSS**: 4.1.10（@tailwindcss/viteプラグイン使用）
-- **Framer Motion**: 12.19.1（アニメーション）
-- **shadcn/ui**: Radix UIベースコンポーネント（Dialog, Button, Card, Badge等）
-- **class-variance-authority**: 0.7.1（コンポーネントバリアント管理）
-- **clsx + tailwind-merge**: 2.1.1/3.3.1（スタイルユーティリティ）
-- **lucide-react**: 0.523.0（アイコン）
+### Styling & UI
+- **Tailwind CSS**: 4.1.10 (with @tailwindcss/vite plugin)
+- **Framer Motion**: 12.19.1 (animations)
+- **shadcn/ui**: Radix UI-based components (Dialog, Button, Card, Badge, etc.)
+- **class-variance-authority**: 0.7.1 (component variant management)
+- **clsx + tailwind-merge**: 2.1.1/3.3.1 (styling utilities)
+- **lucide-react**: 0.523.0 (icons)
 
-### 機能ライブラリ
-- **react-hotkeys-hook**: 5.1.0（キーボード入力管理）
-- **i18next + react-i18next**: 25.2.1/15.5.3（国際化）
+### Feature Libraries
+- **react-hotkeys-hook**: 5.1.0 (keyboard input management)
+- **i18next + react-i18next**: 25.2.1/15.5.3 (internationalization)
 
-### 開発・品質管理
-- **Biome**: 2.0.5（リンティング・フォーマッティング）
-- **Bun Test**: 1.2.17（テストランナー）
-- **happy-dom**: 18.0.1（DOM環境シミュレーション）
-- **Testing Library**: React 16.3.0（コンポーネントテスト）
-- **Lefthook**: 1.11.14（Gitフック管理）
-- **knip**: 5.61.2（デッドコード検出）
-- **@vitejs/plugin-react-oxc**: 0.2.3（高速Reactプラグイン）
+### Development & Quality
+- **Biome**: 2.0.5 (linting and formatting)
+- **Bun Test**: 1.2.17 (test runner)
+- **happy-dom**: 18.0.1 (DOM environment simulation)
+- **Testing Library**: React 16.3.0 (component testing)
+- **Lefthook**: 1.11.14 (Git hooks management)
+- **knip**: 5.61.2 (dead code detection)
+- **@vitejs/plugin-react-oxc**: 0.2.3 (high-performance React plugin)
 
-## アーキテクチャ設計
+## Architecture Design
 
-### 状態管理（Zustand）
+### State Management (Zustand)
+- Centralized game state with pure function reducers
+- Optimized selectors for performance
+- Immutable state updates
+
+### Game State Type Definition
 ```typescript
-interface GameStore extends GameState {
-  moveLeft: () => void;
-  moveRight: () => void;
-  moveDown: () => void;
-  rotate: () => void;
-  drop: () => void;
-  holdPiece: () => void;
-  togglePause: () => void;
-  resetGame: () => void;
-  clearAnimationStates: () => void;
-  toggleGhostPiece: () => void;
+interface GameState {
+  board: BoardMatrix;
+  boardBeforeClear: BoardMatrix | null;
+  currentPiece: Tetromino | null;
+  nextPiece: TetrominoTypeName;
+  heldPiece: TetrominoTypeName | null;
+  canHold: boolean;
+  score: number;
+  lines: number;
+  level: number;
+  isGameOver: boolean;
+  isPaused: boolean;
+  placedPositions: Position[];
+  clearingLines: number[];
+  animationTriggerKey: number;
+  ghostPosition: Position | null;
+  showGhostPiece: boolean;
+  pieceBag: TetrominoTypeName[]; // 7-Bag system state
 }
 ```
 
-### ゲーム状態型定義
+### Tetromino Type Definition (Discriminated Union)
+```typescript
+type TetrominoType =
+  | { type: "I"; colorIndex: 1 }
+  | { type: "O"; colorIndex: 2 }
+  | { type: "T"; colorIndex: 3 }
+  | { type: "S"; colorIndex: 4 }
+  | { type: "Z"; colorIndex: 5 }
+  | { type: "J"; colorIndex: 6 }
+  | { type: "L"; colorIndex: 7 };
+```
 
-### テトリスピース型定義（判別可能ユニオン型）
-
-### フォルダ構造
+### Folder Structure
 ```
 src/
-├── components/
-│   ├── game/              # ゲーム関連コンポーネント
-│   │   ├── AnimatedScoreItem.tsx
-│   │   ├── Board.tsx
-│   │   ├── BoardCell.tsx
-│   │   ├── Controls.tsx
-│   │   ├── GameOverlay.tsx
-│   │   ├── HighScore.tsx
-│   │   ├── HoldPiece.tsx   # ホールドピース表示
-│   │   ├── NextPiece.tsx
-│   │   ├── ScoreBoard.tsx
-│   │   ├── TouchControls.tsx
-│   │   └── index.ts       # エクスポート管理
-│   ├── layout/            # レイアウトコンポーネント
-│   │   ├── Game.tsx
-│   │   └── GameSettings.tsx
-│   └── ui/                # shadcn/ui汎用コンポーネント
-│       ├── badge.tsx
-│       ├── button.tsx
-│       ├── card.tsx
-│       └── dialog.tsx
-├── game/                  # ゲームロジック（純粋関数）
-│   ├── board.ts
-│   ├── game.ts
-│   ├── tetrominos.ts
-│   ├── ghost.test.ts      # ゴーストピース専用テスト
-│   └── hold.test.ts       # ホールド機能専用テスト
-├── hooks/                 # カスタムHooks
-│   ├── executeGameAction.ts
-│   ├── useAnimatedValue.ts
-│   ├── useAnimationCompletionHandler.ts
-│   ├── useCellAnimation.ts
-│   ├── useGameLoop.ts
-│   ├── useGameSelectors.ts
-│   ├── useHighScore.ts
-│   ├── useHighScoreSideEffect.ts
-│   ├── useKeyboardControls.ts
-│   ├── useSettingsSideEffect.ts
-│   └── useTouchGestures.ts
-├── lib/                   # ユーティリティライブラリ
-│   └── utils.ts           # shadcn/ui汎用ユーティリティ
-├── store/                 # Zustand状態管理
-│   ├── gameStore.ts
-│   └── highScoreStore.ts  # ハイスコア専用ストア
-├── test/                  # テスト設定・モック
-│   ├── __mocks__/
-│   │   └── react-i18next.ts
-│   └── setup.ts           # テスト環境設定
-├── types/                 # TypeScript型定義
-│   └── game.ts
-├── utils/                 # ゲーム専用ユーティリティ
-│   ├── colors.ts
-│   ├── constants.ts
-│   ├── localStorage.ts
-│   └── styles.ts
-├── locales/               # 国際化リソース
-│   ├── en.json
-│   └── ja.json
-├── i18n/                  # 国際化設定
-│   └── config.ts
-├── index.css              # グローバルスタイル
-└── main.tsx               # アプリケーションエントリーポイント
+├── components/          # React components
+│   ├── game/           # Game-specific components
+│   ├── layout/         # Layout components
+│   └── ui/             # Reusable UI components
+├── game/               # Core game logic (pure functions)
+├── hooks/              # Custom React hooks
+├── store/              # Zustand stores
+├── types/              # TypeScript type definitions
+├── utils/              # Utility functions
+├── locales/            # Internationalization resources
+└── i18n/               # i18n configuration
 ```
 
-## カスタムHooks設計
+## Custom Hooks Design
 
-### ゲーム制御系
-- **useGameLoop**: requestAnimationFrameベースのゲームループ管理
-- **useKeyboardControls**: react-hotkeys-hookによる宣言的キー入力処理
-- **useTouchGestures**: モバイル向けタッチ操作（スワイプ・タップ）
-- **useGameSelectors**: ゲーム状態の効率的な選択とメモ化
-- **executeGameAction**: ゲームアクション実行のヘルパー関数
+### Game Control Hooks
+- **useGameLoop**: requestAnimationFrame-based game loop management
+- **useKeyboardControls**: Declarative keyboard input handling via react-hotkeys-hook
+- **useTouchGestures**: Mobile touch controls (swipe and tap)
+- **useGameSelectors**: Efficient game state selection with memoization
+- **executeGameAction**: Helper function for game action execution
 
-### アニメーション系
-- **useAnimatedValue**: アニメーション値管理とスプリング制御
-- **useAnimationCompletionHandler**: アニメーション完了時の状態管理
-- **useCellAnimation**: 個別セルのアニメーション状態管理
+### Animation Hooks
+- **useAnimatedValue**: Animation value management and spring control
+- **useAnimationCompletionHandler**: Animation completion state management
+- **useCellAnimation**: Individual cell animation state management
 
-### データ管理系・副作用系
-- **useHighScore**: ハイスコアのローカルストレージ管理
-- **useHighScoreSideEffect**: ハイスコア保存の副作用処理
-- **useSettingsSideEffect**: 設定の永続化副作用処理
+### Data Management & Side Effect Hooks
+- **useHighScore**: High score local storage management
+- **useHighScoreSideEffect**: High score persistence side effects
+- **useSettingsSideEffect**: Settings persistence side effects
 
-## ゲームロジック（純粋関数）
+## Game Logic (Pure Functions)
 
 ### game/game.ts
-- `createInitialGameState()`: 初期ゲーム状態生成（ゴーストピース位置含む）
-- `moveTetrominoBy()`: ピース移動処理（ゴーストピース位置更新）
-- `rotateTetrominoCW()`: 時計回り回転処理（ゴーストピース位置更新）
-- `hardDropTetromino()`: ハードドロップ処理
-- `holdCurrentPiece()`: ホールド機能処理（ピース保存・交換）
-- `calculateGhostPosition()`: ゴーストピース位置計算（落下予測）
-- `updateGhostPosition()`: ゲーム状態のゴーストピース位置更新
+- `createInitialGameState()`: Initial game state generation (including ghost position)
+- `moveTetrominoBy()`: Piece movement processing (with ghost position update)
+- `rotateTetrominoCW()`: Clockwise rotation processing (with ghost position update)  
+- `hardDropTetromino()`: Hard drop processing
+- `holdCurrentPiece()`: Hold functionality (piece saving and swapping)
+- `calculateGhostPosition()`: Ghost piece position calculation (drop preview)
+- `updateGhostPosition()`: Game state ghost position updates
 
 ### game/board.ts
-- `createEmptyBoard()`: 空ボード生成
-- `isValidPosition()`: ピース配置可能性検証
-- `placeTetromino()`: ピースボード配置
-- `clearLines()`: 完成ライン検出・消去
+- `createEmptyBoard()`: Empty board generation
+- `isValidPosition()`: Piece placement validation
+- `placeTetromino()`: Piece board placement
+- `clearLines()`: Complete line detection and clearing
 
 ### game/tetrominos.ts
-- `getTetrominoShape()`: ピース形状データ取得
-- `rotateTetromino()`: 90度回転アルゴリズム
-- `getRandomTetrominoType()`: ランダムピースタイプ生成
-- `createTetromino()`: テトロミノオブジェクト作成
-- `getTetrominoColorIndex()`: ピース種類に対応する色インデックス取得
+- `getTetrominoShape()`: Piece shape data retrieval
+- `rotateTetromino()`: 90-degree rotation algorithm
+- `getRandomTetrominoType()`: Random piece type generation
+- `createTetromino()`: Tetromino object creation
+- `getTetrominoColorIndex()`: Color index mapping for piece types
 
-## データ永続化
+### game/pieceBag.ts
+- **7-Bag System**: `PieceBagManager` class implementing fair tetromino distribution
+- `getNextPiece()`: Retrieve next piece from bag with automatic refill
+- `refillBag()`: Shuffle and refill bag with all 7 piece types
+- Fisher-Yates shuffle algorithm for randomization
 
-### ローカルストレージ管理（utils/localStorage.ts）
+### game/wallKick.ts
+- **SRS Wall Kick System**: Super Rotation System implementation
+- `getWallKickOffsets()`: Retrieve wall kick offset data for piece type and rotation
+- `tryRotateWithWallKick()`: Attempt rotation with wall kick compensation
+- Separate offset tables for I-piece and JLSTZ pieces
+- Support for both clockwise and counter-clockwise rotations
 
-- ハイスコア一覧の保存・取得・管理
-- ゲーム設定の永続化（言語・ゴーストピース表示）
-- 型安全なJSON操作
-- エラーハンドリング
-- カスタムイベント（ハイスコア更新通知）
+## Data Persistence
 
-## アニメーションシステム
+### Local Storage Management (utils/localStorage.ts)
+- High score list saving, retrieval, and management
+- Game settings persistence (language, ghost piece display)
+- Type-safe JSON operations
+- Error handling
+- Custom events (high score update notifications)
 
-### Framer Motion統合
-- **ピース落下**: 新ピース出現時のスプリングアニメーション
-- **ピース回転**: 360度回転エフェクト
-- **ピース配置**: スケールアニメーション（縮小→拡大）
-- **ライン消去**: フラッシュ・パルス・グロー効果
-- **スコア更新**: 数値変更時のスプリングアニメーション
-- **UI遷移**: モーダル・オーバーレイのフェード効果
+## Animation System
 
-## 国際化対応
+### Framer Motion Integration
+- **Piece Drop**: Spring animations for new piece appearance
+- **Piece Rotation**: 360-degree rotation effects
+- **Piece Placement**: Scale animations (shrink → expand)
+- **Line Clear**: Flash, pulse, and glow effects
+- **Score Updates**: Spring animations for value changes
+- **UI Transitions**: Modal and overlay fade effects
 
-### i18next設定
-- デフォルト言語: 日本語
-- フォールバック言語: 英語
-- 実行時言語切り替え
-- 構造化リソースファイル（ゲーム用語、操作説明、UI文言、設定項目）
+## Internationalization
 
-## モバイル対応
+### i18next Configuration
+- Default language: English
+- Fallback language: Japanese
+- Runtime language switching
+- Structured resource files (game terminology, controls, UI text, settings)
 
-### タッチ操作（useTouchGestures）
-- **水平スワイプ**: 左右移動
-- **短縦スワイプ**: ソフトドロップ
-- **長縦スワイプ**: ハードドロップ
-- **タップ**: 回転
+## Mobile Support
 
-### レスポンシブデザイン
-- CSS Gridベースレイアウト
-- デスクトップ: グリッドレイアウト
-- モバイル: 縦スタックレイアウト
-- 30×30px固定サイズセル
+### Touch Controls (useTouchGestures)
+- **Horizontal Swipe**: Left/right movement
+- **Short Vertical Swipe**: Soft drop
+- **Long Vertical Swipe**: Hard drop
+- **Tap**: Rotation
 
-## テスト戦略
+### Responsive Design
+- CSS Grid-based layout
+- Desktop: Grid layout
+- Mobile: Vertical stack layout
+- Fixed 30×30px cell size
+
+## Testing Strategy
 
 ### Bun Test + TypeScript
-- **ゲームロジック**: 純粋関数の包括的テスト
-- **Hooks**: カスタムHooksの動作テスト
-- **コンポーネント**: React Testing Libraryによるレンダリングテスト
-- **CI/CD**: Vercel・GitHub Actions対応
+- **Game Logic**: Comprehensive testing of pure functions
+- **Hooks**: Custom hook behavior testing
+- **Components**: React Testing Library rendering tests
+- **CI/CD**: Vercel and GitHub Actions support
 
-## 開発方針
+## Development Guidelines
 
-### コード品質
-- **TypeScript厳格モード**: ES2024ターゲット
-- **関数型プログラミング**: 純粋関数・Immutable更新
-- **テスト駆動開発**: 新機能は必ずテスト実装
-- **型安全性**: 判別可能ユニオン型・型ガード活用
+### Code Quality
+- **TypeScript Strict Mode**: ES2024 target
+- **Functional Programming**: Pure functions and immutable updates
+- **Test-Driven Development**: All new features require tests
+- **Type Safety**: Discriminated union types and type guards
 
-### パフォーマンス最適化
-- **React Compiler**: 自動最適化（React.memo不使用）
-- **useTransition**: UI応答性維持
-- **Zustand**: 軽量状態管理
-- **Rolldown-Vite**: Rust製高速バンドラー
+### Performance Optimization
+- **React Compiler**: Automatic optimization (no React.memo usage)
+- **useTransition**: UI responsiveness maintenance
+- **Zustand**: Lightweight state management
+- **Rolldown-Vite**: Rust-powered high-speed bundler
 
-### 命名規則
-- **コンポーネント**: PascalCase（Board.tsx, Game.tsx）
-- **カスタムHook**: camelCase（useGameLoop.ts）
-- **ユーティリティ**: camelCase（gameStore.ts, colors.ts）
-- **テストファイル**: `*.test.ts`（同一ディレクトリ配置）
+### Naming Conventions
+- **Components**: PascalCase (Board.tsx, Game.tsx)
+- **Custom Hooks**: camelCase (useGameLoop.ts)
+- **Utilities**: camelCase (gameStore.ts, colors.ts)
+- **Test Files**: `*.test.ts` (co-located with source files)
 
-## 開発コマンド
+## Development Commands
 
 ```bash
-# 開発・ビルド
-bun run dev                    # 開発サーバー起動
-bun run build                  # プロダクションビルド
-bun run preview                # ビルド結果プレビュー
+# Development & Build
+bun run dev                    # Start development server
+bun run build                  # Production build
+bun run preview                # Preview build output
 
-# テスト・品質管理
-bun test                       # 全テスト実行
-bun test --watch               # ウォッチモード
-bun test src/game/             # 特定ディレクトリのテスト
-bun run test:fast              # 高速テスト（game, hooks, utils）
-bun run test:components        # コンポーネントテスト
-bun run test:ci                # CI用テスト
-bun run lint                   # Biome lint実行
-bun run format                 # Biome format実行
-bun run typecheck              # TypeScript型チェック
-bun run knip                   # デッドコード検出
-bun run check                  # 型チェック + デッドコード検出
-bun run ci                     # CI用統合チェック
+# Testing & Quality
+bun test                       # Run all tests
+bun test --watch               # Watch mode
+bun run test:ci                # CI tests
+bun run lint                   # Run Biome lint
+bun run format                 # Run Biome format
+bun run typecheck              # TypeScript type checking
+bun run knip                   # Dead code detection
+bun run check                  # Type check + dead code detection
 
-# パッケージ管理
-bun install                    # 依存関係インストール
-bun add <package>              # パッケージ追加
-bun remove <package>           # パッケージ削除
+# Package Management
+bun install                    # Install dependencies
+bun add <package>              # Add package
+bun remove <package>           # Remove package
 ```
 
-## 開発サーバーでのテスト
+## Development Server Testing
 
-開発サーバーで動作確認を行う場合は、MCP（Model Context Protocol）の Playwright 統合を使用してください。
+For testing in the development server, use MCP (Model Context Protocol) Playwright integration:
 
 ```bash
-# 1. 開発サーバーを起動
+# 1. Start development server
 bun run dev
 
-# 2. Claude Code で以下のように Playwright を使用
-# - mcp__playwright__browser_navigate でページを開く
-# - mcp__playwright__browser_click で要素をクリック
-# - mcp__playwright__browser_take_screenshot でスクリーンショット撮影
-# - mcp__playwright__browser_snapshot でページ構造を確認
+# 2. Use Playwright in Claude Code:
+# - mcp__playwright__browser_navigate to open pages
+# - mcp__playwright__browser_click for element interaction
+# - mcp__playwright__browser_take_screenshot for screenshots
+# - mcp__playwright__browser_snapshot for page structure analysis
 ```
 
-これにより、実際のブラウザ環境での動作確認が可能です。特に以下のような場合に有効です：
-- UIの視覚的な確認
-- インタラクティブな機能のテスト
-- アニメーションの動作確認
-- レスポンシブデザインの検証
+This enables actual browser environment testing, particularly useful for:
+- Visual UI confirmation
+- Interactive feature testing
+- Animation behavior verification
+- Responsive design validation
 
-## 禁止事項
+## Prohibited Practices
 
-- **条件緩和**: テストエラー・型エラー解消のための条件緩和
-- **テストスキップ**: 不適切なモック化による回避
-- **ハードコード**: 出力・レスポンスのハードコード
-- **エラー隠蔽**: エラーメッセージの無視・隠蔽
-- **一時的修正**: 問題の先送り
+- **Condition Relaxation**: Loosening conditions to resolve test or type errors
+- **Test Skipping**: Inappropriate mocking to bypass issues
+- **Hard Coding**: Hard-coded outputs or responses
+- **Error Concealment**: Ignoring or hiding error messages
+- **Temporary Fixes**: Postponing problems with temporary solutions
 
-## 技術選択原則
+## Technical Decision Principles
 
-- **新ライブラリ導入**: 事前確認必須
-- **Bun優先**: パッケージ管理・テスト実行・スクリプト実行
-- **Tailwind設定**: @tailwindcss/viteプラグイン使用（PostCSS非経由）
-- **UIリテラル**: ソースコード埋め込み禁止（国際化リソース使用）
+- **Bun Priority**: Package management, test execution, and script running
+- **Tailwind Setup**: Using @tailwindcss/vite plugin
+- **UI Literals**: No source code embedding (use internationalization resources)
