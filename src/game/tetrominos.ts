@@ -1,5 +1,5 @@
 import type { Tetromino, TetrominoTypeName } from "../types/game";
-import { BOARD_WIDTH, TETROMINO_TYPES } from "../utils/constants";
+import { BOARD_WIDTH } from "../utils/constants";
 
 // Type-safe color index mapping
 export const TETROMINO_COLOR_MAP = {
@@ -71,10 +71,6 @@ export function rotateTetromino(shape: number[][]): number[][] {
   }
 
   return rotated;
-}
-
-export function getRandomTetrominoType(): TetrominoTypeName {
-  return TETROMINO_TYPES[Math.floor(Math.random() * TETROMINO_TYPES.length)];
 }
 
 export function createTetromino(type: TetrominoTypeName): Tetromino {
