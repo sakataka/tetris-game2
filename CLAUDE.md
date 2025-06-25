@@ -10,12 +10,14 @@
 - **ハイスコア記録**: ローカルストレージでのスコア保存
 - **多言語対応**: 日本語・英語の動的切り替え
 - **ゴーストピース**: 落下予測位置の表示
+- **ホールド機能**: ピース保存・交換システム
 
 ## 実装機能
 
 ### コアゲーム機能
 - 7種類のテトリスピース（I, O, T, S, Z, J, L）
 - ピース移動・回転・ハードドロップ
+- ホールド機能（ピース保存・交換）
 - ライン消去とスコアリング
 - レベルアップによる速度上昇
 - ゲーム一時停止・再開・リセット
@@ -24,6 +26,7 @@
 ### ユーザーインターフェース
 - リアルタイムスコア・ライン・レベル表示
 - 次のピース表示
+- ホールドピース表示（使用可能状態の視覚的表示）
 - ハイスコア一覧表示
 - 操作説明
 - ゲームオーバー・一時停止画面
@@ -89,41 +92,17 @@ interface GameStore extends GameState {
   moveDown: () => void;
   rotate: () => void;
   drop: () => void;
+  holdPiece: () => void;
   togglePause: () => void;
   resetGame: () => void;
   clearAnimationStates: () => void;
+  toggleGhostPiece: () => void;
 }
 ```
 
 ### ゲーム状態型定義
-```typescript
-interface GameState {
-  board: BoardMatrix;            // 20×10ゲームボード
-  currentPiece: Tetromino | null; // 現在のピース
-  nextPiece: TetrominoTypeName;   // 次のピース
-  score: number;
-  lines: number;
-  level: number;
-  isGameOver: boolean;
-  isPaused: boolean;
-  placedPositions: Position[];    // アニメーション用
-  clearingLines: number[];        // ライン消去アニメーション用
-  animationTriggerKey: number;    // アニメーション同期用
-  ghostPosition: Position | null;  // ゴーストピース位置
-}
-```
 
 ### テトリスピース型定義（判別可能ユニオン型）
-```typescript
-type TetrominoType =
-  | { type: "I"; colorIndex: 1 }
-  | { type: "O"; colorIndex: 2 }
-  | { type: "T"; colorIndex: 3 }
-  | { type: "S"; colorIndex: 4 }
-  | { type: "Z"; colorIndex: 5 }
-  | { type: "J"; colorIndex: 6 }
-  | { type: "L"; colorIndex: 7 };
-```
 
 ### フォルダ構造
 ```
@@ -136,6 +115,7 @@ src/
 │   │   ├── Controls.tsx
 │   │   ├── GameOverlay.tsx
 │   │   ├── HighScore.tsx
+│   │   ├── HoldPiece.tsx   # ホールドピース表示
 │   │   ├── NextPiece.tsx
 │   │   ├── ScoreBoard.tsx
 │   │   ├── TouchControls.tsx
@@ -152,20 +132,25 @@ src/
 │   ├── board.ts
 │   ├── game.ts
 │   ├── tetrominos.ts
-│   └── ghost.test.ts      # ゴーストピース専用テスト
+│   ├── ghost.test.ts      # ゴーストピース専用テスト
+│   └── hold.test.ts       # ホールド機能専用テスト
 ├── hooks/                 # カスタムHooks
+│   ├── executeGameAction.ts
 │   ├── useAnimatedValue.ts
 │   ├── useAnimationCompletionHandler.ts
 │   ├── useCellAnimation.ts
 │   ├── useGameLoop.ts
 │   ├── useGameSelectors.ts
 │   ├── useHighScore.ts
+│   ├── useHighScoreSideEffect.ts
 │   ├── useKeyboardControls.ts
+│   ├── useSettingsSideEffect.ts
 │   └── useTouchGestures.ts
 ├── lib/                   # ユーティリティライブラリ
 │   └── utils.ts           # shadcn/ui汎用ユーティリティ
 ├── store/                 # Zustand状態管理
-│   └── gameStore.ts
+│   ├── gameStore.ts
+│   └── highScoreStore.ts  # ハイスコア専用ストア
 ├── test/                  # テスト設定・モック
 │   ├── __mocks__/
 │   │   └── react-i18next.ts
@@ -193,14 +178,17 @@ src/
 - **useKeyboardControls**: react-hotkeys-hookによる宣言的キー入力処理
 - **useTouchGestures**: モバイル向けタッチ操作（スワイプ・タップ）
 - **useGameSelectors**: ゲーム状態の効率的な選択とメモ化
+- **executeGameAction**: ゲームアクション実行のヘルパー関数
 
 ### アニメーション系
 - **useAnimatedValue**: アニメーション値管理とスプリング制御
 - **useAnimationCompletionHandler**: アニメーション完了時の状態管理
 - **useCellAnimation**: 個別セルのアニメーション状態管理
 
-### データ管理系
+### データ管理系・副作用系
 - **useHighScore**: ハイスコアのローカルストレージ管理
+- **useHighScoreSideEffect**: ハイスコア保存の副作用処理
+- **useSettingsSideEffect**: 設定の永続化副作用処理
 
 ## ゲームロジック（純粋関数）
 
@@ -209,6 +197,7 @@ src/
 - `moveTetrominoBy()`: ピース移動処理（ゴーストピース位置更新）
 - `rotateTetrominoCW()`: 時計回り回転処理（ゴーストピース位置更新）
 - `hardDropTetromino()`: ハードドロップ処理
+- `holdCurrentPiece()`: ホールド機能処理（ピース保存・交換）
 - `calculateGhostPosition()`: ゴーストピース位置計算（落下予測）
 - `updateGhostPosition()`: ゲーム状態のゴーストピース位置更新
 
@@ -221,28 +210,16 @@ src/
 ### game/tetrominos.ts
 - `getTetrominoShape()`: ピース形状データ取得
 - `rotateTetromino()`: 90度回転アルゴリズム
-- `getRandomTetromino()`: ランダムピース生成
+- `getRandomTetrominoType()`: ランダムピースタイプ生成
+- `createTetromino()`: テトロミノオブジェクト作成
+- `getTetrominoColorIndex()`: ピース種類に対応する色インデックス取得
 
 ## データ永続化
 
 ### ローカルストレージ管理（utils/localStorage.ts）
-```typescript
-interface HighScore {
-  score: number;
-  lines: number;
-  level: number;
-  date: string;
-}
-
-interface GameSettings {
-  language: "ja" | "en";
-  volume: number;
-  showGhostPiece: boolean;
-}
-```
 
 - ハイスコア一覧の保存・取得・管理
-- ゲーム設定の永続化（言語・音量・ゴーストピース表示）
+- ゲーム設定の永続化（言語・ゴーストピース表示）
 - 型安全なJSON操作
 - エラーハンドリング
 - カスタムイベント（ハイスコア更新通知）
@@ -321,6 +298,7 @@ bun test --watch               # ウォッチモード
 bun test src/game/             # 特定ディレクトリのテスト
 bun run test:fast              # 高速テスト（game, hooks, utils）
 bun run test:components        # コンポーネントテスト
+bun run test:ci                # CI用テスト
 bun run lint                   # Biome lint実行
 bun run format                 # Biome format実行
 bun run typecheck              # TypeScript型チェック

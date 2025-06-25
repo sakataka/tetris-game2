@@ -46,14 +46,3 @@ export const CONTROL_STYLES = {
   toggleOff: "bg-gray-600",
   toggleThumb: "w-3 h-3 rounded-full bg-white transition-transform",
 } as const;
-
-/**
- * Container and layout styling patterns
- */
-export const CONTAINER_STYLES = {
-  gameCard: "bg-gray-900/50 backdrop-blur-sm border-gray-700 shadow-xl",
-  gameCardHover:
-    "hover:bg-gray-900/60 hover:border-gray-600 transition-all duration-300 hover:shadow-2xl",
-  sectionContainer: "px-3 py-2",
-  itemContainer: "flex items-center justify-between p-2 rounded cursor-pointer w-full text-left",
-} as const;

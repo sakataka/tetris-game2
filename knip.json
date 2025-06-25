@@ -4,5 +4,5 @@
   "ignore": ["dist/**", "node_modules/**", "**/*.test.{ts,tsx}", "src/test/__mocks__/**"],
   "ignoreExportsUsedInFile": true,
   "includeEntryExports": false,
-  "ignoreDependencies": ["@biomejs/biome", "happy-dom", "bun-types"]
+  "ignoreDependencies": ["@biomejs/biome", "bun-types"]
 }
