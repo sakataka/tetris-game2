@@ -24,10 +24,3 @@ export const BOARD_STYLES = {
   ghostPiece: "opacity-30 border border-white/30 shadow-sm bg-gray-400/20",
   clearingLine: "shadow-white/80 shadow-xl ring-2 ring-white/50 animate-pulse",
 } as const;
-
-/**
- * Helper function to combine style patterns
- */
-export function combineStyles(...styles: (string | undefined | false)[]): string {
-  return styles.filter(Boolean).join(" ");
-}

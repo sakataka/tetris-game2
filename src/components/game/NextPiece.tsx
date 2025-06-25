@@ -4,7 +4,7 @@ import { getTetrominoShape } from "../../game/tetrominos";
 import { useGameStore } from "../../store/gameStore";
 import { getTetrominoColor } from "../../utils/colors";
 import { NEXT_PIECE_GRID_SIZE } from "../../utils/constants";
-import { CARD_STYLES, combineStyles } from "../../utils/styles";
+import { CARD_STYLES } from "../../utils/styles";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 
 export function NextPiece() {
@@ -14,9 +14,7 @@ export function NextPiece() {
   const tetrominoColor = getTetrominoColor(nextPiece);
 
   return (
-    <Card
-      className={combineStyles(CARD_STYLES.base, CARD_STYLES.hover, "shadow-xl hover:shadow-2xl")}
-    >
+    <Card className={cn(CARD_STYLES.base, CARD_STYLES.hover, "shadow-xl hover:shadow-2xl")}>
       <CardHeader>
         <CardTitle className="text-base font-bold text-gray-300 text-center">
           {t("game.next")}

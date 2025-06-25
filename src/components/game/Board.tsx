@@ -1,6 +1,7 @@
+import { cn } from "@/lib/utils";
 import { useBoardData } from "../../hooks/useGameSelectors";
 import { BOARD_CELL_SIZE_PX, BOARD_HEIGHT, BOARD_WIDTH } from "../../utils/constants";
-import { BOARD_STYLES, CARD_STYLES, combineStyles } from "../../utils/styles";
+import { BOARD_STYLES, CARD_STYLES } from "../../utils/styles";
 import { Card } from "../ui/card";
 import { BoardCell } from "./BoardCell";
 
@@ -16,7 +17,7 @@ export function Board() {
 
   return (
     <Card
-      className={combineStyles(
+      className={cn(
         CARD_STYLES.base,
         CARD_STYLES.hover,
         "p-6 min-w-[320px] min-h-[620px] shadow-2xl hover:shadow-3xl",
