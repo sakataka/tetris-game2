@@ -1,26 +1,30 @@
 # Tetris Game
 
-ブラウザで遊べるモダンなテトリスゲーム。
+A modern Tetris game built with React and TypeScript.
 
-## 特徴
+## Features
 
-- 完全なテトリス体験（7種類のピース、ライン消去、スコア、レベルアップ）
-- 美しいアニメーション
-- 日本語・英語対応
-- デスクトップ・モバイル対応
-- ハイスコア記録
+- Complete Tetris experience (7 piece types, line clearing, scoring, level progression)
+- Hold piece functionality
+- Ghost piece (drop preview)
+- Beautiful animations with Framer Motion
+- Japanese and English language support
+- Desktop and mobile compatibility (touch controls)
+- High score tracking with local storage
+- Game settings (language toggle, ghost piece on/off)
 
-## 技術スタック
+## Tech Stack
 
 - React 19 + TypeScript
-- Bun (パッケージ管理・テスト)
-- Rolldown-Vite (ビルド)
+- Bun (package management & testing)
+- Rolldown-Vite (build)
 - Tailwind CSS + Framer Motion
-- Zustand (状態管理)
+- Zustand (state management)
+- shadcn/ui components
 
-## セットアップ
+## Setup
 
-前提条件: [Bun](https://bun.sh/docs/installation)
+Prerequisites: [Bun](https://bun.sh/docs/installation)
 
 ```bash
 git clone https://github.com/sakataka/tetris-game2.git
@@ -29,34 +33,35 @@ bun install
 bun run dev
 ```
 
-http://localhost:5173 でゲーム開始
+Start playing at http://localhost:5173
 
-## 操作方法
+## Controls
 
-| キー | 動作 |
-|------|------|
-| ← → | ピース移動 |
-| ↓ | ソフトドロップ |
-| ↑ | 回転 |
-| Space | ハードドロップ |
-| P | 一時停止/再開 |
-| Enter | ゲームリセット |
+| Key | Action |
+|-----|--------|
+| ← → | Move piece |
+| ↓ | Soft drop |
+| ↑ | Rotate |
+| Space | Hard drop |
+| C | Hold piece |
+| P | Pause/Resume |
+| Enter | Reset game |
 
-## 開発コマンド
+## Development Commands
 
 ```bash
-# 開発
-bun run dev                    # 開発サーバー
-bun run build                  # ビルド
-bun run preview                # プレビュー
+# Development
+bun run dev                    # Development server
+bun run build                  # Build
+bun run preview                # Preview
 
-# テスト・品質
-bun test                       # テスト実行
-bun run lint                   # リント
-bun run format                 # フォーマット
-bun run typecheck              # 型チェック
+# Testing & Quality
+bun test                       # Run tests
+bun run lint                   # Lint
+bun run format                 # Format
+bun run typecheck              # Type check
 ```
 
-## ライセンス
+## License
 
 ISC License
