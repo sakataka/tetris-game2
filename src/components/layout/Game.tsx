@@ -1,5 +1,7 @@
 import { useGameLoop } from "../../hooks/useGameLoop";
+import { useHighScoreSideEffect } from "../../hooks/useHighScoreSideEffect";
 import { useKeyboardControls } from "../../hooks/useKeyboardControls";
+import { useSettingsSideEffect } from "../../hooks/useSettingsSideEffect";
 import { useTouchGestures } from "../../hooks/useTouchGestures";
 import {
   Board,
@@ -15,6 +17,8 @@ import { GameSettings } from "./GameSettings";
 export function Game() {
   useGameLoop();
   useKeyboardControls();
+  useHighScoreSideEffect();
+  useSettingsSideEffect();
   const { handleTouchStart, handleTouchEnd } = useTouchGestures();
 
   return (

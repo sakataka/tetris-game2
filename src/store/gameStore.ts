@@ -6,7 +6,7 @@ import {
   rotateTetrominoCW,
 } from "../game/game";
 import type { GameState } from "../types/game";
-import { getSettings, setHighScore, updateSettings } from "../utils/localStorage";
+import { getSettings } from "../utils/localStorage";
 
 interface GameStore extends GameState {
   moveLeft: () => void;
@@ -20,34 +20,15 @@ interface GameStore extends GameState {
   toggleGhostPiece: () => void;
 }
 
-// Helper function to save high score when game transitions to game over
-const saveHighScoreOnGameOver = (oldState: GameState, newState: GameState): void => {
-  if (!oldState.isGameOver && newState.isGameOver) {
-    setHighScore(newState.score, newState.lines, newState.level);
-  }
-};
-
 export const useGameStore = create<GameStore>((set) => ({
   ...createInitialGameState(),
   showGhostPiece: getSettings().showGhostPiece,
 
   moveLeft: () => set((state) => moveTetrominoBy(state, -1, 0)),
   moveRight: () => set((state) => moveTetrominoBy(state, 1, 0)),
-  moveDown: () => {
-    set((state) => {
-      const newState = moveTetrominoBy(state, 0, 1);
-      saveHighScoreOnGameOver(state, newState);
-      return newState;
-    });
-  },
+  moveDown: () => set((state) => moveTetrominoBy(state, 0, 1)),
   rotate: () => set((state) => rotateTetrominoCW(state)),
-  drop: () => {
-    set((state) => {
-      const newState = hardDropTetromino(state);
-      saveHighScoreOnGameOver(state, newState);
-      return newState;
-    });
-  },
+  drop: () => set((state) => hardDropTetromino(state)),
 
   togglePause: () => set((state) => ({ isPaused: !state.isPaused })),
   resetGame: () =>
@@ -67,10 +48,5 @@ export const useGameStore = create<GameStore>((set) => ({
         clearingLines: [],
       };
     }),
-  toggleGhostPiece: () =>
-    set((state) => {
-      const newShowGhostPiece = !state.showGhostPiece;
-      updateSettings({ showGhostPiece: newShowGhostPiece });
-      return { showGhostPiece: newShowGhostPiece };
-    }),
+  toggleGhostPiece: () => set((state) => ({ showGhostPiece: !state.showGhostPiece })),
 }));
