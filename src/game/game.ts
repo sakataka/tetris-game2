@@ -24,6 +24,7 @@ export function createInitialGameState(): GameState {
   const currentType = getRandomTetrominoType();
   const state = {
     board: createEmptyBoard(),
+    boardBeforeClear: null,
     currentPiece: createTetromino(currentType),
     nextPiece: getRandomTetrominoType(),
     score: 0,
@@ -200,9 +201,13 @@ function lockCurrentTetromino(state: GameState): GameState {
 
   const { currentPiece, nextPiece, isGameOver } = _spawnNewPiece(boardAfterClear, state.nextPiece);
 
+  // If there are lines to clear, preserve the board state before clearing
+  const boardBeforeClear = clearingLines.length > 0 ? boardAfterLock : null;
+
   return updateGhostPosition({
     ...state,
     board: boardAfterClear,
+    boardBeforeClear,
     currentPiece,
     nextPiece,
     score,

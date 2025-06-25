@@ -39,13 +39,18 @@ export const useGameStore = create<GameStore>((set) => ({
   clearAnimationStates: () =>
     set((state) => {
       // Prevent unnecessary updates if animation states are already empty
-      if (state.placedPositions.length === 0 && state.clearingLines.length === 0) {
+      if (
+        state.placedPositions.length === 0 &&
+        state.clearingLines.length === 0 &&
+        state.boardBeforeClear === null
+      ) {
         return state;
       }
       return {
         ...state,
         placedPositions: [],
         clearingLines: [],
+        boardBeforeClear: null,
       };
     }),
   toggleGhostPiece: () => set((state) => ({ showGhostPiece: !state.showGhostPiece })),

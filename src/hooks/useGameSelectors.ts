@@ -43,6 +43,7 @@ export const useGameActions = () => {
 
 export const useBoardData = () => {
   const board = useGameStore((state) => state.board);
+  const boardBeforeClear = useGameStore((state) => state.boardBeforeClear);
   const currentPiece = useGameStore((state) => state.currentPiece);
   const ghostPosition = useGameStore((state) => state.ghostPosition);
   const placedPositions = useGameStore((state) => state.placedPositions);
@@ -52,12 +53,15 @@ export const useBoardData = () => {
 
   // Unified current piece processing - compute both display board and positions
   const { displayBoard, currentPiecePositions } = useMemo(() => {
+    // Use boardBeforeClear during line clearing animation, otherwise use current board
+    const activeBoard = boardBeforeClear && clearingLines.length > 0 ? boardBeforeClear : board;
+
     // Safety check for board existence
-    if (!board || !Array.isArray(board)) {
+    if (!activeBoard || !Array.isArray(activeBoard)) {
       return { displayBoard: [], currentPiecePositions: new Set<string>() };
     }
 
-    const newBoard = board.map((row) => [...row]);
+    const newBoard = activeBoard.map((row) => [...row]);
     const positions = new Set<string>();
 
     if (currentPiece) {
@@ -71,7 +75,7 @@ export const useBoardData = () => {
     }
 
     return { displayBoard: newBoard, currentPiecePositions: positions };
-  }, [board, currentPiece]);
+  }, [board, boardBeforeClear, currentPiece, clearingLines]);
 
   // Pre-compute placed positions for O(1) lookup
   const placedPositionsSet = useMemo(() => {

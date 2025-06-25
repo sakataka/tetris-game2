@@ -36,7 +36,7 @@ export function useCellAnimation({
     if (!shouldAnimate) return {};
     if (isCurrentPiece) return { y: 0, opacity: 1 };
     if (isPlacedPiece) return { scale: 1 };
-    if (isClearingLine) return { opacity: [1, 0.3, 1, 0.3, 0], scale: [1, 1.1, 1, 1.1, 1] };
+    if (isClearingLine) return { opacity: [1, 0, 1, 0], scale: [1, 1.1, 1, 0.9] };
     return {};
   }, [shouldAnimate, isCurrentPiece, isPlacedPiece, isClearingLine]);
 
@@ -51,8 +51,8 @@ export function useCellAnimation({
       };
     }
     return {
-      duration: isClearingLine ? 0.6 : 0.15,
-      repeat: isClearingLine ? 2 : 0,
+      duration: isClearingLine ? 0.2 : 0.15,
+      repeat: isClearingLine ? 0 : 0,
     };
   }, [shouldAnimate, isCurrentPiece, isClearingLine]);
 

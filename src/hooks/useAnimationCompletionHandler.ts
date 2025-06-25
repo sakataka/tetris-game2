@@ -21,7 +21,7 @@ export function useAnimationCompletionHandler() {
         clearTimeoutRef.current = window.setTimeout(() => {
           clearAnimationStates();
           clearTimeoutRef.current = null;
-        }, 50); // Small delay to ensure animation DOM updates complete
+        }, 10); // Minimal delay to ensure animation DOM updates complete
       } else if (isPlacedPiece) {
         // Cancel any pending clear operations to prevent duplicate calls
         if (clearTimeoutRef.current) {

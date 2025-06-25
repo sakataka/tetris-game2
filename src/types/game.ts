@@ -42,6 +42,7 @@ export type BoardMatrix = number[][];
  */
 export interface GameState {
   board: BoardMatrix;
+  boardBeforeClear: BoardMatrix | null; // Board state before line clearing for animation
   currentPiece: Tetromino | null;
   nextPiece: TetrominoTypeName;
   score: number;
