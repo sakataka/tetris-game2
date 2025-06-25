@@ -45,6 +45,8 @@ export interface GameState {
   boardBeforeClear: BoardMatrix | null; // Board state before line clearing for animation
   currentPiece: Tetromino | null;
   nextPiece: TetrominoTypeName;
+  heldPiece: TetrominoTypeName | null;
+  canHold: boolean;
   score: number;
   lines: number;
   level: number;

@@ -27,6 +27,8 @@ export function createInitialGameState(): GameState {
     boardBeforeClear: null,
     currentPiece: createTetromino(currentType),
     nextPiece: getRandomTetrominoType(),
+    heldPiece: null as TetrominoTypeName | null,
+    canHold: true,
     score: 0,
     lines: 0,
     level: 1,
@@ -216,6 +218,7 @@ function lockCurrentTetromino(state: GameState): GameState {
     isGameOver,
     placedPositions,
     clearingLines,
+    canHold: true,
   });
 }
 
@@ -271,4 +274,39 @@ function updateGhostPosition(state: GameState): GameState {
     ...state,
     ghostPosition: calculateGhostPosition(state),
   };
+}
+
+/**
+ * Holds the current piece and either swaps it with the held piece or
+ * replaces it with the next piece if no piece is currently held.
+ * Only allows holding once per piece drop (canHold must be true).
+ */
+export function holdCurrentPiece(state: GameState): GameState {
+  if (!state.currentPiece || !state.canHold || state.isGameOver || state.isPaused) {
+    return state;
+  }
+
+  const currentPieceType = state.currentPiece.type;
+
+  if (state.heldPiece === null) {
+    // Initial hold: save current piece and spawn next piece
+    const newCurrentPiece = createTetromino(state.nextPiece);
+    const newState = {
+      ...state,
+      currentPiece: newCurrentPiece,
+      heldPiece: currentPieceType,
+      nextPiece: getRandomTetrominoType(),
+      canHold: false,
+    };
+    return updateGhostPosition(newState);
+  }
+  // Exchange hold: swap held piece with current piece
+  const newCurrentPiece = createTetromino(state.heldPiece);
+  const newState = {
+    ...state,
+    currentPiece: newCurrentPiece,
+    heldPiece: currentPieceType,
+    canHold: false,
+  };
+  return updateGhostPosition(newState);
 }

@@ -9,6 +9,9 @@
     "lines": "Lines",
     "level": "Level",
     "next": "Next",
+    "hold": "Hold",
+    "holdPiece": "Hold Piece",
+    "holdDescription": "Save piece",
     "gameOver": "Game Over",
     "paused": "Paused",
     "newGame": "New Game",
@@ -26,6 +29,7 @@
       "softDrop": "Soft Drop",
       "rotate": "Rotate",
       "hardDrop": "Hard Drop",
+      "hold": "Hold",
       "pause": "Pause"
     },
     "settings": {

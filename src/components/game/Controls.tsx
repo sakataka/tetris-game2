@@ -11,6 +11,7 @@ export function Controls() {
     { key: "↓", action: t("game.controls.softDrop") },
     { key: "↑", action: t("game.controls.rotate") },
     { key: "Space", action: t("game.controls.hardDrop") },
+    { key: "Shift", action: t("game.controls.hold") },
     { key: "P", action: t("game.controls.pause") },
   ];
 

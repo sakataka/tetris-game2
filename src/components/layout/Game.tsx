@@ -8,6 +8,7 @@ import {
   Controls,
   GameOverlay,
   HighScore,
+  HoldPiece,
   NextPiece,
   ScoreBoard,
   TouchControls,
@@ -36,6 +37,7 @@ export function Game() {
         >
           <ScoreBoard />
           <HighScore />
+          <HoldPiece />
           <NextPiece />
           <div className="hidden md:block">
             <Controls />

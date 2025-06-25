@@ -9,6 +9,9 @@
     "lines": "ライン",
     "level": "レベル",
     "next": "次のピース",
+    "hold": "ホールド",
+    "holdPiece": "ホールドピース",
+    "holdDescription": "ピースを保存",
     "gameOver": "ゲームオーバー",
     "paused": "一時停止中",
     "newGame": "新しいゲーム",
@@ -26,6 +29,7 @@
       "softDrop": "ソフトドロップ",
       "rotate": "回転",
       "hardDrop": "ハードドロップ",
+      "hold": "ホールド",
       "pause": "一時停止"
     },
     "settings": {

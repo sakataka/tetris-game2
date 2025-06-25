@@ -10,6 +10,7 @@ export function useKeyboardControls() {
     moveDown,
     rotate,
     drop,
+    holdPiece,
     togglePause,
     resetGame,
     isPaused,
@@ -40,6 +41,16 @@ export function useKeyboardControls() {
     (e) => {
       e.preventDefault();
       executeGameAction(drop, false);
+    },
+    { keydown: true },
+  );
+
+  // Hold piece
+  useHotkeys(
+    "shift",
+    (e) => {
+      e.preventDefault();
+      executeGameAction(holdPiece);
     },
     { keydown: true },
   );
