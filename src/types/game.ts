@@ -53,4 +53,5 @@ export interface GameState {
   clearingLines: number[];
   animationTriggerKey: number;
   ghostPosition: Position | null;
+  showGhostPiece: boolean;
 }

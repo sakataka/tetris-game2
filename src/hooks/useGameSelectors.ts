@@ -3,7 +3,6 @@ import { forEachPieceCell } from "../game/board";
 import { getTetrominoColorIndex } from "../game/tetrominos";
 import { useGameStore } from "../store/gameStore";
 import { BOARD_HEIGHT, BOARD_WIDTH } from "../utils/constants";
-import { getSettings } from "../utils/localStorage";
 
 /**
  * Game state selectors - optimized with useMemo to prevent infinite loops
@@ -49,6 +48,7 @@ export const useBoardData = () => {
   const placedPositions = useGameStore((state) => state.placedPositions);
   const clearingLines = useGameStore((state) => state.clearingLines);
   const animationTriggerKey = useGameStore((state) => state.animationTriggerKey);
+  const showGhostPiece = useGameStore((state) => state.showGhostPiece);
 
   // Unified current piece processing - compute both display board and positions
   const { displayBoard, currentPiecePositions } = useMemo(() => {
@@ -84,11 +84,10 @@ export const useBoardData = () => {
 
   // Pre-compute ghost piece positions for O(1) lookup
   const ghostPiecePositions = useMemo(() => {
-    const settings = getSettings();
     const positions = new Set<string>();
 
-    // Check if ghost piece display is enabled in settings
-    if (!settings.showGhostPiece || !currentPiece || !ghostPosition) {
+    // Check if ghost piece display is enabled
+    if (!showGhostPiece || !currentPiece || !ghostPosition) {
       return positions;
     }
 
@@ -99,7 +98,7 @@ export const useBoardData = () => {
     });
 
     return positions;
-  }, [currentPiece, ghostPosition]);
+  }, [currentPiece, ghostPosition, showGhostPiece]);
 
   return useMemo(
     () => ({

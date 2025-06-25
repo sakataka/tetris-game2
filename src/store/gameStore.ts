@@ -6,7 +6,7 @@ import {
   rotateTetrominoCW,
 } from "../game/game";
 import type { GameState } from "../types/game";
-import { setHighScore } from "../utils/localStorage";
+import { getSettings, setHighScore, updateSettings } from "../utils/localStorage";
 
 interface GameStore extends GameState {
   moveLeft: () => void;
@@ -17,6 +17,7 @@ interface GameStore extends GameState {
   togglePause: () => void;
   resetGame: () => void;
   clearAnimationStates: () => void;
+  toggleGhostPiece: () => void;
 }
 
 // Helper function to save high score when game transitions to game over
@@ -28,6 +29,7 @@ const saveHighScoreOnGameOver = (oldState: GameState, newState: GameState): void
 
 export const useGameStore = create<GameStore>((set) => ({
   ...createInitialGameState(),
+  showGhostPiece: getSettings().showGhostPiece,
 
   moveLeft: () => set((state) => moveTetrominoBy(state, -1, 0)),
   moveRight: () => set((state) => moveTetrominoBy(state, 1, 0)),
@@ -48,7 +50,11 @@ export const useGameStore = create<GameStore>((set) => ({
   },
 
   togglePause: () => set((state) => ({ isPaused: !state.isPaused })),
-  resetGame: () => set(createInitialGameState()),
+  resetGame: () =>
+    set(() => ({
+      ...createInitialGameState(),
+      showGhostPiece: getSettings().showGhostPiece,
+    })),
   clearAnimationStates: () =>
     set((state) => {
       // Prevent unnecessary updates if animation states are already empty
@@ -60,5 +66,11 @@ export const useGameStore = create<GameStore>((set) => ({
         placedPositions: [],
         clearingLines: [],
       };
+    }),
+  toggleGhostPiece: () =>
+    set((state) => {
+      const newShowGhostPiece = !state.showGhostPiece;
+      updateSettings({ showGhostPiece: newShowGhostPiece });
+      return { showGhostPiece: newShowGhostPiece };
     }),
 }));

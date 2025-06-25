@@ -2,7 +2,6 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { renderHook } from "@testing-library/react";
 import { getTetrominoShape } from "../game/tetrominos";
 import { useGameStore } from "../store/gameStore";
-import { updateSettings } from "../utils/localStorage";
 import { useBoardData } from "./useGameSelectors";
 
 // Mock localStorage for testing
@@ -43,9 +42,6 @@ afterEach(() => {
 
 describe("useBoardData", () => {
   test("should return empty ghost piece positions when showGhostPiece is false", () => {
-    // Set showGhostPiece to false
-    updateSettings({ showGhostPiece: false });
-
     // Set up a game state with a current piece and ghost position
     const currentPiece = {
       type: "T" as const,
@@ -60,6 +56,7 @@ describe("useBoardData", () => {
         ...store,
         currentPiece,
         ghostPosition: { x: 4, y: 18 }, // Ghost position at bottom
+        showGhostPiece: false, // Set showGhostPiece to false in the store
       });
     } catch (_error) {
       // Skip this test if store is not available
@@ -73,9 +70,6 @@ describe("useBoardData", () => {
   });
 
   test("should return ghost piece positions when showGhostPiece is true", () => {
-    // Set showGhostPiece to true (default)
-    updateSettings({ showGhostPiece: true });
-
     // Set up a game state with a current piece and ghost position
     const currentPiece = {
       type: "T" as const,
@@ -90,6 +84,7 @@ describe("useBoardData", () => {
         ...store,
         currentPiece,
         ghostPosition: { x: 4, y: 18 }, // Ghost position at bottom
+        showGhostPiece: true, // Set showGhostPiece to true in the store
       });
     } catch (_error) {
       // Skip this test if store is not available
@@ -103,9 +98,6 @@ describe("useBoardData", () => {
   });
 
   test("should return empty ghost piece positions when no current piece", () => {
-    // Set showGhostPiece to true
-    updateSettings({ showGhostPiece: true });
-
     // Set no current piece and no ghost position
     try {
       const store = useGameStore.getState();
@@ -113,6 +105,7 @@ describe("useBoardData", () => {
         ...store,
         currentPiece: null,
         ghostPosition: null,
+        showGhostPiece: true, // Set showGhostPiece to true in the store
       });
     } catch (_error) {
       // Skip this test if store is not available
@@ -126,9 +119,6 @@ describe("useBoardData", () => {
   });
 
   test("should return empty ghost piece positions when no ghost position", () => {
-    // Set showGhostPiece to true
-    updateSettings({ showGhostPiece: true });
-
     const currentPiece = {
       type: "T" as const,
       position: { x: 4, y: 0 },
@@ -142,6 +132,7 @@ describe("useBoardData", () => {
         ...store,
         currentPiece,
         ghostPosition: null, // No ghost position
+        showGhostPiece: true, // Set showGhostPiece to true in the store
       });
     } catch (_error) {
       // Skip this test if store is not available

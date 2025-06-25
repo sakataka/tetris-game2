@@ -1,22 +1,18 @@
 import { Settings } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { getSettings, updateSettings } from "../../utils/localStorage";
+import { useGameStore } from "../../store/gameStore";
+import { updateSettings } from "../../utils/localStorage";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
 
 export function GameSettings() {
   const { i18n, t } = useTranslation();
-  const [showGhostPiece, setShowGhostPiece] = useState(true);
+  const showGhostPiece = useGameStore((state) => state.showGhostPiece);
+  const toggleGhostPiece = useGameStore((state) => state.toggleGhostPiece);
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
-  // Load settings on component mount
-  useEffect(() => {
-    const settings = getSettings();
-    setShowGhostPiece(settings.showGhostPiece);
-  }, []);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -42,9 +38,7 @@ export function GameSettings() {
   };
 
   const handleGhostPieceToggle = () => {
-    const newValue = !showGhostPiece;
-    setShowGhostPiece(newValue);
-    updateSettings({ showGhostPiece: newValue });
+    toggleGhostPiece();
   };
 
   return (
