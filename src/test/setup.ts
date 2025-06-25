@@ -19,10 +19,10 @@ beforeAll(() => {
   const globalWithDom = global as unknown as GlobalWithDom;
 
   // Set global window and document with proper types
-  globalWithDom.window = window as Window & typeof globalThis;
-  globalWithDom.document = document;
-  globalWithDom.navigator = window.navigator;
-  globalWithDom.HTMLElement = window.HTMLElement;
+  globalWithDom.window = window as unknown as Window & typeof globalThis;
+  globalWithDom.document = document as unknown as Document;
+  globalWithDom.navigator = window.navigator as unknown as Navigator;
+  globalWithDom.HTMLElement = window.HTMLElement as unknown as typeof HTMLElement;
 
   // Set up localStorage mock with proper Storage interface
   globalWithDom.localStorage = {
