@@ -13,21 +13,20 @@ import {
   isValidPosition,
   placeTetromino,
 } from "./board";
-import {
-  createTetromino,
-  getRandomTetrominoType,
-  getTetrominoColorIndex,
-  rotateTetromino,
-} from "./tetrominos";
+import { createPieceBagManager } from "./pieceBag";
+import { createTetromino, getTetrominoColorIndex, rotateTetromino } from "./tetrominos";
 import { tryRotateWithWallKick } from "./wallKick";
 
 export function createInitialGameState(): GameState {
-  const currentType = getRandomTetrominoType();
+  const pieceBagManager = createPieceBagManager();
+  const currentType = pieceBagManager.getNextPiece();
+  const nextType = pieceBagManager.getNextPiece();
+
   const state = {
     board: createEmptyBoard(),
     boardBeforeClear: null,
     currentPiece: createTetromino(currentType),
-    nextPiece: getRandomTetrominoType(),
+    nextPiece: nextType,
     heldPiece: null as TetrominoTypeName | null,
     canHold: true,
     score: 0,
@@ -40,6 +39,7 @@ export function createInitialGameState(): GameState {
     animationTriggerKey: 0,
     ghostPosition: null as Position | null,
     showGhostPiece: true,
+    pieceBag: pieceBagManager.getBag(),
   };
 
   // Calculate initial ghost position
@@ -191,13 +191,20 @@ function _handleLineClearing(
 function _spawnNewPiece(
   board: GameState["board"],
   nextPieceType: TetrominoTypeName,
-): Pick<GameState, "currentPiece" | "nextPiece" | "isGameOver"> {
+  pieceBag: TetrominoTypeName[],
+): Pick<GameState, "currentPiece" | "nextPiece" | "isGameOver" | "pieceBag"> {
+  const pieceBagManager = createPieceBagManager();
+  pieceBagManager.setBag(pieceBag);
+
   const newPiece = createTetromino(nextPieceType);
   const isGameOver = !isValidPosition(board, newPiece.shape, newPiece.position);
+  const newNextPiece = pieceBagManager.getNextPiece();
+
   return {
     currentPiece: isGameOver ? null : newPiece,
-    nextPiece: getRandomTetrominoType(),
+    nextPiece: newNextPiece,
     isGameOver,
+    pieceBag: pieceBagManager.getBag(),
   };
 }
 
@@ -218,7 +225,11 @@ function lockCurrentTetromino(state: GameState): GameState {
     clearingLines,
   } = _handleLineClearing(boardAfterLock, state.score, state.lines, state.level);
 
-  const { currentPiece, nextPiece, isGameOver } = _spawnNewPiece(boardAfterClear, state.nextPiece);
+  const { currentPiece, nextPiece, isGameOver, pieceBag } = _spawnNewPiece(
+    boardAfterClear,
+    state.nextPiece,
+    state.pieceBag,
+  );
 
   // If there are lines to clear, preserve the board state before clearing
   const boardBeforeClear = clearingLines.length > 0 ? boardAfterLock : null;
@@ -236,6 +247,7 @@ function lockCurrentTetromino(state: GameState): GameState {
     placedPositions,
     clearingLines,
     canHold: true,
+    pieceBag,
   });
 }
 
@@ -307,13 +319,19 @@ export function holdCurrentPiece(state: GameState): GameState {
 
   if (state.heldPiece === null) {
     // Initial hold: save current piece and spawn next piece
+    const pieceBagManager = createPieceBagManager();
+    pieceBagManager.setBag(state.pieceBag);
+
     const newCurrentPiece = createTetromino(state.nextPiece);
+    const newNextPiece = pieceBagManager.getNextPiece();
+
     const newState = {
       ...state,
       currentPiece: newCurrentPiece,
       heldPiece: currentPieceType,
-      nextPiece: getRandomTetrominoType(),
+      nextPiece: newNextPiece,
       canHold: false,
+      pieceBag: pieceBagManager.getBag(),
     };
     return updateGhostPosition(newState);
   }

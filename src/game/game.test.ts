@@ -21,6 +21,17 @@ describe("Game Logic", () => {
       expect(state.isPaused).toBe(false);
       expect(state.currentPiece).toBeDefined();
       expect(state.nextPiece).toBeDefined();
+      expect(state.pieceBag).toBeDefined();
+      expect(Array.isArray(state.pieceBag)).toBe(true);
+    });
+
+    test("should use 7-bag system for piece generation", () => {
+      const state = createInitialGameState();
+      // Should have valid current and next pieces from 7-bag system
+      expect(["I", "O", "T", "S", "Z", "J", "L"]).toContain(state.currentPiece?.type);
+      expect(["I", "O", "T", "S", "Z", "J", "L"]).toContain(state.nextPiece);
+      // Bag should contain the remaining pieces
+      expect(state.pieceBag.length).toBeLessThanOrEqual(7);
     });
   });
 
