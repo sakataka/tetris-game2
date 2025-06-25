@@ -21,8 +21,8 @@ export function NextPiece() {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-4 grid-rows-4 gap-[1px] bg-gray-700 rounded-lg overflow-hidden w-fit mx-auto p-1">
-          {Array.from({ length: NEXT_PIECE_GRID_SIZE }).map((_, y) =>
+        <div className="grid grid-cols-4 grid-rows-3 gap-[1px] bg-gray-700 rounded-lg overflow-hidden w-fit mx-auto p-1">
+          {Array.from({ length: 3 }).map((_, y) =>
             Array.from({ length: NEXT_PIECE_GRID_SIZE }).map((_, x) => {
               const isActive = shape[y]?.[x] === 1;
               return (

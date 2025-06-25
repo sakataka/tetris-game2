@@ -24,11 +24,11 @@ export function HoldPiece() {
       <CardContent>
         <div
           className={cn(
-            "grid grid-cols-4 grid-rows-4 gap-[1px] bg-gray-700 rounded-lg overflow-hidden w-fit mx-auto p-1 transition-opacity duration-200",
+            "grid grid-cols-4 grid-rows-3 gap-[1px] bg-gray-700 rounded-lg overflow-hidden w-fit mx-auto p-1 transition-opacity duration-200",
             !canHold && "opacity-50",
           )}
         >
-          {Array.from({ length: NEXT_PIECE_GRID_SIZE }).map((_, y) =>
+          {Array.from({ length: 3 }).map((_, y) =>
             Array.from({ length: NEXT_PIECE_GRID_SIZE }).map((_, x) => {
               const isActive = shape?.[y]?.[x] === 1;
               return (

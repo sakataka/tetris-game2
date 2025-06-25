@@ -5,6 +5,7 @@ import { useGameStore } from "../store/gameStore";
 export function useGameLoop() {
   const { moveDown, isPaused, isGameOver, level } = useGameStore();
   const lastUpdateTime = useRef(0);
+  const animationIdRef = useRef<number | null>(null);
   const [, startTransition] = useTransition();
 
   useEffect(() => {
@@ -13,6 +14,12 @@ export function useGameLoop() {
     const gameSpeed = getGameSpeed(level);
 
     const gameLoop = (currentTime: number) => {
+      // Check game state before processing - safety check for state changes during execution
+      const currentState = useGameStore.getState();
+      if (currentState.isPaused || currentState.isGameOver) {
+        return; // Stop the loop immediately if game state changed
+      }
+
       if (currentTime - lastUpdateTime.current >= gameSpeed) {
         // Use transition for non-urgent game state updates
         startTransition(() => {
@@ -21,11 +28,19 @@ export function useGameLoop() {
         lastUpdateTime.current = currentTime;
       }
 
-      requestAnimationFrame(gameLoop);
+      // Only continue the loop if the game is still active
+      if (!currentState.isPaused && !currentState.isGameOver) {
+        animationIdRef.current = requestAnimationFrame(gameLoop);
+      }
     };
 
-    const animationId = requestAnimationFrame(gameLoop);
+    animationIdRef.current = requestAnimationFrame(gameLoop);
 
-    return () => cancelAnimationFrame(animationId);
+    return () => {
+      if (animationIdRef.current !== null) {
+        cancelAnimationFrame(animationIdRef.current);
+        animationIdRef.current = null;
+      }
+    };
   }, [moveDown, isPaused, isGameOver, level]);
 }

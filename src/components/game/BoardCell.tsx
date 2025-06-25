@@ -38,25 +38,34 @@ export function BoardCell({
     cellValue,
   });
 
-  // For ghost pieces, we don't want animation
-  const shouldDisableAnimation = isGhostPiece;
+  // Only use motion.div when animation is actually needed
+  const needsAnimation = !isGhostPiece && (isCurrentPiece || isPlacedPiece || isClearingLine);
 
+  const cellClasses = cn(
+    BOARD_STYLES.cell,
+    !isGhostPiece && getCellColor(cellValue),
+    isGhostPiece && BOARD_STYLES.ghostPiece,
+    cellValue !== 0 && !isGhostPiece && BOARD_STYLES.cellBorder,
+    cellValue === 0 && !isGhostPiece && BOARD_STYLES.emptyCellBorder,
+    isCurrentPiece && BOARD_STYLES.activePiece,
+    isClearingLine && BOARD_STYLES.clearingLine,
+  );
+
+  // Use regular div for static cells to improve performance
+  if (!needsAnimation) {
+    return <div className={cellClasses} data-testid="board-cell" />;
+  }
+
+  // Use motion.div only when animation is needed
   return (
     <motion.div
-      key={`cell-${y * BOARD_WIDTH + x}-${isCurrentPiece ? animationTriggerKey : "static"}-${isClearingLine ? "clearing" : "normal"}-${cellValue}-${isGhostPiece ? "ghost" : ""}`}
-      initial={shouldDisableAnimation ? false : initialAnimation}
-      animate={shouldDisableAnimation ? {} : animateProps}
-      transition={shouldDisableAnimation ? {} : transitionProps}
+      key={`cell-${y * BOARD_WIDTH + x}-${animationTriggerKey}-${cellValue}`}
+      initial={initialAnimation}
+      animate={animateProps}
+      transition={transitionProps}
       onAnimationComplete={onAnimationComplete}
-      className={cn(
-        BOARD_STYLES.cell,
-        !isGhostPiece && getCellColor(cellValue),
-        isGhostPiece && BOARD_STYLES.ghostPiece,
-        cellValue !== 0 && !isGhostPiece && BOARD_STYLES.cellBorder,
-        cellValue === 0 && !isGhostPiece && BOARD_STYLES.emptyCellBorder,
-        isCurrentPiece && BOARD_STYLES.activePiece,
-        isClearingLine && BOARD_STYLES.clearingLine,
-      )}
+      className={cellClasses}
+      data-testid="board-cell"
     />
   );
 }

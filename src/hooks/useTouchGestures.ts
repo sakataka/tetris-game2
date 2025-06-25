@@ -1,4 +1,4 @@
-import { useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useGameStore } from "../store/gameStore";
 import { createExecuteGameAction } from "./executeGameAction";
 
@@ -22,6 +22,7 @@ export function useTouchGestures(options: TouchGestureOptions = {}) {
 
   const [, startTransition] = useTransition();
   const touchStartRef = useRef<TouchPoint | null>(null);
+  const timeoutRef = useRef<number | null>(null);
   const [lastTapTime, setLastTapTime] = useState<number>(0);
   const executeGameAction = createExecuteGameAction(isGameOver, isPaused, startTransition);
 
@@ -61,14 +62,22 @@ export function useTouchGestures(options: TouchGestureOptions = {}) {
       const timeSinceLastTap = now - lastTapTime;
 
       if (lastTapTime > 0 && timeSinceLastTap < doubleTapTime) {
-        // Double tap detected - execute hard drop immediately
+        // Double tap detected - clear any pending timeout and execute hard drop immediately
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+          timeoutRef.current = null;
+        }
         executeGameAction(drop, false);
         setLastTapTime(0); // Reset to prevent triple tap
       } else {
         // First tap - just record the time, no action yet
         setLastTapTime(now);
+        // Clear any existing timeout
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+        }
         // Schedule single tap action after double tap timeout
-        setTimeout(() => {
+        timeoutRef.current = window.setTimeout(() => {
           setLastTapTime((prevTime) => {
             // Only execute rotate if this is still the last tap
             if (prevTime === now) {
@@ -77,6 +86,7 @@ export function useTouchGestures(options: TouchGestureOptions = {}) {
             }
             return prevTime;
           });
+          timeoutRef.current = null;
         }, doubleTapTime);
       }
       return;
@@ -115,6 +125,16 @@ export function useTouchGestures(options: TouchGestureOptions = {}) {
       // Ignore swipe up for now (could be used for rotate in future)
     }
   };
+
+  // Cleanup effect to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+    };
+  }, []);
 
   return {
     handleTouchStart,

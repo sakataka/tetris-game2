@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, mock } from "bun:test";
-import { renderHook } from "@testing-library/react";
+import { act, renderHook } from "@testing-library/react";
 import { useTouchGestures } from "./useTouchGestures";
 
 // Mock the game store
@@ -63,13 +63,17 @@ describe("useTouchGestures", () => {
   it("handles horizontal swipe right to move right", () => {
     const { result } = renderHook(() => useTouchGestures());
 
-    // Touch start at position (100, 100)
-    const touchStart = createTouchEvent("touchstart", [createTouch(100, 100)]);
-    result.current.handleTouchStart(touchStart);
+    act(() => {
+      // Touch start at position (100, 100)
+      const touchStart = createTouchEvent("touchstart", [createTouch(100, 100)]);
+      result.current.handleTouchStart(touchStart);
+    });
 
-    // Touch end at position (150, 100) - swipe right
-    const touchEnd = createTouchEvent("touchend", [createTouch(150, 100)]);
-    result.current.handleTouchEnd(touchEnd);
+    act(() => {
+      // Touch end at position (150, 100) - swipe right
+      const touchEnd = createTouchEvent("touchend", [createTouch(150, 100)]);
+      result.current.handleTouchEnd(touchEnd);
+    });
 
     expect(mockGameStore.moveRight).toHaveBeenCalled();
   });
@@ -77,13 +81,17 @@ describe("useTouchGestures", () => {
   it("handles horizontal swipe left to move left", () => {
     const { result } = renderHook(() => useTouchGestures());
 
-    // Touch start at position (100, 100)
-    const touchStart = createTouchEvent("touchstart", [createTouch(100, 100)]);
-    result.current.handleTouchStart(touchStart);
+    act(() => {
+      // Touch start at position (100, 100)
+      const touchStart = createTouchEvent("touchstart", [createTouch(100, 100)]);
+      result.current.handleTouchStart(touchStart);
+    });
 
-    // Touch end at position (50, 100) - swipe left
-    const touchEnd = createTouchEvent("touchend", [createTouch(50, 100)]);
-    result.current.handleTouchEnd(touchEnd);
+    act(() => {
+      // Touch end at position (50, 100) - swipe left
+      const touchEnd = createTouchEvent("touchend", [createTouch(50, 100)]);
+      result.current.handleTouchEnd(touchEnd);
+    });
 
     expect(mockGameStore.moveLeft).toHaveBeenCalled();
   });
@@ -91,13 +99,17 @@ describe("useTouchGestures", () => {
   it("handles short vertical swipe down to soft drop", () => {
     const { result } = renderHook(() => useTouchGestures({ minSwipeDistance: 30 }));
 
-    // Touch start at position (100, 100)
-    const touchStart = createTouchEvent("touchstart", [createTouch(100, 100)]);
-    result.current.handleTouchStart(touchStart);
+    act(() => {
+      // Touch start at position (100, 100)
+      const touchStart = createTouchEvent("touchstart", [createTouch(100, 100)]);
+      result.current.handleTouchStart(touchStart);
+    });
 
-    // Touch end at position (100, 140) - short swipe down
-    const touchEnd = createTouchEvent("touchend", [createTouch(100, 140)]);
-    result.current.handleTouchEnd(touchEnd);
+    act(() => {
+      // Touch end at position (100, 140) - short swipe down
+      const touchEnd = createTouchEvent("touchend", [createTouch(100, 140)]);
+      result.current.handleTouchEnd(touchEnd);
+    });
 
     expect(mockGameStore.moveDown).toHaveBeenCalled();
   });
@@ -105,13 +117,17 @@ describe("useTouchGestures", () => {
   it("handles long vertical swipe down to hard drop", () => {
     const { result } = renderHook(() => useTouchGestures({ minSwipeDistance: 30 }));
 
-    // Touch start at position (100, 100)
-    const touchStart = createTouchEvent("touchstart", [createTouch(100, 100)]);
-    result.current.handleTouchStart(touchStart);
+    act(() => {
+      // Touch start at position (100, 100)
+      const touchStart = createTouchEvent("touchstart", [createTouch(100, 100)]);
+      result.current.handleTouchStart(touchStart);
+    });
 
-    // Touch end at position (100, 180) - long swipe down (80px > 30*2)
-    const touchEnd = createTouchEvent("touchend", [createTouch(100, 180)]);
-    result.current.handleTouchEnd(touchEnd);
+    act(() => {
+      // Touch end at position (100, 180) - long swipe down (80px > 30*2)
+      const touchEnd = createTouchEvent("touchend", [createTouch(100, 180)]);
+      result.current.handleTouchEnd(touchEnd);
+    });
 
     expect(mockGameStore.drop).toHaveBeenCalled();
   });
@@ -121,16 +137,22 @@ describe("useTouchGestures", () => {
       useTouchGestures({ tapTime: 200, minSwipeDistance: 30, doubleTapTime: 50 }),
     );
 
-    // Touch start at position (100, 100)
-    const touchStart = createTouchEvent("touchstart", [createTouch(100, 100)]);
-    result.current.handleTouchStart(touchStart);
+    act(() => {
+      // Touch start at position (100, 100)
+      const touchStart = createTouchEvent("touchstart", [createTouch(100, 100)]);
+      result.current.handleTouchStart(touchStart);
+    });
 
-    // Touch end at same position immediately - tap
-    const touchEnd = createTouchEvent("touchend", [createTouch(105, 105)]);
-    result.current.handleTouchEnd(touchEnd);
+    act(() => {
+      // Touch end at same position immediately - tap
+      const touchEnd = createTouchEvent("touchend", [createTouch(105, 105)]);
+      result.current.handleTouchEnd(touchEnd);
+    });
 
     // Wait for single tap timeout to complete
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    });
 
     expect(mockGameStore.rotate).toHaveBeenCalled();
   });
@@ -146,23 +168,31 @@ describe("useTouchGestures", () => {
     mockGameStore.drop.mockClear();
     mockGameStore.rotate.mockClear();
 
-    // First tap
-    const touchStart1 = createTouchEvent("touchstart", [createTouch(100, 100)]);
-    result.current.handleTouchStart(touchStart1);
-    const touchEnd1 = createTouchEvent("touchend", [createTouch(105, 105)]);
-    result.current.handleTouchEnd(touchEnd1);
+    act(() => {
+      // First tap
+      const touchStart1 = createTouchEvent("touchstart", [createTouch(100, 100)]);
+      result.current.handleTouchStart(touchStart1);
+      const touchEnd1 = createTouchEvent("touchend", [createTouch(105, 105)]);
+      result.current.handleTouchEnd(touchEnd1);
+    });
 
     // Wait a bit but within double tap window
-    await new Promise((resolve) => setTimeout(resolve, 50));
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    });
 
-    // Second tap
-    const touchStart2 = createTouchEvent("touchstart", [createTouch(100, 100)]);
-    result.current.handleTouchStart(touchStart2);
-    const touchEnd2 = createTouchEvent("touchend", [createTouch(105, 105)]);
-    result.current.handleTouchEnd(touchEnd2);
+    act(() => {
+      // Second tap
+      const touchStart2 = createTouchEvent("touchstart", [createTouch(100, 100)]);
+      result.current.handleTouchStart(touchStart2);
+      const touchEnd2 = createTouchEvent("touchend", [createTouch(105, 105)]);
+      result.current.handleTouchEnd(touchEnd2);
+    });
 
     // Wait for any delayed actions to complete
-    await new Promise((resolve) => setTimeout(resolve, 150));
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 150));
+    });
 
     // Second tap should trigger drop immediately, no rotate calls
     expect(mockGameStore.rotate).toHaveBeenCalledTimes(0);
@@ -174,23 +204,31 @@ describe("useTouchGestures", () => {
       useTouchGestures({ tapTime: 200, minSwipeDistance: 30, doubleTapTime: 50 }),
     );
 
-    // First tap
-    const touchStart1 = createTouchEvent("touchstart", [createTouch(100, 100)]);
-    result.current.handleTouchStart(touchStart1);
-    const touchEnd1 = createTouchEvent("touchend", [createTouch(105, 105)]);
-    result.current.handleTouchEnd(touchEnd1);
+    act(() => {
+      // First tap
+      const touchStart1 = createTouchEvent("touchstart", [createTouch(100, 100)]);
+      result.current.handleTouchStart(touchStart1);
+      const touchEnd1 = createTouchEvent("touchend", [createTouch(105, 105)]);
+      result.current.handleTouchEnd(touchEnd1);
+    });
 
     // Wait longer than double tap time
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    });
 
-    // Second tap after double tap time has passed
-    const touchStart2 = createTouchEvent("touchstart", [createTouch(100, 100)]);
-    result.current.handleTouchStart(touchStart2);
-    const touchEnd2 = createTouchEvent("touchend", [createTouch(105, 105)]);
-    result.current.handleTouchEnd(touchEnd2);
+    act(() => {
+      // Second tap after double tap time has passed
+      const touchStart2 = createTouchEvent("touchstart", [createTouch(100, 100)]);
+      result.current.handleTouchStart(touchStart2);
+      const touchEnd2 = createTouchEvent("touchend", [createTouch(105, 105)]);
+      result.current.handleTouchEnd(touchEnd2);
+    });
 
     // Wait for second tap timeout to complete
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    });
 
     // Both taps should trigger rotate, no drop
     expect(mockGameStore.rotate).toHaveBeenCalledTimes(2);
@@ -201,12 +239,16 @@ describe("useTouchGestures", () => {
     mockGameStore.isPaused = true;
     const { result } = renderHook(() => useTouchGestures());
 
-    // Touch start and end
-    const touchStart = createTouchEvent("touchstart", [createTouch(100, 100)]);
-    result.current.handleTouchStart(touchStart);
+    act(() => {
+      // Touch start and end
+      const touchStart = createTouchEvent("touchstart", [createTouch(100, 100)]);
+      result.current.handleTouchStart(touchStart);
+    });
 
-    const touchEnd = createTouchEvent("touchend", [createTouch(150, 100)]);
-    result.current.handleTouchEnd(touchEnd);
+    act(() => {
+      const touchEnd = createTouchEvent("touchend", [createTouch(150, 100)]);
+      result.current.handleTouchEnd(touchEnd);
+    });
 
     // No action should be called when paused
     expect(mockGameStore.moveRight).not.toHaveBeenCalled();
@@ -217,12 +259,16 @@ describe("useTouchGestures", () => {
     mockGameStore.isGameOver = true;
     const { result } = renderHook(() => useTouchGestures());
 
-    // Touch start and end
-    const touchStart = createTouchEvent("touchstart", [createTouch(100, 100)]);
-    result.current.handleTouchStart(touchStart);
+    act(() => {
+      // Touch start and end
+      const touchStart = createTouchEvent("touchstart", [createTouch(100, 100)]);
+      result.current.handleTouchStart(touchStart);
+    });
 
-    const touchEnd = createTouchEvent("touchend", [createTouch(150, 100)]);
-    result.current.handleTouchEnd(touchEnd);
+    act(() => {
+      const touchEnd = createTouchEvent("touchend", [createTouch(150, 100)]);
+      result.current.handleTouchEnd(touchEnd);
+    });
 
     // No action should be called when game is over
     expect(mockGameStore.moveRight).not.toHaveBeenCalled();

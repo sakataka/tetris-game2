@@ -1,4 +1,4 @@
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useGameActions } from "./useGameSelectors";
 
 export function useAnimationCompletionHandler() {
@@ -40,6 +40,20 @@ export function useAnimationCompletionHandler() {
     },
     [clearAnimationStates],
   );
+
+  // Cleanup effect to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      if (clearTimeoutRef.current) {
+        clearTimeout(clearTimeoutRef.current);
+        clearTimeoutRef.current = null;
+      }
+      if (clearRequestRef.current) {
+        cancelAnimationFrame(clearRequestRef.current);
+        clearRequestRef.current = null;
+      }
+    };
+  }, []);
 
   return { handleAnimationComplete };
 }
