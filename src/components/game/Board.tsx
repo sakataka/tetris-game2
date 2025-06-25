@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { useAnimationCompletionHandler } from "../../hooks/useAnimationCompletionHandler";
 import { useBoardData } from "../../hooks/useGameSelectors";
 import { BOARD_CELL_SIZE_PX, BOARD_HEIGHT, BOARD_WIDTH } from "../../utils/constants";
 import { BOARD_STYLES, CARD_STYLES } from "../../utils/styles";
@@ -14,6 +15,7 @@ export function Board() {
     clearingLines,
     animationTriggerKey,
   } = useBoardData();
+  const { handleAnimationComplete } = useAnimationCompletionHandler();
 
   return (
     <Card
@@ -54,7 +56,7 @@ export function Board() {
                 isPlacedPiece={isPlacedPiece}
                 isClearingLine={isClearingLine}
                 animationTriggerKey={animationTriggerKey}
-                // onAnimationComplete is now handled by useAnimationCompletionHandler in BoardCell
+                onAnimationComplete={() => handleAnimationComplete(isClearingLine, isPlacedPiece)}
               />
             );
           }),

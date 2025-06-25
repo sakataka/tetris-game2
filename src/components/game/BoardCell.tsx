@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { useAnimationCompletionHandler } from "../../hooks/useAnimationCompletionHandler";
 import { useCellAnimation } from "../../hooks/useCellAnimation";
 import { getCellColor } from "../../utils/colors";
 import { BOARD_WIDTH } from "../../utils/constants";
@@ -15,7 +14,7 @@ interface BoardCellProps {
   isPlacedPiece: boolean;
   isClearingLine: boolean;
   animationTriggerKey: string | number;
-  // onAnimationComplete is now handled internally by useAnimationCompletionHandler
+  onAnimationComplete: () => void;
 }
 
 /**
@@ -30,6 +29,7 @@ export function BoardCell({
   isPlacedPiece,
   isClearingLine,
   animationTriggerKey,
+  onAnimationComplete,
 }: BoardCellProps) {
   const { initialAnimation, animateProps, transitionProps } = useCellAnimation({
     isCurrentPiece,
@@ -37,7 +37,6 @@ export function BoardCell({
     isClearingLine,
     cellValue,
   });
-  const { handleAnimationComplete } = useAnimationCompletionHandler();
 
   // For ghost pieces, we don't want animation
   const shouldDisableAnimation = isGhostPiece;
@@ -48,7 +47,7 @@ export function BoardCell({
       initial={shouldDisableAnimation ? false : initialAnimation}
       animate={shouldDisableAnimation ? {} : animateProps}
       transition={shouldDisableAnimation ? {} : transitionProps}
-      onAnimationComplete={() => handleAnimationComplete(isClearingLine, isPlacedPiece)}
+      onAnimationComplete={onAnimationComplete}
       className={cn(
         BOARD_STYLES.cell,
         !isGhostPiece && getCellColor(cellValue),
