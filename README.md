@@ -1,17 +1,17 @@
 # Tetris Game
 
-A modern Tetris game built with React and TypeScript.
+A modern, full-featured Tetris game built with React and TypeScript.
 
 ## Features
 
-- Complete Tetris experience (7 piece types, line clearing, scoring, level progression)
-- Hold piece functionality
-- Ghost piece (drop preview)
-- Beautiful animations with Framer Motion
-- Japanese and English language support
-- Desktop and mobile compatibility (touch controls)
-- High score tracking with local storage
-- Game settings (language toggle, ghost piece on/off)
+- Classic Tetris gameplay with all 7 tetromino types, line clearing, scoring, and level progression
+- Hold piece mechanics for strategic play
+- Ghost piece showing landing position
+- Smooth animations powered by Framer Motion
+- Bilingual support (Japanese/English)
+- Cross-platform compatibility with touch controls for mobile
+- Local high score tracking
+- Customizable game settings
 
 ## Tech Stack
 
@@ -22,9 +22,9 @@ A modern Tetris game built with React and TypeScript.
 - Zustand (state management)
 - shadcn/ui components
 
-## Setup
+## Getting Started
 
-Prerequisites: [Bun](https://bun.sh/docs/installation)
+**Prerequisites:** [Bun](https://bun.sh/docs/installation)
 
 ```bash
 git clone https://github.com/sakataka/tetris-game2.git
@@ -33,7 +33,7 @@ bun install
 bun run dev
 ```
 
-Start playing at http://localhost:5173
+Open http://localhost:5173 to start playing!
 
 ## Controls
 

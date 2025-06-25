@@ -1,95 +1,96 @@
 # Tetris Game Project
 
-A complete Tetris game built with modern web technologies
+A fully-featured Tetris game built with modern web technologies.
 
-## Game Overview
+## Key Features
 
-- **Complete Tetris Experience**: 7 piece types, line clearing, level progression system
-- **Beautiful Animations**: Smooth effects powered by Framer Motion
-- **Mobile Support**: Touch controls and responsive design
-- **High Score Tracking**: Local storage-based score persistence
-- **Multi-language Support**: Dynamic Japanese/English switching
-- **Ghost Piece**: Visual preview of drop position
-- **Hold System**: Piece saving and swapping functionality
+- **Classic Tetris Gameplay**: All 7 tetromino types with line clearing and progressive difficulty
+- **Smooth Animations**: Polished visual effects powered by Framer Motion
+- **Mobile-Friendly**: Touch controls and responsive design for all devices
+- **High Score System**: Persistent local score tracking and leaderboards
+- **Bilingual Support**: Real-time Japanese/English language switching
+- **Ghost Piece**: Landing position preview for better gameplay
+- **Hold Mechanics**: Save and swap pieces for strategic play
 
-## Implemented Features
+## Game Features
 
-### Core Game Mechanics
-- 7 tetromino types (I, O, T, S, Z, J, L)
-- Piece movement, rotation, and hard drop
-- Hold functionality (piece saving and swapping)
-- Line clearing and scoring system
-- Level progression with increasing drop speed
-- Game pause, resume, and reset
-- Ghost piece display (drop position preview)
-- **7-Bag System**: Fair piece distribution ensuring all 7 pieces appear exactly once before any repeats
-- **SRS Wall Kick System**: Super Rotation System for enhanced piece rotation with wall kick compensation
+### Core Mechanics
+- All 7 standard tetromino types (I, O, T, S, Z, J, L)
+- Fluid piece movement, rotation, and instant drop
+- Hold system for piece saving and swapping
+- Line clearing with combo scoring
+- Progressive difficulty with faster piece drops
+- Pause, resume, and restart functionality
+- Ghost piece preview showing landing position
+- **7-Bag System**: Ensures fair piece distribution—all 7 pieces appear once before any repeat
+- **SRS Wall Kicks**: Super Rotation System with intelligent wall kick mechanics for smoother gameplay
 
 ### User Interface
-- Real-time score, lines, and level display
-- Next piece preview
-- Hold piece display with availability status indication
+- Live game stats (score, lines cleared, current level)
+- Next piece preview window
+- Hold piece indicator with availability status
 - High score leaderboard
-- Control instructions
-- Game over and pause screens
-- Settings UI (language switching, ghost piece toggle)
+- Built-in control reference
+- Game over and pause overlays
+- Settings panel with customization options
 
-### Game Settings
-- **Unified Settings Panel**: Dropdown-style access from settings button
-- **Language Switching**: Dynamic Japanese/English switching with immediate effect
-- **Ghost Piece Control**: Toggle for drop position preview display
-- **Settings Persistence**: Auto-save to local storage
-- **Visual Feedback**: Toggle switches and current setting indicators
+### Settings & Customization
+- **Integrated Settings**: Clean dropdown interface accessible from the settings button
+- **Language Toggle**: Instant switching between Japanese and English
+- **Ghost Piece Toggle**: Show/hide landing position preview
+- **Persistent Preferences**: Settings automatically saved locally
+- **Visual Indicators**: Clear feedback for all toggle states
 
-### Mobile Support
-- Touch controls (swipe and tap gestures)
-- Responsive layout design
-- Desktop and mobile compatibility
+### Cross-Platform Support
+- Touch gesture controls (swipe and tap)
+- Responsive design adapting to any screen size
+- Optimized for both desktop and mobile play
 
-### Animation System
-- Piece drop, placement, and rotation animations
-- Line clear flash effects
-- Score update spring animations
-- UI transition effects
+### Visual Polish
+- Smooth piece animations for drops, placements, and rotations
+- Satisfying line clear effects with visual feedback
+- Animated score updates with spring physics
+- Polished UI transitions throughout
 
-## Tech Stack
+## Technology Stack
 
-### Frontend
-- **React**: 19.1.0 (functional components with Hooks)
-- **TypeScript**: 5.8.3 (ES2024 target, strict type definitions)
-- **Zustand**: 5.0.5 (lightweight state management)
+### Frontend Framework
+- **React**: 19.1.0 — Modern functional components with Hooks
+- **TypeScript**: 5.8.3 — ES2024 target with strict type checking
+- **Zustand**: 5.0.5 — Lightweight, scalable state management
 
-### Build & Development
-- **Bun**: 1.2.17 (package management and test runner)
-- **Rolldown-Vite**: 7.0.0 (Rust-powered high-performance bundler)
+### Build Tools & Runtime
+- **Bun**: 1.2.17 — Fast package manager and test runner
+- **Rolldown-Vite**: 7.0.0 — Rust-powered bundler for optimal performance
 
-### Styling & UI
-- **Tailwind CSS**: 4.1.10 (with @tailwindcss/vite plugin)
-- **Framer Motion**: 12.19.1 (animations)
-- **shadcn/ui**: Radix UI-based components (Dialog, Button, Card, Badge, etc.)
-- **class-variance-authority**: 0.7.1 (component variant management)
-- **clsx + tailwind-merge**: 2.1.1/3.3.1 (styling utilities)
-- **lucide-react**: 0.523.0 (icons)
+### UI & Styling
+- **Tailwind CSS**: 4.1.10 — Utility-first CSS framework via Vite plugin
+- **Framer Motion**: 12.19.1 — Production-ready animation library
+- **shadcn/ui**: Modern component library built on Radix UI primitives
+- **class-variance-authority**: 0.7.1 — Type-safe component variants
+- **clsx + tailwind-merge**: 2.1.1/3.3.1 — Intelligent class name utilities
+- **Lucide React**: 0.523.0 — Beautiful, customizable icon library
 
-### Feature Libraries
-- **react-hotkeys-hook**: 5.1.0 (keyboard input management)
-- **i18next + react-i18next**: 25.2.1/15.5.3 (internationalization)
+### Core Features
+- **react-hotkeys-hook**: 5.1.0 — Declarative keyboard shortcut handling
+- **i18next + react-i18next**: 25.2.1/15.5.3 — Robust internationalization
 
-### Development & Quality
-- **Biome**: 2.0.5 (linting and formatting)
-- **Bun Test**: 1.2.17 (test runner)
-- **happy-dom**: 18.0.1 (DOM environment simulation)
-- **Testing Library**: React 16.3.0 (component testing)
-- **Lefthook**: 1.11.14 (Git hooks management)
-- **knip**: 5.61.2 (dead code detection)
-- **@vitejs/plugin-react-oxc**: 0.2.3 (high-performance React plugin)
+### Development & Quality Assurance
+- **Biome**: 2.0.5 — Fast linter and formatter in Rust
+- **Bun Test**: 1.2.17 — Native test runner with Jest compatibility
+- **happy-dom**: 18.0.1 — Lightweight DOM environment for testing
+- **Testing Library**: React 16.3.0 — Simple, intuitive component testing
+- **Lefthook**: 1.11.14 — Fast Git hooks manager
+- **knip**: 5.61.2 — Finds unused files, dependencies, and exports
+- **@vitejs/plugin-react-oxc**: 0.2.3 — High-performance React plugin with oxc parser
 
-## Architecture Design
+## Architecture & Design
 
-### State Management (Zustand)
-- Centralized game state with pure function reducers
-- Optimized selectors for performance
-- Immutable state updates
+### State Management
+Built on **Zustand** for clean, scalable state management:
+- Centralized game state using pure function reducers
+- Performance-optimized selectors with automatic memoization  
+- Immutable updates ensuring predictable state transitions
 
 ### Game State Type Definition
 ```typescript
@@ -126,146 +127,152 @@ type TetrominoType =
   | { type: "L"; colorIndex: 7 };
 ```
 
-### Folder Structure
+### Project Structure
 ```
 src/
-├── components/          # React components
+├── components/          # React UI components
 │   ├── game/           # Game-specific components
-│   ├── layout/         # Layout components
-│   └── ui/             # Reusable UI components
-├── game/               # Core game logic (pure functions)
+│   ├── layout/         # Layout and shell components
+│   └── ui/             # Reusable UI primitives
+├── game/               # Pure game logic functions
 ├── hooks/              # Custom React hooks
-├── store/              # Zustand stores
+├── store/              # Zustand state stores
 ├── types/              # TypeScript type definitions
-├── utils/              # Utility functions
-├── locales/            # Internationalization resources
-└── i18n/               # i18n configuration
+├── utils/              # Shared utility functions
+├── locales/            # Translation files
+└── i18n/               # Internationalization config
 ```
 
-## Custom Hooks Design
+## Custom Hooks
 
-### Game Control Hooks
-- **useGameLoop**: requestAnimationFrame-based game loop management
-- **useKeyboardControls**: Declarative keyboard input handling via react-hotkeys-hook
-- **useTouchGestures**: Mobile touch controls (swipe and tap)
-- **useGameSelectors**: Efficient game state selection with memoization
-- **executeGameAction**: Helper function for game action execution
+### Game Controls
+- **useGameLoop**: Manages the core game loop using requestAnimationFrame
+- **useKeyboardControls**: Handles keyboard input with react-hotkeys-hook
+- **useTouchGestures**: Processes touch gestures for mobile gameplay
+- **useGameSelectors**: Provides memoized game state selections
+- **executeGameAction**: Utility for dispatching game actions
 
-### Animation Hooks
-- **useAnimatedValue**: Animation value management and spring control
-- **useAnimationCompletionHandler**: Animation completion state management
-- **useCellAnimation**: Individual cell animation state management
+### Animation System
+- **useAnimatedValue**: Manages animation triggers and spring controls
+- **useAnimationCompletionHandler**: Handles animation lifecycle events
+- **useCellAnimation**: Controls individual cell animation states
 
-### Data Management & Side Effect Hooks
-- **useHighScore**: High score local storage management
-- **useHighScoreSideEffect**: High score persistence side effects
-- **useSettingsSideEffect**: Settings persistence side effects
+### Data & Side Effects
+- **useHighScore**: Manages high score data and local storage
+- **useHighScoreSideEffect**: Handles high score persistence
+- **useSettingsSideEffect**: Manages settings persistence
 
-## Game Logic (Pure Functions)
+## Core Game Logic
 
 ### game/game.ts
-- `createInitialGameState()`: Initial game state generation (including ghost position)
-- `moveTetrominoBy()`: Piece movement processing (with ghost position update)
-- `rotateTetrominoCW()`: Clockwise rotation processing (with ghost position update)  
-- `hardDropTetromino()`: Hard drop processing
-- `holdCurrentPiece()`: Hold functionality (piece saving and swapping)
-- `calculateGhostPosition()`: Ghost piece position calculation (drop preview)
-- `updateGhostPosition()`: Game state ghost position updates
+- `createInitialGameState()` — Initializes game state with ghost piece positioning
+- `moveTetrominoBy()` — Handles piece movement with ghost updates
+- `rotateTetrominoCW()` — Processes clockwise rotation with ghost recalculation
+- `hardDropTetromino()` — Executes instant piece drops
+- `holdCurrentPiece()` — Manages piece saving and swapping
+- `calculateGhostPosition()` — Computes landing position preview
+- `updateGhostPosition()` — Updates ghost piece in game state
 
 ### game/board.ts
-- `createEmptyBoard()`: Empty board generation
-- `isValidPosition()`: Piece placement validation
-- `placeTetromino()`: Piece board placement
-- `clearLines()`: Complete line detection and clearing
+- `createEmptyBoard()` — Generates clean game board
+- `isValidPosition()` — Validates piece placement
+- `placeTetromino()` — Places pieces on the board
+- `clearLines()` — Detects and removes completed lines
 
 ### game/tetrominos.ts
-- `getTetrominoShape()`: Piece shape data retrieval
-- `rotateTetromino()`: 90-degree rotation algorithm
-- `getRandomTetrominoType()`: Random piece type generation
-- `createTetromino()`: Tetromino object creation
-- `getTetrominoColorIndex()`: Color index mapping for piece types
+- `getTetrominoShape()` — Returns piece shape matrices
+- `rotateTetromino()` — 90-degree clockwise rotation logic
+- `createTetromino()` — Creates new tetromino instances
+- `getTetrominoColorIndex()` — Maps piece types to color indices
 
 ### game/pieceBag.ts
-- **7-Bag System**: `PieceBagManager` class implementing fair tetromino distribution
-- `getNextPiece()`: Retrieve next piece from bag with automatic refill
-- `refillBag()`: Shuffle and refill bag with all 7 piece types
-- Fisher-Yates shuffle algorithm for randomization
+**7-Bag System** — Ensures fair piece distribution:
+- `PieceBagManager` class managing the bag state
+- `getNextPiece()` — Retrieves pieces with automatic bag refill
+- `refillBag()` — Shuffles and replenishes the bag
+- Fisher-Yates shuffle for true randomization
 
 ### game/wallKick.ts
-- **SRS Wall Kick System**: Super Rotation System implementation
-- `getWallKickOffsets()`: Retrieve wall kick offset data for piece type and rotation
-- `tryRotateWithWallKick()`: Attempt rotation with wall kick compensation
-- Separate offset tables for I-piece and JLSTZ pieces
-- Support for both clockwise and counter-clockwise rotations
+**SRS Wall Kick System** — Advanced rotation mechanics:
+- `getWallKickOffsets()` — Provides rotation offset data
+- `tryRotateWithWallKick()` — Attempts rotation with fallback positions
+- Separate tables for I-piece vs. JLSTZ pieces
+- Full clockwise and counter-clockwise support
 
 ## Data Persistence
 
-### Local Storage Management (utils/localStorage.ts)
-- High score list saving, retrieval, and management
-- Game settings persistence (language, ghost piece display)
-- Type-safe JSON operations
-- Error handling
-- Custom events (high score update notifications)
+### Local Storage (utils/localStorage.ts)
+Robust client-side data management:
+- High score tracking with leaderboard functionality
+- Persistent game settings (language, ghost piece visibility)  
+- Type-safe JSON serialization
+- Graceful error handling and fallbacks
+- Custom event system for score updates
 
-## Animation System
+## Visual Effects
 
-### Framer Motion Integration
-- **Piece Drop**: Spring animations for new piece appearance
-- **Piece Rotation**: 360-degree rotation effects
-- **Piece Placement**: Scale animations (shrink → expand)
-- **Line Clear**: Flash, pulse, and glow effects
-- **Score Updates**: Spring animations for value changes
-- **UI Transitions**: Modal and overlay fade effects
+### Animation Framework
+Powered by **Framer Motion** for smooth, engaging visuals:
+- **Piece Drops**: Satisfying spring animations on piece spawn
+- **Rotations**: Fluid 360-degree rotation effects
+- **Placements**: Subtle scale feedback (shrink → expand)
+- **Line Clears**: Eye-catching flash and glow effects
+- **Score Changes**: Bouncy spring animations for number updates
+- **UI Flow**: Polished modal and overlay transitions
 
-## Internationalization
+## Localization
 
-### i18next Configuration
-- Default language: English
-- Fallback language: Japanese
-- Runtime language switching
-- Structured resource files (game terminology, controls, UI text, settings)
+### Internationalization Setup
+Built with **i18next** for seamless language support:
+- Primary language: English
+- Secondary language: Japanese  
+- Instant language switching without reload
+- Organized translation files covering all UI text, controls, and game terminology
 
-## Mobile Support
+## Cross-Platform Design
 
-### Touch Controls (useTouchGestures)
-- **Horizontal Swipe**: Left/right movement
-- **Short Vertical Swipe**: Soft drop
-- **Long Vertical Swipe**: Hard drop
-- **Tap**: Rotation
+### Touch Interface
+Intuitive mobile controls via **useTouchGestures**:
+- **Horizontal Swipes**: Natural left/right piece movement
+- **Quick Down Swipe**: Soft drop for faster placement
+- **Long Down Swipe**: Instant hard drop
+- **Single Tap**: Piece rotation
 
-### Responsive Design
-- CSS Grid-based layout
-- Desktop: Grid layout
-- Mobile: Vertical stack layout
-- Fixed 30×30px cell size
+### Responsive Layout
+Adaptive design for any screen:
+- CSS Grid foundation for flexible layouts
+- Desktop: Spacious side-by-side arrangement
+- Mobile: Optimized vertical stacking
+- Consistent 30×30px cell sizing across devices
 
-## Testing Strategy
+## Quality Assurance
 
-### Bun Test + TypeScript
-- **Game Logic**: Comprehensive testing of pure functions
-- **Hooks**: Custom hook behavior testing
-- **Components**: React Testing Library rendering tests
-- **CI/CD**: Vercel and GitHub Actions support
+### Testing Approach
+Comprehensive test coverage with **Bun Test**:
+- **Pure Functions**: Exhaustive game logic testing
+- **Custom Hooks**: Behavior verification in isolation
+- **React Components**: Rendering and interaction tests
+- **CI/CD Ready**: Seamless integration with Vercel and GitHub Actions
 
-## Development Guidelines
+## Development Standards
 
-### Code Quality
-- **TypeScript Strict Mode**: ES2024 target
-- **Functional Programming**: Pure functions and immutable updates
-- **Test-Driven Development**: All new features require tests
-- **Type Safety**: Discriminated union types and type guards
+### Code Excellence
+- **Strict TypeScript**: ES2024 target with zero tolerance for type errors
+- **Functional Paradigm**: Pure functions and immutable data patterns
+- **Test-First Development**: Every feature backed by comprehensive tests
+- **Type Safety**: Leveraging discriminated unions and type guards
 
-### Performance Optimization
-- **React Compiler**: Automatic optimization (no React.memo usage)
-- **useTransition**: UI responsiveness maintenance
-- **Zustand**: Lightweight state management
-- **Rolldown-Vite**: Rust-powered high-speed bundler
+### Performance Focus
+- **React Compiler**: Automatic optimizations eliminating manual memoization
+- **Concurrent Features**: useTransition for responsive UI updates
+- **Lightweight State**: Zustand's minimal overhead approach
+- **Fast Builds**: Rust-powered Rolldown-Vite bundler
 
-### Naming Conventions
-- **Components**: PascalCase (Board.tsx, Game.tsx)
-- **Custom Hooks**: camelCase (useGameLoop.ts)
-- **Utilities**: camelCase (gameStore.ts, colors.ts)
-- **Test Files**: `*.test.ts` (co-located with source files)
+### Code Organization
+- **Components**: PascalCase naming (Board.tsx, Game.tsx)
+- **Hooks**: camelCase with 'use' prefix (useGameLoop.ts)
+- **Utilities**: camelCase for consistency (gameStore.ts, colors.ts)
+- **Tests**: Co-located `*.test.ts` files for easy maintenance
 
 ## Development Commands
 
@@ -291,37 +298,38 @@ bun add <package>              # Add package
 bun remove <package>           # Remove package
 ```
 
-## Development Server Testing
+## Browser Testing
 
-For testing in the development server, use MCP (Model Context Protocol) Playwright integration:
+### Live Development Testing
+Interactive testing using **MCP (Model Context Protocol)** with Playwright:
 
 ```bash
-# 1. Start development server
+# 1. Start the development server
 bun run dev
 
-# 2. Use Playwright in Claude Code:
-# - mcp__playwright__browser_navigate to open pages
-# - mcp__playwright__browser_click for element interaction
-# - mcp__playwright__browser_take_screenshot for screenshots
-# - mcp__playwright__browser_snapshot for page structure analysis
+# 2. Use Playwright tools in Claude Code:
+# - mcp__playwright__browser_navigate — Navigate to pages
+# - mcp__playwright__browser_click — Interact with elements  
+# - mcp__playwright__browser_take_screenshot — Capture visuals
+# - mcp__playwright__browser_snapshot — Analyze page structure
 ```
 
-This enables actual browser environment testing, particularly useful for:
-- Visual UI confirmation
-- Interactive feature testing
-- Animation behavior verification
-- Responsive design validation
+**Perfect for:**
+- Visual UI validation and screenshot comparison
+- Interactive feature testing and user flow verification
+- Animation timing and behavior analysis
+- Responsive design testing across viewports
 
-## Prohibited Practices
+## Code Standards
 
-- **Condition Relaxation**: Loosening conditions to resolve test or type errors
-- **Test Skipping**: Inappropriate mocking to bypass issues
-- **Hard Coding**: Hard-coded outputs or responses
-- **Error Concealment**: Ignoring or hiding error messages
-- **Temporary Fixes**: Postponing problems with temporary solutions
+### Non-Negotiable Rules
+- **Zero Type Errors**: Never relax TypeScript checks to "fix" issues
+- **No Test Skipping**: Address root causes instead of bypassing tests
+- **Anti-Hardcoding**: All user-facing text must use i18n resources
+- **Transparent Errors**: Never suppress or hide error messages
+- **Permanent Solutions**: No temporary fixes or technical debt
 
-## Technical Decision Principles
-
-- **Bun Priority**: Package management, test execution, and script running
-- **Tailwind Setup**: Using @tailwindcss/vite plugin
-- **UI Literals**: No source code embedding (use internationalization resources)
+### Technology Decisions
+- **Bun Everywhere**: Primary choice for package management, testing, and scripts
+- **Tailwind Via Vite**: Using @tailwindcss/vite plugin for optimal performance
+- **i18n Required**: No hardcoded UI strings—everything through translation files
