@@ -1,6 +1,7 @@
 import { useRef, useTransition } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useGameStore } from "../store/gameStore";
+import { createExecuteGameAction } from "./executeGameAction";
 
 export function useKeyboardControls() {
   const {
@@ -16,16 +17,7 @@ export function useKeyboardControls() {
   } = useGameStore();
   const lastPauseTime = useRef(0);
   const [, startTransition] = useTransition();
-
-  // Helper for game actions with common conditions
-  const executeGameAction = (action: () => void, useTransitionWrapper = true) => {
-    if (isGameOver || isPaused) return;
-    if (useTransitionWrapper) {
-      startTransition(action);
-    } else {
-      action();
-    }
-  };
+  const executeGameAction = createExecuteGameAction(isGameOver, isPaused, startTransition);
 
   // Movement controls (with key repeat)
   useHotkeys("arrowleft", () => executeGameAction(moveLeft), { keydown: true });

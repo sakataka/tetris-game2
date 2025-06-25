@@ -1,5 +1,6 @@
 import { useRef, useState, useTransition } from "react";
 import { useGameStore } from "../store/gameStore";
+import { createExecuteGameAction } from "./executeGameAction";
 
 interface TouchPoint {
   x: number;
@@ -22,16 +23,7 @@ export function useTouchGestures(options: TouchGestureOptions = {}) {
   const [, startTransition] = useTransition();
   const touchStartRef = useRef<TouchPoint | null>(null);
   const [lastTapTime, setLastTapTime] = useState<number>(0);
-
-  // Helper for game actions with common conditions
-  const executeGameAction = (action: () => void, useTransitionWrapper = true) => {
-    if (isGameOver || isPaused) return;
-    if (useTransitionWrapper) {
-      startTransition(action);
-    } else {
-      action();
-    }
-  };
+  const executeGameAction = createExecuteGameAction(isGameOver, isPaused, startTransition);
 
   const handleTouchStart = (event: React.TouchEvent) => {
     if (event.touches.length !== 1) return;
