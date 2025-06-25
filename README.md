@@ -15,7 +15,7 @@ A modern, full-featured Tetris game built with React and TypeScript.
 
 ## Tech Stack
 
-- React 19 + TypeScript
+- React 19 + TypeScript (ESNext target)
 - Bun (package management & testing)
 - Rolldown-Vite (build)
 - Tailwind CSS + Framer Motion

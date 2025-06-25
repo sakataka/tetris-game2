@@ -56,7 +56,7 @@ A fully-featured Tetris game built with modern web technologies.
 
 ### Frontend Framework
 - **React**: 19.1.0 — Modern functional components with Hooks
-- **TypeScript**: 5.8.3 — ES2024 target with strict type checking
+- **TypeScript**: 5.8.3 — ESNext target with strict type checking for cutting-edge JS features
 - **Zustand**: 5.0.5 — Lightweight, scalable state management
 
 ### Build Tools & Runtime
@@ -257,7 +257,7 @@ Comprehensive test coverage with **Bun Test**:
 ## Development Standards
 
 ### Code Excellence
-- **Strict TypeScript**: ES2024 target with zero tolerance for type errors
+- **Strict TypeScript**: ESNext target with zero tolerance for type errors, enabling cutting-edge JavaScript features
 - **Functional Paradigm**: Pure functions and immutable data patterns
 - **Test-First Development**: Every feature backed by comprehensive tests
 - **Type Safety**: Leveraging discriminated unions and type guards
