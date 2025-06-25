@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useGameStore } from "../../store/gameStore";
+import { MODAL_STYLES } from "../../utils/styles";
 import { Button } from "../ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 
@@ -18,7 +19,7 @@ export function GameOverlay() {
 
       <Dialog open={isGameOver || isPaused}>
         <DialogContent
-          className="sm:max-w-md bg-gray-900/95 border-gray-700 backdrop-blur-sm"
+          className={`sm:max-w-md ${MODAL_STYLES.overlay}`}
           hideCloseButton={true}
           onOpenAutoFocus={(e) => e.preventDefault()}
         >

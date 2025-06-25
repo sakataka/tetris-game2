@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useGameStore } from "../../store/gameStore";
 import { updateSettings } from "../../utils/localStorage";
+import { CONTROL_STYLES, MODAL_STYLES } from "../../utils/styles";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
@@ -43,10 +44,7 @@ export function GameSettings() {
 
   return (
     <div className="absolute top-4 right-4 z-50" ref={dropdownRef}>
-      <Button
-        onClick={() => setIsOpen(!isOpen)}
-        className="bg-gray-900/70 backdrop-blur-sm border-gray-700 text-white hover:bg-gray-800/70 transition-colors border"
-      >
+      <Button onClick={() => setIsOpen(!isOpen)} className={CONTROL_STYLES.button}>
         <div className="flex items-center gap-2">
           <Settings className="h-4 w-4" />
           <span>{t("game.settings.title")}</span>
@@ -54,7 +52,7 @@ export function GameSettings() {
       </Button>
 
       {isOpen && (
-        <Card className="absolute top-full right-0 mt-2 bg-gray-900 border-gray-700 min-w-[240px] p-0 shadow-lg">
+        <Card className={`absolute top-full right-0 mt-2 ${MODAL_STYLES.panel} min-w-[240px] p-0`}>
           {/* Language Section */}
           <div className="px-3 py-2">
             <div className="text-xs text-gray-400 uppercase font-semibold mb-2">
@@ -64,7 +62,7 @@ export function GameSettings() {
               <button
                 key={lang.value}
                 type="button"
-                className="flex items-center justify-between p-2 rounded cursor-pointer hover:bg-gray-800 transition-colors w-full text-left"
+                className={`${CONTROL_STYLES.interactiveItem} flex items-center justify-between p-2 rounded cursor-pointer w-full text-left`}
                 onClick={() => handleLanguageChange(lang.value)}
               >
                 <div className="flex items-center gap-2">
@@ -81,7 +79,7 @@ export function GameSettings() {
           </div>
 
           {/* Separator */}
-          <div className="h-px bg-gray-700 mx-3 my-2" />
+          <div className={`${MODAL_STYLES.separator} mx-3 my-2`} />
 
           {/* Ghost Piece Section */}
           <div className="px-3 py-2">
@@ -90,7 +88,7 @@ export function GameSettings() {
             </div>
             <button
               type="button"
-              className="flex items-center justify-between p-2 rounded cursor-pointer hover:bg-gray-800 transition-colors w-full text-left"
+              className={`${CONTROL_STYLES.interactiveItem} flex items-center justify-between p-2 rounded cursor-pointer w-full text-left`}
               onClick={handleGhostPieceToggle}
             >
               <div className="flex flex-col">
@@ -104,11 +102,11 @@ export function GameSettings() {
                 </span>
                 <div
                   className={`w-10 h-5 rounded-full p-1 transition-colors ${
-                    showGhostPiece ? "bg-blue-600" : "bg-gray-600"
+                    showGhostPiece ? CONTROL_STYLES.toggleOn : CONTROL_STYLES.toggleOff
                   }`}
                 >
                   <div
-                    className={`w-3 h-3 rounded-full bg-white transition-transform ${
+                    className={`${CONTROL_STYLES.toggleThumb} ${
                       showGhostPiece ? "translate-x-5" : "translate-x-0"
                     }`}
                   />

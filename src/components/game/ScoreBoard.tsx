@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { useAnimatedValue } from "../../hooks/useAnimatedValue";
 import { useScoreState } from "../../hooks/useGameSelectors";
+import { CARD_STYLES } from "../../utils/styles";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { AnimatedScoreItem } from "./AnimatedScoreItem";
 
@@ -13,7 +14,7 @@ export function ScoreBoard() {
   const levelKey = useAnimatedValue(level);
 
   return (
-    <Card className="bg-gray-900/50 backdrop-blur-sm border-gray-700 shadow-xl hover:bg-gray-900/60 hover:border-gray-600 transition-all duration-300 hover:shadow-2xl">
+    <Card className={`${CARD_STYLES.base} ${CARD_STYLES.hover} ${CARD_STYLES.interactive}`}>
       <CardHeader>
         <CardTitle className="text-base font-bold text-gray-300 text-center">
           {t("game.score.title")}

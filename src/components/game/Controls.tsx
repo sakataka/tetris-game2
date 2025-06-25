@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { CARD_STYLES, CONTROL_STYLES } from "../../utils/styles";
 import { Badge } from "../ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 
@@ -14,7 +15,7 @@ export function Controls() {
   ];
 
   return (
-    <Card className="bg-gray-900/50 backdrop-blur-sm border-gray-700 shadow-xl hover:bg-gray-900/60 hover:border-gray-600 transition-all duration-300 hover:shadow-2xl">
+    <Card className={`${CARD_STYLES.base} ${CARD_STYLES.hover} ${CARD_STYLES.interactive}`}>
       <CardHeader>
         <CardTitle className="text-base font-bold text-gray-300 text-center">
           {t("game.controls.title")}
@@ -25,7 +26,7 @@ export function Controls() {
           {controls.map(({ key, action }) => (
             <div
               key={key}
-              className="flex items-center justify-between py-1.5 px-3 bg-gray-800/30 rounded-md transition-colors hover:bg-gray-700/30"
+              className={`flex items-center justify-between py-1.5 px-3 ${CONTROL_STYLES.interactiveItem} rounded-md`}
             >
               <Badge variant="outline" className="font-mono text-xs border-gray-600 text-gray-300">
                 {key}
