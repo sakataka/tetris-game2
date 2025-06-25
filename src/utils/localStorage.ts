@@ -105,8 +105,8 @@ export function setHighScore(score: number, lines: number, level: number): boole
     // Also add to high scores list
     if (success) {
       addToHighScoresList(newHighScore);
-      // Trigger update event for React components
-      window.dispatchEvent(new CustomEvent("tetris-high-score-update"));
+      // Note: High score update notification is now handled by Zustand store
+      // The store will be updated when components call updateHighScore action
     }
 
     return success;

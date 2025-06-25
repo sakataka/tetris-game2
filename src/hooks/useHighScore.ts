@@ -1,22 +1,15 @@
-import { useCallback, useEffect, useState } from "react";
-import type { HighScore } from "../utils/localStorage";
-import { getCurrentHighScore, getHighScoresList } from "../utils/localStorage";
+import { useEffect } from "react";
+import { useHighScoreStore } from "../store/highScoreStore";
 
 /**
  * Custom hook for managing high score data with real-time updates
- * This hook will automatically refresh when high scores change
+ * This hook uses Zustand store for state management instead of CustomEvent
  */
 export function useHighScore() {
-  const [currentHighScore, setCurrentHighScore] = useState<HighScore | null>(null);
-  const [highScoresList, setHighScoresList] = useState<HighScore[]>([]);
-  const [refreshKey, setRefreshKey] = useState(0);
-
-  // Function to refresh high score data
-  const refreshHighScores = useCallback(() => {
-    setCurrentHighScore(getCurrentHighScore());
-    setHighScoresList(getHighScoresList());
-    setRefreshKey((prev) => prev + 1);
-  }, []);
+  const currentHighScore = useHighScoreStore((state) => state.currentHighScore);
+  const highScoresList = useHighScoreStore((state) => state.highScoresList);
+  const refreshKey = useHighScoreStore((state) => state.refreshKey);
+  const refreshHighScores = useHighScoreStore((state) => state.refreshHighScores);
 
   // Load initial data
   useEffect(() => {
@@ -33,16 +26,6 @@ export function useHighScore() {
 
     window.addEventListener("storage", handleStorageChange);
     return () => window.removeEventListener("storage", handleStorageChange);
-  }, [refreshHighScores]);
-
-  // Listen for custom events (when localStorage changes in the same tab)
-  useEffect(() => {
-    const handleHighScoreUpdate = () => {
-      refreshHighScores();
-    };
-
-    window.addEventListener("tetris-high-score-update", handleHighScoreUpdate);
-    return () => window.removeEventListener("tetris-high-score-update", handleHighScoreUpdate);
   }, [refreshHighScores]);
 
   return {

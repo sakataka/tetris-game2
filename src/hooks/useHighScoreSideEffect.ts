@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useGameStore } from "../store/gameStore";
+import { useHighScoreStore } from "../store/highScoreStore";
 import { setHighScore } from "../utils/localStorage";
 
 /**
@@ -11,13 +12,16 @@ export function useHighScoreSideEffect() {
   const score = useGameStore((state) => state.score);
   const lines = useGameStore((state) => state.lines);
   const level = useGameStore((state) => state.level);
+  const updateHighScore = useHighScoreStore((state) => state.updateHighScore);
   const wasGameOverRef = useRef(isGameOver);
 
   useEffect(() => {
     // Save high score when game transitions from playing to game over
     if (!wasGameOverRef.current && isGameOver) {
       setHighScore(score, lines, level);
+      // Update the high score store to reflect the changes
+      updateHighScore();
     }
     wasGameOverRef.current = isGameOver;
-  }, [isGameOver, score, lines, level]);
+  }, [isGameOver, score, lines, level, updateHighScore]);
 }
