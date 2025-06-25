@@ -19,6 +19,7 @@ import {
   getTetrominoColorIndex,
   rotateTetromino,
 } from "./tetrominos";
+import { tryRotateWithWallKick } from "./wallKick";
 
 export function createInitialGameState(): GameState {
   const currentType = getRandomTetrominoType();
@@ -75,15 +76,31 @@ export function moveTetrominoBy(state: GameState, dx: number, dy: number): GameS
 export function rotateTetrominoCW(state: GameState): GameState {
   if (!state.currentPiece || state.isGameOver || state.isPaused) return state;
 
-  const rotatedShape = rotateTetromino(state.currentPiece.shape);
+  const currentPiece = state.currentPiece;
+  const rotatedShape = rotateTetromino(currentPiece.shape);
+  const fromRotation = currentPiece.rotation;
+  const toRotation = (fromRotation + 1) % 4;
 
-  if (isValidPosition(state.board, rotatedShape, state.currentPiece.position)) {
+  // Try rotation with wall kick compensation
+  const newPosition = tryRotateWithWallKick(
+    state.board,
+    currentPiece.shape,
+    rotatedShape,
+    currentPiece.position,
+    currentPiece.type,
+    fromRotation,
+    toRotation,
+    isValidPosition,
+  );
+
+  if (newPosition) {
     return updateGhostPosition({
       ...state,
       currentPiece: {
-        ...state.currentPiece,
+        ...currentPiece,
         shape: rotatedShape,
-        rotation: (state.currentPiece.rotation + 1) % 4,
+        rotation: toRotation,
+        position: newPosition,
       },
       animationTriggerKey: state.animationTriggerKey + 1,
     });

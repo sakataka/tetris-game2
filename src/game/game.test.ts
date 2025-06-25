@@ -66,6 +66,44 @@ describe("Game Logic", () => {
       const newState = rotateTetrominoCW(state);
       expect(newState.currentPiece?.rotation).toBe((initialRotation + 1) % 4);
     });
+
+    test("should use wall kick when basic rotation fails", () => {
+      const state = createInitialGameState();
+
+      // Move piece to left edge where basic rotation might fail
+      let edgeState = state;
+      for (let i = 0; i < 3; i++) {
+        edgeState = moveTetrominoBy(edgeState, -1, 0);
+      }
+
+      const initialRotation = edgeState.currentPiece?.rotation ?? 0;
+      const newState = rotateTetrominoCW(edgeState);
+
+      // Should successfully rotate with wall kick compensation
+      expect(newState.currentPiece?.rotation).toBe((initialRotation + 1) % 4);
+    });
+
+    test("should maintain position when wall kick finds valid spot", () => {
+      const state = createInitialGameState();
+      const newState = rotateTetrominoCW(state);
+
+      // Should have valid position after rotation
+      expect(newState.currentPiece?.position.x).toBeGreaterThanOrEqual(0);
+      expect(newState.currentPiece?.position.x).toBeLessThan(BOARD_WIDTH);
+      expect(newState.currentPiece?.position.y).toBeGreaterThanOrEqual(0);
+    });
+
+    test("should not rotate when game is paused", () => {
+      const state = { ...createInitialGameState(), isPaused: true };
+      const newState = rotateTetrominoCW(state);
+      expect(newState).toBe(state);
+    });
+
+    test("should not rotate when game is over", () => {
+      const state = { ...createInitialGameState(), isGameOver: true };
+      const newState = rotateTetrominoCW(state);
+      expect(newState).toBe(state);
+    });
   });
 
   describe("hardDropTetromino", () => {
