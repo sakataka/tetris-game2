@@ -8,11 +8,11 @@ beforeAll(() => {
   const window = new Window();
   const document = window.document;
 
-  // Set global window and document
-  global.window = window as any;
-  global.document = document as any;
-  global.navigator = window.navigator as any;
-  global.HTMLElement = window.HTMLElement as any;
+  // Set global window and document with proper types
+  global.window = window as Window & typeof globalThis;
+  global.document = document as Document;
+  global.navigator = window.navigator as Navigator;
+  global.HTMLElement = window.HTMLElement as typeof HTMLElement;
 
   // Set up localStorage mock
   global.localStorage = {

@@ -1,11 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import type { GameState } from "../types/game";
-import {
-  calculateGhostPosition,
-  createInitialGameState,
-  holdCurrentPiece,
-  moveTetrominoBy,
-} from "./game";
+import { calculateGhostPosition, createInitialGameState, holdCurrentPiece } from "./game";
 
 describe("Hold Feature", () => {
   describe("holdCurrentPiece", () => {
