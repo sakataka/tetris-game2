@@ -334,6 +334,27 @@ bun add <package>              # パッケージ追加
 bun remove <package>           # パッケージ削除
 ```
 
+## 開発サーバーでのテスト
+
+開発サーバーで動作確認を行う場合は、MCP（Model Context Protocol）の Playwright 統合を使用してください。
+
+```bash
+# 1. 開発サーバーを起動
+bun run dev
+
+# 2. Claude Code で以下のように Playwright を使用
+# - mcp__playwright__browser_navigate でページを開く
+# - mcp__playwright__browser_click で要素をクリック
+# - mcp__playwright__browser_take_screenshot でスクリーンショット撮影
+# - mcp__playwright__browser_snapshot でページ構造を確認
+```
+
+これにより、実際のブラウザ環境での動作確認が可能です。特に以下のような場合に有効です：
+- UIの視覚的な確認
+- インタラクティブな機能のテスト
+- アニメーションの動作確認
+- レスポンシブデザインの検証
+
 ## 禁止事項
 
 - **条件緩和**: テストエラー・型エラー解消のための条件緩和
