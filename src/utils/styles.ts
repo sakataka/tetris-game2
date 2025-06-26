@@ -1,4 +1,9 @@
 /**
+ * UI Styling Constants
+ *
+ * This file contains UI styling patterns and Tailwind CSS class combinations.
+ * For game logic constants, configuration values, and numeric constants, see constants.ts
+ *
  * Common Tailwind CSS class patterns used throughout the application
  * Helps maintain consistency and reduces duplication
  */

@@ -1,4 +1,11 @@
 /**
+ * Game Constants
+ *
+ * This file contains game logic constants, configuration values, and numeric constants.
+ * For UI styling and Tailwind CSS class combinations, see styles.ts
+ */
+
+/**
  * Game board configuration constants
  */
 export const BOARD_WIDTH = 10;
