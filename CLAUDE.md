@@ -57,16 +57,16 @@ A fully-featured Tetris game built with modern web technologies.
 ### Frontend Framework
 - **React**: 19.1.0 — Modern functional components with Hooks
 - **TypeScript**: 5.8.3 — ESNext target with strict type checking for cutting-edge JS features
-- **Zustand**: 5.0.5 — Lightweight, scalable state management
+- **Zustand**: 5.0.6 — Lightweight, scalable state management
 
 ### Build Tools & Runtime
 - **Bun**: 1.2.17 — Fast package manager and test runner
-- **Rolldown-Vite**: 7.0.0 — Rust-powered bundler for optimal performance
+- **Rolldown-Vite**: 7.0.2 — Rust-powered bundler for optimal performance
 
 ### UI & Styling
-- **Tailwind CSS**: 4.1.10 — Utility-first CSS framework via Vite plugin
+- **Tailwind CSS**: 4.1.11 — Utility-first CSS framework via Vite plugin
 - **Framer Motion**: 12.19.1 — Production-ready animation library
-- **shadcn/ui**: Modern component library built on Radix UI primitives
+- **Radix UI**: Dialog 1.1.14, Slot 1.2.3 — Headless UI components
 - **class-variance-authority**: 0.7.1 — Type-safe component variants
 - **clsx + tailwind-merge**: 2.1.1/3.3.1 — Intelligent class name utilities
 - **Lucide React**: 0.523.0 — Beautiful, customizable icon library
@@ -79,7 +79,7 @@ A fully-featured Tetris game built with modern web technologies.
 - **Biome**: 2.0.5 — Fast linter and formatter in Rust
 - **Bun Test**: 1.2.17 — Native test runner with Jest compatibility
 - **happy-dom**: 18.0.1 — Lightweight DOM environment for testing
-- **Testing Library**: React 16.3.0 — Simple, intuitive component testing
+- **Testing Library**: React 16.3.0, DOM 10.4.0, jest-dom 6.6.3 — Simple, intuitive component testing
 - **Lefthook**: 1.11.14 — Fast Git hooks manager
 - **knip**: 5.61.2 — Finds unused files, dependencies, and exports
 - **@vitejs/plugin-react-oxc**: 0.2.3 — High-performance React plugin with oxc parser
