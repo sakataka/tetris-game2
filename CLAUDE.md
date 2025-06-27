@@ -97,8 +97,8 @@ Built on **Zustand** for clean, scalable state management:
 ### Game State Type Definition
 ```typescript
 interface GameState {
-  board: BoardMatrix;
-  boardBeforeClear: BoardMatrix | null;
+  board: GameBoard;
+  boardBeforeClear: GameBoard | null;
   currentPiece: Tetromino | null;
   nextPiece: TetrominoTypeName;
   heldPiece: TetrominoTypeName | null;
@@ -159,18 +159,21 @@ src/
 - **useGameLoop**: Manages the core game loop using requestAnimationFrame
 - **useKeyboardControls**: Handles keyboard input with react-hotkeys-hook
 - **useTouchGestures**: Processes touch gestures for mobile gameplay
-- **useGameSelectors**: Provides memoized game state selections
-- **executeGameAction**: Utility for dispatching game actions
+- **useTouchActions**: Handles touch-based game actions
+- **useTouchDetection**: Processes gesture detection logic
+- **useGameActions**: Provides game action dispatchers
+- **useGameActionHandler**: Coordinates action execution
 
 ### Animation System
 - **useAnimatedValue**: Manages animation triggers and spring controls
 - **useAnimationCompletionHandler**: Handles animation lifecycle events
 - **useCellAnimation**: Controls individual cell animation states
 
-### Data & Side Effects
+### State Selection & Data
+- **useBoardData**: Provides memoized board state selections
+- **useScoreState**: Provides memoized score state selections
 - **useHighScore**: Manages high score data and local storage
 - **useHighScoreSideEffect**: Handles high score persistence
-- **useSettingsSideEffect**: Manages settings persistence
 
 ## Core Game Logic
 
@@ -181,7 +184,10 @@ src/
 - `hardDropTetromino()` — Executes instant piece drops
 - `holdCurrentPiece()` — Manages piece saving and swapping
 - `calculateGhostPosition()` — Computes landing position preview
-- `updateGhostPosition()` — Updates ghost piece in game state
+- `placePieceOnBoard()` — Places pieces on the board with collision detection
+- `clearCompletedLines()` — Handles line clearing logic and scoring
+- `spawnNextPiece()` — Generates next tetromino from piece bag
+- `checkGameOver()` — Validates game over conditions
 
 ### game/board.ts
 - `createEmptyBoard()` — Generates clean game board
