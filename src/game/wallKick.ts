@@ -1,5 +1,4 @@
 import type { Position, TetrominoTypeName } from "../types/game";
-import { ROTATION_180, ROTATION_LEFT, ROTATION_RIGHT, ROTATION_SPAWN } from "../utils/constants";
 
 /**
  * Type-safe rotation transition identifiers
@@ -18,9 +17,9 @@ type RotationTransition =
  * Wall kick data for Super Rotation System (SRS)
  * Maps rotation transitions to offset positions to test in order
  */
-interface WallKickData {
+type WallKickData = {
   [K in RotationTransition]: Position[];
-}
+};
 
 /**
  * Creates a type-safe rotation transition key
@@ -96,7 +95,10 @@ function createIPieceOffsetPattern(
   ...offsets: (keyof typeof COMMON_OFFSETS | keyof typeof I_PIECE_OFFSETS)[]
 ): Position[] {
   return offsets.map((key) => {
-    return (COMMON_OFFSETS as any)[key] ?? (I_PIECE_OFFSETS as any)[key];
+    if (key in COMMON_OFFSETS) {
+      return COMMON_OFFSETS[key as keyof typeof COMMON_OFFSETS];
+    }
+    return I_PIECE_OFFSETS[key as keyof typeof I_PIECE_OFFSETS];
   });
 }
 
@@ -133,11 +135,13 @@ export function getWallKickOffsets(
   const rotationKey = createRotationTransition(fromRotation, toRotation);
 
   if (pieceType === "I") {
-    return I_WALL_KICK_DATA[rotationKey] ?? [{ x: 0, y: 0 }];
+    const data = I_WALL_KICK_DATA[rotationKey];
+    return data ?? [{ x: 0, y: 0 }];
   }
 
   // J, L, S, T, Z pieces use the same wall kick data
-  return JLSTZ_WALL_KICK_DATA[rotationKey] ?? [{ x: 0, y: 0 }];
+  const data = JLSTZ_WALL_KICK_DATA[rotationKey];
+  return data ?? [{ x: 0, y: 0 }];
 }
 
 /**

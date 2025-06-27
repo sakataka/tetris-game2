@@ -82,7 +82,7 @@ describe("Wall Kick System", () => {
     });
 
     test("should succeed with no wall kick needed", () => {
-      const tShape = TETROMINOS.T;
+      const _tShape = TETROMINOS.T;
       const rotatedShape = [
         [0, 1, 0],
         [0, 1, 1],
@@ -104,7 +104,7 @@ describe("Wall Kick System", () => {
     });
 
     test("should use wall kick when basic rotation fails", () => {
-      const tShape = TETROMINOS.T;
+      const _tShape = TETROMINOS.T;
       const rotatedShape = [
         [0, 1, 0],
         [0, 1, 1],
@@ -133,7 +133,7 @@ describe("Wall Kick System", () => {
     });
 
     test("should return null when all wall kicks fail", () => {
-      const tShape = TETROMINOS.T;
+      const _tShape = TETROMINOS.T;
       const rotatedShape = [
         [0, 1, 0],
         [0, 1, 1],
@@ -164,7 +164,7 @@ describe("Wall Kick System", () => {
     });
 
     test("should handle I piece wall kicks correctly", () => {
-      const iShape = TETROMINOS.I;
+      const _iShape = TETROMINOS.I;
       const rotatedShape = [
         [0, 0, 1, 0],
         [0, 0, 1, 0],
@@ -192,7 +192,7 @@ describe("Wall Kick System", () => {
     });
 
     test("should handle O piece (no wall kicks needed)", () => {
-      const oShape = TETROMINOS.O;
+      const _oShape = TETROMINOS.O;
       const rotatedShape = TETROMINOS.O; // O piece doesn't change when rotated
       const position = { x: 5, y: 5 };
 
@@ -213,7 +213,7 @@ describe("Wall Kick System", () => {
   describe("Integration with different rotation states", () => {
     test("should handle all rotation transitions for T piece", () => {
       const board = createEmptyBoard();
-      const tShape = TETROMINOS.T;
+      const _tShape = TETROMINOS.T;
       const position = { x: 5, y: 5 };
 
       // Test all possible rotation transitions
@@ -231,7 +231,7 @@ describe("Wall Kick System", () => {
       for (const [from, to] of transitions) {
         const result = tryRotateWithWallKick(
           board,
-          tShape, // Using same shape for simplicity
+          _tShape, // Using same shape for simplicity
           position,
           "T",
           from,
