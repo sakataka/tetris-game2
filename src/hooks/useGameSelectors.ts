@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { shallow } from "zustand/shallow";
 import { forEachPieceCell } from "../game/board";
 import { getTetrominoColorIndex } from "../game/tetrominos";
 import { useGameStore } from "../store/gameStore";
@@ -6,41 +7,33 @@ import { useSettingsStore } from "../store/settingsStore";
 import { BOARD_HEIGHT, BOARD_WIDTH } from "../utils/constants";
 
 /**
- * Game state selectors - optimized with useMemo to prevent infinite loops
+ * Game state selectors - optimized using Zustand's built-in shallow comparison
  */
 
-export const useScoreState = () => {
-  const score = useGameStore((state) => state.score);
-  const lines = useGameStore((state) => state.lines);
-  const level = useGameStore((state) => state.level);
-
-  return useMemo(() => ({ score, lines, level }), [score, lines, level]);
-};
-
-export const useGameActions = () => {
-  const moveLeft = useGameStore((state) => state.moveLeft);
-  const moveRight = useGameStore((state) => state.moveRight);
-  const moveDown = useGameStore((state) => state.moveDown);
-  const rotate = useGameStore((state) => state.rotate);
-  const drop = useGameStore((state) => state.drop);
-  const togglePause = useGameStore((state) => state.togglePause);
-  const resetGame = useGameStore((state) => state.resetGame);
-  const clearAnimationStates = useGameStore((state) => state.clearAnimationStates);
-
-  return useMemo(
-    () => ({
-      moveLeft,
-      moveRight,
-      moveDown,
-      rotate,
-      drop,
-      togglePause,
-      resetGame,
-      clearAnimationStates,
+export const useScoreState = () =>
+  useGameStore(
+    (state) => ({
+      score: state.score,
+      lines: state.lines,
+      level: state.level,
     }),
-    [moveLeft, moveRight, moveDown, rotate, drop, togglePause, resetGame, clearAnimationStates],
+    shallow,
   );
-};
+
+export const useGameActions = () =>
+  useGameStore(
+    (state) => ({
+      moveLeft: state.moveLeft,
+      moveRight: state.moveRight,
+      moveDown: state.moveDown,
+      rotate: state.rotate,
+      drop: state.drop,
+      togglePause: state.togglePause,
+      resetGame: state.resetGame,
+      clearAnimationStates: state.clearAnimationStates,
+    }),
+    shallow,
+  );
 
 export const useBoardData = () => {
   const board = useGameStore((state) => state.board);
