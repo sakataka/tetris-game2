@@ -1,5 +1,5 @@
 import type { BoardMatrix, Position } from "../types/game";
-import { BOARD_HEIGHT, BOARD_WIDTH } from "../utils/constants";
+import { BOARD_HEIGHT, BOARD_WIDTH } from "../utils/gameConstants";
 
 export function createEmptyBoard(): BoardMatrix {
   return Array(BOARD_HEIGHT)

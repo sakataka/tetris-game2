@@ -1,5 +1,5 @@
 import type { Tetromino, TetrominoTypeName } from "../types/game";
-import { BOARD_WIDTH } from "../utils/constants";
+import { BOARD_WIDTH } from "../utils/gameConstants";
 
 // Type-safe color index mapping
 export const TETROMINO_COLOR_MAP = {

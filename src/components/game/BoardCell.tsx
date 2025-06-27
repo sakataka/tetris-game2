@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useCellAnimation } from "../../hooks/useCellAnimation";
 import { getCellColor } from "../../utils/colors";
-import { BOARD_WIDTH } from "../../utils/constants";
+import { BOARD_WIDTH } from "../../utils/gameConstants";
 import { BOARD_STYLES } from "../../utils/styles";
 
 interface BoardCellProps {

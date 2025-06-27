@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { GAME_CONSTANTS, SPRING_CONFIGS } from "../utils/gameConstants";
 
 interface CellAnimationState {
   isCurrentPiece: boolean;
@@ -45,13 +46,14 @@ export function useCellAnimation({
     if (isCurrentPiece) {
       return {
         type: "spring" as const,
-        stiffness: 500,
-        damping: 30,
-        duration: 0.25,
+        ...SPRING_CONFIGS.CELL,
+        duration: GAME_CONSTANTS.ANIMATION.CELL.DURATION,
       };
     }
     return {
-      duration: isClearingLine ? 0.2 : 0.15,
+      duration: isClearingLine
+        ? GAME_CONSTANTS.ANIMATION.LINE_CLEAR_DURATION
+        : GAME_CONSTANTS.ANIMATION.PIECE_PLACE_DURATION,
       repeat: isClearingLine ? 0 : 0,
     };
   }, [shouldAnimate, isCurrentPiece, isClearingLine]);

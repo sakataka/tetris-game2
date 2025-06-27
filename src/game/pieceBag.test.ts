@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { TETROMINO_TYPES } from "../utils/constants";
+import { TETROMINO_TYPES } from "../utils/gameConstants";
 import { createPieceBagManager, PieceBagManager } from "./pieceBag";
 
 describe("PieceBagManager", () => {

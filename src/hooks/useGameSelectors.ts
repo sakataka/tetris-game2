@@ -1,39 +1,32 @@
 import { useMemo } from "react";
-import { shallow } from "zustand/shallow";
 import { forEachPieceCell } from "../game/board";
 import { getTetrominoColorIndex } from "../game/tetrominos";
 import { useGameStore } from "../store/gameStore";
 import { useSettingsStore } from "../store/settingsStore";
-import { BOARD_HEIGHT, BOARD_WIDTH } from "../utils/constants";
+import { BOARD_HEIGHT, BOARD_WIDTH } from "../utils/gameConstants";
 
 /**
  * Game state selectors - optimized using Zustand's built-in shallow comparison
  */
 
 export const useScoreState = () =>
-  useGameStore(
-    (state) => ({
-      score: state.score,
-      lines: state.lines,
-      level: state.level,
-    }),
-    shallow,
-  );
+  useGameStore((state) => ({
+    score: state.score,
+    lines: state.lines,
+    level: state.level,
+  }));
 
 export const useGameActions = () =>
-  useGameStore(
-    (state) => ({
-      moveLeft: state.moveLeft,
-      moveRight: state.moveRight,
-      moveDown: state.moveDown,
-      rotate: state.rotate,
-      drop: state.drop,
-      togglePause: state.togglePause,
-      resetGame: state.resetGame,
-      clearAnimationStates: state.clearAnimationStates,
-    }),
-    shallow,
-  );
+  useGameStore((state) => ({
+    moveLeft: state.moveLeft,
+    moveRight: state.moveRight,
+    moveDown: state.moveDown,
+    rotate: state.rotate,
+    drop: state.drop,
+    togglePause: state.togglePause,
+    resetGame: state.resetGame,
+    clearAnimationStates: state.clearAnimationStates,
+  }));
 
 export const useBoardData = () => {
   const board = useGameStore((state) => state.board);

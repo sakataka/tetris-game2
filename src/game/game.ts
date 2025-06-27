@@ -7,7 +7,7 @@ import {
   MAX_ROTATION_STATE,
   MIN_DROP_SPEED_MS,
   SPEED_DECREASE_PER_LEVEL,
-} from "../utils/constants";
+} from "../utils/gameConstants";
 import {
   clearLines,
   createEmptyBoard,

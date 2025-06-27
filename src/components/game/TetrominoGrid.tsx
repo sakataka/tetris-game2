@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { GAME_CONSTANTS } from "../../utils/gameConstants";
 
 interface TetrominoGridProps {
   shape: number[][] | null;
@@ -18,11 +19,11 @@ export function TetrominoGrid({
   return (
     <div
       className={cn(
-        "grid grid-cols-4 grid-rows-3 gap-[1px] bg-gray-700 rounded-lg overflow-hidden w-fit mx-auto p-1",
+        `grid grid-cols-4 grid-rows-${GAME_CONSTANTS.TETROMINO.GRID_ROWS} gap-[1px] bg-gray-700 rounded-lg overflow-hidden w-fit mx-auto p-1`,
         disabled && "opacity-50",
       )}
     >
-      {Array.from({ length: 3 }).map((_, y) =>
+      {Array.from({ length: GAME_CONSTANTS.TETROMINO.GRID_ROWS }).map((_, y) =>
         Array.from({ length: gridSize }).map((_, x) => {
           const isActive = shape?.[y]?.[x] === 1;
           return (

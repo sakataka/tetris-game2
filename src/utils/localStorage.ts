@@ -2,6 +2,7 @@
  * Safe LocalStorage utility with type safety and error handling
  * Provides a reliable interface for storing and retrieving game data
  */
+import { GAME_CONSTANTS } from "./gameConstants";
 
 export interface HighScore {
   score: number;
@@ -24,7 +25,7 @@ const STORAGE_KEYS = {
 
 const DEFAULT_SETTINGS: GameSettings = {
   language: "ja",
-  volume: 0.5,
+  volume: GAME_CONSTANTS.UI.DEFAULT_VOLUME,
   showGhostPiece: true,
 };
 
@@ -129,7 +130,9 @@ export function addToHighScoresList(highScore: HighScore): boolean {
   const currentList = getHighScoresList();
 
   // Add new score and sort by score descending
-  const updatedList = [...currentList, highScore].sort((a, b) => b.score - a.score).slice(0, 10); // Keep only top 10
+  const updatedList = [...currentList, highScore]
+    .sort((a, b) => b.score - a.score)
+    .slice(0, GAME_CONSTANTS.UI.HIGH_SCORE_LIST_MAX); // Keep only top scores
 
   return setStorageItem(STORAGE_KEYS.HIGH_SCORES, updatedList);
 }

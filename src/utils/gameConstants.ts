@@ -1,0 +1,131 @@
+/**
+ * Centralized Game Constants
+ *
+ * This file contains all game-related constants, magic numbers, and configuration values
+ * to ensure consistency and maintainability across the entire codebase.
+ */
+
+/**
+ * Board-related constants
+ */
+export const GAME_CONSTANTS = {
+  BOARD: {
+    WIDTH: 10,
+    HEIGHT: 20,
+    CELL_SIZE: 30,
+    MIN_WIDTH_PX: 320,
+    MIN_HEIGHT_PX: 620,
+  },
+  TIMING: {
+    INITIAL_DROP_SPEED_MS: 1000,
+    MIN_DROP_SPEED_MS: 100,
+    SPEED_DECREASE_PER_LEVEL: 100,
+    SOFT_DROP_INTERVAL: 50,
+    HARD_DROP_DELAY: 100,
+    LINE_CLEAR_DELAY: 300,
+    TRANSITION_DURATION: 300,
+  },
+  TETROMINO: {
+    GRID_SIZE: 4,
+    NEXT_PIECE_GRID_SIZE: 4,
+    ROTATION_STATES: [0, 90, 180, 270] as const,
+    DROP_POSITION_LIMIT: 30,
+    MAX_ROTATION_STATE: 3,
+    GRID_ROWS: 3,
+    GRID_CELL_SIZE: 16, // For display in UI (w-4 h-4 = 16px)
+  },
+  ANIMATION: {
+    SCORE: {
+      STIFFNESS: 300,
+      DAMPING: 15,
+    },
+    LINES: {
+      STIFFNESS: 400,
+      DAMPING: 20,
+    },
+    LEVEL: {
+      STIFFNESS: 250,
+      DAMPING: 12,
+    },
+    DEFAULT: {
+      STIFFNESS: 300,
+      DAMPING: 15,
+    },
+    CELL: {
+      STIFFNESS: 500,
+      DAMPING: 30,
+      DURATION: 0.25,
+    },
+    LINE_CLEAR_DURATION: 0.2,
+    PIECE_PLACE_DURATION: 0.15,
+  },
+  TOUCH: {
+    MIN_SWIPE_DISTANCE: 30,
+    MAX_SWIPE_TIME: 500,
+    TAP_TIME: 200,
+    DOUBLE_TAP_TIME: 300,
+    LONG_SWIPE_MULTIPLIER: 2,
+  },
+  UI: {
+    BUTTON_HEIGHT: 48, // h-12 = 3rem = 48px
+    BUTTON_WIDTH_SMALL: 48, // w-12
+    BUTTON_WIDTH_LARGE: 64, // w-16
+    HIGH_SCORE_LIST_MAX: 10,
+    DEFAULT_VOLUME: 0.5,
+  },
+  SCORING: {
+    BASE_SCORES: [0, 100, 300, 500, 800] as const,
+    LEVEL_MULTIPLIER: 1,
+    LINES_PER_LEVEL: 10,
+  },
+  TYPES: {
+    TETROMINO_TYPES: ["I", "O", "T", "S", "Z", "J", "L"] as const,
+  },
+} as const;
+
+// Type-safe constants exports
+export type RotationState = (typeof GAME_CONSTANTS.TETROMINO.ROTATION_STATES)[number];
+export type TetrominoTypeName = (typeof GAME_CONSTANTS.TYPES.TETROMINO_TYPES)[number];
+export type BaseScore = (typeof GAME_CONSTANTS.SCORING.BASE_SCORES)[number];
+
+// Backward compatibility exports for existing code
+export const BOARD_WIDTH = GAME_CONSTANTS.BOARD.WIDTH;
+export const BOARD_HEIGHT = GAME_CONSTANTS.BOARD.HEIGHT;
+export const BOARD_CELL_SIZE_PX = GAME_CONSTANTS.BOARD.CELL_SIZE;
+export const INITIAL_DROP_SPEED_MS = GAME_CONSTANTS.TIMING.INITIAL_DROP_SPEED_MS;
+export const MIN_DROP_SPEED_MS = GAME_CONSTANTS.TIMING.MIN_DROP_SPEED_MS;
+export const SPEED_DECREASE_PER_LEVEL = GAME_CONSTANTS.TIMING.SPEED_DECREASE_PER_LEVEL;
+export const NEXT_PIECE_GRID_SIZE = GAME_CONSTANTS.TETROMINO.NEXT_PIECE_GRID_SIZE;
+export const LINES_PER_LEVEL = GAME_CONSTANTS.SCORING.LINES_PER_LEVEL;
+export const BASE_SCORES = GAME_CONSTANTS.SCORING.BASE_SCORES;
+export const TETROMINO_TYPES = GAME_CONSTANTS.TYPES.TETROMINO_TYPES;
+export const MAX_ROTATION_STATE = GAME_CONSTANTS.TETROMINO.MAX_ROTATION_STATE;
+export const DROP_POSITION_MAX_ITERATIONS = GAME_CONSTANTS.TETROMINO.DROP_POSITION_LIMIT;
+
+// Additional named constants for common calculations
+export const BOARD_CENTER_X = Math.floor(GAME_CONSTANTS.BOARD.WIDTH / 2);
+export const TETROMINO_GRID_CENTER = Math.floor(GAME_CONSTANTS.TETROMINO.GRID_SIZE / 2);
+
+// Animation spring configurations
+export const SPRING_CONFIGS = {
+  SCORE: {
+    stiffness: GAME_CONSTANTS.ANIMATION.SCORE.STIFFNESS,
+    damping: GAME_CONSTANTS.ANIMATION.SCORE.DAMPING,
+  },
+  LINES: {
+    stiffness: GAME_CONSTANTS.ANIMATION.LINES.STIFFNESS,
+    damping: GAME_CONSTANTS.ANIMATION.LINES.DAMPING,
+  },
+  LEVEL: {
+    stiffness: GAME_CONSTANTS.ANIMATION.LEVEL.STIFFNESS,
+    damping: GAME_CONSTANTS.ANIMATION.LEVEL.DAMPING,
+  },
+  DEFAULT: {
+    stiffness: GAME_CONSTANTS.ANIMATION.DEFAULT.STIFFNESS,
+    damping: GAME_CONSTANTS.ANIMATION.DEFAULT.DAMPING,
+  },
+  CELL: {
+    stiffness: GAME_CONSTANTS.ANIMATION.CELL.STIFFNESS,
+    damping: GAME_CONSTANTS.ANIMATION.CELL.DAMPING,
+  },
+} as const;

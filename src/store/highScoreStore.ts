@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { GAME_CONSTANTS } from "../utils/gameConstants";
 import type { HighScore } from "../utils/localStorage";
 
 interface HighScoreStore {
@@ -29,10 +30,10 @@ export const useHighScoreStore = create<HighScoreStore>()(
           // Update current high score
           set({ currentHighScore: newHighScore });
 
-          // Add to high scores list and keep top 10
+          // Add to high scores list and keep top scores
           const updatedList = [...get().highScoresList, newHighScore]
             .sort((a, b) => b.score - a.score)
-            .slice(0, 10);
+            .slice(0, GAME_CONSTANTS.UI.HIGH_SCORE_LIST_MAX);
 
           set({ highScoresList: updatedList });
         }

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useGameStore } from "../store/gameStore";
+import { GAME_CONSTANTS } from "../utils/gameConstants";
 import { useGameActionHandler } from "./useGameActionHandler";
 
 interface TouchPoint {
@@ -16,7 +17,12 @@ interface TouchGestureOptions {
 }
 
 export function useTouchGestures(options: TouchGestureOptions = {}) {
-  const { minSwipeDistance = 30, maxSwipeTime = 500, tapTime = 200, doubleTapTime = 300 } = options;
+  const {
+    minSwipeDistance = GAME_CONSTANTS.TOUCH.MIN_SWIPE_DISTANCE,
+    maxSwipeTime = GAME_CONSTANTS.TOUCH.MAX_SWIPE_TIME,
+    tapTime = GAME_CONSTANTS.TOUCH.TAP_TIME,
+    doubleTapTime = GAME_CONSTANTS.TOUCH.DOUBLE_TAP_TIME,
+  } = options;
 
   const { moveLeft, moveRight, moveDown, rotate, drop } = useGameStore();
 
@@ -112,7 +118,8 @@ export function useTouchGestures(options: TouchGestureOptions = {}) {
       // Vertical swipe
       if (deltaY > 0) {
         // Swipe down
-        const isLongSwipe = Math.abs(deltaY) > minSwipeDistance * 2;
+        const isLongSwipe =
+          Math.abs(deltaY) > minSwipeDistance * GAME_CONSTANTS.TOUCH.LONG_SWIPE_MULTIPLIER;
         if (isLongSwipe) {
           // Long swipe down = hard drop
           executeAction(drop, true);

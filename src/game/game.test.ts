@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { BOARD_HEIGHT, BOARD_WIDTH } from "../utils/constants";
+import { BOARD_HEIGHT, BOARD_WIDTH } from "../utils/gameConstants";
 import { createEmptyBoard } from "./board";
 import {
   calculateScore,
