@@ -32,7 +32,7 @@ mock.module("../../store/gameStore", () => ({
 // Mock useGameActionHandler to execute actions directly
 mock.module("../core/useGameActionHandler", () => ({
   useGameActionHandler: () =>
-    mock((action, urgent = false) => {
+    mock((action, _urgent = false) => {
       // Only execute action if game is not paused or over
       if (!mockGameState.isGameOver && !mockGameState.isPaused) {
         action();

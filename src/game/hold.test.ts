@@ -1,5 +1,4 @@
 import { describe, expect, test } from "bun:test";
-import { createTestGameState } from "../tests/helpers/gameTestUtils";
 import { calculateGhostPosition, createInitialGameState, holdCurrentPiece } from "./game";
 
 describe("Hold Feature", () => {

@@ -17,12 +17,7 @@ export type CellValue = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
 /**
  * Animation trigger for board cell animations
  */
-export type AnimationTrigger = number | `animation-${number}`;
-
-/**
- * Animation trigger key for game state updates
- */
-export type AnimationTriggerKey = number;
+export type AnimationTriggerKey = number | `animation-${number}`;
 
 /**
  * Represents a 2D coordinate position on the game board.
