@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { TetrominoGrid } from "./TetrominoGrid";
 
 export function NextPiece() {
-  const { nextPiece } = useGameStore();
+  const nextPiece = useGameStore((state) => state.nextPiece);
   const { t } = useTranslation();
   const shape = getTetrominoShape(nextPiece);
   const tetrominoColor = getTetrominoColor(nextPiece);

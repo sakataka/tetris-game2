@@ -5,7 +5,10 @@ import { AnimatedButton } from "../ui/AnimatedButton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 
 export function GameOverlay() {
-  const { isGameOver, isPaused, resetGame, togglePause } = useGameStore();
+  const isGameOver = useGameStore((state) => state.isGameOver);
+  const isPaused = useGameStore((state) => state.isPaused);
+  const resetGame = useGameStore((state) => state.resetGame);
+  const togglePause = useGameStore((state) => state.togglePause);
   const { t } = useTranslation();
 
   return (

@@ -13,7 +13,10 @@ import { useGameActionHandler } from "./useGameActionHandler";
  * - Prevent timer drift that can occur with setInterval
  */
 export function useGameLoop() {
-  const { moveDown, isPaused, isGameOver, level } = useGameStore();
+  const moveDown = useGameStore((state) => state.moveDown);
+  const isPaused = useGameStore((state) => state.isPaused);
+  const isGameOver = useGameStore((state) => state.isGameOver);
+  const level = useGameStore((state) => state.level);
   const lastUpdateTime = useRef(0);
   const animationIdRef = useRef<number | null>(null);
   const executeAction = useGameActionHandler();

@@ -9,7 +9,11 @@ export interface TouchActionsReturn {
 }
 
 export function useTouchActions(): TouchActionsReturn {
-  const { moveLeft, moveRight, moveDown, rotate, drop } = useGameStore();
+  const moveLeft = useGameStore((state) => state.moveLeft);
+  const moveRight = useGameStore((state) => state.moveRight);
+  const moveDown = useGameStore((state) => state.moveDown);
+  const rotate = useGameStore((state) => state.rotate);
+  const drop = useGameStore((state) => state.drop);
   const executeAction = useGameActionHandler();
 
   const handleSwipe = (gesture: SwipeGesture) => {

@@ -8,7 +8,13 @@ interface TouchControlsProps {
 }
 
 export function TouchControls({ className }: TouchControlsProps) {
-  const { moveLeft, moveRight, moveDown, rotate, drop, isPaused, isGameOver } = useGameStore();
+  const moveLeft = useGameStore((state) => state.moveLeft);
+  const moveRight = useGameStore((state) => state.moveRight);
+  const moveDown = useGameStore((state) => state.moveDown);
+  const rotate = useGameStore((state) => state.rotate);
+  const drop = useGameStore((state) => state.drop);
+  const isPaused = useGameStore((state) => state.isPaused);
+  const isGameOver = useGameStore((state) => state.isGameOver);
   const [, startTransition] = useTransition();
 
   // Helper for game actions with common conditions

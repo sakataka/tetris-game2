@@ -4,17 +4,15 @@ import { useGameStore } from "../store/gameStore";
 import { useGameActionHandler } from "./useGameActionHandler";
 
 export function useKeyboardControls() {
-  const {
-    moveLeft,
-    moveRight,
-    moveDown,
-    rotate,
-    drop,
-    holdPiece,
-    togglePause,
-    resetGame,
-    isGameOver,
-  } = useGameStore();
+  const moveLeft = useGameStore((state) => state.moveLeft);
+  const moveRight = useGameStore((state) => state.moveRight);
+  const moveDown = useGameStore((state) => state.moveDown);
+  const rotate = useGameStore((state) => state.rotate);
+  const drop = useGameStore((state) => state.drop);
+  const holdPiece = useGameStore((state) => state.holdPiece);
+  const togglePause = useGameStore((state) => state.togglePause);
+  const resetGame = useGameStore((state) => state.resetGame);
+  const isGameOver = useGameStore((state) => state.isGameOver);
   const lastPauseTime = useRef(0);
   const [, startTransition] = useTransition();
   const executeAction = useGameActionHandler();

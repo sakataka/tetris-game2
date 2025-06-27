@@ -9,7 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { TetrominoGrid } from "./TetrominoGrid";
 
 export function HoldPiece() {
-  const { heldPiece, canHold } = useGameStore();
+  const heldPiece = useGameStore((state) => state.heldPiece);
+  const canHold = useGameStore((state) => state.canHold);
   const { t } = useTranslation();
 
   const shape = heldPiece ? getTetrominoShape(heldPiece) : null;

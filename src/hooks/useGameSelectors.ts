@@ -9,24 +9,38 @@ import { BOARD_HEIGHT, BOARD_WIDTH } from "../utils/gameConstants";
  * Game state selectors - optimized using Zustand's built-in shallow comparison
  */
 
-export const useScoreState = () =>
-  useGameStore((state) => ({
-    score: state.score,
-    lines: state.lines,
-    level: state.level,
-  }));
+export const useScoreState = () => {
+  const score = useGameStore((state) => state.score);
+  const lines = useGameStore((state) => state.lines);
+  const level = useGameStore((state) => state.level);
 
-export const useGameActions = () =>
-  useGameStore((state) => ({
-    moveLeft: state.moveLeft,
-    moveRight: state.moveRight,
-    moveDown: state.moveDown,
-    rotate: state.rotate,
-    drop: state.drop,
-    togglePause: state.togglePause,
-    resetGame: state.resetGame,
-    clearAnimationStates: state.clearAnimationStates,
-  }));
+  return useMemo(() => ({ score, lines, level }), [score, lines, level]);
+};
+
+export const useGameActions = () => {
+  const moveLeft = useGameStore((state) => state.moveLeft);
+  const moveRight = useGameStore((state) => state.moveRight);
+  const moveDown = useGameStore((state) => state.moveDown);
+  const rotate = useGameStore((state) => state.rotate);
+  const drop = useGameStore((state) => state.drop);
+  const togglePause = useGameStore((state) => state.togglePause);
+  const resetGame = useGameStore((state) => state.resetGame);
+  const clearAnimationStates = useGameStore((state) => state.clearAnimationStates);
+
+  return useMemo(
+    () => ({
+      moveLeft,
+      moveRight,
+      moveDown,
+      rotate,
+      drop,
+      togglePause,
+      resetGame,
+      clearAnimationStates,
+    }),
+    [moveLeft, moveRight, moveDown, rotate, drop, togglePause, resetGame, clearAnimationStates],
+  );
+};
 
 export const useBoardData = () => {
   const board = useGameStore((state) => state.board);
