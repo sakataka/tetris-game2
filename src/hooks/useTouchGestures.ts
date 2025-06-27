@@ -1,149 +1,34 @@
-import { useEffect, useRef, useState } from "react";
-import { useGameStore } from "../store/gameStore";
-import { GAME_CONSTANTS } from "../utils/gameConstants";
-import { useGameActionHandler } from "./useGameActionHandler";
+import { useTouchActions } from "./useTouchActions";
+import { type TouchGestureOptions, useTouchDetection } from "./useTouchDetection";
 
-interface TouchPoint {
-  x: number;
-  y: number;
-  time: number;
+export interface TouchGesturesReturn {
+  handleTouchStart: (event: React.TouchEvent) => void;
+  handleTouchEnd: (event: React.TouchEvent) => void;
 }
 
-interface TouchGestureOptions {
-  minSwipeDistance?: number;
-  maxSwipeTime?: number;
-  tapTime?: number;
-  doubleTapTime?: number;
-}
+/**
+ * Main touch gestures hook that coordinates touch detection and actions
+ *
+ * This hook acts as a coordinator between useTouchDetection and useTouchActions,
+ * maintaining backward compatibility while providing a clean separation of concerns.
+ *
+ * @param options - Touch gesture configuration options
+ * @returns Touch event handlers for components
+ */
+export function useTouchGestures(options: TouchGestureOptions = {}): TouchGesturesReturn {
+  const actions = useTouchActions();
 
-export function useTouchGestures(options: TouchGestureOptions = {}) {
-  const {
-    minSwipeDistance = GAME_CONSTANTS.TOUCH.MIN_SWIPE_DISTANCE,
-    maxSwipeTime = GAME_CONSTANTS.TOUCH.MAX_SWIPE_TIME,
-    tapTime = GAME_CONSTANTS.TOUCH.TAP_TIME,
-    doubleTapTime = GAME_CONSTANTS.TOUCH.DOUBLE_TAP_TIME,
-  } = options;
-
-  const { moveLeft, moveRight, moveDown, rotate, drop } = useGameStore();
-
-  const touchStartRef = useRef<TouchPoint | null>(null);
-  const timeoutRef = useRef<number | null>(null);
-  const [lastTapTime, setLastTapTime] = useState<number>(0);
-  const executeAction = useGameActionHandler();
-
-  const handleTouchStart = (event: React.TouchEvent) => {
-    if (event.touches.length !== 1) return;
-
-    const touch = event.touches[0];
-    touchStartRef.current = {
-      x: touch.clientX,
-      y: touch.clientY,
-      time: Date.now(),
-    };
-  };
-
-  const handleTouchEnd = (event: React.TouchEvent) => {
-    if (!touchStartRef.current || event.changedTouches.length !== 1) return;
-
-    const touch = event.changedTouches[0];
-    const touchEnd = {
-      x: touch.clientX,
-      y: touch.clientY,
-      time: Date.now(),
-    };
-
-    const deltaX = touchEnd.x - touchStartRef.current.x;
-    const deltaY = touchEnd.y - touchStartRef.current.y;
-    const deltaTime = touchEnd.time - touchStartRef.current.time;
-    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-
-    // Reset touch start
-    touchStartRef.current = null;
-
-    // Check if it's a tap (short time, small distance)
-    if (deltaTime < tapTime && distance < minSwipeDistance) {
-      // Handle double tap detection
-      const now = Date.now();
-      const timeSinceLastTap = now - lastTapTime;
-
-      if (lastTapTime > 0 && timeSinceLastTap < doubleTapTime) {
-        // Double tap detected - clear any pending timeout and execute hard drop immediately
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current);
-          timeoutRef.current = null;
-        }
-        executeAction(drop, true);
-        setLastTapTime(0); // Reset to prevent triple tap
-      } else {
-        // First tap - just record the time, no action yet
-        setLastTapTime(now);
-        // Clear any existing timeout
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current);
-        }
-        // Schedule single tap action after double tap timeout
-        timeoutRef.current = window.setTimeout(() => {
-          setLastTapTime((prevTime) => {
-            // Only execute rotate if this is still the last tap
-            if (prevTime === now) {
-              executeAction(rotate);
-              return 0;
-            }
-            return prevTime;
-          });
-          timeoutRef.current = null;
-        }, doubleTapTime);
-      }
-      return;
-    }
-
-    // Check if swipe is within time limit and meets minimum distance
-    if (deltaTime > maxSwipeTime || distance < minSwipeDistance) {
-      return;
-    }
-
-    // Determine swipe direction
-    const isHorizontal = Math.abs(deltaX) > Math.abs(deltaY);
-
-    if (isHorizontal) {
-      // Horizontal swipe
-      if (deltaX > 0) {
-        // Swipe right
-        executeAction(moveRight);
-      } else {
-        // Swipe left
-        executeAction(moveLeft);
-      }
-    } else {
-      // Vertical swipe
-      if (deltaY > 0) {
-        // Swipe down
-        const isLongSwipe =
-          Math.abs(deltaY) > minSwipeDistance * GAME_CONSTANTS.TOUCH.LONG_SWIPE_MULTIPLIER;
-        if (isLongSwipe) {
-          // Long swipe down = hard drop
-          executeAction(drop, true);
-        } else {
-          // Short swipe down = soft drop
-          executeAction(moveDown);
-        }
-      }
-      // Ignore swipe up for now (could be used for rotate in future)
-    }
-  };
-
-  // Cleanup effect to prevent memory leaks
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-        timeoutRef.current = null;
-      }
-    };
-  }, []);
+  const detection = useTouchDetection(
+    {
+      onSwipe: actions.handleSwipe,
+      onTap: actions.handleTap,
+      onDoubleTap: actions.handleDoubleTap,
+    },
+    options,
+  );
 
   return {
-    handleTouchStart,
-    handleTouchEnd,
+    handleTouchStart: detection.handleTouchStart,
+    handleTouchEnd: detection.handleTouchEnd,
   };
 }
