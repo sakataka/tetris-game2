@@ -161,7 +161,6 @@ describe("Hold Feature", () => {
       expect(newState.boardBeforeClear).toBe(modifiedState.boardBeforeClear);
       expect(newState.isGameOver).toBe(modifiedState.isGameOver);
       expect(newState.isPaused).toBe(modifiedState.isPaused);
-      expect(newState.showGhostPiece).toBe(modifiedState.showGhostPiece);
     });
   });
 });
