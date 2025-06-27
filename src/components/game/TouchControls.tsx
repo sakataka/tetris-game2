@@ -1,7 +1,7 @@
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronsDown, RotateCw } from "lucide-react";
 import { useTransition } from "react";
 import { useGameStore } from "../../store/gameStore";
-import { Button } from "../ui/button";
+import { AnimatedButton } from "../ui/AnimatedButton";
 
 interface TouchControlsProps {
   className?: string;
@@ -31,7 +31,7 @@ export function TouchControls({ className }: TouchControlsProps) {
     <div className={`flex flex-col gap-2 ${className}`}>
       {/* Top row - Rotate and Hard Drop */}
       <div className="flex justify-center gap-4">
-        <Button
+        <AnimatedButton
           variant="outline"
           size="lg"
           onTouchStart={handleRotate}
@@ -39,10 +39,11 @@ export function TouchControls({ className }: TouchControlsProps) {
           disabled={isGameOver || isPaused}
           className="h-12 w-12 bg-slate-800/50 border-slate-600 hover:bg-slate-700/50 touch-manipulation"
           aria-label="Rotate piece"
+          animationDisabled={true}
         >
           <RotateCw className="h-6 w-6" />
-        </Button>
-        <Button
+        </AnimatedButton>
+        <AnimatedButton
           variant="outline"
           size="lg"
           onTouchStart={handleDrop}
@@ -50,14 +51,15 @@ export function TouchControls({ className }: TouchControlsProps) {
           disabled={isGameOver || isPaused}
           className="h-12 w-16 bg-slate-800/50 border-slate-600 hover:bg-slate-700/50 touch-manipulation"
           aria-label="Hard drop"
+          animationDisabled={true}
         >
           <ChevronsDown className="h-6 w-6" />
-        </Button>
+        </AnimatedButton>
       </div>
 
       {/* Middle row - Soft Drop */}
       <div className="flex justify-center">
-        <Button
+        <AnimatedButton
           variant="outline"
           size="lg"
           onTouchStart={handleMoveDown}
@@ -65,14 +67,15 @@ export function TouchControls({ className }: TouchControlsProps) {
           disabled={isGameOver || isPaused}
           className="h-12 w-12 bg-slate-800/50 border-slate-600 hover:bg-slate-700/50 touch-manipulation"
           aria-label="Soft drop"
+          animationDisabled={true}
         >
           <ChevronDown className="h-6 w-6" />
-        </Button>
+        </AnimatedButton>
       </div>
 
       {/* Bottom row - Left and Right */}
       <div className="flex justify-center gap-4">
-        <Button
+        <AnimatedButton
           variant="outline"
           size="lg"
           onTouchStart={handleMoveLeft}
@@ -80,10 +83,11 @@ export function TouchControls({ className }: TouchControlsProps) {
           disabled={isGameOver || isPaused}
           className="h-12 w-16 bg-slate-800/50 border-slate-600 hover:bg-slate-700/50 touch-manipulation"
           aria-label="Move left"
+          animationDisabled={true}
         >
           <ChevronLeft className="h-6 w-6" />
-        </Button>
-        <Button
+        </AnimatedButton>
+        <AnimatedButton
           variant="outline"
           size="lg"
           onTouchStart={handleMoveRight}
@@ -91,9 +95,10 @@ export function TouchControls({ className }: TouchControlsProps) {
           disabled={isGameOver || isPaused}
           className="h-12 w-16 bg-slate-800/50 border-slate-600 hover:bg-slate-700/50 touch-manipulation"
           aria-label="Move right"
+          animationDisabled={true}
         >
           <ChevronRight className="h-6 w-6" />
-        </Button>
+        </AnimatedButton>
       </div>
     </div>
   );

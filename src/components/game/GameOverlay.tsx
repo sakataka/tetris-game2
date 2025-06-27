@@ -1,8 +1,7 @@
-import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useGameStore } from "../../store/gameStore";
 import { MODAL_STYLES } from "../../utils/styles";
-import { Button } from "../ui/button";
+import { AnimatedButton } from "../ui/AnimatedButton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 
 export function GameOverlay() {
@@ -35,16 +34,14 @@ export function GameOverlay() {
 
           {isGameOver && (
             <div className="flex justify-center">
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button
-                  onClick={resetGame}
-                  variant="destructive"
-                  size="lg"
-                  className="bg-red-600 hover:bg-red-700 text-white"
-                >
-                  {t("game.newGame")}
-                </Button>
-              </motion.div>
+              <AnimatedButton
+                onClick={resetGame}
+                variant="destructive"
+                size="lg"
+                className="bg-red-600 hover:bg-red-700 text-white"
+              >
+                {t("game.newGame")}
+              </AnimatedButton>
             </div>
           )}
 
@@ -52,16 +49,14 @@ export function GameOverlay() {
             <div className="space-y-4">
               <p className="text-center text-gray-300">{t("game.resumeHint")}</p>
               <div className="flex justify-center">
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Button
-                    onClick={togglePause}
-                    variant="default"
-                    size="lg"
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
-                  >
-                    {t("game.resume")}
-                  </Button>
-                </motion.div>
+                <AnimatedButton
+                  onClick={togglePause}
+                  variant="default"
+                  size="lg"
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  {t("game.resume")}
+                </AnimatedButton>
               </div>
             </div>
           )}

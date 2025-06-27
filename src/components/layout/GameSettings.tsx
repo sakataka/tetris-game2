@@ -3,8 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSettingsStore } from "../../store/settingsStore";
 import { CONTROL_STYLES, MODAL_STYLES } from "../../utils/styles";
+import { AnimatedButton } from "../ui/AnimatedButton";
 import { Badge } from "../ui/badge";
-import { Button } from "../ui/button";
 import { Card } from "../ui/card";
 
 export function GameSettings() {
@@ -44,12 +44,12 @@ export function GameSettings() {
 
   return (
     <div className="absolute top-4 right-4 z-50" ref={dropdownRef}>
-      <Button onClick={() => setIsOpen(!isOpen)} className={CONTROL_STYLES.button}>
+      <AnimatedButton onClick={() => setIsOpen(!isOpen)} className={CONTROL_STYLES.button}>
         <div className="flex items-center gap-2">
           <Settings className="h-4 w-4" />
           <span>{t("game.settings.title")}</span>
         </div>
-      </Button>
+      </AnimatedButton>
 
       {isOpen && (
         <Card className={`absolute top-full right-0 mt-2 ${MODAL_STYLES.panel} min-w-[240px] p-0`}>
