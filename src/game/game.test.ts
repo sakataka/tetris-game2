@@ -1,12 +1,19 @@
 import { describe, expect, test } from "bun:test";
 import { BOARD_HEIGHT, BOARD_WIDTH } from "../utils/constants";
+import { createEmptyBoard } from "./board";
 import {
   calculateScore,
+  checkGameOver,
+  clearCompletedLines,
   createInitialGameState,
   hardDropTetromino,
   moveTetrominoBy,
+  placePieceOnBoard,
+  preserveBoardForAnimation,
   rotateTetrominoCW,
+  spawnNextPiece,
 } from "./game";
+import { createTetromino } from "./tetrominos";
 
 describe("Game Logic", () => {
   describe("createInitialGameState", () => {
@@ -146,6 +153,113 @@ describe("Game Logic", () => {
     test("should increase score with level", () => {
       expect(calculateScore(1, 2)).toBe(200);
       expect(calculateScore(4, 5)).toBe(4000);
+    });
+  });
+
+  describe("preserveBoardForAnimation", () => {
+    test("should return board when clearing lines exist", () => {
+      const board = createEmptyBoard();
+      const clearingLines = [0, 1];
+      const result = preserveBoardForAnimation(board, clearingLines);
+      expect(result).toBe(board);
+    });
+
+    test("should return null when no clearing lines", () => {
+      const board = createEmptyBoard();
+      const clearingLines: number[] = [];
+      const result = preserveBoardForAnimation(board, clearingLines);
+      expect(result).toBeNull();
+    });
+  });
+
+  describe("checkGameOver", () => {
+    test("should return false when piece can be placed", () => {
+      const board = createEmptyBoard();
+      const piece = createTetromino("T");
+      const result = checkGameOver(board, piece);
+      expect(result).toBe(false);
+    });
+
+    test("should return true when piece cannot be placed", () => {
+      const board = createEmptyBoard();
+      // Fill the top row to create collision
+      for (let x = 0; x < BOARD_WIDTH; x++) {
+        board[0][x] = 1;
+      }
+      const piece = createTetromino("T");
+      const result = checkGameOver(board, piece);
+      expect(result).toBe(true);
+    });
+  });
+
+  describe("spawnNextPiece", () => {
+    test("should create new piece and update bag", () => {
+      const nextPieceType = "T";
+      const pieceBag = ["I", "O", "S", "Z", "J", "L"];
+      const result = spawnNextPiece(nextPieceType, pieceBag);
+
+      expect(result.currentPiece.type).toBe("T");
+      expect(result.nextPiece).toBeDefined();
+      expect(["I", "O", "S", "Z", "J", "L"]).toContain(result.nextPiece);
+      expect(result.pieceBag).toBeDefined();
+      expect(Array.isArray(result.pieceBag)).toBe(true);
+    });
+
+    test("should handle empty bag correctly", () => {
+      const nextPieceType = "I";
+      const pieceBag: string[] = [];
+      const result = spawnNextPiece(nextPieceType, pieceBag);
+
+      expect(result.currentPiece.type).toBe("I");
+      expect(result.nextPiece).toBeDefined();
+      expect(result.pieceBag.length).toBeGreaterThan(0);
+    });
+  });
+
+  describe("clearCompletedLines", () => {
+    test("should not change score when no lines cleared", () => {
+      const board = createEmptyBoard();
+      const result = clearCompletedLines(board, 100, 5, 2);
+
+      expect(result.score).toBe(100);
+      expect(result.lines).toBe(5);
+      expect(result.level).toBe(1); // Level is calculated as Math.floor(lines / LINES_PER_LEVEL) + 1
+      expect(result.clearingLines).toEqual([]);
+    });
+
+    test("should update score and level when lines cleared", () => {
+      const board = createEmptyBoard();
+      // Fill bottom row to create a complete line
+      for (let x = 0; x < BOARD_WIDTH; x++) {
+        board[BOARD_HEIGHT - 1][x] = 1;
+      }
+
+      const result = clearCompletedLines(board, 0, 0, 1);
+
+      expect(result.score).toBe(100); // 1 line * level 1
+      expect(result.lines).toBe(1);
+      expect(result.level).toBe(1);
+      expect(result.clearingLines).toEqual([BOARD_HEIGHT - 1]);
+    });
+  });
+
+  describe("placePieceOnBoard", () => {
+    test("should place piece on board", () => {
+      const state = createInitialGameState();
+      const result = placePieceOnBoard(state);
+
+      expect(result.board).toBeDefined();
+      expect(result.placedPositions).toBeDefined();
+      expect(Array.isArray(result.placedPositions)).toBe(true);
+      expect(result.placedPositions.length).toBeGreaterThan(0);
+    });
+
+    test("should return empty positions when no current piece", () => {
+      const state = { ...createInitialGameState(), currentPiece: null };
+      const result = placePieceOnBoard(state);
+
+      expect(result.board).toBe(state.board);
+      expect(result.placedPositions).toEqual([]);
     });
   });
 });

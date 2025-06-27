@@ -175,13 +175,6 @@ type LineClearResult = {
   clearingLines: number[];
 };
 
-type PieceSpawnResult = {
-  currentPiece: Tetromino | null;
-  nextPiece: TetrominoTypeName;
-  isGameOver: boolean;
-  pieceBag: TetrominoTypeName[];
-};
-
 /**
  * Records the positions where a piece will be placed for animation purposes
  */
@@ -194,9 +187,9 @@ function recordPlacedPositions(currentPiece: Tetromino): Position[] {
 }
 
 /**
- * Locks a piece onto the board and returns the updated board and piece positions
+ * Places a piece onto the board and returns the updated board and piece positions
  */
-function lockPieceOnBoard(state: GameState): PieceLockResult {
+export function placePieceOnBoard(state: GameState): PieceLockResult {
   if (!state.currentPiece) {
     return { board: state.board, placedPositions: [] };
   }
@@ -216,7 +209,7 @@ function lockPieceOnBoard(state: GameState): PieceLockResult {
 /**
  * Handles line clearing logic and score calculation
  */
-function processLineClearing(
+export function clearCompletedLines(
   board: BoardMatrix,
   currentScore: number,
   currentLines: number,
@@ -237,60 +230,80 @@ function processLineClearing(
 }
 
 /**
- * Spawns a new piece and checks for game over conditions
+ * Preserves the board state before clearing for animation purposes
  */
-function spawnNextPiece(
+export function preserveBoardForAnimation(
   board: BoardMatrix,
+  clearingLines: number[],
+): BoardMatrix | null {
+  return clearingLines.length > 0 ? board : null;
+}
+
+/**
+ * Checks if the game is over by testing if a new piece can be placed
+ */
+export function checkGameOver(board: BoardMatrix, piece: Tetromino): boolean {
+  return !isValidPosition(board, piece.shape, piece.position);
+}
+
+/**
+ * Spawns a new piece and generates the next piece from the bag
+ */
+export function spawnNextPiece(
   nextPieceType: TetrominoTypeName,
   pieceBag: TetrominoTypeName[],
-): PieceSpawnResult {
+): { currentPiece: Tetromino; nextPiece: TetrominoTypeName; pieceBag: TetrominoTypeName[] } {
   const pieceBagManager = createPieceBagManager();
   pieceBagManager.setBag(pieceBag);
 
   const newPiece = createTetromino(nextPieceType);
-  const isGameOver = !isValidPosition(board, newPiece.shape, newPiece.position);
   const newNextPiece = pieceBagManager.getNextPiece();
 
   return {
-    currentPiece: isGameOver ? null : newPiece,
+    currentPiece: newPiece,
     nextPiece: newNextPiece,
-    isGameOver,
     pieceBag: pieceBagManager.getBag(),
   };
 }
 
 /**
- * Locks the current tetromino in place, clears complete lines, and spawns the next piece.
- * This is the core game state transition when a piece can no longer move down.
+ * Coordinates the piece locking process by calling specialized functions.
+ * This is the main coordinator function that handles the complete flow
+ * when a piece can no longer move down.
  */
 function lockCurrentTetromino(state: GameState): GameState {
   if (!state.currentPiece) return state;
 
-  // Step 1: Lock the piece onto the board
-  const { board: boardAfterLock, placedPositions } = lockPieceOnBoard(state);
+  const newState = state;
 
-  // Step 2: Process line clearing and scoring
+  // 1. Place the piece onto the board
+  const { board: boardAfterLock, placedPositions } = placePieceOnBoard(newState);
+
+  // 2. Preserve board state for animation purposes
   const {
     board: boardAfterClear,
     score,
     lines,
     level,
     clearingLines,
-  } = processLineClearing(boardAfterLock, state.score, state.lines, state.level);
+  } = clearCompletedLines(boardAfterLock, newState.score, newState.lines, newState.level);
 
-  // Step 3: Spawn the next piece
-  const { currentPiece, nextPiece, isGameOver, pieceBag } = spawnNextPiece(
-    boardAfterClear,
-    state.nextPiece,
-    state.pieceBag,
-  );
+  const boardBeforeClear = preserveBoardForAnimation(boardAfterLock, clearingLines);
 
-  // Preserve board state before clearing for animation purposes
-  const boardBeforeClear = clearingLines.length > 0 ? boardAfterLock : null;
+  // 3. Spawn the next piece
+  const {
+    currentPiece: newPiece,
+    nextPiece,
+    pieceBag,
+  } = spawnNextPiece(newState.nextPiece, newState.pieceBag);
 
-  // Step 4: Update ghost position and return the new state
+  // 4. Check for game over
+  const isGameOver = checkGameOver(boardAfterClear, newPiece);
+  const currentPiece = isGameOver ? null : newPiece;
+
+  // 5. Update ghost position and return the new state
   return updateGhostPosition({
-    ...state,
+    ...newState,
     board: boardAfterClear,
     boardBeforeClear,
     currentPiece,
