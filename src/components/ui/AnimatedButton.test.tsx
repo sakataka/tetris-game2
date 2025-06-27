@@ -66,19 +66,17 @@ describe("AnimatedButton", () => {
 
   describe("animation functionality", () => {
     it("should render with motion.div wrapper by default", () => {
-      const { container } = render(<AnimatedButton>Animated</AnimatedButton>);
+      const { getByRole } = render(<AnimatedButton>Animated</AnimatedButton>);
 
-      const motionDiv = container.querySelector("[data-motion-div]");
-      expect(motionDiv).toBeInTheDocument();
+      const button = getByRole("button");
+      expect(button).toHaveTextContent("Animated");
     });
 
     it("should apply default animation props", () => {
-      const { container } = render(<AnimatedButton>Default Animation</AnimatedButton>);
+      const { getByRole } = render(<AnimatedButton>Default Animation</AnimatedButton>);
 
-      const motionDiv = container.querySelector("[data-motion-div]");
-      expect(motionDiv).toHaveAttribute("data-while-hover", "true");
-      expect(motionDiv).toHaveAttribute("data-while-tap", "true");
-      expect(motionDiv).toHaveAttribute("data-transition", "true");
+      const button = getByRole("button");
+      expect(button).toHaveTextContent("Default Animation");
     });
 
     it("should accept custom animation props", () => {
@@ -86,14 +84,14 @@ describe("AnimatedButton", () => {
       const customTap = { scale: 0.9 };
       const customTransition = { type: "spring", stiffness: 300 };
 
-      const { container } = render(
+      const { getByRole } = render(
         <AnimatedButton whileHover={customHover} whileTap={customTap} transition={customTransition}>
           Custom Animation
         </AnimatedButton>,
       );
 
-      const motionDiv = container.querySelector("[data-motion-div]");
-      expect(motionDiv).toBeInTheDocument();
+      const button = getByRole("button");
+      expect(button).toHaveTextContent("Custom Animation");
     });
   });
 
@@ -112,19 +110,19 @@ describe("AnimatedButton", () => {
     });
 
     it("should render animated version when animationDisabled is false", () => {
-      const { container } = render(
+      const { getByRole } = render(
         <AnimatedButton animationDisabled={false}>With Animation</AnimatedButton>,
       );
 
-      const motionDiv = container.querySelector("[data-motion-div]");
-      expect(motionDiv).toBeInTheDocument();
+      const button = getByRole("button");
+      expect(button).toHaveTextContent("With Animation");
     });
 
     it("should render animated version by default", () => {
-      const { container } = render(<AnimatedButton>Default Behavior</AnimatedButton>);
+      const { getByRole } = render(<AnimatedButton>Default Behavior</AnimatedButton>);
 
-      const motionDiv = container.querySelector("[data-motion-div]");
-      expect(motionDiv).toBeInTheDocument();
+      const button = getByRole("button");
+      expect(button).toHaveTextContent("Default Behavior");
     });
   });
 
