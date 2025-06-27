@@ -61,22 +61,22 @@ A fully-featured Tetris game built with modern web technologies.
 
 ### Build Tools & Runtime
 - **Bun**: 1.2.17 — Fast package manager and test runner
-- **Rolldown-Vite**: 7.0.2 — Rust-powered bundler for optimal performance
+- **Rolldown-Vite**: 7.0.3 — Rust-powered bundler for optimal performance
 
 ### UI & Styling
 - **Tailwind CSS**: 4.1.11 — Utility-first CSS framework via Vite plugin
-- **Framer Motion**: 12.19.1 — Production-ready animation library
+- **Framer Motion**: 12.19.2 — Production-ready animation library
 - **Radix UI**: Dialog 1.1.14, Slot 1.2.3 — Headless UI components
 - **class-variance-authority**: 0.7.1 — Type-safe component variants
 - **clsx + tailwind-merge**: 2.1.1/3.3.1 — Intelligent class name utilities
-- **Lucide React**: 0.523.0 — Beautiful, customizable icon library
+- **Lucide React**: 0.524.0 — Beautiful, customizable icon library
 
 ### Core Features
 - **react-hotkeys-hook**: 5.1.0 — Declarative keyboard shortcut handling
 - **i18next + react-i18next**: 25.2.1/15.5.3 — Robust internationalization
 
 ### Development & Quality Assurance
-- **Biome**: 2.0.5 — Fast linter and formatter in Rust
+- **Biome**: 2.0.6 — Fast linter and formatter in Rust
 - **Bun Test**: 1.2.17 — Native test runner with Jest compatibility
 - **happy-dom**: 18.0.1 — Lightweight DOM environment for testing
 - **Testing Library**: React 16.3.0, DOM 10.4.0, jest-dom 6.6.3 — Simple, intuitive component testing
@@ -88,7 +88,9 @@ A fully-featured Tetris game built with modern web technologies.
 
 ### State Management
 Built on **Zustand** for clean, scalable state management:
-- Centralized game state using pure function reducers
+- **GameStore**: Centralized game state using pure function reducers
+- **SettingsStore**: User preferences (language, ghost piece visibility) with persistence
+- **HighScoreStore**: Score tracking and leaderboard management
 - Performance-optimized selectors with automatic memoization  
 - Immutable updates ensuring predictable state transitions
 
@@ -108,23 +110,31 @@ interface GameState {
   isPaused: boolean;
   placedPositions: Position[];
   clearingLines: number[];
-  animationTriggerKey: number;
+  animationTriggerKey: AnimationTriggerKey;
   ghostPosition: Position | null;
-  showGhostPiece: boolean;
   pieceBag: TetrominoTypeName[]; // 7-Bag system state
 }
 ```
 
-### Tetromino Type Definition (Discriminated Union)
+### Core Type Definitions
 ```typescript
-type TetrominoType =
-  | { type: "I"; colorIndex: 1 }
-  | { type: "O"; colorIndex: 2 }
-  | { type: "T"; colorIndex: 3 }
-  | { type: "S"; colorIndex: 4 }
-  | { type: "Z"; colorIndex: 5 }
-  | { type: "J"; colorIndex: 6 }
-  | { type: "L"; colorIndex: 7 };
+// Union type for tetromino piece names
+export type TetrominoTypeName = "I" | "O" | "T" | "S" | "Z" | "J" | "L";
+
+// Tetromino piece with position and rotation state
+export interface Tetromino {
+  type: TetrominoTypeName;
+  position: Position;
+  rotation: RotationState; // 0=spawn, 1=right, 2=180, 3=left
+  shape: CellValue[][];
+}
+
+// Settings managed separately in SettingsStore
+interface GameSettings {
+  language: "ja" | "en";
+  volume: number;
+  showGhostPiece: boolean; // Ghost piece visibility toggle
+}
 ```
 
 ### Project Structure
@@ -285,12 +295,16 @@ bun run preview                # Preview build output
 # Testing & Quality
 bun test                       # Run all tests
 bun test --watch               # Watch mode
+bun run test:fast              # Fast subset tests (game logic & hooks)
+bun run test:components        # Component-specific tests
 bun run test:ci                # CI tests
 bun run lint                   # Run Biome lint
 bun run format                 # Run Biome format
 bun run typecheck              # TypeScript type checking
 bun run knip                   # Dead code detection
 bun run check                  # Type check + dead code detection
+bun run ci                     # Full CI pipeline (format, lint, typecheck, test, build)
+bun run prepare                # Setup Git hooks with Lefthook
 
 # Package Management
 bun install                    # Install dependencies
