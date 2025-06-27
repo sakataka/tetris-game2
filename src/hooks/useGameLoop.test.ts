@@ -19,13 +19,16 @@ mock.module("../game/game", () => ({
 }));
 
 mock.module("../store/gameStore", () => ({
-  useGameStore: mock(() => ({
-    moveDown: mock(),
-    isPaused: false,
-    isGameOver: false,
-    level: 1,
-    clearAnimationStates: mock(),
-  })),
+  useGameStore: mock((selector) => {
+    const state = {
+      moveDown: mock(),
+      isPaused: false,
+      isGameOver: false,
+      level: 1,
+      clearAnimationStates: mock(),
+    };
+    return selector ? selector(state) : state;
+  }),
 }));
 
 // Mock React hooks
@@ -44,13 +47,16 @@ describe("useGameLoop", () => {
 
     // Setup default mock implementations
     getGameSpeed.mockReturnValue(1000);
-    useGameStore.mockReturnValue({
-      moveDown: mockMoveDown,
-      isPaused: false,
-      isGameOver: false,
-      level: 1,
-      clearAnimationStates: mockClearAnimationStates,
-    } as MockGameStoreSubset);
+    useGameStore.mockImplementation((selector) => {
+      const state = {
+        moveDown: mockMoveDown,
+        isPaused: false,
+        isGameOver: false,
+        level: 1,
+        clearAnimationStates: mockClearAnimationStates,
+      };
+      return selector ? selector(state) : state;
+    });
 
     // Mock requestAnimationFrame
     global.requestAnimationFrame = mock((callback) => {
@@ -67,13 +73,16 @@ describe("useGameLoop", () => {
   });
 
   test("should not start game loop when paused", () => {
-    useGameStore.mockReturnValue({
-      moveDown: mockMoveDown,
-      isPaused: true,
-      isGameOver: false,
-      level: 1,
-      clearAnimationStates: mockClearAnimationStates,
-    } as MockGameStoreSubset);
+    useGameStore.mockImplementation((selector) => {
+      const state = {
+        moveDown: mockMoveDown,
+        isPaused: true,
+        isGameOver: false,
+        level: 1,
+        clearAnimationStates: mockClearAnimationStates,
+      };
+      return selector ? selector(state) : state;
+    });
 
     renderHook(() => useGameLoop());
 
@@ -81,13 +90,16 @@ describe("useGameLoop", () => {
   });
 
   test("should not start game loop when game is over", () => {
-    useGameStore.mockReturnValue({
-      moveDown: mockMoveDown,
-      isPaused: false,
-      isGameOver: true,
-      level: 1,
-      clearAnimationStates: mockClearAnimationStates,
-    } as MockGameStoreSubset);
+    useGameStore.mockImplementation((selector) => {
+      const state = {
+        moveDown: mockMoveDown,
+        isPaused: false,
+        isGameOver: true,
+        level: 1,
+        clearAnimationStates: mockClearAnimationStates,
+      };
+      return selector ? selector(state) : state;
+    });
 
     renderHook(() => useGameLoop());
 
@@ -107,13 +119,16 @@ describe("useGameLoop", () => {
 
   test("should use game speed based on level", () => {
     const testLevel = 5;
-    useGameStore.mockReturnValue({
-      moveDown: mockMoveDown,
-      isPaused: false,
-      isGameOver: false,
-      level: testLevel,
-      clearAnimationStates: mockClearAnimationStates,
-    } as MockGameStoreSubset);
+    useGameStore.mockImplementation((selector) => {
+      const state = {
+        moveDown: mockMoveDown,
+        isPaused: false,
+        isGameOver: false,
+        level: testLevel,
+        clearAnimationStates: mockClearAnimationStates,
+      };
+      return selector ? selector(state) : state;
+    });
 
     renderHook(() => useGameLoop());
 
@@ -135,13 +150,16 @@ describe("useGameLoop", () => {
     const initialCallCount = requestAnimationFrame.mock.calls.length;
 
     // Change level to trigger re-render
-    useGameStore.mockReturnValue({
-      moveDown: mockMoveDown,
-      isPaused: false,
-      isGameOver: false,
-      level: 2,
-      clearAnimationStates: mockClearAnimationStates,
-    } as MockGameStoreSubset);
+    useGameStore.mockImplementation((selector) => {
+      const state = {
+        moveDown: mockMoveDown,
+        isPaused: false,
+        isGameOver: false,
+        level: 2,
+        clearAnimationStates: mockClearAnimationStates,
+      };
+      return selector ? selector(state) : state;
+    });
 
     rerender();
 
@@ -150,13 +168,16 @@ describe("useGameLoop", () => {
 
   test("should call getGameSpeed with correct level", () => {
     const testLevel = 3;
-    useGameStore.mockReturnValue({
-      moveDown: mockMoveDown,
-      isPaused: false,
-      isGameOver: false,
-      level: testLevel,
-      clearAnimationStates: mockClearAnimationStates,
-    } as MockGameStoreSubset);
+    useGameStore.mockImplementation((selector) => {
+      const state = {
+        moveDown: mockMoveDown,
+        isPaused: false,
+        isGameOver: false,
+        level: testLevel,
+        clearAnimationStates: mockClearAnimationStates,
+      };
+      return selector ? selector(state) : state;
+    });
 
     renderHook(() => useGameLoop());
 
