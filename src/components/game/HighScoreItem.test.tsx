@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test";
 import { render } from "@testing-library/react";
-import type { HighScore } from "../../utils/localStorage";
+import type { HighScore } from "../../types/storage";
 import { HighScoreItem } from "./HighScoreItem";
 
 describe("HighScoreItem", () => {

@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { GameSettings } from "../utils/localStorage";
+import type { GameSettings } from "../types/storage";
+import { GAME_CONSTANTS } from "../utils/gameConstants";
 
 interface SettingsStore extends GameSettings {
   setLanguage: (language: "ja" | "en") => void;
@@ -10,7 +11,7 @@ interface SettingsStore extends GameSettings {
 
 const DEFAULT_SETTINGS: GameSettings = {
   language: "ja",
-  volume: 0.5,
+  volume: GAME_CONSTANTS.UI.DEFAULT_VOLUME,
   showGhostPiece: true,
 };
 

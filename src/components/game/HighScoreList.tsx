@@ -1,6 +1,6 @@
 import { Trophy } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import type { HighScore } from "../../utils/localStorage";
+import type { HighScore } from "../../types/storage";
 import { CARD_STYLES } from "../../utils/styles";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { HighScoreItem } from "./HighScoreItem";

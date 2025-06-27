@@ -1,5 +1,5 @@
 import { Calendar, Target, TrendingUp } from "lucide-react";
-import type { HighScore } from "../../utils/localStorage";
+import type { HighScore } from "../../types/storage";
 import { CONTROL_STYLES } from "../../utils/styles";
 import { Badge } from "../ui/badge";
 
