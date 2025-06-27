@@ -1,5 +1,5 @@
 import { describe, expect, it, mock } from "bun:test";
-import { render } from "@testing-library/react";
+import { fireEvent, render } from "@testing-library/react";
 import { AnimatedButton } from "./AnimatedButton";
 
 // Mock framer-motion to avoid animation complexities in tests
@@ -216,9 +216,8 @@ describe("AnimatedButton", () => {
 
       const button = getByRole("button");
 
-      // Simulate touch start using dispatchEvent
-      const touchEvent = new Event("touchstart", { bubbles: true });
-      button.dispatchEvent(touchEvent);
+      // Simulate touch start using fireEvent
+      fireEvent.touchStart(button);
 
       expect(handleTouchStart).toHaveBeenCalledTimes(1);
     });
@@ -235,9 +234,8 @@ describe("AnimatedButton", () => {
 
       const button = getByRole("button");
 
-      // Simulate mouse over
-      const mouseOverEvent = new Event("mouseover", { bubbles: true });
-      button.dispatchEvent(mouseOverEvent);
+      // Simulate mouse over using fireEvent
+      fireEvent.mouseOver(button);
       expect(handleMouseOver).toHaveBeenCalledTimes(1);
 
       // Simulate click
@@ -262,7 +260,7 @@ describe("AnimatedButton", () => {
     });
 
     it("should render with mixed content", () => {
-      const { getByText } = render(
+      const { getByRole, getByText } = render(
         <AnimatedButton>
           Some text
           <strong>Bold text</strong>
@@ -270,9 +268,9 @@ describe("AnimatedButton", () => {
         </AnimatedButton>,
       );
 
-      expect(getByText("Some text")).toBeInTheDocument();
+      const button = getByRole("button");
+      expect(button).toHaveTextContent("Some textBold text more text");
       expect(getByText("Bold text")).toBeInTheDocument();
-      expect(getByText(" more text")).toBeInTheDocument();
     });
   });
 });
