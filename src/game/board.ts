@@ -1,4 +1,4 @@
-import type { BoardMatrix, Position } from "../types/game";
+import type { BoardMatrix, CellValue, Position } from "../types/game";
 import { BOARD_HEIGHT, BOARD_WIDTH } from "../utils/gameConstants";
 
 export function createEmptyBoard(): BoardMatrix {
@@ -55,9 +55,9 @@ export function forEachPieceCell(
 
 export function placeTetromino(
   board: BoardMatrix,
-  shape: number[][],
+  shape: CellValue[][],
   position: Position,
-  colorIndex: number,
+  colorIndex: CellValue,
 ): BoardMatrix {
   const newBoard = board.map((row) => [...row]) as BoardMatrix;
 

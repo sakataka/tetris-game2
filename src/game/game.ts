@@ -4,10 +4,10 @@ import {
   DROP_POSITION_MAX_ITERATIONS,
   INITIAL_DROP_SPEED_MS,
   LINES_PER_LEVEL,
-  MAX_ROTATION_STATE,
   MIN_DROP_SPEED_MS,
   SPEED_DECREASE_PER_LEVEL,
 } from "../utils/gameConstants";
+import { normalizeRotationState } from "../utils/typeGuards";
 import {
   clearLines,
   createEmptyBoard,
@@ -80,7 +80,7 @@ export function rotateTetrominoCW(state: GameState): GameState {
   const currentPiece = state.currentPiece;
   const rotatedShape = rotateTetromino(currentPiece.shape);
   const fromRotation = currentPiece.rotation;
-  const toRotation = (fromRotation + 1) % (MAX_ROTATION_STATE + 1);
+  const toRotation = normalizeRotationState(fromRotation + 1);
 
   // Try rotation with wall kick compensation
   const newPosition = tryRotateWithWallKick(
@@ -102,7 +102,8 @@ export function rotateTetrominoCW(state: GameState): GameState {
         rotation: toRotation,
         position: newPosition,
       },
-      animationTriggerKey: state.animationTriggerKey + 1,
+      animationTriggerKey:
+        typeof state.animationTriggerKey === "number" ? state.animationTriggerKey + 1 : 1,
     });
   }
 

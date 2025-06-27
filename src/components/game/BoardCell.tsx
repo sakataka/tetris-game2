@@ -1,19 +1,20 @@
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useCellAnimation } from "../../hooks/useCellAnimation";
+import type { AnimationTriggerKey, CellValue } from "../../types/game";
 import { getCellColor } from "../../utils/colors";
 import { BOARD_WIDTH } from "../../utils/gameConstants";
 import { BOARD_STYLES } from "../../utils/styles";
 
 interface BoardCellProps {
-  cellValue: number;
+  cellValue: CellValue;
   x: number;
   y: number;
   isCurrentPiece: boolean;
   isGhostPiece: boolean;
   isPlacedPiece: boolean;
   isClearingLine: boolean;
-  animationTriggerKey: string | number;
+  animationTriggerKey: AnimationTriggerKey;
   onAnimationComplete: () => void;
 }
 

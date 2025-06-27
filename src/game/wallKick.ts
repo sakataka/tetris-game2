@@ -1,4 +1,4 @@
-import type { Position, TetrominoTypeName } from "../types/game";
+import type { CellValue, Position, RotationState, TetrominoTypeName } from "../types/game";
 
 /**
  * Type-safe rotation transition identifiers
@@ -24,7 +24,7 @@ type WallKickData = {
 /**
  * Creates a type-safe rotation transition key
  */
-function createRotationTransition(from: number, to: number): RotationTransition {
+function createRotationTransition(from: RotationState, to: RotationState): RotationTransition {
   return `${from}->${to}` as RotationTransition;
 }
 
@@ -124,8 +124,8 @@ const I_WALL_KICK_DATA: WallKickData = {
  */
 export function getWallKickOffsets(
   pieceType: TetrominoTypeName,
-  fromRotation: number,
-  toRotation: number,
+  fromRotation: RotationState,
+  toRotation: RotationState,
 ): Position[] {
   // O piece doesn't need wall kicks (2x2 square)
   if (pieceType === "O") {
@@ -162,19 +162,19 @@ export function applyWallKickOffset(position: Position, offset: Position): Posit
  * @param rotatedShape - Shape after rotation
  * @param position - Current piece position
  * @param pieceType - Type of tetromino piece
- * @param fromRotation - Current rotation state (0-3)
- * @param toRotation - Target rotation state (0-3)
+ * @param fromRotation - Current rotation state
+ * @param toRotation - Target rotation state
  * @param isValidPositionFn - Function to check if position is valid
  * @returns New position if successful, null if rotation is impossible
  */
 export function tryRotateWithWallKick(
-  board: number[][],
-  rotatedShape: number[][],
+  board: CellValue[][],
+  rotatedShape: CellValue[][],
   position: Position,
   pieceType: TetrominoTypeName,
-  fromRotation: number,
-  toRotation: number,
-  isValidPositionFn: (board: number[][], shape: number[][], position: Position) => boolean,
+  fromRotation: RotationState,
+  toRotation: RotationState,
+  isValidPositionFn: (board: CellValue[][], shape: CellValue[][], position: Position) => boolean,
 ): Position | null {
   const wallKickOffsets = getWallKickOffsets(pieceType, fromRotation, toRotation);
 

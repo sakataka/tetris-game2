@@ -1,5 +1,6 @@
-import type { Tetromino, TetrominoTypeName } from "../types/game";
+import type { CellValue, Tetromino, TetrominoTypeName } from "../types/game";
 import { BOARD_WIDTH } from "../utils/gameConstants";
+import { isValidTetrominoType } from "../utils/typeGuards";
 
 // Type-safe color index mapping
 export const TETROMINO_COLOR_MAP = {
@@ -10,13 +11,23 @@ export const TETROMINO_COLOR_MAP = {
   Z: 5,
   J: 6,
   L: 7,
-} as const satisfies Record<TetrominoTypeName, number>;
+} as const satisfies Record<TetrominoTypeName, CellValue>;
 
-export function getTetrominoColorIndex(type: TetrominoTypeName): number {
+export function getTetrominoColorIndex(type: TetrominoTypeName): CellValue {
   return TETROMINO_COLOR_MAP[type];
 }
 
-export const TETROMINOS: Record<TetrominoTypeName, number[][]> = {
+/**
+ * Safely gets tetromino shape with validation
+ */
+export function getTetrominoShapeSafe(type: string): CellValue[][] {
+  if (!isValidTetrominoType(type)) {
+    throw new Error(`Invalid tetromino type: ${type}`);
+  }
+  return getTetrominoShape(type);
+}
+
+export const TETROMINOS: Record<TetrominoTypeName, CellValue[][]> = {
   I: [
     [0, 0, 0, 0],
     [1, 1, 1, 1],
@@ -54,11 +65,11 @@ export const TETROMINOS: Record<TetrominoTypeName, number[][]> = {
   ],
 };
 
-export function getTetrominoShape(type: TetrominoTypeName): number[][] {
+export function getTetrominoShape(type: TetrominoTypeName): CellValue[][] {
   return TETROMINOS[type].map((row) => [...row]);
 }
 
-export function rotateTetromino(shape: number[][]): number[][] {
+export function rotateTetromino(shape: CellValue[][]): CellValue[][] {
   const n = shape.length;
   const rotated = Array(n)
     .fill(null)
