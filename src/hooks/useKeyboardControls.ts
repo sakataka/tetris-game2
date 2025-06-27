@@ -1,7 +1,7 @@
 import { useRef, useTransition } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useGameStore } from "../store/gameStore";
-import { createExecuteGameAction } from "./executeGameAction";
+import { useGameActionHandler } from "./useGameActionHandler";
 
 export function useKeyboardControls() {
   const {
@@ -13,24 +13,23 @@ export function useKeyboardControls() {
     holdPiece,
     togglePause,
     resetGame,
-    isPaused,
     isGameOver,
   } = useGameStore();
   const lastPauseTime = useRef(0);
   const [, startTransition] = useTransition();
-  const executeGameAction = createExecuteGameAction(isGameOver, isPaused, startTransition);
+  const executeAction = useGameActionHandler();
 
   // Movement controls (with key repeat)
-  useHotkeys("arrowleft", () => executeGameAction(moveLeft), { keydown: true });
-  useHotkeys("arrowright", () => executeGameAction(moveRight), { keydown: true });
-  useHotkeys("arrowdown", () => executeGameAction(moveDown), { keydown: true });
+  useHotkeys("arrowleft", () => executeAction(moveLeft), { keydown: true });
+  useHotkeys("arrowright", () => executeAction(moveRight), { keydown: true });
+  useHotkeys("arrowdown", () => executeAction(moveDown), { keydown: true });
 
   // Rotation (single action with preventDefault)
   useHotkeys(
     "arrowup",
     (e) => {
       e.preventDefault();
-      executeGameAction(rotate);
+      executeAction(rotate);
     },
     { keydown: true },
   );
@@ -40,7 +39,7 @@ export function useKeyboardControls() {
     "space",
     (e) => {
       e.preventDefault();
-      executeGameAction(drop, false);
+      executeAction(drop, true);
     },
     { keydown: true },
   );
@@ -50,7 +49,7 @@ export function useKeyboardControls() {
     "shift",
     (e) => {
       e.preventDefault();
-      executeGameAction(holdPiece);
+      executeAction(holdPiece);
     },
     { keydown: true },
   );

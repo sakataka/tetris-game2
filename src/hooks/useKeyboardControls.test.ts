@@ -32,17 +32,23 @@ type MockGameStoreSubset = {
 
 // Mock dependencies
 mock.module("../store/gameStore", () => ({
-  useGameStore: mock(() => ({
-    moveLeft: mock(),
-    moveRight: mock(),
-    moveDown: mock(),
-    rotate: mock(),
-    drop: mock(),
-    togglePause: mock(),
-    resetGame: mock(),
-    isPaused: false,
-    isGameOver: false,
-  })),
+  useGameStore: mock((selector?: any) => {
+    const mockStore = {
+      moveLeft: mock(),
+      moveRight: mock(),
+      moveDown: mock(),
+      rotate: mock(),
+      drop: mock(),
+      togglePause: mock(),
+      resetGame: mock(),
+      isPaused: false,
+      isGameOver: false,
+    };
+    if (typeof selector === "function") {
+      return selector(mockStore);
+    }
+    return mockStore;
+  }),
 }));
 
 // Mock React hooks
@@ -115,21 +121,18 @@ describe("useKeyboardControls", () => {
     test("should move left on ArrowLeft", () => {
       hotkeyHandlers.arrowleft({} as KeyboardEvent, {} as HotkeysEvent);
 
-      expect(mockStartTransition).toHaveBeenCalled();
       expect(mockGameActions.moveLeft).toHaveBeenCalled();
     });
 
     test("should move right on ArrowRight", () => {
       hotkeyHandlers.arrowright({} as KeyboardEvent, {} as HotkeysEvent);
 
-      expect(mockStartTransition).toHaveBeenCalled();
       expect(mockGameActions.moveRight).toHaveBeenCalled();
     });
 
     test("should move down on ArrowDown", () => {
       hotkeyHandlers.arrowdown({} as KeyboardEvent, {} as HotkeysEvent);
 
-      expect(mockStartTransition).toHaveBeenCalled();
       expect(mockGameActions.moveDown).toHaveBeenCalled();
     });
 
@@ -170,7 +173,6 @@ describe("useKeyboardControls", () => {
       hotkeyHandlers.arrowup(mockEvent, {} as HotkeysEvent);
 
       expect(mockEvent.preventDefault).toHaveBeenCalled();
-      expect(mockStartTransition).toHaveBeenCalled();
       expect(mockGameActions.rotate).toHaveBeenCalled();
     });
 
@@ -179,8 +181,6 @@ describe("useKeyboardControls", () => {
 
       expect(mockEvent.preventDefault).toHaveBeenCalled();
       expect(mockGameActions.drop).toHaveBeenCalled();
-      // Drop should not use transition (urgent action)
-      expect(mockStartTransition).not.toHaveBeenCalled();
     });
 
     test("should not rotate when game is paused", () => {

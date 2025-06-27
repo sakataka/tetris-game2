@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useGameStore } from "../store/gameStore";
-import { createExecuteGameAction } from "./executeGameAction";
+import { useGameActionHandler } from "./useGameActionHandler";
 
 interface TouchPoint {
   x: number;
@@ -18,13 +18,12 @@ interface TouchGestureOptions {
 export function useTouchGestures(options: TouchGestureOptions = {}) {
   const { minSwipeDistance = 30, maxSwipeTime = 500, tapTime = 200, doubleTapTime = 300 } = options;
 
-  const { moveLeft, moveRight, moveDown, rotate, drop, isPaused, isGameOver } = useGameStore();
+  const { moveLeft, moveRight, moveDown, rotate, drop } = useGameStore();
 
-  const [, startTransition] = useTransition();
   const touchStartRef = useRef<TouchPoint | null>(null);
   const timeoutRef = useRef<number | null>(null);
   const [lastTapTime, setLastTapTime] = useState<number>(0);
-  const executeGameAction = createExecuteGameAction(isGameOver, isPaused, startTransition);
+  const executeAction = useGameActionHandler();
 
   const handleTouchStart = (event: React.TouchEvent) => {
     if (event.touches.length !== 1) return;
@@ -67,7 +66,7 @@ export function useTouchGestures(options: TouchGestureOptions = {}) {
           clearTimeout(timeoutRef.current);
           timeoutRef.current = null;
         }
-        executeGameAction(drop, false);
+        executeAction(drop, true);
         setLastTapTime(0); // Reset to prevent triple tap
       } else {
         // First tap - just record the time, no action yet
@@ -81,7 +80,7 @@ export function useTouchGestures(options: TouchGestureOptions = {}) {
           setLastTapTime((prevTime) => {
             // Only execute rotate if this is still the last tap
             if (prevTime === now) {
-              executeGameAction(rotate);
+              executeAction(rotate);
               return 0;
             }
             return prevTime;
@@ -104,10 +103,10 @@ export function useTouchGestures(options: TouchGestureOptions = {}) {
       // Horizontal swipe
       if (deltaX > 0) {
         // Swipe right
-        executeGameAction(moveRight);
+        executeAction(moveRight);
       } else {
         // Swipe left
-        executeGameAction(moveLeft);
+        executeAction(moveLeft);
       }
     } else {
       // Vertical swipe
@@ -116,10 +115,10 @@ export function useTouchGestures(options: TouchGestureOptions = {}) {
         const isLongSwipe = Math.abs(deltaY) > minSwipeDistance * 2;
         if (isLongSwipe) {
           // Long swipe down = hard drop
-          executeGameAction(drop, false);
+          executeAction(drop, true);
         } else {
           // Short swipe down = soft drop
-          executeGameAction(moveDown);
+          executeAction(moveDown);
         }
       }
       // Ignore swipe up for now (could be used for rotate in future)

@@ -14,7 +14,12 @@ const mockGameStore = {
 };
 
 mock.module("../store/gameStore", () => ({
-  useGameStore: () => mockGameStore,
+  useGameStore: (selector?: any) => {
+    if (typeof selector === "function") {
+      return selector(mockGameStore);
+    }
+    return mockGameStore;
+  },
 }));
 
 describe("useTouchGestures", () => {

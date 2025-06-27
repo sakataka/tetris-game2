@@ -1,6 +1,7 @@
-import { useEffect, useRef, useTransition } from "react";
+import { useEffect, useRef } from "react";
 import { getGameSpeed } from "../game/game";
 import { useGameStore } from "../store/gameStore";
+import { useGameActionHandler } from "./useGameActionHandler";
 
 /**
  * Game loop implementation using requestAnimationFrame
@@ -15,7 +16,7 @@ export function useGameLoop() {
   const { moveDown, isPaused, isGameOver, level } = useGameStore();
   const lastUpdateTime = useRef(0);
   const animationIdRef = useRef<number | null>(null);
-  const [, startTransition] = useTransition();
+  const executeAction = useGameActionHandler();
 
   useEffect(() => {
     if (isPaused || isGameOver) return;
@@ -30,10 +31,8 @@ export function useGameLoop() {
       }
 
       if (currentTime - lastUpdateTime.current >= gameSpeed) {
-        // Use transition for non-urgent game state updates
-        startTransition(() => {
-          moveDown();
-        });
+        // Use executeAction which handles game state checks and transitions
+        executeAction(moveDown);
         lastUpdateTime.current = currentTime;
       }
 
@@ -51,5 +50,5 @@ export function useGameLoop() {
         animationIdRef.current = null;
       }
     };
-  }, [moveDown, isPaused, isGameOver, level]);
+  }, [moveDown, isPaused, isGameOver, level, executeAction]);
 }
