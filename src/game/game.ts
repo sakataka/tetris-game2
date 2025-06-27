@@ -59,25 +59,18 @@ export function moveTetrominoBy(state: GameState, dx: number, dy: number): GameS
   if (isValidPosition(state.board, state.currentPiece.shape, newPosition)) {
     return updateGhostPosition({
       ...state,
-      currentPiece: {
-        ...state.currentPiece,
-        position: newPosition,
-      },
+      currentPiece: { ...state.currentPiece, position: newPosition },
     });
   }
 
   // If moving down failed, lock the piece
-  if (dy > 0) {
-    return lockCurrentTetromino(state);
-  }
-
-  return state;
+  return dy > 0 ? lockCurrentTetromino(state) : state;
 }
 
 export function rotateTetrominoCW(state: GameState): GameState {
   if (!state.currentPiece || state.isGameOver || state.isPaused) return state;
 
-  const currentPiece = state.currentPiece;
+  const { currentPiece } = state;
   const rotatedShape = rotateTetromino(currentPiece.shape);
   const fromRotation = currentPiece.rotation;
   const toRotation = normalizeRotationState(fromRotation + 1);
@@ -93,26 +86,24 @@ export function rotateTetrominoCW(state: GameState): GameState {
     isValidPosition,
   );
 
-  if (newPosition) {
-    return updateGhostPosition({
-      ...state,
-      currentPiece: {
-        ...currentPiece,
-        shape: rotatedShape,
-        rotation: toRotation,
-        position: newPosition,
-      },
-      animationTriggerKey:
-        typeof state.animationTriggerKey === "number" ? state.animationTriggerKey + 1 : 1,
-    });
-  }
-
-  return state;
+  return newPosition
+    ? updateGhostPosition({
+        ...state,
+        currentPiece: {
+          ...currentPiece,
+          shape: rotatedShape,
+          rotation: toRotation,
+          position: newPosition,
+        },
+        animationTriggerKey:
+          typeof state.animationTriggerKey === "number" ? state.animationTriggerKey + 1 : 1,
+      })
+    : state;
 }
 
 /**
  * Find the lowest valid position where a tetromino can be placed when dropped
- * This is used by both hard drop and ghost piece calculations
+ * Used by both hard drop and ghost piece calculations
  */
 function _findDropPosition(
   board: BoardMatrix,
@@ -120,16 +111,11 @@ function _findDropPosition(
   startPosition: Position,
 ): Position {
   let dropPosition = startPosition;
-
-  // Move down until we can't anymore (with safety limit to prevent infinite loop)
   let iterations = 0;
 
+  // Move down until collision, with safety limit to prevent infinite loop
   while (iterations < DROP_POSITION_MAX_ITERATIONS) {
-    const nextPosition = {
-      x: dropPosition.x,
-      y: dropPosition.y + 1,
-    };
-
+    const nextPosition = { x: dropPosition.x, y: dropPosition.y + 1 };
     if (isValidPosition(board, shape, nextPosition)) {
       dropPosition = nextPosition;
       iterations++;
@@ -137,37 +123,24 @@ function _findDropPosition(
       break;
     }
   }
-
   return dropPosition;
 }
 
 export function hardDropTetromino(state: GameState): GameState {
   if (!state.currentPiece || state.isGameOver || state.isPaused) return state;
 
-  const currentPiece = state.currentPiece;
-  const finalPosition = _findDropPosition(state.board, currentPiece.shape, currentPiece.position);
-
-  // Update the piece position to the final position
-  const newState = {
+  const finalPosition = _findDropPosition(
+    state.board,
+    state.currentPiece.shape,
+    state.currentPiece.position,
+  );
+  return lockCurrentTetromino({
     ...state,
-    currentPiece: {
-      ...currentPiece,
-      position: finalPosition,
-    },
-  };
-
-  // Lock the piece at the final position
-  return lockCurrentTetromino(newState);
+    currentPiece: { ...state.currentPiece, position: finalPosition },
+  });
 }
 
-/**
- * Result types for piece locking operations
- */
-type PieceLockResult = {
-  board: BoardMatrix;
-  placedPositions: Position[];
-};
-
+type PieceLockResult = { board: BoardMatrix; placedPositions: Position[] };
 type LineClearResult = {
   board: BoardMatrix;
   score: number;
@@ -176,40 +149,28 @@ type LineClearResult = {
   clearingLines: number[];
 };
 
-/**
- * Records the positions where a piece will be placed for animation purposes
- */
 function recordPlacedPositions(currentPiece: Tetromino): Position[] {
   const positions: Position[] = [];
-  forEachPieceCell(currentPiece.shape, currentPiece.position, (boardX, boardY) => {
-    positions.push({ x: boardX, y: boardY });
-  });
+  forEachPieceCell(currentPiece.shape, currentPiece.position, (boardX, boardY) =>
+    positions.push({ x: boardX, y: boardY }),
+  );
   return positions;
 }
 
-/**
- * Places a piece onto the board and returns the updated board and piece positions
- */
 export function placePieceOnBoard(state: GameState): PieceLockResult {
-  if (!state.currentPiece) {
-    return { board: state.board, placedPositions: [] };
-  }
+  if (!state.currentPiece) return { board: state.board, placedPositions: [] };
 
   const colorIndex = getTetrominoColorIndex(state.currentPiece.type);
   const placedPositions = recordPlacedPositions(state.currentPiece);
-  const newBoard = placeTetromino(
+  const board = placeTetromino(
     state.board,
     state.currentPiece.shape,
     state.currentPiece.position,
     colorIndex,
   );
-
-  return { board: newBoard, placedPositions };
+  return { board, placedPositions };
 }
 
-/**
- * Handles line clearing logic and score calculation
- */
 export function clearCompletedLines(
   board: BoardMatrix,
   currentScore: number,
@@ -217,22 +178,16 @@ export function clearCompletedLines(
   currentLevel: number,
 ): LineClearResult {
   const { board: clearedBoard, linesCleared, clearedLineIndices } = clearLines(board);
-  const newLines = currentLines + linesCleared;
-  const newLevel = Math.floor(newLines / LINES_PER_LEVEL) + 1;
-  const newScore = currentScore + calculateScore(linesCleared, currentLevel);
-
+  const lines = currentLines + linesCleared;
   return {
     board: clearedBoard,
-    score: newScore,
-    lines: newLines,
-    level: newLevel,
+    score: currentScore + calculateScore(linesCleared, currentLevel),
+    lines,
+    level: Math.floor(lines / LINES_PER_LEVEL) + 1,
     clearingLines: clearedLineIndices.length > 0 ? clearedLineIndices : [],
   };
 }
 
-/**
- * Preserves the board state before clearing for animation purposes
- */
 export function preserveBoardForAnimation(
   board: BoardMatrix,
   clearingLines: number[],
@@ -240,74 +195,48 @@ export function preserveBoardForAnimation(
   return clearingLines.length > 0 ? board : null;
 }
 
-/**
- * Checks if the game is over by testing if a new piece can be placed
- */
 export function checkGameOver(board: BoardMatrix, piece: Tetromino): boolean {
   return !isValidPosition(board, piece.shape, piece.position);
 }
 
-/**
- * Spawns a new piece and generates the next piece from the bag
- */
-export function spawnNextPiece(
-  nextPieceType: TetrominoTypeName,
-  pieceBag: TetrominoTypeName[],
-): { currentPiece: Tetromino; nextPiece: TetrominoTypeName; pieceBag: TetrominoTypeName[] } {
+export function spawnNextPiece(nextPieceType: TetrominoTypeName, pieceBag: TetrominoTypeName[]) {
   const pieceBagManager = createPieceBagManager();
   pieceBagManager.setBag(pieceBag);
-
-  const newPiece = createTetromino(nextPieceType);
-  const newNextPiece = pieceBagManager.getNextPiece();
-
   return {
-    currentPiece: newPiece,
-    nextPiece: newNextPiece,
+    currentPiece: createTetromino(nextPieceType),
+    nextPiece: pieceBagManager.getNextPiece(),
     pieceBag: pieceBagManager.getBag(),
   };
 }
 
 /**
- * Coordinates the piece locking process by calling specialized functions.
- * This is the main coordinator function that handles the complete flow
- * when a piece can no longer move down.
+ * Coordinates the piece locking process when a piece can no longer move down
+ * Handles: piece placement, line clearing, scoring, next piece spawning, game over check
  */
 function lockCurrentTetromino(state: GameState): GameState {
   if (!state.currentPiece) return state;
 
-  const newState = state;
-
-  // 1. Place the piece onto the board
-  const { board: boardAfterLock, placedPositions } = placePieceOnBoard(newState);
-
-  // 2. Preserve board state for animation purposes
+  const { board: boardAfterLock, placedPositions } = placePieceOnBoard(state);
   const {
     board: boardAfterClear,
     score,
     lines,
     level,
     clearingLines,
-  } = clearCompletedLines(boardAfterLock, newState.score, newState.lines, newState.level);
-
+  } = clearCompletedLines(boardAfterLock, state.score, state.lines, state.level);
   const boardBeforeClear = preserveBoardForAnimation(boardAfterLock, clearingLines);
-
-  // 3. Spawn the next piece
   const {
     currentPiece: newPiece,
     nextPiece,
     pieceBag,
-  } = spawnNextPiece(newState.nextPiece, newState.pieceBag);
-
-  // 4. Check for game over
+  } = spawnNextPiece(state.nextPiece, state.pieceBag);
   const isGameOver = checkGameOver(boardAfterClear, newPiece);
-  const currentPiece = isGameOver ? null : newPiece;
 
-  // 5. Update ghost position and return the new state
   return updateGhostPosition({
-    ...newState,
+    ...state,
     board: boardAfterClear,
     boardBeforeClear,
-    currentPiece,
+    currentPiece: isGameOver ? null : newPiece,
     nextPiece,
     score,
     lines,
@@ -321,9 +250,8 @@ function lockCurrentTetromino(state: GameState): GameState {
 }
 
 /**
- * Calculates the score based on lines cleared and current level.
- * Uses the classic Tetris scoring system: 1 Line = 100, 2 Lines = 300, 3 Lines = 500, 4 Lines (Tetris) = 800
- * Score is multiplied by the current level for progressive difficulty reward.
+ * Calculates score using classic Tetris system: 1=100, 2=300, 3=500, 4=800 points
+ * Score is multiplied by current level for progressive difficulty reward
  */
 export function calculateScore(linesCleared: number, level: number): number {
   return BASE_SCORES[linesCleared] * level;
@@ -337,45 +265,29 @@ export function getGameSpeed(level: number): number {
 }
 
 /**
- * Calculates the ghost position where the current piece would land if dropped.
- * Returns null if the piece is already at the bottom or no valid position exists.
+ * Calculates where the current piece would land if dropped
+ * Returns null if piece is already at bottom (no visual ghost needed)
  */
 export function calculateGhostPosition(state: GameState): Position | null {
   if (!state.currentPiece || state.isGameOver) return null;
-
   const ghostPosition = _findDropPosition(
     state.board,
     state.currentPiece.shape,
     state.currentPiece.position,
   );
-
-  // If ghost position is the same as current position, don't show ghost
-  if (ghostPosition.y === state.currentPiece.position.y) {
-    return null;
-  }
-
-  return ghostPosition;
+  return ghostPosition.y === state.currentPiece.position.y ? null : ghostPosition;
 }
 
-/**
- * Updates the ghost position in the game state
- */
 function updateGhostPosition(state: GameState): GameState {
-  return {
-    ...state,
-    ghostPosition: calculateGhostPosition(state),
-  };
+  return { ...state, ghostPosition: calculateGhostPosition(state) };
 }
 
 /**
- * Holds the current piece and either swaps it with the held piece or
- * replaces it with the next piece if no piece is currently held.
- * Only allows holding once per piece drop (canHold must be true).
+ * Holds current piece (can only be used once per piece drop)
+ * Initial hold: save piece and spawn next, Exchange hold: swap with held piece
  */
 export function holdCurrentPiece(state: GameState): GameState {
-  if (!state.currentPiece || !state.canHold || state.isGameOver || state.isPaused) {
-    return state;
-  }
+  if (!state.currentPiece || !state.canHold || state.isGameOver || state.isPaused) return state;
 
   const currentPieceType = state.currentPiece.type;
 
@@ -383,27 +295,20 @@ export function holdCurrentPiece(state: GameState): GameState {
     // Initial hold: save current piece and spawn next piece
     const pieceBagManager = createPieceBagManager();
     pieceBagManager.setBag(state.pieceBag);
-
-    const newCurrentPiece = createTetromino(state.nextPiece);
-    const newNextPiece = pieceBagManager.getNextPiece();
-
-    const newState = {
+    return updateGhostPosition({
       ...state,
-      currentPiece: newCurrentPiece,
+      currentPiece: createTetromino(state.nextPiece),
       heldPiece: currentPieceType,
-      nextPiece: newNextPiece,
+      nextPiece: pieceBagManager.getNextPiece(),
       canHold: false,
       pieceBag: pieceBagManager.getBag(),
-    };
-    return updateGhostPosition(newState);
+    });
   }
   // Exchange hold: swap held piece with current piece
-  const newCurrentPiece = createTetromino(state.heldPiece);
-  const newState = {
+  return updateGhostPosition({
     ...state,
-    currentPiece: newCurrentPiece,
+    currentPiece: createTetromino(state.heldPiece),
     heldPiece: currentPieceType,
     canHold: false,
-  };
-  return updateGhostPosition(newState);
+  });
 }

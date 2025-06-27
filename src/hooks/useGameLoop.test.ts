@@ -4,15 +4,6 @@ import { getGameSpeed } from "../game/game";
 import { useGameStore } from "../store/gameStore";
 import { useGameLoop } from "./useGameLoop";
 
-// Type for the mocked game store subset used in these tests
-type MockGameStoreSubset = {
-  moveDown: () => void;
-  isPaused: boolean;
-  isGameOver: boolean;
-  level: number;
-  clearAnimationStates: () => void;
-};
-
 // Mock dependencies
 mock.module("../game/game", () => ({
   getGameSpeed: mock(() => 1000),

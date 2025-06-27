@@ -15,26 +15,22 @@ export interface TouchGestureOptions {
 }
 
 export type SwipeDirection = "left" | "right" | "up" | "down";
-
 export interface SwipeGesture {
   direction: SwipeDirection;
   distance: number;
   deltaTime: number;
   isLongSwipe?: boolean;
 }
-
 export interface TapGesture {
   x: number;
   y: number;
   deltaTime: number;
 }
-
 export interface TouchDetectionEvents {
   onSwipe?: (gesture: SwipeGesture) => void;
   onTap?: (gesture: TapGesture) => void;
   onDoubleTap?: (gesture: TapGesture) => void;
 }
-
 export interface TouchDetectionReturn {
   handleTouchStart: (event: React.TouchEvent) => void;
   handleTouchEnd: (event: React.TouchEvent) => void;
@@ -50,7 +46,6 @@ export function useTouchDetection(
     tapTime = GAME_CONSTANTS.TOUCH.TAP_TIME,
     doubleTapTime = GAME_CONSTANTS.TOUCH.DOUBLE_TAP_TIME,
   } = options;
-
   const { onSwipe, onTap, onDoubleTap } = events;
 
   const touchStartRef = useRef<TouchPoint | null>(null);
@@ -59,25 +54,15 @@ export function useTouchDetection(
 
   const handleTouchStart = (event: React.TouchEvent) => {
     if (event.touches.length !== 1) return;
-
     const touch = event.touches[0];
-    touchStartRef.current = {
-      x: touch.clientX,
-      y: touch.clientY,
-      time: Date.now(),
-    };
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY, time: Date.now() };
   };
 
   const handleTouchEnd = (event: React.TouchEvent) => {
     if (!touchStartRef.current || event.changedTouches.length !== 1) return;
 
     const touch = event.changedTouches[0];
-    const touchEnd = {
-      x: touch.clientX,
-      y: touch.clientY,
-      time: Date.now(),
-    };
-
+    const touchEnd = { x: touch.clientX, y: touch.clientY, time: Date.now() };
     const deltaX = touchEnd.x - touchStartRef.current.x;
     const deltaY = touchEnd.y - touchStartRef.current.y;
     const deltaTime = touchEnd.time - touchStartRef.current.time;
@@ -91,14 +76,10 @@ export function useTouchDetection(
       const now = Date.now();
       const timeSinceLastTap = now - lastTapTime;
 
-      const tapGesture: TapGesture = {
-        x: touchEnd.x,
-        y: touchEnd.y,
-        deltaTime,
-      };
+      const tapGesture: TapGesture = { x: touchEnd.x, y: touchEnd.y, deltaTime };
 
       if (lastTapTime > 0 && timeSinceLastTap < doubleTapTime) {
-        // Double tap detected - clear any pending timeout and execute immediately
+        // Double tap detected - clear pending timeout and execute immediately
         if (timeoutRef.current) {
           clearTimeout(timeoutRef.current);
           timeoutRef.current = null;
@@ -106,13 +87,9 @@ export function useTouchDetection(
         onDoubleTap?.(tapGesture);
         setLastTapTime(0); // Reset to prevent triple tap
       } else {
-        // First tap - record the time
+        // First tap - record time and schedule delayed single tap action
         setLastTapTime(now);
-        // Clear any existing timeout
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current);
-        }
-        // Schedule single tap action after double tap timeout
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
         timeoutRef.current = window.setTimeout(() => {
           setLastTapTime((prevTime) => {
             // Only execute tap if this is still the last tap
@@ -128,45 +105,37 @@ export function useTouchDetection(
       return;
     }
 
-    // Check if swipe is within time limit and meets minimum distance
-    if (deltaTime > maxSwipeTime || distance < minSwipeDistance) {
-      return;
-    }
+    if (deltaTime > maxSwipeTime || distance < minSwipeDistance) return;
 
-    // Determine swipe direction
     const isHorizontal = Math.abs(deltaX) > Math.abs(deltaY);
-    let direction: SwipeDirection;
+    const direction: SwipeDirection = isHorizontal
+      ? deltaX > 0
+        ? "right"
+        : "left"
+      : deltaY > 0
+        ? "down"
+        : "up";
 
-    if (isHorizontal) {
-      direction = deltaX > 0 ? "right" : "left";
-    } else {
-      direction = deltaY > 0 ? "down" : "up";
-    }
-
-    const swipeGesture: SwipeGesture = {
+    onSwipe?.({
       direction,
       distance,
       deltaTime,
+      // Mark as long swipe for hard drop when down swipe exceeds threshold
       isLongSwipe:
         direction === "down" &&
         Math.abs(deltaY) > minSwipeDistance * GAME_CONSTANTS.TOUCH.LONG_SWIPE_MULTIPLIER,
-    };
-
-    onSwipe?.(swipeGesture);
+    });
   };
 
-  // Cleanup effect to prevent memory leaks
-  useEffect(() => {
-    return () => {
+  useEffect(
+    () => () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
         timeoutRef.current = null;
       }
-    };
-  }, []);
+    },
+    [],
+  );
 
-  return {
-    handleTouchStart,
-    handleTouchEnd,
-  };
+  return { handleTouchStart, handleTouchEnd };
 }
