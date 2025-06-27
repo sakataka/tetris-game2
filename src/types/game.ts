@@ -15,9 +15,14 @@ export type RotationState = 0 | 1 | 2 | 3;
 export type CellValue = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
 /**
- * Animation trigger key for board cell animations
+ * Animation trigger for board cell animations
  */
-export type AnimationTriggerKey = number | `animation-${number}`;
+export type AnimationTrigger = number | `animation-${number}`;
+
+/**
+ * Animation trigger key for game state updates
+ */
+export type AnimationTriggerKey = number;
 
 /**
  * Represents a 2D coordinate position on the game board.
@@ -41,14 +46,14 @@ export interface Tetromino {
  * 2D matrix representing the game board where each cell contains:
  * 0 = empty, 1-7 = tetromino color indices
  */
-export type BoardMatrix = CellValue[][];
+export type GameBoard = CellValue[][];
 
 /**
  * Complete game state containing all information needed to render and update the game.
  */
 export interface GameState {
-  board: BoardMatrix;
-  boardBeforeClear: BoardMatrix | null; // Board state before line clearing for animation
+  board: GameBoard;
+  boardBeforeClear: GameBoard | null; // Board state before line clearing for animation
   currentPiece: Tetromino | null;
   nextPiece: TetrominoTypeName;
   heldPiece: TetrominoTypeName | null;

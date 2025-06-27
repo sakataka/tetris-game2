@@ -17,7 +17,7 @@ interface GameStore extends GameState {
   holdPiece: () => void;
   togglePause: () => void;
   resetGame: () => void;
-  clearAnimationStates: () => void;
+  clearAnimationData: () => void;
 }
 
 // Create initial state once outside the store to avoid recreation on each access
@@ -38,7 +38,7 @@ export const useGameStore = create<GameStore>((set) => ({
     set(() => ({
       ...createInitialGameState(),
     })),
-  clearAnimationStates: () =>
+  clearAnimationData: () =>
     set((state) => {
       // Prevent unnecessary updates if animation states are already empty
       if (

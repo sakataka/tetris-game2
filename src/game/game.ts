@@ -1,4 +1,4 @@
-import type { BoardMatrix, GameState, Position, Tetromino, TetrominoTypeName } from "../types/game";
+import type { GameBoard, GameState, Position, Tetromino, TetrominoTypeName } from "../types/game";
 import { GAME_CONSTANTS } from "../utils/gameConstants";
 import { normalizeRotationState } from "../utils/typeGuards";
 import {
@@ -98,11 +98,7 @@ export function rotateTetrominoCW(state: GameState): GameState {
  * Find the lowest valid position where a tetromino can be placed when dropped
  * Used by both hard drop and ghost piece calculations
  */
-function _findDropPosition(
-  board: BoardMatrix,
-  shape: number[][],
-  startPosition: Position,
-): Position {
+function _findDropPosition(board: GameBoard, shape: number[][], startPosition: Position): Position {
   let dropPosition = startPosition;
   let iterations = 0;
 
@@ -133,9 +129,9 @@ export function hardDropTetromino(state: GameState): GameState {
   });
 }
 
-type PieceLockResult = { board: BoardMatrix; placedPositions: Position[] };
+type PieceLockResult = { board: GameBoard; placedPositions: Position[] };
 type LineClearResult = {
-  board: BoardMatrix;
+  board: GameBoard;
   score: number;
   lines: number;
   level: number;
@@ -165,7 +161,7 @@ export function placePieceOnBoard(state: GameState): PieceLockResult {
 }
 
 export function clearCompletedLines(
-  board: BoardMatrix,
+  board: GameBoard,
   currentScore: number,
   currentLines: number,
   currentLevel: number,
@@ -182,13 +178,13 @@ export function clearCompletedLines(
 }
 
 export function preserveBoardForAnimation(
-  board: BoardMatrix,
+  board: GameBoard,
   clearingLines: number[],
-): BoardMatrix | null {
+): GameBoard | null {
   return clearingLines.length > 0 ? board : null;
 }
 
-export function checkGameOver(board: BoardMatrix, piece: Tetromino): boolean {
+export function checkGameOver(board: GameBoard, piece: Tetromino): boolean {
   return !isValidPosition(board, piece.shape, piece.position);
 }
 

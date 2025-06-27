@@ -55,7 +55,7 @@ export function Board() {
                 isGhostPiece={isGhostPiece}
                 isPlacedPiece={isPlacedPiece}
                 isClearingLine={isClearingLine}
-                animationTriggerKey={animationTriggerKey}
+                animationTrigger={animationTriggerKey}
                 onAnimationComplete={() => handleAnimationComplete(isClearingLine, isPlacedPiece)}
               />
             );

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef } from "react";
 import { useGameActions } from "../actions/useGameActions";
 
 export function useAnimationCompletionHandler() {
-  const { clearAnimationStates } = useGameActions();
+  const { clearAnimationData } = useGameActions();
   const clearTimeoutRef = useRef<number | null>(null);
   const clearRequestRef = useRef<number | null>(null);
 
@@ -19,7 +19,7 @@ export function useAnimationCompletionHandler() {
 
         // For line clear animation, delay clearing to ensure animation completes
         clearTimeoutRef.current = window.setTimeout(() => {
-          clearAnimationStates();
+          clearAnimationData();
           clearTimeoutRef.current = null;
         }, 10); // Minimal delay to ensure animation DOM updates complete
       } else if (isPlacedPiece) {
@@ -33,12 +33,12 @@ export function useAnimationCompletionHandler() {
 
         // For piece placement animation, clear the state in the next frame
         clearRequestRef.current = requestAnimationFrame(() => {
-          clearAnimationStates();
+          clearAnimationData();
           clearRequestRef.current = null;
         });
       }
     },
-    [clearAnimationStates],
+    [clearAnimationData],
   );
 
   // Cleanup effect to prevent memory leaks

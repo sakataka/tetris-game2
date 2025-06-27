@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useCellAnimation } from "../../hooks/ui/useCellAnimation";
-import type { AnimationTriggerKey, CellValue } from "../../types/game";
+import type { AnimationTrigger, CellValue } from "../../types/game";
 import { getCellColor } from "../../utils/colors";
 import { GAME_CONSTANTS } from "../../utils/gameConstants";
 import { BOARD_STYLES } from "../../utils/styles";
@@ -14,7 +14,7 @@ interface BoardCellProps {
   isGhostPiece: boolean;
   isPlacedPiece: boolean;
   isClearingLine: boolean;
-  animationTriggerKey: AnimationTriggerKey;
+  animationTrigger: AnimationTrigger;
   onAnimationComplete: () => void;
 }
 
@@ -29,7 +29,7 @@ export function BoardCell({
   isGhostPiece,
   isPlacedPiece,
   isClearingLine,
-  animationTriggerKey,
+  animationTrigger,
   onAnimationComplete,
 }: BoardCellProps) {
   const { initialAnimation, animateProps, transitionProps } = useCellAnimation({
@@ -60,7 +60,7 @@ export function BoardCell({
   // Use motion.div only when animation is needed
   return (
     <motion.div
-      key={`cell-${y * GAME_CONSTANTS.BOARD.WIDTH + x}-${animationTriggerKey}-${cellValue}`}
+      key={`cell-${y * GAME_CONSTANTS.BOARD.WIDTH + x}-${animationTrigger}-${cellValue}`}
       initial={initialAnimation}
       animate={animateProps}
       transition={transitionProps}

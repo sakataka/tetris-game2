@@ -1,8 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import { act, renderHook } from "@testing-library/react";
 import { create } from "zustand";
-import { createEmptyBoard } from "../game/board";
-import { createTetromino } from "../game/tetrominos";
+import { createMockTetromino, createTestGameState } from "../tests/helpers/gameTestUtils";
 import type { GameState, TetrominoTypeName } from "../types/game";
 
 // Mock localStorage for testing
@@ -38,24 +37,11 @@ interface TestGameStore extends GameState {
 }
 
 // Static initial state to avoid complex initialization during tests
-const getTestInitialState = (): Partial<GameState> => ({
-  board: createEmptyBoard(),
-  boardBeforeClear: null,
-  currentPiece: createTetromino("T"),
-  nextPiece: "I" as TetrominoTypeName,
-  heldPiece: null,
-  canHold: true,
-  score: 0,
-  lines: 0,
-  level: 1,
-  isGameOver: false,
-  isPaused: false,
-  placedPositions: [],
-  clearingLines: [],
-  animationTriggerKey: 0,
-  ghostPosition: { x: 4, y: 18 }, // Static ghost position matching T-piece initial x position
-  pieceBag: ["O", "S", "Z", "J", "L"] as TetrominoTypeName[],
-});
+const getTestInitialState = (): Partial<GameState> =>
+  createTestGameState({
+    ghostPosition: { x: 4, y: 18 }, // Static ghost position matching T-piece initial x position
+    pieceBag: ["O", "S", "Z", "J", "L"] as TetrominoTypeName[],
+  });
 
 // Create isolated test store instance
 const useTestGameStore = create<TestGameStore>((set) => ({
@@ -125,7 +111,7 @@ const useTestGameStore = create<TestGameStore>((set) => ({
         ...state,
         heldPiece: state.currentPiece.type,
         canHold: false,
-        currentPiece: createTetromino("I"),
+        currentPiece: createMockTetromino("I"),
       };
     }),
 

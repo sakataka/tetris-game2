@@ -61,7 +61,7 @@ describe("BoardCell", () => {
     isGhostPiece: false,
     isPlacedPiece: false,
     isClearingLine: false,
-    animationTriggerKey: "test-key",
+    animationTrigger: "test-key",
   };
 
   test("should render without errors", () => {

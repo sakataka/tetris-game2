@@ -1,17 +1,13 @@
-import type { BoardMatrix, CellValue, Position } from "../types/game";
+import type { CellValue, GameBoard, Position } from "../types/game";
 import { GAME_CONSTANTS } from "../utils/gameConstants";
 
-export function createEmptyBoard(): BoardMatrix {
+export function createEmptyBoard(): GameBoard {
   return Array(GAME_CONSTANTS.BOARD.HEIGHT)
     .fill(null)
-    .map(() => Array(GAME_CONSTANTS.BOARD.WIDTH).fill(0)) as BoardMatrix;
+    .map(() => Array(GAME_CONSTANTS.BOARD.WIDTH).fill(0)) as GameBoard;
 }
 
-export function isValidPosition(
-  board: BoardMatrix,
-  shape: number[][],
-  position: Position,
-): boolean {
+export function isValidPosition(board: GameBoard, shape: number[][], position: Position): boolean {
   for (let y = 0; y < shape.length; y++) {
     for (let x = 0; x < shape[y].length; x++) {
       if (shape[y][x]) {
@@ -54,12 +50,12 @@ export function forEachPieceCell(
 }
 
 export function placeTetromino(
-  board: BoardMatrix,
+  board: GameBoard,
   shape: CellValue[][],
   position: Position,
   colorIndex: CellValue,
-): BoardMatrix {
-  const newBoard = board.map((row) => [...row]) as BoardMatrix;
+): GameBoard {
+  const newBoard = board.map((row) => [...row]) as GameBoard;
 
   forEachPieceCell(shape, position, (boardX, boardY) => {
     if (
@@ -75,8 +71,8 @@ export function placeTetromino(
   return newBoard;
 }
 
-export function clearLines(board: BoardMatrix): {
-  board: BoardMatrix;
+export function clearLines(board: GameBoard): {
+  board: GameBoard;
   linesCleared: number;
   clearedLineIndices: number[];
 } {
@@ -93,7 +89,7 @@ export function clearLines(board: BoardMatrix): {
   const emptyRows = Array.from({ length: clearedLineIndices.length }, () =>
     Array(GAME_CONSTANTS.BOARD.WIDTH).fill(0),
   );
-  const newBoard = [...emptyRows, ...remainingRows] as BoardMatrix;
+  const newBoard = [...emptyRows, ...remainingRows] as GameBoard;
 
   return {
     board: newBoard,

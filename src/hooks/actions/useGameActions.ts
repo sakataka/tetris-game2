@@ -12,7 +12,7 @@ export const useGameActions = () => {
   const drop = useGameStore((state) => state.drop);
   const togglePause = useGameStore((state) => state.togglePause);
   const resetGame = useGameStore((state) => state.resetGame);
-  const clearAnimationStates = useGameStore((state) => state.clearAnimationStates);
+  const clearAnimationData = useGameStore((state) => state.clearAnimationData);
 
   return useMemo(
     () => ({
@@ -23,8 +23,8 @@ export const useGameActions = () => {
       drop,
       togglePause,
       resetGame,
-      clearAnimationStates,
+      clearAnimationData,
     }),
-    [moveLeft, moveRight, moveDown, rotate, drop, togglePause, resetGame, clearAnimationStates],
+    [moveLeft, moveRight, moveDown, rotate, drop, togglePause, resetGame, clearAnimationData],
   );
 };
