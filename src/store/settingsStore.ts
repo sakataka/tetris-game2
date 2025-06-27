@@ -10,7 +10,7 @@ interface SettingsStore extends GameSettings {
 }
 
 const DEFAULT_SETTINGS: GameSettings = {
-  language: "ja",
+  language: "en",
   volume: GAME_CONSTANTS.UI.DEFAULT_VOLUME,
   showGhostPiece: true,
 };

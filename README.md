@@ -8,7 +8,7 @@ A modern, full-featured Tetris game built with React and TypeScript.
 - Hold piece mechanics for strategic play
 - Ghost piece showing landing position
 - Smooth animations powered by Framer Motion
-- Bilingual support (Japanese/English)
+- Bilingual support (English/Japanese) with English as default
 - Cross-platform compatibility with touch controls for mobile
 - Local high score tracking
 - Customizable game settings

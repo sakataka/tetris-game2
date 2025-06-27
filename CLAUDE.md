@@ -8,7 +8,7 @@ A fully-featured Tetris game built with modern web technologies.
 - **Smooth Animations**: Polished visual effects powered by Framer Motion
 - **Mobile-Friendly**: Touch controls and responsive design for all devices
 - **High Score System**: Persistent local score tracking and leaderboards
-- **Bilingual Support**: Real-time Japanese/English language switching
+- **Bilingual Support**: Real-time English/Japanese language switching (English default)
 - **Ghost Piece**: Landing position preview for better gameplay
 - **Hold Mechanics**: Save and swap pieces for strategic play
 
@@ -36,7 +36,7 @@ A fully-featured Tetris game built with modern web technologies.
 
 ### Settings & Customization
 - **Integrated Settings**: Clean dropdown interface accessible from the settings button
-- **Language Toggle**: Instant switching between Japanese and English
+- **Language Toggle**: Instant switching between English and Japanese (English default)
 - **Ghost Piece Toggle**: Show/hide landing position preview
 - **Persistent Preferences**: Settings automatically saved locally
 - **Visual Indicators**: Clear feedback for all toggle states
