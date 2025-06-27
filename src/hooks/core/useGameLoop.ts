@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
-import { getGameSpeed } from "../game/game";
-import { useGameStore } from "../store/gameStore";
+import { getGameSpeed } from "../../game/game";
+import { useGameStore } from "../../store/gameStore";
 import { useGameActionHandler } from "./useGameActionHandler";
 
 /**

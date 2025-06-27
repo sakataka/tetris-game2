@@ -1,5 +1,5 @@
 import type { TetrominoTypeName } from "../types/game";
-import { TETROMINO_TYPES } from "../utils/gameConstants";
+import { GAME_CONSTANTS } from "../utils/gameConstants";
 
 /**
  * 7-Bag system implementation for fair tetromino distribution.
@@ -78,7 +78,7 @@ export class PieceBagManager {
    * This implements the core 7-bag algorithm.
    */
   private refillBag(): void {
-    this.bag = [...TETROMINO_TYPES];
+    this.bag = [...GAME_CONSTANTS.TYPES.TETROMINO_TYPES];
     this.shuffle(this.bag);
   }
 

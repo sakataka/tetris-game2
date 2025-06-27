@@ -1,4 +1,4 @@
-import { useHighScore } from "../../hooks/useHighScore";
+import { useHighScore } from "../../hooks/data/useHighScore";
 import { CurrentHighScore } from "./CurrentHighScore";
 import { HighScoreList } from "./HighScoreList";
 import { NoHighScore } from "./NoHighScore";

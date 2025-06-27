@@ -36,7 +36,7 @@ let mockGameState = {
 };
 
 // Mock useGameStore
-mock.module("../store/gameStore", () => ({
+mock.module("../../store/gameStore", () => ({
   useGameStore: mock((selector) => {
     if (typeof selector === "function") {
       return selector(mockGameState);

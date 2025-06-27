@@ -5,7 +5,7 @@ import type React from "react";
 import { BoardCell } from "./BoardCell";
 
 // Simple, focused mocks
-mock.module("../../hooks/useCellAnimation", () => ({
+mock.module("../../hooks/ui/useCellAnimation", () => ({
   useCellAnimation: () => ({
     initialAnimation: {},
     animateProps: {},

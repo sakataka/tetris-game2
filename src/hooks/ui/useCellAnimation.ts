@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { GAME_CONSTANTS, SPRING_CONFIGS } from "../utils/gameConstants";
+import { GAME_CONSTANTS, SPRING_CONFIGS } from "../../utils/gameConstants";
 
 interface CellAnimationState {
   isCurrentPiece: boolean;

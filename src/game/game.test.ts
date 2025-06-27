@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { BOARD_HEIGHT, BOARD_WIDTH } from "../utils/gameConstants";
+import { GAME_CONSTANTS } from "../utils/gameConstants";
 import { createEmptyBoard } from "./board";
 import {
   calculateScore,
@@ -19,8 +19,8 @@ describe("Game Logic", () => {
   describe("createInitialGameState", () => {
     test("should create initial game state", () => {
       const state = createInitialGameState();
-      expect(state.board.length).toBe(BOARD_HEIGHT);
-      expect(state.board[0].length).toBe(BOARD_WIDTH);
+      expect(state.board.length).toBe(GAME_CONSTANTS.BOARD.HEIGHT);
+      expect(state.board[0].length).toBe(GAME_CONSTANTS.BOARD.WIDTH);
       expect(state.score).toBe(0);
       expect(state.lines).toBe(0);
       expect(state.level).toBe(1);
@@ -68,7 +68,7 @@ describe("Game Logic", () => {
       const state = createInitialGameState();
       // Move piece to left edge
       let newState = state;
-      for (let i = 0; i < BOARD_WIDTH; i++) {
+      for (let i = 0; i < GAME_CONSTANTS.BOARD.WIDTH; i++) {
         newState = moveTetrominoBy(newState, -1, 0);
       }
       // Try to move further left
@@ -107,7 +107,7 @@ describe("Game Logic", () => {
 
       // Should have valid position after rotation
       expect(newState.currentPiece?.position.x).toBeGreaterThanOrEqual(0);
-      expect(newState.currentPiece?.position.x).toBeLessThan(BOARD_WIDTH);
+      expect(newState.currentPiece?.position.x).toBeLessThan(GAME_CONSTANTS.BOARD.WIDTH);
       expect(newState.currentPiece?.position.y).toBeGreaterThanOrEqual(0);
     });
 
@@ -183,7 +183,7 @@ describe("Game Logic", () => {
     test("should return true when piece cannot be placed", () => {
       const board = createEmptyBoard();
       // Fill the top row to create collision
-      for (let x = 0; x < BOARD_WIDTH; x++) {
+      for (let x = 0; x < GAME_CONSTANTS.BOARD.WIDTH; x++) {
         board[0][x] = 1;
       }
       const piece = createTetromino("T");
@@ -230,8 +230,8 @@ describe("Game Logic", () => {
     test("should update score and level when lines cleared", () => {
       const board = createEmptyBoard();
       // Fill bottom row to create a complete line
-      for (let x = 0; x < BOARD_WIDTH; x++) {
-        board[BOARD_HEIGHT - 1][x] = 1;
+      for (let x = 0; x < GAME_CONSTANTS.BOARD.WIDTH; x++) {
+        board[GAME_CONSTANTS.BOARD.HEIGHT - 1][x] = 1;
       }
 
       const result = clearCompletedLines(board, 0, 0, 1);
@@ -239,7 +239,7 @@ describe("Game Logic", () => {
       expect(result.score).toBe(100); // 1 line * level 1
       expect(result.lines).toBe(1);
       expect(result.level).toBe(1);
-      expect(result.clearingLines).toEqual([BOARD_HEIGHT - 1]);
+      expect(result.clearingLines).toEqual([GAME_CONSTANTS.BOARD.HEIGHT - 1]);
     });
   });
 

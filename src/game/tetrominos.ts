@@ -1,5 +1,5 @@
 import type { CellValue, Tetromino, TetrominoTypeName } from "../types/game";
-import { BOARD_WIDTH } from "../utils/gameConstants";
+import { GAME_CONSTANTS } from "../utils/gameConstants";
 
 // Type-safe color index mapping
 export const TETROMINO_COLOR_MAP = {
@@ -77,7 +77,10 @@ export function createTetromino(type: TetrominoTypeName): Tetromino {
   const shape = getTetrominoShape(type);
   return {
     type,
-    position: { x: Math.floor(BOARD_WIDTH / 2) - Math.floor(shape[0].length / 2), y: 0 },
+    position: {
+      x: Math.floor(GAME_CONSTANTS.BOARD.WIDTH / 2) - Math.floor(shape[0].length / 2),
+      y: 0,
+    },
     rotation: 0,
     shape,
   };

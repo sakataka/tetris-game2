@@ -32,7 +32,7 @@ const mockHighScoreData = {
   highScoresList: [],
 };
 
-mock.module("../../hooks/useHighScore", () => ({
+mock.module("../../hooks/data/useHighScore", () => ({
   useHighScore: () => mockHighScoreData,
 }));
 

@@ -6,12 +6,22 @@ import { GameOverlay } from "./GameOverlay";
 
 // Simple mocks
 mock.module("../../store/gameStore", () => ({
-  useGameStore: () => ({
-    isGameOver: false,
-    isPaused: false,
-    resetGame: () => {},
-    togglePause: () => {},
-  }),
+  useGameStore: (
+    selector: (state: {
+      isGameOver: boolean;
+      isPaused: boolean;
+      resetGame: () => void;
+      togglePause: () => void;
+    }) => unknown,
+  ) => {
+    const mockState = {
+      isGameOver: false,
+      isPaused: false,
+      resetGame: mock(() => {}),
+      togglePause: mock(() => {}),
+    };
+    return selector(mockState);
+  },
 }));
 
 mock.module("react-i18next", () => ({
@@ -45,6 +55,22 @@ mock.module("../ui/button", () => ({
   ),
 }));
 
+mock.module("../ui/AnimatedButton", () => ({
+  AnimatedButton: ({
+    children,
+    onClick,
+    ...props
+  }: {
+    children: React.ReactNode;
+    onClick?: () => void;
+    [key: string]: unknown;
+  }) => (
+    <button onClick={onClick} data-testid="animated-button" {...props}>
+      {children}
+    </button>
+  ),
+}));
+
 mock.module("../ui/dialog", () => ({
   Dialog: ({ children, open }: { children: React.ReactNode; open: boolean }) => (
     <div data-testid="dialog" data-open={open}>
@@ -64,7 +90,19 @@ mock.module("../ui/dialog", () => ({
 
 mock.module("framer-motion", () => ({
   motion: {
-    div: ({ children, ...props }: { children: React.ReactNode; [key: string]: unknown }) => (
+    div: ({
+      children,
+      whileHover,
+      whileTap,
+      transition,
+      ...props
+    }: {
+      children: React.ReactNode;
+      whileHover?: unknown;
+      whileTap?: unknown;
+      transition?: unknown;
+      [key: string]: unknown;
+    }) => (
       <div data-testid="motion-div" {...props}>
         {children}
       </div>

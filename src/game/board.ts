@@ -1,10 +1,10 @@
 import type { BoardMatrix, CellValue, Position } from "../types/game";
-import { BOARD_HEIGHT, BOARD_WIDTH } from "../utils/gameConstants";
+import { GAME_CONSTANTS } from "../utils/gameConstants";
 
 export function createEmptyBoard(): BoardMatrix {
-  return Array(BOARD_HEIGHT)
+  return Array(GAME_CONSTANTS.BOARD.HEIGHT)
     .fill(null)
-    .map(() => Array(BOARD_WIDTH).fill(0)) as BoardMatrix;
+    .map(() => Array(GAME_CONSTANTS.BOARD.WIDTH).fill(0)) as BoardMatrix;
 }
 
 export function isValidPosition(
@@ -20,9 +20,9 @@ export function isValidPosition(
 
         if (
           boardX < 0 ||
-          boardX >= BOARD_WIDTH ||
+          boardX >= GAME_CONSTANTS.BOARD.WIDTH ||
           boardY < 0 ||
-          boardY >= BOARD_HEIGHT ||
+          boardY >= GAME_CONSTANTS.BOARD.HEIGHT ||
           board[boardY]?.[boardX]
         ) {
           return false;
@@ -62,7 +62,12 @@ export function placeTetromino(
   const newBoard = board.map((row) => [...row]) as BoardMatrix;
 
   forEachPieceCell(shape, position, (boardX, boardY) => {
-    if (boardY >= 0 && boardY < BOARD_HEIGHT && boardX >= 0 && boardX < BOARD_WIDTH) {
+    if (
+      boardY >= 0 &&
+      boardY < GAME_CONSTANTS.BOARD.HEIGHT &&
+      boardX >= 0 &&
+      boardX < GAME_CONSTANTS.BOARD.WIDTH
+    ) {
       newBoard[boardY][boardX] = colorIndex;
     }
   });
@@ -86,7 +91,7 @@ export function clearLines(board: BoardMatrix): {
 
   const remainingRows = board.filter((_, index) => !clearedLineIndices.includes(index));
   const emptyRows = Array.from({ length: clearedLineIndices.length }, () =>
-    Array(BOARD_WIDTH).fill(0),
+    Array(GAME_CONSTANTS.BOARD.WIDTH).fill(0),
   );
   const newBoard = [...emptyRows, ...remainingRows] as BoardMatrix;
 

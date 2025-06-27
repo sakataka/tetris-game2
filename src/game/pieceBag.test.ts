@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { TETROMINO_TYPES } from "../utils/gameConstants";
+import { GAME_CONSTANTS } from "../utils/gameConstants";
 import { createPieceBagManager, PieceBagManager } from "./pieceBag";
 
 describe("PieceBagManager", () => {
@@ -18,7 +18,7 @@ describe("PieceBagManager", () => {
     }
 
     // Should contain all 7 unique pieces
-    expect(pieces.sort()).toEqual([...TETROMINO_TYPES].sort());
+    expect(pieces.sort()).toEqual([...GAME_CONSTANTS.TYPES.TETROMINO_TYPES].sort());
     expect(new Set(pieces).size).toBe(7);
   });
 
@@ -35,8 +35,8 @@ describe("PieceBagManager", () => {
     const firstBag = pieces.slice(0, 7).sort();
     const secondBag = pieces.slice(7, 14).sort();
 
-    expect(firstBag).toEqual([...TETROMINO_TYPES].sort());
-    expect(secondBag).toEqual([...TETROMINO_TYPES].sort());
+    expect(firstBag).toEqual([...GAME_CONSTANTS.TYPES.TETROMINO_TYPES].sort());
+    expect(secondBag).toEqual([...GAME_CONSTANTS.TYPES.TETROMINO_TYPES].sort());
   });
 
   it("should allow setting bag state for testing", () => {

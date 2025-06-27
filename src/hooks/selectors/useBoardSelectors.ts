@@ -1,47 +1,13 @@
 import { useMemo } from "react";
-import { forEachPieceCell } from "../game/board";
-import { getTetrominoColorIndex } from "../game/tetrominos";
-import { useGameStore } from "../store/gameStore";
-import { useSettingsStore } from "../store/settingsStore";
-import { BOARD_HEIGHT, BOARD_WIDTH } from "../utils/gameConstants";
+import { forEachPieceCell } from "../../game/board";
+import { getTetrominoColorIndex } from "../../game/tetrominos";
+import { useGameStore } from "../../store/gameStore";
+import { useSettingsStore } from "../../store/settingsStore";
+import { GAME_CONSTANTS } from "../../utils/gameConstants";
 
 /**
- * Game state selectors - optimized using Zustand's built-in shallow comparison
+ * Board-related state selectors
  */
-
-export const useScoreState = () => {
-  const score = useGameStore((state) => state.score);
-  const lines = useGameStore((state) => state.lines);
-  const level = useGameStore((state) => state.level);
-
-  return useMemo(() => ({ score, lines, level }), [score, lines, level]);
-};
-
-export const useGameActions = () => {
-  const moveLeft = useGameStore((state) => state.moveLeft);
-  const moveRight = useGameStore((state) => state.moveRight);
-  const moveDown = useGameStore((state) => state.moveDown);
-  const rotate = useGameStore((state) => state.rotate);
-  const drop = useGameStore((state) => state.drop);
-  const togglePause = useGameStore((state) => state.togglePause);
-  const resetGame = useGameStore((state) => state.resetGame);
-  const clearAnimationStates = useGameStore((state) => state.clearAnimationStates);
-
-  return useMemo(
-    () => ({
-      moveLeft,
-      moveRight,
-      moveDown,
-      rotate,
-      drop,
-      togglePause,
-      resetGame,
-      clearAnimationStates,
-    }),
-    [moveLeft, moveRight, moveDown, rotate, drop, togglePause, resetGame, clearAnimationStates],
-  );
-};
-
 export const useBoardData = () => {
   const board = useGameStore((state) => state.board);
   const boardBeforeClear = useGameStore((state) => state.boardBeforeClear);
@@ -68,7 +34,12 @@ export const useBoardData = () => {
     if (currentPiece) {
       const colorIndex = getTetrominoColorIndex(currentPiece.type);
       forEachPieceCell(currentPiece.shape, currentPiece.position, (boardX, boardY) => {
-        if (boardY >= 0 && boardY < BOARD_HEIGHT && boardX >= 0 && boardX < BOARD_WIDTH) {
+        if (
+          boardY >= 0 &&
+          boardY < GAME_CONSTANTS.BOARD.HEIGHT &&
+          boardX >= 0 &&
+          boardX < GAME_CONSTANTS.BOARD.WIDTH
+        ) {
           newBoard[boardY][boardX] = colorIndex;
           positions.add(`${boardX},${boardY}`);
         }
@@ -97,7 +68,12 @@ export const useBoardData = () => {
     }
 
     forEachPieceCell(currentPiece.shape, ghostPosition, (boardX, boardY) => {
-      if (boardY >= 0 && boardY < BOARD_HEIGHT && boardX >= 0 && boardX < BOARD_WIDTH) {
+      if (
+        boardY >= 0 &&
+        boardY < GAME_CONSTANTS.BOARD.HEIGHT &&
+        boardX >= 0 &&
+        boardX < GAME_CONSTANTS.BOARD.WIDTH
+      ) {
         positions.add(`${boardX},${boardY}`);
       }
     });

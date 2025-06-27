@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
-import { useGameActions } from "./useGameSelectors";
+import { useGameActions } from "../actions/useGameActions";
 
 export function useAnimationCompletionHandler() {
   const { clearAnimationStates } = useGameActions();

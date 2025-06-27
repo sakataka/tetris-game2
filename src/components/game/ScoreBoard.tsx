@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
-import { useAnimatedValue } from "../../hooks/useAnimatedValue";
-import { useScoreState } from "../../hooks/useGameSelectors";
+import { useScoreState } from "../../hooks/selectors/useScoreSelectors";
+import { useAnimatedValue } from "../../hooks/ui/useAnimatedValue";
 import { CARD_STYLES } from "../../utils/styles";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { AnimatedScoreItem } from "./AnimatedScoreItem";

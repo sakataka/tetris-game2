@@ -1,9 +1,9 @@
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { useCellAnimation } from "../../hooks/useCellAnimation";
+import { useCellAnimation } from "../../hooks/ui/useCellAnimation";
 import type { AnimationTriggerKey, CellValue } from "../../types/game";
 import { getCellColor } from "../../utils/colors";
-import { BOARD_WIDTH } from "../../utils/gameConstants";
+import { GAME_CONSTANTS } from "../../utils/gameConstants";
 import { BOARD_STYLES } from "../../utils/styles";
 
 interface BoardCellProps {
@@ -60,7 +60,7 @@ export function BoardCell({
   // Use motion.div only when animation is needed
   return (
     <motion.div
-      key={`cell-${y * BOARD_WIDTH + x}-${animationTriggerKey}-${cellValue}`}
+      key={`cell-${y * GAME_CONSTANTS.BOARD.WIDTH + x}-${animationTriggerKey}-${cellValue}`}
       initial={initialAnimation}
       animate={animateProps}
       transition={transitionProps}

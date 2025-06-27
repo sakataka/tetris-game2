@@ -1,12 +1,5 @@
 import type { BoardMatrix, GameState, Position, Tetromino, TetrominoTypeName } from "../types/game";
-import {
-  BASE_SCORES,
-  DROP_POSITION_MAX_ITERATIONS,
-  INITIAL_DROP_SPEED_MS,
-  LINES_PER_LEVEL,
-  MIN_DROP_SPEED_MS,
-  SPEED_DECREASE_PER_LEVEL,
-} from "../utils/gameConstants";
+import { GAME_CONSTANTS } from "../utils/gameConstants";
 import { normalizeRotationState } from "../utils/typeGuards";
 import {
   clearLines,
@@ -114,7 +107,7 @@ function _findDropPosition(
   let iterations = 0;
 
   // Move down until collision, with safety limit to prevent infinite loop
-  while (iterations < DROP_POSITION_MAX_ITERATIONS) {
+  while (iterations < GAME_CONSTANTS.TETROMINO.DROP_POSITION_LIMIT) {
     const nextPosition = { x: dropPosition.x, y: dropPosition.y + 1 };
     if (isValidPosition(board, shape, nextPosition)) {
       dropPosition = nextPosition;
@@ -183,7 +176,7 @@ export function clearCompletedLines(
     board: clearedBoard,
     score: currentScore + calculateScore(linesCleared, currentLevel),
     lines,
-    level: Math.floor(lines / LINES_PER_LEVEL) + 1,
+    level: Math.floor(lines / GAME_CONSTANTS.SCORING.LINES_PER_LEVEL) + 1,
     clearingLines: clearedLineIndices.length > 0 ? clearedLineIndices : [],
   };
 }
@@ -254,13 +247,14 @@ function lockCurrentTetromino(state: GameState): GameState {
  * Score is multiplied by current level for progressive difficulty reward
  */
 export function calculateScore(linesCleared: number, level: number): number {
-  return BASE_SCORES[linesCleared] * level;
+  return GAME_CONSTANTS.SCORING.BASE_SCORES[linesCleared] * level;
 }
 
 export function getGameSpeed(level: number): number {
   return Math.max(
-    MIN_DROP_SPEED_MS,
-    INITIAL_DROP_SPEED_MS - (level - 1) * SPEED_DECREASE_PER_LEVEL,
+    GAME_CONSTANTS.TIMING.MIN_DROP_SPEED_MS,
+    GAME_CONSTANTS.TIMING.INITIAL_DROP_SPEED_MS -
+      (level - 1) * GAME_CONSTANTS.TIMING.SPEED_DECREASE_PER_LEVEL,
   );
 }
 

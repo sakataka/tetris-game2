@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import { getTetrominoShape } from "../../game/tetrominos";
 import { useGameStore } from "../../store/gameStore";
 import { getTetrominoColor } from "../../utils/colors";
-import { NEXT_PIECE_GRID_SIZE } from "../../utils/gameConstants";
+import { GAME_CONSTANTS } from "../../utils/gameConstants";
 import { CARD_STYLES } from "../../utils/styles";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { TetrominoGrid } from "./TetrominoGrid";
@@ -27,7 +27,7 @@ export function HoldPiece() {
         <TetrominoGrid
           shape={shape}
           tetrominoColor={tetrominoColor}
-          gridSize={NEXT_PIECE_GRID_SIZE}
+          gridSize={GAME_CONSTANTS.TETROMINO.NEXT_PIECE_GRID_SIZE}
           keyPrefix="hold"
           disabled={!canHold}
         />

@@ -1,12 +1,7 @@
 import { cn } from "@/lib/utils";
-import { useAnimationCompletionHandler } from "../../hooks/useAnimationCompletionHandler";
-import { useBoardData } from "../../hooks/useGameSelectors";
-import {
-  BOARD_CELL_SIZE_PX,
-  BOARD_HEIGHT,
-  BOARD_WIDTH,
-  GAME_CONSTANTS,
-} from "../../utils/gameConstants";
+import { useBoardData } from "../../hooks/selectors/useBoardSelectors";
+import { useAnimationCompletionHandler } from "../../hooks/ui/useAnimationCompletionHandler";
+import { GAME_CONSTANTS } from "../../utils/gameConstants";
 import { BOARD_STYLES, CARD_STYLES } from "../../utils/styles";
 import { Card } from "../ui/card";
 import { BoardCell } from "./BoardCell";
@@ -35,8 +30,8 @@ export function Board() {
         aria-label="Tetris game board"
         role="img"
         style={{
-          gridTemplateColumns: `repeat(${BOARD_WIDTH}, ${BOARD_CELL_SIZE_PX}px)`,
-          gridTemplateRows: `repeat(${BOARD_HEIGHT}, ${BOARD_CELL_SIZE_PX}px)`,
+          gridTemplateColumns: `repeat(${GAME_CONSTANTS.BOARD.WIDTH}, ${GAME_CONSTANTS.BOARD.CELL_SIZE}px)`,
+          gridTemplateRows: `repeat(${GAME_CONSTANTS.BOARD.HEIGHT}, ${GAME_CONSTANTS.BOARD.CELL_SIZE}px)`,
         }}
       >
         {displayBoard.map((row, y) =>
@@ -52,7 +47,7 @@ export function Board() {
 
             return (
               <BoardCell
-                key={`cell-${y * BOARD_WIDTH + x}`}
+                key={`cell-${y * GAME_CONSTANTS.BOARD.WIDTH + x}`}
                 cellValue={cellValue}
                 x={x}
                 y={y}

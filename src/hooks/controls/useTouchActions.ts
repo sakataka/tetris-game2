@@ -1,5 +1,5 @@
-import { useGameStore } from "../store/gameStore";
-import { useGameActionHandler } from "./useGameActionHandler";
+import { useGameStore } from "../../store/gameStore";
+import { useGameActionHandler } from "../core/useGameActionHandler";
 import type { SwipeGesture, TapGesture } from "./useTouchDetection";
 
 export interface TouchActionsReturn {

@@ -1,7 +1,7 @@
-import { useGameLoop } from "../../hooks/useGameLoop";
-import { useHighScoreSideEffect } from "../../hooks/useHighScoreSideEffect";
-import { useKeyboardControls } from "../../hooks/useKeyboardControls";
-import { useTouchGestures } from "../../hooks/useTouchGestures";
+import { useKeyboardControls } from "../../hooks/controls/useKeyboardControls";
+import { useTouchGestures } from "../../hooks/controls/useTouchGestures";
+import { useGameLoop } from "../../hooks/core/useGameLoop";
+import { useHighScoreSideEffect } from "../../hooks/effects/useHighScoreSideEffect";
 import {
   Board,
   Controls,

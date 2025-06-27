@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
-import { useGameStore } from "../store/gameStore";
-import { useHighScoreStore } from "../store/highScoreStore";
+import { useGameStore } from "../../store/gameStore";
+import { useHighScoreStore } from "../../store/highScoreStore";
 
 /**
  * Custom hook that handles high score saving as a side effect

@@ -1,7 +1,7 @@
 import { useRef, useTransition } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { useGameStore } from "../store/gameStore";
-import { useGameActionHandler } from "./useGameActionHandler";
+import { useGameStore } from "../../store/gameStore";
+import { useGameActionHandler } from "../core/useGameActionHandler";
 
 export function useKeyboardControls() {
   const moveLeft = useGameStore((state) => state.moveLeft);

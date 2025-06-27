@@ -1,5 +1,5 @@
 import { useCallback, useTransition } from "react";
-import { useGameStore } from "../store/gameStore";
+import { useGameStore } from "../../store/gameStore";
 
 /**
  * Shared game action handler that provides consistent action execution across all hooks
