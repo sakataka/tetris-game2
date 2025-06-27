@@ -28,6 +28,17 @@ mock.module("../../store/gameStore", () => ({
   }),
 }));
 
+// Mock useGameActionHandler to execute actions directly
+mock.module("../core/useGameActionHandler", () => ({
+  useGameActionHandler: () =>
+    mock((action, urgent = false) => {
+      // Only execute action if game is not paused or over
+      if (!mockGameState.isGameOver && !mockGameState.isPaused) {
+        action();
+      }
+    }),
+}));
+
 // Mock only startTransition, let React hooks work normally
 const mockStartTransition = mock((callback) => callback());
 mock.module("react", () => ({

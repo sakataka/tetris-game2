@@ -70,11 +70,11 @@ describe("useGameLoop", () => {
     useGameStore.getState = mock(() => defaultState);
 
     // Mock requestAnimationFrame - don't actually call the callback to prevent infinite loops
-    global.requestAnimationFrame = mock((callback) => {
+    global.requestAnimationFrame = mock((_callback) => {
       // Return a mock ID without calling the callback
       return 1;
     });
-    global.cancelAnimationFrame = mock((id) => {});
+    global.cancelAnimationFrame = mock((_id) => {});
   });
 
   test("should start game loop when not paused and not game over", () => {
