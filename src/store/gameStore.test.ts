@@ -297,7 +297,6 @@ describe("gameStore", () => {
   describe("drop action", () => {
     it("should hard drop current piece", () => {
       const { result } = renderHook(() => useTestGameStore());
-      const initialScore = result.current.score;
 
       act(() => {
         result.current.drop();
