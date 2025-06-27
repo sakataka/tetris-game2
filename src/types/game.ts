@@ -1,17 +1,8 @@
 /**
- * Discriminated union type for tetromino pieces with their associated color indices.
- * Each piece type has a unique shape and color representation.
+ * Union type for tetromino piece names.
+ * Color indices are managed separately via TETROMINO_COLOR_MAP.
  */
-export type TetrominoType =
-  | { type: "I"; colorIndex: 1 }
-  | { type: "O"; colorIndex: 2 }
-  | { type: "T"; colorIndex: 3 }
-  | { type: "S"; colorIndex: 4 }
-  | { type: "Z"; colorIndex: 5 }
-  | { type: "J"; colorIndex: 6 }
-  | { type: "L"; colorIndex: 7 };
-
-export type TetrominoTypeName = TetrominoType["type"];
+export type TetrominoTypeName = "I" | "O" | "T" | "S" | "Z" | "J" | "L";
 
 /**
  * Represents a 2D coordinate position on the game board.

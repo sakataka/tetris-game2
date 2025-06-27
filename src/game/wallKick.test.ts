@@ -92,7 +92,6 @@ describe("Wall Kick System", () => {
 
       const result = tryRotateWithWallKick(
         board,
-        tShape,
         rotatedShape,
         position,
         "T",
@@ -120,7 +119,6 @@ describe("Wall Kick System", () => {
 
       const result = tryRotateWithWallKick(
         board,
-        tShape,
         rotatedShape,
         position,
         "T",
@@ -154,7 +152,6 @@ describe("Wall Kick System", () => {
 
       const result = tryRotateWithWallKick(
         board,
-        tShape,
         rotatedShape,
         position,
         "T",
@@ -180,7 +177,6 @@ describe("Wall Kick System", () => {
 
       const result = tryRotateWithWallKick(
         board,
-        iShape,
         rotatedShape,
         position,
         "I",
@@ -202,7 +198,6 @@ describe("Wall Kick System", () => {
 
       const result = tryRotateWithWallKick(
         board,
-        oShape,
         rotatedShape,
         position,
         "O",
@@ -236,7 +231,6 @@ describe("Wall Kick System", () => {
       for (const [from, to] of transitions) {
         const result = tryRotateWithWallKick(
           board,
-          tShape,
           tShape, // Using same shape for simplicity
           position,
           "T",
