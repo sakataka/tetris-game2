@@ -1,6 +1,5 @@
 import type { CellValue, Tetromino, TetrominoTypeName } from "../types/game";
 import { BOARD_WIDTH } from "../utils/gameConstants";
-import { isValidTetrominoType } from "../utils/typeGuards";
 
 // Type-safe color index mapping
 export const TETROMINO_COLOR_MAP = {
@@ -15,16 +14,6 @@ export const TETROMINO_COLOR_MAP = {
 
 export function getTetrominoColorIndex(type: TetrominoTypeName): CellValue {
   return TETROMINO_COLOR_MAP[type];
-}
-
-/**
- * Safely gets tetromino shape with validation
- */
-export function getTetrominoShapeSafe(type: string): CellValue[][] {
-  if (!isValidTetrominoType(type)) {
-    throw new Error(`Invalid tetromino type: ${type}`);
-  }
-  return getTetrominoShape(type);
 }
 
 export const TETROMINOS: Record<TetrominoTypeName, CellValue[][]> = {

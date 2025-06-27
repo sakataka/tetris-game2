@@ -3,9 +3,17 @@ import { fireEvent, render } from "@testing-library/react";
 import { AnimatedButton } from "./AnimatedButton";
 
 // Mock framer-motion to avoid animation complexities in tests
+interface MockMotionProps {
+  children?: React.ReactNode;
+  whileHover?: object;
+  whileTap?: object;
+  transition?: object;
+  [key: string]: unknown;
+}
+
 mock.module("framer-motion", () => ({
   motion: {
-    div: ({ children, whileHover, whileTap, transition, ...props }: any) => (
+    div: ({ children, whileHover, whileTap, transition, ...props }: MockMotionProps) => (
       <div
         data-motion-div
         data-while-hover={whileHover ? "true" : undefined}
@@ -122,7 +130,7 @@ describe("AnimatedButton", () => {
 
   describe("forwardRef functionality", () => {
     it("should forward ref to button element", () => {
-      let buttonRef: any = null;
+      let buttonRef: HTMLButtonElement | null = null;
 
       render(
         <AnimatedButton
@@ -139,7 +147,7 @@ describe("AnimatedButton", () => {
     });
 
     it("should forward ref when animation is disabled", () => {
-      let buttonRef: any = null;
+      let buttonRef: HTMLButtonElement | null = null;
 
       render(
         <AnimatedButton

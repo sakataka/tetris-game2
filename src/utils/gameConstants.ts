@@ -83,11 +83,6 @@ export const GAME_CONSTANTS = {
   },
 } as const;
 
-// Type-safe constants exports
-export type RotationState = (typeof GAME_CONSTANTS.TETROMINO.ROTATION_STATES)[number];
-export type TetrominoTypeName = (typeof GAME_CONSTANTS.TYPES.TETROMINO_TYPES)[number];
-export type BaseScore = (typeof GAME_CONSTANTS.SCORING.BASE_SCORES)[number];
-
 // Backward compatibility exports for existing code
 export const BOARD_WIDTH = GAME_CONSTANTS.BOARD.WIDTH;
 export const BOARD_HEIGHT = GAME_CONSTANTS.BOARD.HEIGHT;
@@ -99,12 +94,7 @@ export const NEXT_PIECE_GRID_SIZE = GAME_CONSTANTS.TETROMINO.NEXT_PIECE_GRID_SIZ
 export const LINES_PER_LEVEL = GAME_CONSTANTS.SCORING.LINES_PER_LEVEL;
 export const BASE_SCORES = GAME_CONSTANTS.SCORING.BASE_SCORES;
 export const TETROMINO_TYPES = GAME_CONSTANTS.TYPES.TETROMINO_TYPES;
-export const MAX_ROTATION_STATE = GAME_CONSTANTS.TETROMINO.MAX_ROTATION_STATE;
 export const DROP_POSITION_MAX_ITERATIONS = GAME_CONSTANTS.TETROMINO.DROP_POSITION_LIMIT;
-
-// Additional named constants for common calculations
-export const BOARD_CENTER_X = Math.floor(GAME_CONSTANTS.BOARD.WIDTH / 2);
-export const TETROMINO_GRID_CENTER = Math.floor(GAME_CONSTANTS.TETROMINO.GRID_SIZE / 2);
 
 // Animation spring configurations
 export const SPRING_CONFIGS = {

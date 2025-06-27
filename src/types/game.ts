@@ -10,11 +10,6 @@ export type TetrominoTypeName = "I" | "O" | "T" | "S" | "Z" | "J" | "L";
 export type RotationState = 0 | 1 | 2 | 3;
 
 /**
- * All tetromino piece types as a const array for better type inference
- */
-export const TETROMINO_TYPES = ["I", "O", "T", "S", "Z", "J", "L"] as const;
-
-/**
  * Cell values for board matrix (0=empty, 1-7=tetromino color indices)
  */
 export type CellValue = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;

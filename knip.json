@@ -1,8 +1,14 @@
 {
   "entry": ["src/main.tsx"],
   "project": ["src/**/*.{ts,tsx}", "*.{ts,js}"],
-  "ignore": ["dist/**", "node_modules/**", "**/*.test.{ts,tsx}", "src/test/__mocks__/**"],
+  "ignore": [
+    "dist/**",
+    "node_modules/**",
+    "**/*.test.{ts,tsx}",
+    "src/test/__mocks__/**",
+    "src/test/setup.ts"
+  ],
   "ignoreExportsUsedInFile": true,
   "includeEntryExports": false,
-  "ignoreDependencies": ["@biomejs/biome", "bun-types"]
+  "ignoreDependencies": ["@biomejs/biome", "bun-types", "happy-dom"]
 }
