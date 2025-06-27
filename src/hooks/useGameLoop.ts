@@ -2,6 +2,15 @@ import { useEffect, useRef, useTransition } from "react";
 import { getGameSpeed } from "../game/game";
 import { useGameStore } from "../store/gameStore";
 
+/**
+ * Game loop implementation using requestAnimationFrame
+ *
+ * We use requestAnimationFrame instead of setInterval to:
+ * - Sync with browser's repaint cycle for smoother animations
+ * - Automatically pause when tab is not visible (browser optimization)
+ * - Better performance on high refresh rate displays
+ * - Prevent timer drift that can occur with setInterval
+ */
 export function useGameLoop() {
   const { moveDown, isPaused, isGameOver, level } = useGameStore();
   const lastUpdateTime = useRef(0);

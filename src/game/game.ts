@@ -1,4 +1,4 @@
-import type { GameState, Position, Tetromino, TetrominoTypeName } from "../types/game";
+import type { BoardMatrix, GameState, Position, Tetromino, TetrominoTypeName } from "../types/game";
 import {
   BASE_SCORES,
   INITIAL_DROP_SPEED_MS,
@@ -55,7 +55,7 @@ export function moveTetrominoBy(state: GameState, dx: number, dy: number): GameS
   };
 
   if (isValidPosition(state.board, state.currentPiece.shape, newPosition)) {
-    return updateGhostPosition({
+    return _updateGhostPosition({
       ...state,
       currentPiece: {
         ...state.currentPiece,
@@ -93,7 +93,7 @@ export function rotateTetrominoCW(state: GameState): GameState {
   );
 
   if (newPosition) {
-    return updateGhostPosition({
+    return _updateGhostPosition({
       ...state,
       currentPiece: {
         ...currentPiece,
@@ -108,29 +108,43 @@ export function rotateTetrominoCW(state: GameState): GameState {
   return state;
 }
 
-export function hardDropTetromino(state: GameState): GameState {
-  if (!state.currentPiece || state.isGameOver || state.isPaused) return state;
+/**
+ * Find the lowest valid position where a tetromino can be placed when dropped
+ * This is used by both hard drop and ghost piece calculations
+ */
+function _findDropPosition(
+  board: BoardMatrix,
+  shape: number[][],
+  startPosition: Position,
+): Position {
+  let dropPosition = startPosition;
 
-  const currentPiece = state.currentPiece;
-  let finalPosition = currentPiece.position;
-
-  // Find the lowest valid position (with safety limit to prevent infinite loop)
+  // Move down until we can't anymore (with safety limit to prevent infinite loop)
   let iterations = 0;
   const maxIterations = 30; // Safety limit: more than enough for any valid board position
 
   while (iterations < maxIterations) {
     const nextPosition = {
-      x: finalPosition.x,
-      y: finalPosition.y + 1,
+      x: dropPosition.x,
+      y: dropPosition.y + 1,
     };
 
-    if (isValidPosition(state.board, currentPiece.shape, nextPosition)) {
-      finalPosition = nextPosition;
+    if (isValidPosition(board, shape, nextPosition)) {
+      dropPosition = nextPosition;
       iterations++;
     } else {
       break;
     }
   }
+
+  return dropPosition;
+}
+
+export function hardDropTetromino(state: GameState): GameState {
+  if (!state.currentPiece || state.isGameOver || state.isPaused) return state;
+
+  const currentPiece = state.currentPiece;
+  const finalPosition = _findDropPosition(state.board, currentPiece.shape, currentPiece.position);
 
   // Update the piece position to the final position
   const newState = {
@@ -237,7 +251,7 @@ function lockCurrentTetromino(state: GameState): GameState {
   // If there are lines to clear, preserve the board state before clearing
   const boardBeforeClear = clearingLines.length > 0 ? boardAfterLock : null;
 
-  return updateGhostPosition({
+  return _updateGhostPosition({
     ...state,
     board: boardAfterClear,
     boardBeforeClear,
@@ -277,36 +291,24 @@ export function getGameSpeed(level: number): number {
 export function calculateGhostPosition(state: GameState): Position | null {
   if (!state.currentPiece || state.isGameOver) return null;
 
-  let ghostY = state.currentPiece.position.y;
-  const ghostX = state.currentPiece.position.x;
-
-  // Move down until we can't anymore (with safety limit to prevent infinite loop)
-  let iterations = 0;
-  const maxIterations = 30; // Safety limit: more than enough for any valid board position
-
-  while (
-    iterations < maxIterations &&
-    isValidPosition(state.board, state.currentPiece.shape, {
-      x: ghostX,
-      y: ghostY + 1,
-    })
-  ) {
-    ghostY++;
-    iterations++;
-  }
+  const ghostPosition = _findDropPosition(
+    state.board,
+    state.currentPiece.shape,
+    state.currentPiece.position,
+  );
 
   // If ghost position is the same as current position, don't show ghost
-  if (ghostY === state.currentPiece.position.y) {
+  if (ghostPosition.y === state.currentPiece.position.y) {
     return null;
   }
 
-  return { x: ghostX, y: ghostY };
+  return ghostPosition;
 }
 
 /**
  * Helper function to update ghost position in game state
  */
-function updateGhostPosition(state: GameState): GameState {
+function _updateGhostPosition(state: GameState): GameState {
   return {
     ...state,
     ghostPosition: calculateGhostPosition(state),
@@ -341,7 +343,7 @@ export function holdCurrentPiece(state: GameState): GameState {
       canHold: false,
       pieceBag: pieceBagManager.getBag(),
     };
-    return updateGhostPosition(newState);
+    return _updateGhostPosition(newState);
   }
   // Exchange hold: swap held piece with current piece
   const newCurrentPiece = createTetromino(state.heldPiece);
@@ -351,5 +353,5 @@ export function holdCurrentPiece(state: GameState): GameState {
     heldPiece: currentPieceType,
     canHold: false,
   };
-  return updateGhostPosition(newState);
+  return _updateGhostPosition(newState);
 }
