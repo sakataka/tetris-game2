@@ -3,7 +3,7 @@ import { render } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import type React from "react";
 import { createEmptyBoard, placeTetromino } from "../../game/board";
-import { createTetromino, getTetrominoColorIndex } from "../../game/tetrominos";
+import { getTetrominoColorIndex } from "../../game/tetrominos";
 import type { GameBoard, GameState, Position, TetrominoTypeName } from "../../types/game";
 import { GAME_CONSTANTS } from "../../utils/gameConstants";
 import { Board } from "./Board";
@@ -80,6 +80,50 @@ mock.module("@/lib/utils", () => ({
 // ==============================
 
 /**
+ * Get tetromino shape for testing (avoid CI environment issues)
+ */
+function getTestTetrominoShape(type: TetrominoTypeName): number[][] {
+  const shapes: Record<TetrominoTypeName, number[][]> = {
+    I: [
+      [0, 0, 0, 0],
+      [1, 1, 1, 1],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+    ],
+    O: [
+      [1, 1],
+      [1, 1],
+    ],
+    T: [
+      [0, 1, 0],
+      [1, 1, 1],
+      [0, 0, 0],
+    ],
+    S: [
+      [0, 1, 1],
+      [1, 1, 0],
+      [0, 0, 0],
+    ],
+    Z: [
+      [1, 1, 0],
+      [0, 1, 1],
+      [0, 0, 0],
+    ],
+    J: [
+      [1, 0, 0],
+      [1, 1, 1],
+      [0, 0, 0],
+    ],
+    L: [
+      [0, 0, 1],
+      [1, 1, 1],
+      [0, 0, 0],
+    ],
+  };
+  return shapes[type];
+}
+
+/**
  * Create board with specific tetromino placed at position
  * Assertion First: Create by working backwards from expected placement state
  */
@@ -87,13 +131,13 @@ function createBoardWithTetromino(
   type: TetrominoTypeName,
   position: Position,
 ): { board: GameBoard; piecePositions: Set<string> } {
-  const tetromino = createTetromino(type);
+  const shape = getTestTetrominoShape(type);
   const colorIndex = getTetrominoColorIndex(type);
-  const board = placeTetromino(createEmptyBoard(), tetromino.shape, position, colorIndex);
+  const board = placeTetromino(createEmptyBoard(), shape, position, colorIndex);
 
   // Calculate expected piece positions for assertions
   const piecePositions = new Set<string>();
-  tetromino.shape.forEach((row, rowIndex) => {
+  shape.forEach((row, rowIndex) => {
     row.forEach((cell, colIndex) => {
       if (cell !== 0) {
         piecePositions.add(`${position.x + colIndex},${position.y + rowIndex}`);
