@@ -28,12 +28,8 @@ jobs:
       - name: Run type check
         run: bun run typecheck
 
-      - name: Run tests with coverage
-        run: bun run test:coverage
-
-      - name: Generate JUnit test report
-        run: bun run test:junit
-        if: always()
+      - name: Run tests
+        run: bun test
 
       - name: Check dead code
         run: bun run knip
@@ -41,9 +37,3 @@ jobs:
       - name: Run build
         run: bun run build
 
-      - name: Upload test results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: test-results
-          path: test-results.xml
