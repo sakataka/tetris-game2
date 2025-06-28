@@ -21,6 +21,11 @@
     "test:fast": "bun test src/game/ src/hooks/ src/utils/",
     "test:components": "bun test src/components/",
     "test:ci": "bun test",
+    "test:visual": "playwright test",
+    "test:visual:ui": "playwright test --ui",
+    "test:visual:debug": "playwright test --debug",
+    "test:visual:update": "playwright test --update-snapshots",
+    "playwright:install": "playwright install",
     "outdated": "bun outdated",
     "update:latest": "bun update --latest",
     "ci": "bun x biome ci && bun run typecheck && bun run build",
@@ -43,6 +48,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.0.6",
+    "@playwright/test": "^1.53.1",
     "@tailwindcss/vite": "^4.1.11",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
@@ -54,6 +60,7 @@
     "happy-dom": "^18.0.1",
     "knip": "^5.61.2",
     "lefthook": "1.11.14",
+    "playwright": "^1.53.1",
     "tailwindcss": "4.1.11",
     "typescript": "5.8.3",
     "vite": "npm:rolldown-vite@^7.0.3"

@@ -33,5 +33,12 @@ coverage
 .nyc_output
 .vercel
 
+# Playwright
+test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+playwright-report/
+
 # TypeScript
 *.tsbuildinfo
