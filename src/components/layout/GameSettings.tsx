@@ -1,5 +1,5 @@
 import { Settings } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { useSettingsStore } from "../../store/settingsStore";
@@ -28,10 +28,13 @@ export function GameSettings() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const languages = [
-    { value: "en", label: i18n.language === "ja" ? "英語" : "English", flag: "🇺🇸" },
-    { value: "ja", label: i18n.language === "ja" ? "日本語" : "Japanese", flag: "🇯🇵" },
-  ];
+  const languages = useMemo(
+    () => [
+      { value: "en", label: i18n.language === "ja" ? "英語" : "English", flag: "🇺🇸" },
+      { value: "ja", label: i18n.language === "ja" ? "日本語" : "Japanese", flag: "🇯🇵" },
+    ],
+    [i18n.language],
+  );
 
   const handleLanguageChange = (value: string) => {
     i18n.changeLanguage(value);
