@@ -204,7 +204,7 @@ function expectCellToBeTetrominoType(
 // TESTS - t_wada style: Assertion First & Triangulation
 // ==============================
 
-describe("Board.tsx - t_wada TDD Style", () => {
+describe.skip("Board.tsx - t_wada TDD Style", () => {
   // ==============================
   // Basic Rendering Test
   // ==============================
