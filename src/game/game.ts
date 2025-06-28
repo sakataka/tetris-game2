@@ -1,5 +1,6 @@
 import type { GameBoard, GameState, Position, Tetromino, TetrominoTypeName } from "../types/game";
 import { GAME_CONSTANTS } from "../utils/gameConstants";
+import { canPerformHoldAction, isGameOverState, isGamePlayable } from "../utils/gameValidation";
 import { normalizeRotationState } from "../utils/typeGuards";
 import {
   clearLines,
@@ -42,7 +43,7 @@ export function createInitialGameState(): GameState {
 }
 
 export function moveTetrominoBy(state: GameState, dx: number, dy: number): GameState {
-  if (!state.currentPiece || state.isGameOver || state.isPaused) return state;
+  if (!isGamePlayable(state) || !state.currentPiece) return state;
 
   const newPosition = {
     x: state.currentPiece.position.x + dx,
@@ -61,7 +62,7 @@ export function moveTetrominoBy(state: GameState, dx: number, dy: number): GameS
 }
 
 export function rotateTetrominoCW(state: GameState): GameState {
-  if (!state.currentPiece || state.isGameOver || state.isPaused) return state;
+  if (!isGamePlayable(state) || !state.currentPiece) return state;
 
   const { currentPiece } = state;
   const rotatedShape = rotateTetromino(currentPiece.shape);
@@ -116,7 +117,7 @@ function _findDropPosition(board: GameBoard, shape: number[][], startPosition: P
 }
 
 export function hardDropTetromino(state: GameState): GameState {
-  if (!state.currentPiece || state.isGameOver || state.isPaused) return state;
+  if (!isGamePlayable(state) || !state.currentPiece) return state;
 
   const finalPosition = _findDropPosition(
     state.board,
@@ -185,7 +186,7 @@ export function preserveBoardForAnimation(
 }
 
 export function checkGameOver(board: GameBoard, piece: Tetromino): boolean {
-  return !isValidPosition(board, piece.shape, piece.position);
+  return isGameOverState(board, piece);
 }
 
 export function spawnNextPiece(nextPieceType: TetrominoTypeName, pieceBag: TetrominoTypeName[]) {
@@ -200,13 +201,21 @@ export function spawnNextPiece(nextPieceType: TetrominoTypeName, pieceBag: Tetro
   };
 }
 
-/**
- * Coordinates the piece locking process when a piece can no longer move down
- * Handles: piece placement, line clearing, scoring, next piece spawning, game over check
- */
-function lockCurrentTetromino(state: GameState): GameState {
-  if (!state.currentPiece) return state;
+type PlacementResult = {
+  board: GameBoard;
+  boardBeforeClear: GameBoard | null;
+  score: number;
+  lines: number;
+  level: number;
+  placedPositions: Position[];
+  clearingLines: number[];
+};
 
+/**
+ * Processes piece placement and line clearing in a single operation
+ * Combines placement, clearing, scoring, and animation setup
+ */
+function processPlacementAndClearing(state: GameState): PlacementResult {
   const { board: boardAfterLock, placedPositions } = placePieceOnBoard(state);
   const {
     board: boardAfterClear,
@@ -216,28 +225,90 @@ function lockCurrentTetromino(state: GameState): GameState {
     clearingLines,
   } = clearCompletedLines(boardAfterLock, state.score, state.lines, state.level);
   const boardBeforeClear = preserveBoardForAnimation(boardAfterLock, clearingLines);
-  const {
-    currentPiece: newPiece,
-    nextPiece,
-    pieceBag,
-  } = spawnNextPiece(state.nextPiece, state.pieceBag);
-  const isGameOver = checkGameOver(boardAfterClear, newPiece);
 
-  return updateGhostPosition({
-    ...state,
+  return {
     board: boardAfterClear,
     boardBeforeClear,
-    currentPiece: isGameOver ? null : newPiece,
-    nextPiece,
     score,
     lines,
     level,
-    isGameOver,
     placedPositions,
     clearingLines,
+  };
+}
+
+type NextPieceResult = {
+  currentPiece: Tetromino | null;
+  nextPiece: TetrominoTypeName;
+  pieceBag: TetrominoTypeName[];
+  isGameOver: boolean;
+};
+
+/**
+ * Handles next piece generation and game over validation
+ * Spawns new piece and determines if game should end
+ */
+function processNextPieceAndGameState(
+  nextPieceType: TetrominoTypeName,
+  pieceBag: TetrominoTypeName[],
+  board: GameBoard,
+): NextPieceResult {
+  const {
+    currentPiece: newPiece,
+    nextPiece,
+    pieceBag: updatedBag,
+  } = spawnNextPiece(nextPieceType, pieceBag);
+  const isGameOver = checkGameOver(board, newPiece);
+
+  return {
+    currentPiece: isGameOver ? null : newPiece,
+    nextPiece,
+    pieceBag: updatedBag,
+    isGameOver,
+  };
+}
+
+/**
+ * Builds the final game state by combining all processing results
+ * Handles state merge and ghost position calculation
+ */
+function buildFinalGameState(
+  baseState: GameState,
+  placementResult: PlacementResult,
+  nextPieceResult: NextPieceResult,
+): GameState {
+  return updateGhostPosition({
+    ...baseState,
+    board: placementResult.board,
+    boardBeforeClear: placementResult.boardBeforeClear,
+    currentPiece: nextPieceResult.currentPiece,
+    nextPiece: nextPieceResult.nextPiece,
+    score: placementResult.score,
+    lines: placementResult.lines,
+    level: placementResult.level,
+    isGameOver: nextPieceResult.isGameOver,
+    placedPositions: placementResult.placedPositions,
+    clearingLines: placementResult.clearingLines,
     canHold: true,
-    pieceBag,
+    pieceBag: nextPieceResult.pieceBag,
   });
+}
+
+/**
+ * Coordinates the piece locking process when a piece can no longer move down
+ * Handles: piece placement, line clearing, scoring, next piece spawning, game over check
+ */
+function lockCurrentTetromino(state: GameState): GameState {
+  if (!state.currentPiece) return state;
+
+  const placementResult = processPlacementAndClearing(state);
+  const nextPieceResult = processNextPieceAndGameState(
+    state.nextPiece,
+    state.pieceBag,
+    placementResult.board,
+  );
+
+  return buildFinalGameState(state, placementResult, nextPieceResult);
 }
 
 /**
@@ -279,7 +350,7 @@ function updateGhostPosition(state: GameState): GameState {
  * Initial hold: save piece and spawn next, Exchange hold: swap with held piece
  */
 export function holdCurrentPiece(state: GameState): GameState {
-  if (!state.currentPiece || !state.canHold || state.isGameOver || state.isPaused) return state;
+  if (!canPerformHoldAction(state) || !state.currentPiece) return state;
 
   const currentPieceType = state.currentPiece.type;
 

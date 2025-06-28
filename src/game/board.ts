@@ -1,4 +1,5 @@
 import type { CellValue, GameBoard, Position } from "../types/game";
+import { isValidBoardPosition } from "../utils/boardUtils";
 import { GAME_CONSTANTS } from "../utils/gameConstants";
 
 export function createEmptyBoard(): GameBoard {
@@ -58,12 +59,7 @@ export function placeTetromino(
   const newBoard = board.map((row) => [...row]) as GameBoard;
 
   forEachPieceCell(shape, position, (boardX, boardY) => {
-    if (
-      boardY >= 0 &&
-      boardY < GAME_CONSTANTS.BOARD.HEIGHT &&
-      boardX >= 0 &&
-      boardX < GAME_CONSTANTS.BOARD.WIDTH
-    ) {
+    if (isValidBoardPosition({ x: boardX, y: boardY })) {
       newBoard[boardY][boardX] = colorIndex;
     }
   });

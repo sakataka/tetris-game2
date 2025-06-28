@@ -3,7 +3,7 @@ import { forEachPieceCell } from "../../game/board";
 import { getTetrominoColorIndex } from "../../game/tetrominos";
 import { useGameStore } from "../../store/gameStore";
 import { useSettingsStore } from "../../store/settingsStore";
-import { GAME_CONSTANTS } from "../../utils/gameConstants";
+import { createCellKey, isValidBoardPosition } from "../../utils/boardUtils";
 
 /**
  * Board-related state selectors
@@ -34,14 +34,10 @@ export const useBoardData = () => {
     if (currentPiece) {
       const colorIndex = getTetrominoColorIndex(currentPiece.type);
       forEachPieceCell(currentPiece.shape, currentPiece.position, (boardX, boardY) => {
-        if (
-          boardY >= 0 &&
-          boardY < GAME_CONSTANTS.BOARD.HEIGHT &&
-          boardX >= 0 &&
-          boardX < GAME_CONSTANTS.BOARD.WIDTH
-        ) {
+        const position = { x: boardX, y: boardY };
+        if (isValidBoardPosition(position)) {
           newBoard[boardY][boardX] = colorIndex;
-          positions.add(`${boardX},${boardY}`);
+          positions.add(createCellKey(position));
         }
       });
     }
@@ -53,7 +49,7 @@ export const useBoardData = () => {
   const placedPositionsSet = useMemo(() => {
     const positions = new Set<string>();
     placedPositions.forEach((pos) => {
-      positions.add(`${pos.x},${pos.y}`);
+      positions.add(createCellKey(pos));
     });
     return positions;
   }, [placedPositions]);
@@ -68,13 +64,9 @@ export const useBoardData = () => {
     }
 
     forEachPieceCell(currentPiece.shape, ghostPosition, (boardX, boardY) => {
-      if (
-        boardY >= 0 &&
-        boardY < GAME_CONSTANTS.BOARD.HEIGHT &&
-        boardX >= 0 &&
-        boardX < GAME_CONSTANTS.BOARD.WIDTH
-      ) {
-        positions.add(`${boardX},${boardY}`);
+      const position = { x: boardX, y: boardY };
+      if (isValidBoardPosition(position)) {
+        positions.add(createCellKey(position));
       }
     });
 
