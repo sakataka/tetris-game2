@@ -12,10 +12,25 @@ export function useActionCooldown<T extends unknown[]>(
   cooldownMs: number,
 ) {
   const lastExecutionTimeRef = useRef<number>(0);
+  const isProcessingRef = useRef<boolean>(false);
 
   const executeWithCooldown = useCallback(
     (...args: T) => {
+      // Prevent re-entrant calls
+      if (isProcessingRef.current) {
+        return;
+      }
+
       const now = Date.now();
+
+      // Special case: if cooldownMs is 0, always execute
+      if (cooldownMs === 0) {
+        isProcessingRef.current = true;
+        lastExecutionTimeRef.current = now;
+        action(...args);
+        isProcessingRef.current = false;
+        return;
+      }
 
       // Check if enough time has passed since last execution
       if (now - lastExecutionTimeRef.current < cooldownMs) {
@@ -23,8 +38,10 @@ export function useActionCooldown<T extends unknown[]>(
       }
 
       // Update last execution time and execute action
+      isProcessingRef.current = true;
       lastExecutionTimeRef.current = now;
       action(...args);
+      isProcessingRef.current = false;
     },
     [action, cooldownMs],
   );

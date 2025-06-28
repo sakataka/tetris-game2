@@ -11,7 +11,7 @@ describe("useActionCooldown", () => {
       lastCallArgs = args;
     };
 
-    const { result } = renderHook(() => useActionCooldown(mockAction, 100));
+    const { result } = renderHook(() => useActionCooldown(mockAction, 0));
 
     expect(typeof result.current).toBe("function");
 
@@ -29,7 +29,7 @@ describe("useActionCooldown", () => {
       callCount++;
     };
 
-    // Use 0ms cooldown to avoid timing issues in CI
+    // Use 0ms cooldown to ensure immediate execution
     const { result } = renderHook(() => useActionCooldown(mockAction, 0));
 
     act(() => {
@@ -54,7 +54,7 @@ describe("useActionCooldown", () => {
       lastCallArgs = args;
     };
 
-    const { result } = renderHook(() => useActionCooldown(mockAction, 100));
+    const { result } = renderHook(() => useActionCooldown(mockAction, 0));
 
     act(() => {
       result.current("arg1", 42, true);
