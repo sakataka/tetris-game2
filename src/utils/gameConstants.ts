@@ -85,27 +85,3 @@ export const GAME_CONSTANTS = {
 } as const;
 
 // All constants are now accessed through the centralized GAME_CONSTANTS object
-
-// Animation spring configurations
-export const SPRING_CONFIGS = {
-  SCORE: {
-    stiffness: GAME_CONSTANTS.ANIMATION.SCORE.STIFFNESS,
-    damping: GAME_CONSTANTS.ANIMATION.SCORE.DAMPING,
-  },
-  LINES: {
-    stiffness: GAME_CONSTANTS.ANIMATION.LINES.STIFFNESS,
-    damping: GAME_CONSTANTS.ANIMATION.LINES.DAMPING,
-  },
-  LEVEL: {
-    stiffness: GAME_CONSTANTS.ANIMATION.LEVEL.STIFFNESS,
-    damping: GAME_CONSTANTS.ANIMATION.LEVEL.DAMPING,
-  },
-  DEFAULT: {
-    stiffness: GAME_CONSTANTS.ANIMATION.DEFAULT.STIFFNESS,
-    damping: GAME_CONSTANTS.ANIMATION.DEFAULT.DAMPING,
-  },
-  CELL: {
-    stiffness: GAME_CONSTANTS.ANIMATION.CELL.STIFFNESS,
-    damping: GAME_CONSTANTS.ANIMATION.CELL.DAMPING,
-  },
-} as const;

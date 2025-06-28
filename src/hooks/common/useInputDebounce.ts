@@ -26,13 +26,19 @@ interface DebounceOptions {
 export function useInputDebounce<T>(value: T, delay: number, options: DebounceOptions = {}): T {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
   const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
-  const isFirstRunRef = useRef(true);
+  const isInitialMount = useRef(true);
+  const { leading = false, trailing = true } = options;
 
   useEffect(() => {
-    // Handle leading edge execution
-    if (options.leading && isFirstRunRef.current) {
+    // Skip debouncing on initial mount
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
+    // Handle leading edge execution - execute immediately on value change
+    if (leading) {
       setDebouncedValue(value);
-      isFirstRunRef.current = false;
     }
 
     // Clear existing timeout
@@ -40,27 +46,25 @@ export function useInputDebounce<T>(value: T, delay: number, options: DebounceOp
       clearTimeout(timeoutRef.current);
     }
 
-    // Set new timeout
+    // Don't set timeout if trailing is disabled
+    if (!trailing) {
+      return;
+    }
+
+    // Set new timeout for trailing edge
     timeoutRef.current = setTimeout(() => {
-      // Handle trailing edge execution
-      if (options.trailing !== false) {
-        setDebouncedValue(value);
-      }
+      setDebouncedValue(value);
       timeoutRef.current = undefined;
     }, delay);
 
-    // Cleanup
+    // Cleanup function
     return () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
+        timeoutRef.current = undefined;
       }
     };
-  }, [value, delay, options.leading, options.trailing]);
-
-  // Reset first run flag when value changes
-  useEffect(() => {
-    isFirstRunRef.current = true;
-  });
+  }, [value, delay, leading, trailing]);
 
   return debouncedValue;
 }

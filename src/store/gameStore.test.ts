@@ -1,7 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import { act, renderHook } from "@testing-library/react";
 import { create } from "zustand";
-import { createMockTetromino, createTestGameState } from "../tests/helpers/gameTestUtils";
+import { createInitialGameState } from "../game/game";
+import { createTetromino } from "../game/tetrominos";
 import type { GameState, TetrominoTypeName } from "../types/game";
 
 // Mock localStorage for testing
@@ -37,11 +38,7 @@ interface TestGameStore extends GameState {
 }
 
 // Static initial state to avoid complex initialization during tests
-const getTestInitialState = (): Partial<GameState> =>
-  createTestGameState({
-    ghostPosition: { x: 4, y: 18 }, // Static ghost position matching T-piece initial x position
-    pieceBag: ["O", "S", "Z", "J", "L"] as TetrominoTypeName[],
-  });
+const getTestInitialState = (): GameState => createInitialGameState();
 
 // Create isolated test store instance
 const useTestGameStore = create<TestGameStore>((set) => ({
@@ -111,7 +108,7 @@ const useTestGameStore = create<TestGameStore>((set) => ({
         ...state,
         heldPiece: state.currentPiece.type,
         canHold: false,
-        currentPiece: createMockTetromino("I"),
+        currentPiece: createTetromino("I"),
       };
     }),
 

@@ -82,7 +82,6 @@ export const getNextPiece = (bag: PieceBag): [TetrominoTypeName, PieceBag] => {
  * @param bag Current bag state
  * @returns true if the bag contains no pieces
  */
-export const isEmpty = (bag: PieceBag): boolean => bag.currentBag.length === 0;
 
 /**
  * Gets the current bag contents as an immutable array.
@@ -120,7 +119,6 @@ export const setBagForTesting = (
  * @param bag Current bag state
  * @returns Number of pieces remaining
  */
-export const getPiecesRemaining = (bag: PieceBag): number => bag.currentBag.length;
 
 /**
  * Gets the history of all generated pieces.
@@ -129,8 +127,6 @@ export const getPiecesRemaining = (bag: PieceBag): number => bag.currentBag.leng
  * @param bag Current bag state
  * @returns Array of all previously generated pieces
  */
-export const getGenerationHistory = (bag: PieceBag): readonly TetrominoTypeName[] =>
-  bag.generatedPieces;
 
 /**
  * Resets the bag to initial state while preserving seed.
@@ -139,7 +135,6 @@ export const getGenerationHistory = (bag: PieceBag): readonly TetrominoTypeName[
  * @param bag Current bag state
  * @returns New bag state reset to initial condition
  */
-export const resetBag = (bag: PieceBag): PieceBag => createPieceBag(bag.seed);
 
 // === UTILITY FUNCTIONS ===
 
@@ -176,41 +171,3 @@ const shuffleWithSeed = (array: TetrominoTypeName[], seed?: number): TetrominoTy
 
 // === BACKWARD COMPATIBILITY ===
 // Temporary compatibility layer for gradual migration
-
-/**
- * Legacy compatibility wrapper - DO NOT USE IN NEW CODE
- * @deprecated Use functional PieceBag API instead
- */
-export class PieceBagManager {
-  private bagState: PieceBag;
-
-  constructor() {
-    this.bagState = createPieceBag();
-  }
-
-  getNextPiece(): TetrominoTypeName {
-    const [piece, newState] = getNextPiece(this.bagState);
-    this.bagState = newState;
-    return piece;
-  }
-
-  isEmpty(): boolean {
-    return isEmpty(this.bagState);
-  }
-
-  getBag(): TetrominoTypeName[] {
-    return [...getBagContents(this.bagState)];
-  }
-
-  setBag(pieces: TetrominoTypeName[]): void {
-    this.bagState = setBagForTesting(this.bagState, pieces);
-  }
-}
-
-/**
- * Legacy factory function - DO NOT USE IN NEW CODE
- * @deprecated Use createPieceBag() instead
- */
-export function createPieceBagManager(): PieceBagManager {
-  return new PieceBagManager();
-}

@@ -1,6 +1,6 @@
 import { type MotionProps, motion } from "framer-motion";
 import { forwardRef } from "react";
-import { GAME_CONSTANTS } from "../../utils/gameConstants";
+import { ANIMATION_PRESETS } from "../../utils/animationConstants";
 import { Button, type ButtonProps } from "./button";
 
 interface AnimatedButtonProps extends ButtonProps {
@@ -52,11 +52,7 @@ export const AnimatedButton = forwardRef<HTMLButtonElement, AnimatedButtonProps>
       children,
       whileHover = { scale: 1.05 },
       whileTap = { scale: 0.95 },
-      transition = {
-        type: "spring",
-        stiffness: GAME_CONSTANTS.ANIMATION.DEFAULT.STIFFNESS,
-        damping: GAME_CONSTANTS.ANIMATION.DEFAULT.DAMPING,
-      },
+      transition = ANIMATION_PRESETS.buttonHover,
       animationDisabled = false,
       ...buttonProps
     },

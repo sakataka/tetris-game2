@@ -1,18 +1,6 @@
 import { describe, expect, it } from "bun:test";
 import { GAME_CONSTANTS } from "../utils/gameConstants";
-import {
-  createPieceBag,
-  // Legacy compatibility imports for backward compatibility tests
-  createPieceBagManager,
-  getBagContents,
-  getGenerationHistory,
-  getNextPiece,
-  getPiecesRemaining,
-  isEmpty,
-  PieceBagManager,
-  resetBag,
-  setBagForTesting,
-} from "./pieceBag";
+import { createPieceBag, getBagContents, getNextPiece, setBagForTesting } from "./pieceBag";
 
 describe("Functional PieceBag (mizchi-style)", () => {
   describe("createPieceBag", () => {
@@ -49,25 +37,24 @@ describe("Functional PieceBag (mizchi-style)", () => {
     });
 
     it("should refill bag automatically when empty", () => {
-      const bag = setBagForTesting(createPieceBag(), ["I"]); // Set bag with only one piece
+      const bag = setBagForTesting(createPieceBag(), ["I"]);
+      const [piece, newBag] = getNextPiece(bag);
 
-      // Get the last piece
-      const [lastPiece, newBag] = getNextPiece(bag);
-      expect(lastPiece).toBe("I");
-      expect(newBag.currentBag.length).toBe(0);
+      expect(piece).toBe("I");
+      expect(newBag.currentBag.length).toBe(0); // Current bag empty after taking last piece
+      expect(newBag.bagCount).toBe(1);
 
-      // Get next piece should trigger refill
-      const [nextPiece, refilledBag] = getNextPiece(newBag);
-      expect(typeof nextPiece).toBe("string");
-      expect(refilledBag.currentBag.length).toBe(6); // 7 - 1 taken
-      expect(refilledBag.bagCount).toBe(2);
+      // Get next piece to trigger refill
+      const [_nextPiece, refillBag] = getNextPiece(newBag);
+      expect(refillBag.currentBag.length).toBe(6); // New bag with 6 remaining
+      expect(refillBag.bagCount).toBe(2);
     });
 
     it("should return all 7 pieces exactly once before refilling", () => {
-      let bag = createPieceBag(12345); // Use seed for predictable order
-      const pieces: string[] = [];
+      let bag = createPieceBag();
+      const pieces = [];
 
-      // Get 7 pieces (one complete bag)
+      // Get all 7 pieces from current bag
       for (let i = 0; i < 7; i++) {
         const [piece, newBag] = getNextPiece(bag);
         pieces.push(piece);
@@ -80,8 +67,8 @@ describe("Functional PieceBag (mizchi-style)", () => {
     });
 
     it("should handle multiple bag generations", () => {
-      let bag = createPieceBag(12345);
-      const pieces: string[] = [];
+      let bag = createPieceBag();
+      const pieces = [];
 
       // Get 14 pieces (two complete bags)
       for (let i = 0; i < 14; i++) {
@@ -97,18 +84,6 @@ describe("Functional PieceBag (mizchi-style)", () => {
       expect(firstBag).toEqual([...GAME_CONSTANTS.TYPES.TETROMINO_TYPES].sort());
       expect(secondBag).toEqual([...GAME_CONSTANTS.TYPES.TETROMINO_TYPES].sort());
       expect(bag.bagCount).toBe(2);
-    });
-  });
-
-  describe("isEmpty", () => {
-    it("should return false for new bag", () => {
-      const bag = createPieceBag();
-      expect(isEmpty(bag)).toBe(false);
-    });
-
-    it("should return true for empty bag", () => {
-      const emptyBag = setBagForTesting(createPieceBag(), []);
-      expect(isEmpty(emptyBag)).toBe(true);
     });
   });
 
@@ -138,36 +113,9 @@ describe("Functional PieceBag (mizchi-style)", () => {
       const originalBag = createPieceBag();
       const originalContents = getBagContents(originalBag);
 
-      setBagForTesting(originalBag, ["I"]);
+      setBagForTesting(originalBag, ["I", "O"]);
 
       expect(getBagContents(originalBag)).toEqual(originalContents);
-    });
-  });
-
-  describe("utility functions", () => {
-    it("getPiecesRemaining should return correct count", () => {
-      const bag = setBagForTesting(createPieceBag(), ["I", "O", "T"]);
-      expect(getPiecesRemaining(bag)).toBe(3);
-    });
-
-    it("getGenerationHistory should track generated pieces", () => {
-      const bag = createPieceBag();
-      const [piece1, bag1] = getNextPiece(bag);
-      const [piece2, bag2] = getNextPiece(bag1);
-
-      expect(getGenerationHistory(bag2)).toEqual([piece1, piece2]);
-    });
-
-    it("resetBag should create fresh bag with same seed", () => {
-      const bag = createPieceBag(12345);
-      const [, usedBag] = getNextPiece(bag);
-
-      const resetBagInstance = resetBag(usedBag);
-
-      expect(resetBagInstance.currentBag.length).toBe(7);
-      expect(resetBagInstance.generatedPieces.length).toBe(0);
-      expect(resetBagInstance.bagCount).toBe(1);
-      expect(resetBagInstance.seed).toBe(12345);
     });
   });
 
@@ -189,92 +137,5 @@ describe("Functional PieceBag (mizchi-style)", () => {
       // At runtime, we can verify the array is a copy
       expect(contents).not.toBe(bag.currentBag);
     });
-  });
-});
-
-// === BACKWARD COMPATIBILITY TESTS ===
-// These tests ensure the legacy class-based API still works during transition
-
-describe("Legacy PieceBagManager (backward compatibility)", () => {
-  it("should create an empty bag initially", () => {
-    const manager = new PieceBagManager();
-    expect(manager.isEmpty()).toBe(false); // New bag starts with pieces
-  });
-
-  it("should refill bag and return all 7 pieces exactly once before refilling", () => {
-    const manager = new PieceBagManager();
-    const pieces: string[] = [];
-
-    // Get 7 pieces (one complete bag)
-    for (let i = 0; i < 7; i++) {
-      pieces.push(manager.getNextPiece());
-    }
-
-    // Should contain all 7 unique pieces
-    expect(pieces.sort()).toEqual([...GAME_CONSTANTS.TYPES.TETROMINO_TYPES].sort());
-    expect(new Set(pieces).size).toBe(7);
-  });
-
-  it("should refill bag automatically when empty", () => {
-    const manager = new PieceBagManager();
-
-    // Get more than 7 pieces (should trigger refill)
-    const pieces: string[] = [];
-    for (let i = 0; i < 14; i++) {
-      pieces.push(manager.getNextPiece());
-    }
-
-    // First 7 should be unique, next 7 should also be unique
-    const firstBag = pieces.slice(0, 7).sort();
-    const secondBag = pieces.slice(7, 14).sort();
-
-    expect(firstBag).toEqual([...GAME_CONSTANTS.TYPES.TETROMINO_TYPES].sort());
-    expect(secondBag).toEqual([...GAME_CONSTANTS.TYPES.TETROMINO_TYPES].sort());
-  });
-
-  it("should allow setting bag state for testing", () => {
-    const manager = new PieceBagManager();
-    const testBag = ["I", "O", "T"];
-
-    manager.setBag(testBag);
-    expect(manager.getBag()).toEqual(testBag);
-
-    // Should get pieces in order (first element first)
-    expect(manager.getNextPiece()).toBe("I");
-    expect(manager.getNextPiece()).toBe("O");
-    expect(manager.getNextPiece()).toBe("T");
-  });
-
-  it("should correctly report empty state", () => {
-    const manager = new PieceBagManager();
-    expect(manager.isEmpty()).toBe(false); // Starts with full bag
-
-    manager.setBag([]);
-    expect(manager.isEmpty()).toBe(true);
-
-    manager.setBag(["I"]);
-    expect(manager.isEmpty()).toBe(false);
-
-    manager.getNextPiece();
-    expect(manager.isEmpty()).toBe(true);
-  });
-
-  it("should return immutable copy of bag state", () => {
-    const manager = new PieceBagManager();
-    manager.setBag(["I", "O", "T"]);
-
-    const bag = manager.getBag();
-    bag.push("S"); // Modify the returned array
-
-    // Original bag should be unchanged
-    expect(manager.getBag()).toEqual(["I", "O", "T"]);
-  });
-});
-
-describe("createPieceBagManager (legacy)", () => {
-  it("should create a new PieceBagManager instance", () => {
-    const manager = createPieceBagManager();
-    expect(manager).toBeInstanceOf(PieceBagManager);
-    expect(manager.isEmpty()).toBe(false); // Starts with full bag
   });
 });

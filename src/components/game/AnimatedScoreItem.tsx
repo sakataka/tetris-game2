@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { SPRING_CONFIGS } from "../../utils/gameConstants";
+import { COMPLETE_ANIMATIONS } from "../../utils/animationConstants";
 
 interface AnimatedScoreItemProps {
   label: string;
@@ -22,29 +22,13 @@ export function AnimatedScoreItem({
   const getAnimationPreset = () => {
     switch (animation) {
       case "score":
-        return {
-          initial: { scale: 1.3, opacity: 0.7 },
-          animate: { scale: 1, opacity: 1 },
-          transition: { type: "spring" as const, ...SPRING_CONFIGS.SCORE },
-        };
+        return COMPLETE_ANIMATIONS.scoreIncrease;
       case "lines":
-        return {
-          initial: { scale: 1.2, opacity: 0.8, y: -10 },
-          animate: { scale: 1, opacity: 1, y: 0 },
-          transition: { type: "spring" as const, ...SPRING_CONFIGS.LINES },
-        };
+        return COMPLETE_ANIMATIONS.linesCleared;
       case "level":
-        return {
-          initial: { scale: 1.5, opacity: 0.5, rotate: -10 },
-          animate: { scale: 1, opacity: 1, rotate: 0 },
-          transition: { type: "spring" as const, ...SPRING_CONFIGS.LEVEL },
-        };
+        return COMPLETE_ANIMATIONS.levelIncrease;
       default:
-        return {
-          initial: { scale: 1.3, opacity: 0.7 },
-          animate: { scale: 1, opacity: 1 },
-          transition: { type: "spring" as const, ...SPRING_CONFIGS.DEFAULT },
-        };
+        return COMPLETE_ANIMATIONS.scoreIncrease;
     }
   };
 
