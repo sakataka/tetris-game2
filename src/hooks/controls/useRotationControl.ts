@@ -1,6 +1,7 @@
-import { useCallback, useRef } from "react";
+import { useCallback } from "react";
 import { useGameStore } from "../../store/gameStore";
 import { useGameActionHandler } from "../core/useGameActionHandler";
+import { useActionCooldown } from "./useActionCooldown";
 
 /**
  * Hook for handling rotation control with proper debouncing to prevent double rotation
@@ -10,23 +11,14 @@ import { useGameActionHandler } from "../core/useGameActionHandler";
 export function useRotationControl() {
   const rotate = useGameStore((state) => state.rotate);
   const executeAction = useGameActionHandler();
-  const lastRotationTimeRef = useRef<number>(0);
 
   // Cooldown period in milliseconds to prevent double rotation
   const ROTATION_COOLDOWN = 200;
 
-  const handleRotate = useCallback(() => {
-    const now = Date.now();
-
-    // Check if enough time has passed since last rotation
-    if (now - lastRotationTimeRef.current < ROTATION_COOLDOWN) {
-      return; // Ignore this rotation attempt
-    }
-
-    // Update last rotation time and execute rotation
-    lastRotationTimeRef.current = now;
-    executeAction(rotate);
-  }, [rotate, executeAction]);
+  const handleRotate = useActionCooldown(
+    useCallback(() => executeAction(rotate), [executeAction, rotate]),
+    ROTATION_COOLDOWN,
+  );
 
   return { handleRotate };
 }

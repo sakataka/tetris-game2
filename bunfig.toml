@@ -4,3 +4,17 @@ timeout = 30000
 root = "./"
 # Use happy-dom as test environment
 dom = { library = "happy-dom" }
+# Enable coverage by default for CI
+coverage = false
+# Enable smol mode for memory optimization during tests
+smol = false
+
+# Development server optimization
+[serve.static]
+# Future: Add Tailwind plugin when needed
+# plugins = ["bun-plugin-tailwind"]
+
+# Build optimization
+[build]
+# Enable for production builds if needed
+# bytecode = true

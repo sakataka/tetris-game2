@@ -1,6 +1,6 @@
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronsDown, RotateCw } from "lucide-react";
+import { useMovementControls } from "../../hooks/controls/useMovementControls";
 import { useRotationControl } from "../../hooks/controls/useRotationControl";
-import { useGameActionHandler } from "../../hooks/core/useGameActionHandler";
 import { useGameStore } from "../../store/gameStore";
 import { AnimatedButton } from "../ui/AnimatedButton";
 
@@ -9,19 +9,10 @@ interface TouchControlsProps {
 }
 
 export function TouchControls({ className }: TouchControlsProps) {
-  const moveLeft = useGameStore((state) => state.moveLeft);
-  const moveRight = useGameStore((state) => state.moveRight);
-  const moveDown = useGameStore((state) => state.moveDown);
-  const drop = useGameStore((state) => state.drop);
   const isPaused = useGameStore((state) => state.isPaused);
   const isGameOver = useGameStore((state) => state.isGameOver);
   const { handleRotate } = useRotationControl();
-  const executeGameAction = useGameActionHandler();
-
-  const handleMoveLeft = () => executeGameAction(moveLeft);
-  const handleMoveRight = () => executeGameAction(moveRight);
-  const handleMoveDown = () => executeGameAction(moveDown);
-  const handleDrop = () => executeGameAction(drop, true); // urgent = true for hard drop
+  const { handleMoveLeft, handleMoveRight, handleMoveDown, handleDrop } = useMovementControls();
 
   return (
     <div className={`grid grid-cols-3 gap-2 ${className}`}>

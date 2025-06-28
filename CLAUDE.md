@@ -286,6 +286,35 @@ Interactive testing using **MCP (Model Context Protocol)** with Playwright:
 - Animation timing and behavior analysis
 - Responsive design testing across viewports
 
+## Library Documentation & Updates
+
+### Context7 Integration for Latest Library Information
+Use **Context7** MCP tools to get up-to-date documentation and specifications for libraries:
+
+```bash
+# Get library documentation for any technology stack component
+mcp__context7__resolve-library-id <library-name>
+mcp__context7__get-library-docs <context7-library-id>
+```
+
+**Examples:**
+- `mcp__context7__resolve-library-id "bun"` → `/oven-sh/bun`
+- `mcp__context7__get-library-docs "/oven-sh/bun"` → Latest Bun features, API changes, configuration options
+
+**Benefits:**
+- **Always Current**: Get the latest features, breaking changes, and best practices
+- **Comprehensive Coverage**: Detailed API documentation with code examples
+- **Performance Insights**: Discover new optimization techniques and configurations
+- **Migration Guidance**: Find deprecation notices and upgrade paths
+
+**Use Cases:**
+- Before major dependency updates to understand breaking changes
+- When exploring new features or configuration options
+- During performance optimization to discover latest techniques
+- For troubleshooting with most current documentation
+
+This approach helped identify modern Bun features like bytecode generation, improved test runner options, and advanced configuration settings that weren't in older documentation.
+
 ## Code Standards
 
 ### Non-Negotiable Rules
