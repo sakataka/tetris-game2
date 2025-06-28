@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { GAME_CONSTANTS } from "../../utils/gameConstants";
+import { GAME_CONSTANTS } from "@/utils/gameConstants";
 
 interface TetrominoGridProps {
   shape: number[][] | null;

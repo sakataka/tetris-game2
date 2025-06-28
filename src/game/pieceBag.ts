@@ -1,5 +1,5 @@
-import type { TetrominoTypeName } from "../types/game";
-import { GAME_CONSTANTS } from "../utils/gameConstants";
+import type { TetrominoTypeName } from "@/types/game";
+import { GAME_CONSTANTS } from "@/utils/gameConstants";
 
 /**
  * 7-Bag system implementation for fair tetromino distribution.

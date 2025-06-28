@@ -1,8 +1,16 @@
-import { useKeyboardControls } from "../../hooks/controls/useKeyboardControls";
-import { useTouchGestures } from "../../hooks/controls/useTouchGestures";
-import { useGameLoop } from "../../hooks/core/useGameLoop";
-import { useHighScoreSideEffect } from "../../hooks/effects/useHighScoreSideEffect";
-import { Board, Controls, GameOverlay, HighScore, HoldPiece, NextPiece, ScoreBoard } from "../game";
+import { useKeyboardControls } from "@/hooks/controls/useKeyboardControls";
+import { useTouchGestures } from "@/hooks/controls/useTouchGestures";
+import { useGameLoop } from "@/hooks/core/useGameLoop";
+import { useHighScoreSideEffect } from "@/hooks/effects/useHighScoreSideEffect";
+import {
+  Board,
+  Controls,
+  GameOverlay,
+  HighScore,
+  HoldPiece,
+  NextPiece,
+  ScoreBoard,
+} from "@/components/game";
 import { GameSettings } from "./GameSettings";
 import { MobileGameLayout } from "./MobileGameLayout";
 

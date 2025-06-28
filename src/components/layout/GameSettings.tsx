@@ -2,11 +2,11 @@ import { Settings } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
-import { useSettingsStore } from "../../store/settingsStore";
-import { CONTROL_STYLES, MODAL_STYLES } from "../../utils/styles";
-import { AnimatedButton } from "../ui/AnimatedButton";
-import { Badge } from "../ui/badge";
-import { Card } from "../ui/card";
+import { useSettingsStore } from "@/store/settingsStore";
+import { CONTROL_STYLES, MODAL_STYLES } from "@/utils/styles";
+import { AnimatedButton } from "@/components/ui/AnimatedButton";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 
 export function GameSettings() {
   const { i18n, t } = useTranslation();

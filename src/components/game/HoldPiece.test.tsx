@@ -2,7 +2,7 @@ import { describe, expect, mock, test } from "bun:test";
 import { render } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import type React from "react";
-import type { TetrominoTypeName } from "../../types/game";
+import type { TetrominoTypeName } from "@/types/game";
 import { HoldPiece } from "./HoldPiece";
 
 // ==============================

@@ -1,4 +1,4 @@
-import type { Position } from "../types/game";
+import type { Position } from "@/types/game";
 import { GAME_CONSTANTS } from "./gameConstants";
 
 /**

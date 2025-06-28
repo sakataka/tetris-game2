@@ -1,4 +1,4 @@
-import type { TetrominoTypeName } from "../types/game";
+import type { TetrominoTypeName } from "@/types/game";
 
 /**
  * Tetris piece color mapping using Tailwind CSS classes

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import type { GameState } from "../types/game";
+import type { GameState } from "@/types/game";
 import { createEmptyBoard } from "./board";
 import { calculateGhostPosition, createInitialGameState } from "./game";
 import { createTetromino } from "./tetrominos";

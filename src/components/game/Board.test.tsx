@@ -2,10 +2,10 @@ import { describe, expect, mock, test } from "bun:test";
 import { render } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import type React from "react";
-import { createEmptyBoard, placeTetromino } from "../../game/board";
-import { getTetrominoColorIndex } from "../../game/tetrominos";
-import type { GameBoard, GameState, Position, TetrominoTypeName } from "../../types/game";
-import { GAME_CONSTANTS } from "../../utils/gameConstants";
+import { createEmptyBoard, placeTetromino } from "@/game/board";
+import { getTetrominoColorIndex } from "@/game/tetrominos";
+import type { GameBoard, GameState, Position, TetrominoTypeName } from "@/types/game";
+import { GAME_CONSTANTS } from "@/utils/gameConstants";
 import { Board } from "./Board";
 
 // ==============================

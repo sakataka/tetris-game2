@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { GAME_CONSTANTS } from "../utils/gameConstants";
+import { GAME_CONSTANTS } from "@/utils/gameConstants";
 import { createPieceBag, getBagContents, getNextPiece, setBagForTesting } from "./pieceBag";
 
 describe("Functional PieceBag (mizchi-style)", () => {

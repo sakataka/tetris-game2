@@ -1,7 +1,7 @@
 import { Calendar, Target, TrendingUp } from "lucide-react";
-import type { HighScore } from "../../types/storage";
-import { CONTROL_STYLES } from "../../utils/styles";
-import { Badge } from "../ui/badge";
+import type { HighScore } from "@/types/storage";
+import { CONTROL_STYLES } from "@/utils/styles";
+import { Badge } from "@/components/ui/badge";
 
 interface HighScoreItemProps {
   score: HighScore;

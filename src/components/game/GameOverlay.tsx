@@ -1,8 +1,8 @@
 import { useTranslation } from "react-i18next";
-import { useGameStore } from "../../store/gameStore";
-import { MODAL_STYLES } from "../../utils/styles";
-import { AnimatedButton } from "../ui/AnimatedButton";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
+import { useGameStore } from "@/store/gameStore";
+import { MODAL_STYLES } from "@/utils/styles";
+import { AnimatedButton } from "@/components/ui/AnimatedButton";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export function GameOverlay() {
   const isGameOver = useGameStore((state) => state.isGameOver);

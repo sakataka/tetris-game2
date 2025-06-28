@@ -280,3 +280,32 @@ This approach helped identify modern Bun features like bytecode generation, impr
 - **Bun Everywhere**: Primary choice for package management, testing, and scripts
 - **Tailwind Via Vite**: Using @tailwindcss/vite plugin for optimal performance
 - **i18n Required**: No hardcoded UI strings—everything through translation files
+- **Path Aliases Mandatory**: Always use `@/` path aliases for imports, never relative paths beyond same directory
+
+### Import Guidelines
+
+#### Path Alias Usage (Mandatory)
+- **Cross-directory imports**: MUST use `@/` path alias
+- **Same directory imports**: Use relative `./` paths for performance
+- **Test mocks**: Exception for test frameworks requiring relative paths
+
+#### Examples
+```typescript
+// ✅ Correct: Cross-directory with path alias
+import { useGameStore } from '@/store/gameStore';
+import { GAME_CONSTANTS } from '@/utils/gameConstants';
+import { Card } from '@/components/ui/card';
+
+// ✅ Correct: Same directory relative import
+import { BoardCell } from './BoardCell';
+
+// ❌ Incorrect: Cross-directory relative paths
+import { useGameStore } from '../../store/gameStore';
+import { GAME_CONSTANTS } from '../utils/gameConstants';
+```
+
+#### Benefits of Path Aliases
+- **Maintainability**: Directory restructuring doesn't break imports
+- **Readability**: Clear indication of module location from project root
+- **IDE Support**: Enhanced autocomplete and refactoring capabilities
+- **Consistency**: Uniform import patterns across the codebase

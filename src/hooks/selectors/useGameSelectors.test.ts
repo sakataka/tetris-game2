@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { renderHook } from "@testing-library/react";
-import { getTetrominoShape } from "../../game/tetrominos";
-import { useGameStore } from "../../store/gameStore";
-import { useSettingsStore } from "../../store/settingsStore";
+import { getTetrominoShape } from "@/game/tetrominos";
+import { useGameStore } from "@/store/gameStore";
+import { useSettingsStore } from "@/store/settingsStore";
 import { useBoardData } from "./useBoardSelectors";
 
 // Mock localStorage for testing

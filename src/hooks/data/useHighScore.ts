@@ -1,4 +1,4 @@
-import { useHighScoreStore } from "../../store/highScoreStore";
+import { useHighScoreStore } from "@/store/highScoreStore";
 
 /**
  * Custom hook for managing high score data with real-time updates

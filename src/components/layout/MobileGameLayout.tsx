@@ -1,5 +1,5 @@
-import { useTouchGestures } from "../../hooks/controls/useTouchGestures";
-import { Board, GameOverlay, TouchControls } from "../game";
+import { useTouchGestures } from "@/hooks/controls/useTouchGestures";
+import { Board, GameOverlay, TouchControls } from "@/components/game";
 import { MobileHeader } from "./MobileHeader";
 
 export function MobileGameLayout() {

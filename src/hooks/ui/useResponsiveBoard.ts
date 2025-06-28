@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { GAME_CONSTANTS } from "../../utils/gameConstants";
+import { GAME_CONSTANTS } from "@/utils/gameConstants";
 
 interface ResponsiveBoardSize {
   cellSize: number;

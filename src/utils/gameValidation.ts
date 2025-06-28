@@ -1,4 +1,4 @@
-import type { GameBoard, Position, Tetromino } from "../types/game";
+import type { GameBoard, Position, Tetromino } from "@/types/game";
 import { isValidBoardPosition } from "./boardUtils";
 
 /**

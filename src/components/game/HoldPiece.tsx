@@ -1,11 +1,11 @@
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
-import { getTetrominoShape } from "../../game/tetrominos";
-import { useGameStore } from "../../store/gameStore";
-import { getTetrominoColor } from "../../utils/colors";
-import { GAME_CONSTANTS } from "../../utils/gameConstants";
-import { CARD_STYLES } from "../../utils/styles";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { getTetrominoShape } from "@/game/tetrominos";
+import { useGameStore } from "@/store/gameStore";
+import { getTetrominoColor } from "@/utils/colors";
+import { GAME_CONSTANTS } from "@/utils/gameConstants";
+import { CARD_STYLES } from "@/utils/styles";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TetrominoGrid } from "./TetrominoGrid";
 
 export function HoldPiece() {

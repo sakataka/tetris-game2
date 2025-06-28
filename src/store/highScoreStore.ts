@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
-import type { HighScore } from "../types/storage";
-import { GAME_CONSTANTS } from "../utils/gameConstants";
+import type { HighScore } from "@/types/storage";
+import { GAME_CONSTANTS } from "@/utils/gameConstants";
 
 interface HighScoreStore {
   currentHighScore: HighScore | null;

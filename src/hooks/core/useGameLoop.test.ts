@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, mock, spyOn, test } from "bun:test";
 import { renderHook } from "@testing-library/react";
-import { getGameSpeed } from "../../game/game";
-import { useGameStore } from "../../store/gameStore";
+import { getGameSpeed } from "@/game/game";
+import { useGameStore } from "@/store/gameStore";
 import { useGameLoop } from "./useGameLoop";
 
 // Mock dependencies

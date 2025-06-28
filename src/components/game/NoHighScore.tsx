@@ -1,7 +1,7 @@
 import { Trophy } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { CARD_STYLES } from "../../utils/styles";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { CARD_STYLES } from "@/utils/styles";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface NoHighScoreProps {
   className?: string;

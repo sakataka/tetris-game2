@@ -1,9 +1,9 @@
 import { useMemo } from "react";
-import { forEachPieceCell } from "../../game/board";
-import { getTetrominoColorIndex } from "../../game/tetrominos";
-import { useGameStore } from "../../store/gameStore";
-import { useSettingsStore } from "../../store/settingsStore";
-import { createCellKey, isValidBoardPosition } from "../../utils/boardUtils";
+import { forEachPieceCell } from "@/game/board";
+import { getTetrominoColorIndex } from "@/game/tetrominos";
+import { useGameStore } from "@/store/gameStore";
+import { useSettingsStore } from "@/store/settingsStore";
+import { createCellKey, isValidBoardPosition } from "@/utils/boardUtils";
 
 /**
  * Board-related state selectors

@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import { act, renderHook } from "@testing-library/react";
 import { create } from "zustand";
-import { createInitialGameState } from "../game/game";
-import { createTetromino } from "../game/tetrominos";
-import type { GameState, TetrominoTypeName } from "../types/game";
+import { createInitialGameState } from "@/game/game";
+import { createTetromino } from "@/game/tetrominos";
+import type { GameState, TetrominoTypeName } from "@/types/game";
 
 // Mock localStorage for testing
 const mockStorage: Record<string, string> = {};

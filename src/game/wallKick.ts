@@ -1,4 +1,4 @@
-import type { CellValue, Position, RotationState, TetrominoTypeName } from "../types/game";
+import type { CellValue, Position, RotationState, TetrominoTypeName } from "@/types/game";
 
 type RotationTransition = "0->1" | "1->2" | "2->3" | "3->0" | "1->0" | "2->1" | "3->2" | "0->3";
 type WallKickData = { [K in RotationTransition]: Position[] };

@@ -1,6 +1,6 @@
-import type { CellValue, GameBoard, Position } from "../types/game";
-import { isValidBoardPosition } from "../utils/boardUtils";
-import { GAME_CONSTANTS } from "../utils/gameConstants";
+import type { CellValue, GameBoard, Position } from "@/types/game";
+import { isValidBoardPosition } from "@/utils/boardUtils";
+import { GAME_CONSTANTS } from "@/utils/gameConstants";
 
 export function createEmptyBoard(): GameBoard {
   return Array(GAME_CONSTANTS.BOARD.HEIGHT)

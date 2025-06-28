@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import type { GameBoard, Tetromino } from "../types/game";
+import type { GameBoard, Tetromino } from "@/types/game";
 import {
   canPerformHoldAction,
   canPlacePieceAt,

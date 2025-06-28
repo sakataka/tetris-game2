@@ -1,4 +1,4 @@
-import type { RotationState } from "../types/game";
+import type { RotationState } from "@/types/game";
 
 /**
  * Validates and normalizes rotation state to ensure it's within bounds

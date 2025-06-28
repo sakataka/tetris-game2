@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, test } from "bun:test";
-import type { TetrominoTypeName } from "../types/game";
+import type { TetrominoTypeName } from "@/types/game";
 import { createEmptyBoard, isValidPosition } from "./board";
 import { TETROMINOS } from "./tetrominos";
 import { applyWallKickOffset, getWallKickOffsets, tryRotateWithWallKick } from "./wallKick";

@@ -1,8 +1,8 @@
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronsDown, RotateCw } from "lucide-react";
-import { useMovementControls } from "../../hooks/controls/useMovementControls";
-import { useRotationControl } from "../../hooks/controls/useRotationControl";
-import { useGameStore } from "../../store/gameStore";
-import { AnimatedButton } from "../ui/AnimatedButton";
+import { useMovementControls } from "@/hooks/controls/useMovementControls";
+import { useRotationControl } from "@/hooks/controls/useRotationControl";
+import { useGameStore } from "@/store/gameStore";
+import { AnimatedButton } from "@/components/ui/AnimatedButton";
 
 interface TouchControlsProps {
   className?: string;

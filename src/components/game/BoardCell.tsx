@@ -1,10 +1,10 @@
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { useCellAnimation } from "../../hooks/ui/useCellAnimation";
-import type { AnimationTriggerKey, CellValue } from "../../types/game";
-import { getCellColor } from "../../utils/colors";
-import { GAME_CONSTANTS } from "../../utils/gameConstants";
-import { BOARD_STYLES } from "../../utils/styles";
+import { useCellAnimation } from "@/hooks/ui/useCellAnimation";
+import type { AnimationTriggerKey, CellValue } from "@/types/game";
+import { getCellColor } from "@/utils/colors";
+import { GAME_CONSTANTS } from "@/utils/gameConstants";
+import { BOARD_STYLES } from "@/utils/styles";
 
 interface BoardCellProps {
   cellValue: CellValue;

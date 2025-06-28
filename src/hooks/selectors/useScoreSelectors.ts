@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useGameStore } from "../../store/gameStore";
+import { useGameStore } from "@/store/gameStore";
 
 /**
  * Score-related state selectors

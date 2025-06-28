@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { COMPLETE_ANIMATIONS } from "../../utils/animationConstants";
+import { COMPLETE_ANIMATIONS } from "@/utils/animationConstants";
 
 interface AnimatedScoreItemProps {
   label: string;

@@ -1,6 +1,6 @@
 import { type MotionProps, motion } from "framer-motion";
 import { forwardRef } from "react";
-import { ANIMATION_PRESETS } from "../../utils/animationConstants";
+import { ANIMATION_PRESETS } from "@/utils/animationConstants";
 import { Button, type ButtonProps } from "./button";
 
 interface AnimatedButtonProps extends ButtonProps {

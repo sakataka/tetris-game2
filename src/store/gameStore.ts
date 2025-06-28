@@ -6,8 +6,8 @@ import {
   holdCurrentPiece,
   moveTetrominoBy,
   rotateTetrominoCW,
-} from "../game/game";
-import type { GameState } from "../types/game";
+} from "@/game/game";
+import type { GameState } from "@/types/game";
 
 interface GameStore extends GameState {
   moveLeft: () => void;

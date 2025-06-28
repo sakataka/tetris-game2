@@ -1,5 +1,5 @@
-import type { CellValue, Tetromino, TetrominoTypeName } from "../types/game";
-import { GAME_CONSTANTS } from "../utils/gameConstants";
+import type { CellValue, Tetromino, TetrominoTypeName } from "@/types/game";
+import { GAME_CONSTANTS } from "@/utils/gameConstants";
 
 // Type-safe color index mapping
 export const TETROMINO_COLOR_MAP = {

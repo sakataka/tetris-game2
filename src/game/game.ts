@@ -1,7 +1,7 @@
-import type { GameBoard, GameState, Position, Tetromino, TetrominoTypeName } from "../types/game";
-import { GAME_CONSTANTS } from "../utils/gameConstants";
-import { canPerformHoldAction, isGameOverState, isGamePlayable } from "../utils/gameValidation";
-import { normalizeRotationState } from "../utils/typeGuards";
+import type { GameBoard, GameState, Position, Tetromino, TetrominoTypeName } from "@/types/game";
+import { GAME_CONSTANTS } from "@/utils/gameConstants";
+import { canPerformHoldAction, isGameOverState, isGamePlayable } from "@/utils/gameValidation";
+import { normalizeRotationState } from "@/utils/typeGuards";
 import {
   clearLines,
   createEmptyBoard,

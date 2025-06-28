@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { GAME_CONSTANTS } from "../utils/gameConstants";
+import { GAME_CONSTANTS } from "@/utils/gameConstants";
 import { createEmptyBoard } from "./board";
 import {
   calculateScore,
