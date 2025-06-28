@@ -36,8 +36,8 @@ export function GameSettings() {
     [i18n.language],
   );
 
-  const handleLanguageChange = (value: string) => {
-    i18n.changeLanguage(value);
+  const handleLanguageChange = async (value: string) => {
+    await i18n.changeLanguage(value);
     setLanguage(value as "ja" | "en");
     setIsOpen(false);
   };
