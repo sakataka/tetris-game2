@@ -43,7 +43,7 @@ export function GameSettings() {
   };
 
   return (
-    <div className="absolute top-4 right-4 z-50" ref={dropdownRef}>
+    <div className="absolute top-4 right-4 z-[9999]" ref={dropdownRef}>
       <AnimatedButton onClick={() => setIsOpen(!isOpen)} className={CONTROL_STYLES.button}>
         <div className="flex items-center gap-2">
           <Settings className="h-4 w-4" />

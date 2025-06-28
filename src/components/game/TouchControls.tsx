@@ -1,5 +1,6 @@
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronsDown, RotateCw } from "lucide-react";
 import { useTransition } from "react";
+import { useRotationControl } from "../../hooks/controls/useRotationControl";
 import { useGameStore } from "../../store/gameStore";
 import { AnimatedButton } from "../ui/AnimatedButton";
 
@@ -11,11 +12,11 @@ export function TouchControls({ className }: TouchControlsProps) {
   const moveLeft = useGameStore((state) => state.moveLeft);
   const moveRight = useGameStore((state) => state.moveRight);
   const moveDown = useGameStore((state) => state.moveDown);
-  const rotate = useGameStore((state) => state.rotate);
   const drop = useGameStore((state) => state.drop);
   const isPaused = useGameStore((state) => state.isPaused);
   const isGameOver = useGameStore((state) => state.isGameOver);
   const [, startTransition] = useTransition();
+  const { handleRotate } = useRotationControl();
 
   // Helper for game actions with common conditions
   const executeGameAction = (action: () => void, useTransitionWrapper = true) => {
@@ -30,7 +31,6 @@ export function TouchControls({ className }: TouchControlsProps) {
   const handleMoveLeft = () => executeGameAction(moveLeft);
   const handleMoveRight = () => executeGameAction(moveRight);
   const handleMoveDown = () => executeGameAction(moveDown);
-  const handleRotate = () => executeGameAction(rotate);
   const handleDrop = () => executeGameAction(drop, false);
 
   return (
