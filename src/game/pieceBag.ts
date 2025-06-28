@@ -12,92 +12,204 @@ import { GAME_CONSTANTS } from "../utils/gameConstants";
  * 4. When the bag is empty, refill and shuffle again
  *
  * This prevents long droughts of specific pieces and ensures fair distribution.
+ *
+ * Following mizchi-style functional TypeScript design patterns:
+ * - Immutable state with readonly modifiers
+ * - Pure functions without side effects
+ * - Functional state transitions
+ */
+
+/**
+ * Immutable piece bag state following mizchi-style functional design.
+ * All fields are readonly to ensure immutability.
+ */
+export interface PieceBag {
+  readonly currentBag: readonly TetrominoTypeName[];
+  readonly generatedPieces: readonly TetrominoTypeName[];
+  readonly bagCount: number;
+  readonly seed?: number; // For reproducible randomness in testing
+}
+
+/**
+ * Creates a new piece bag with initial state.
+ * Factory function following functional programming patterns.
+ *
+ * @param seed Optional seed for reproducible randomness (primarily for testing)
+ * @returns New immutable PieceBag instance
+ */
+export const createPieceBag = (seed?: number): PieceBag => ({
+  currentBag: shuffleWithSeed([...GAME_CONSTANTS.TYPES.TETROMINO_TYPES], seed),
+  generatedPieces: [],
+  bagCount: 1,
+  seed,
+});
+
+/**
+ * Gets the next piece from the bag using pure functional approach.
+ * Returns a tuple of [nextPiece, newBagState] for immutable state transitions.
+ *
+ * @param bag Current bag state
+ * @returns Tuple of [next piece, updated bag state]
+ * @throws Error if bag operations fail unexpectedly
+ */
+export const getNextPiece = (bag: PieceBag): [TetrominoTypeName, PieceBag] => {
+  const workingBag =
+    bag.currentBag.length > 0
+      ? bag.currentBag
+      : shuffleWithSeed([...GAME_CONSTANTS.TYPES.TETROMINO_TYPES], bag.seed);
+
+  if (workingBag.length === 0) {
+    throw new Error("Failed to get piece from bag - this should never happen");
+  }
+
+  const [nextPiece, ...remainingPieces] = workingBag;
+
+  return [
+    nextPiece,
+    {
+      currentBag: remainingPieces,
+      generatedPieces: [...bag.generatedPieces, nextPiece],
+      bagCount: bag.currentBag.length === 0 ? bag.bagCount + 1 : bag.bagCount,
+      seed: bag.seed,
+    },
+  ];
+};
+
+/**
+ * Checks if the bag is currently empty.
+ * Pure function for testing bag state.
+ *
+ * @param bag Current bag state
+ * @returns true if the bag contains no pieces
+ */
+export const isEmpty = (bag: PieceBag): boolean => bag.currentBag.length === 0;
+
+/**
+ * Gets the current bag contents as an immutable array.
+ * Returns a copy to ensure external code cannot modify the internal state.
+ *
+ * @param bag Current bag state
+ * @returns Array of tetromino types currently in the bag
+ */
+export const getBagContents = (bag: PieceBag): readonly TetrominoTypeName[] => [...bag.currentBag];
+
+/**
+ * Sets the bag state directly for testing purposes.
+ * Creates a new bag state with specified pieces.
+ *
+ * ⚠️ **FOR TESTING ONLY** ⚠️
+ * This function bypasses the normal 7-bag algorithm and should only be used
+ * in tests to set up specific scenarios.
+ *
+ * @param bag Current bag state
+ * @param pieces Array of tetromino types to set as the bag contents
+ * @returns New bag state with specified pieces
+ */
+export const setBagForTesting = (
+  bag: PieceBag,
+  pieces: readonly TetrominoTypeName[],
+): PieceBag => ({
+  ...bag,
+  currentBag: [...pieces],
+});
+
+/**
+ * Gets the number of pieces remaining in the current bag.
+ * Pure function for bag state inspection.
+ *
+ * @param bag Current bag state
+ * @returns Number of pieces remaining
+ */
+export const getPiecesRemaining = (bag: PieceBag): number => bag.currentBag.length;
+
+/**
+ * Gets the history of all generated pieces.
+ * Useful for testing and debugging.
+ *
+ * @param bag Current bag state
+ * @returns Array of all previously generated pieces
+ */
+export const getGenerationHistory = (bag: PieceBag): readonly TetrominoTypeName[] =>
+  bag.generatedPieces;
+
+/**
+ * Resets the bag to initial state while preserving seed.
+ * Pure function that creates a new bag instance.
+ *
+ * @param bag Current bag state
+ * @returns New bag state reset to initial condition
+ */
+export const resetBag = (bag: PieceBag): PieceBag => createPieceBag(bag.seed);
+
+// === UTILITY FUNCTIONS ===
+
+/**
+ * Fisher-Yates shuffle algorithm with optional seed for reproducible randomness.
+ * Pure function that does not modify the input array.
+ *
+ * @param array Array to shuffle
+ * @param seed Optional seed for reproducible randomness
+ * @returns New shuffled array
+ */
+const shuffleWithSeed = (array: TetrominoTypeName[], seed?: number): TetrominoTypeName[] => {
+  const shuffled = [...array];
+
+  if (seed !== undefined) {
+    // Reproducible shuffle using Linear Congruential Generator
+    let currentSeed = seed;
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      currentSeed = (currentSeed * 9301 + 49297) % 233280;
+      const randomValue = currentSeed / 233280;
+      const j = Math.floor(randomValue * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+  } else {
+    // Standard random shuffle
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+  }
+
+  return shuffled;
+};
+
+// === BACKWARD COMPATIBILITY ===
+// Temporary compatibility layer for gradual migration
+
+/**
+ * Legacy compatibility wrapper - DO NOT USE IN NEW CODE
+ * @deprecated Use functional PieceBag API instead
  */
 export class PieceBagManager {
-  private bag: TetrominoTypeName[] = [];
+  private bagState: PieceBag;
 
-  /**
-   * Gets the next piece from the bag.
-   * Automatically refills the bag when empty using the 7-bag algorithm.
-   *
-   * @returns The next tetromino type to spawn
-   * @throws Error if bag operations fail unexpectedly
-   */
+  constructor() {
+    this.bagState = createPieceBag();
+  }
+
   getNextPiece(): TetrominoTypeName {
-    if (this.bag.length === 0) {
-      this.refillBag();
-    }
-    const piece = this.bag.pop();
-    if (!piece) {
-      throw new Error("Failed to get piece from bag - this should never happen");
-    }
+    const [piece, newState] = getNextPiece(this.bagState);
+    this.bagState = newState;
     return piece;
   }
 
-  /**
-   * Checks if the bag is currently empty.
-   * Useful for testing bag refill behavior.
-   *
-   * @returns true if the bag contains no pieces
-   */
   isEmpty(): boolean {
-    return this.bag.length === 0;
+    return isEmpty(this.bagState);
   }
 
-  /**
-   * Gets the current state of the bag.
-   * Returns an immutable copy to prevent external modification.
-   *
-   * @returns Array of tetromino types currently in the bag
-   */
   getBag(): TetrominoTypeName[] {
-    return [...this.bag];
+    return [...getBagContents(this.bagState)];
   }
 
-  // === TESTING UTILITIES ===
-  // The following methods are primarily intended for testing purposes
-  // and should not be used in normal game logic.
-
-  /**
-   * Sets the bag state directly.
-   *
-   * ⚠️ **FOR TESTING ONLY** ⚠️
-   * This method bypasses the normal 7-bag algorithm and should only be used
-   * in tests to set up specific scenarios.
-   *
-   * @param pieces Array of tetromino types to set as the bag contents
-   */
   setBag(pieces: TetrominoTypeName[]): void {
-    this.bag = [...pieces];
-  }
-
-  // === PRIVATE IMPLEMENTATION ===
-
-  /**
-   * Refills the bag with all 7 piece types and shuffles them.
-   * This implements the core 7-bag algorithm.
-   */
-  private refillBag(): void {
-    this.bag = [...GAME_CONSTANTS.TYPES.TETROMINO_TYPES];
-    this.shuffle(this.bag);
-  }
-
-  /**
-   * Fisher-Yates shuffle algorithm for array randomization.
-   * Ensures each permutation has equal probability.
-   *
-   * @param array Array to shuffle in-place
-   */
-  private shuffle(array: TetrominoTypeName[]): void {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
-    }
+    this.bagState = setBagForTesting(this.bagState, pieces);
   }
 }
 
 /**
- * Creates a new piece bag manager instance.
+ * Legacy factory function - DO NOT USE IN NEW CODE
+ * @deprecated Use createPieceBag() instead
  */
 export function createPieceBagManager(): PieceBagManager {
   return new PieceBagManager();

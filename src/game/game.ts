@@ -8,14 +8,14 @@ import {
   isValidPosition,
   placeTetromino,
 } from "./board";
-import { createPieceBagManager } from "./pieceBag";
+import { createPieceBag, getBagContents, getNextPiece, setBagForTesting } from "./pieceBag";
 import { createTetromino, getTetrominoColorIndex, rotateTetromino } from "./tetrominos";
 import { tryRotateWithWallKick } from "./wallKick";
 
 export function createInitialGameState(): GameState {
-  const pieceBagManager = createPieceBagManager();
-  const currentType = pieceBagManager.getNextPiece();
-  const nextType = pieceBagManager.getNextPiece();
+  const pieceBag = createPieceBag();
+  const [currentType, pieceBagAfterFirst] = getNextPiece(pieceBag);
+  const [nextType, finalPieceBag] = getNextPiece(pieceBagAfterFirst);
 
   const state = {
     board: createEmptyBoard(),
@@ -33,7 +33,7 @@ export function createInitialGameState(): GameState {
     clearingLines: [],
     animationTriggerKey: 0,
     ghostPosition: null as Position | null,
-    pieceBag: pieceBagManager.getBag(),
+    pieceBag: [...getBagContents(finalPieceBag)], // Convert to legacy array format
   };
 
   // Calculate initial ghost position
@@ -189,12 +189,14 @@ export function checkGameOver(board: GameBoard, piece: Tetromino): boolean {
 }
 
 export function spawnNextPiece(nextPieceType: TetrominoTypeName, pieceBag: TetrominoTypeName[]) {
-  const pieceBagManager = createPieceBagManager();
-  pieceBagManager.setBag(pieceBag);
+  // Convert legacy array format to functional PieceBag
+  const currentBag = setBagForTesting(createPieceBag(), pieceBag);
+  const [newNextPiece, updatedBag] = getNextPiece(currentBag);
+
   return {
     currentPiece: createTetromino(nextPieceType),
-    nextPiece: pieceBagManager.getNextPiece(),
-    pieceBag: pieceBagManager.getBag(),
+    nextPiece: newNextPiece,
+    pieceBag: [...getBagContents(updatedBag)], // Convert back to legacy array format
   };
 }
 
@@ -283,15 +285,16 @@ export function holdCurrentPiece(state: GameState): GameState {
 
   if (state.heldPiece === null) {
     // Initial hold: save current piece and spawn next piece
-    const pieceBagManager = createPieceBagManager();
-    pieceBagManager.setBag(state.pieceBag);
+    const currentBag = setBagForTesting(createPieceBag(), state.pieceBag);
+    const [newNextPiece, updatedBag] = getNextPiece(currentBag);
+
     return updateGhostPosition({
       ...state,
       currentPiece: createTetromino(state.nextPiece),
       heldPiece: currentPieceType,
-      nextPiece: pieceBagManager.getNextPiece(),
+      nextPiece: newNextPiece,
       canHold: false,
-      pieceBag: pieceBagManager.getBag(),
+      pieceBag: [...getBagContents(updatedBag)],
     });
   }
   // Exchange hold: swap held piece with current piece
