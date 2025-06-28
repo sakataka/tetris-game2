@@ -22,8 +22,8 @@ A fully-featured Tetris game built with modern web technologies.
 - Progressive difficulty with faster piece drops
 - Pause, resume, and restart functionality
 - Ghost piece preview showing landing position
-- **7-Bag System**: Ensures fair piece distribution—all 7 pieces appear once before any repeat
-- **SRS Wall Kicks**: Super Rotation System with intelligent wall kick mechanics for smoother gameplay
+- 7-Bag System: Ensures fair piece distribution—all 7 pieces appear once before any repeat
+- SRS Wall Kicks: Super Rotation System with intelligent wall kick mechanics for smoother gameplay
 
 ### User Interface
 - Live game stats (score, lines cleared, current level)

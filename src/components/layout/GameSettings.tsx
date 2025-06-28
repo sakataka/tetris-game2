@@ -29,8 +29,8 @@ export function GameSettings() {
   }, []);
 
   const languages = [
-    { value: "ja", label: "日本語", flag: "🇯🇵" },
-    { value: "en", label: "English", flag: "🇺🇸" },
+    { value: "en", label: i18n.language === "ja" ? "英語" : "English", flag: "🇺🇸" },
+    { value: "ja", label: i18n.language === "ja" ? "日本語" : "Japanese", flag: "🇯🇵" },
   ];
 
   const handleLanguageChange = (value: string) => {
