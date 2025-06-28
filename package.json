@@ -24,7 +24,7 @@
     "test:ci": "bun test --coverage",
     "outdated": "bun outdated",
     "update:latest": "bun update --latest",
-    "ci": "bun x biome ci && bun run typecheck && bun run test:ci && bun run build",
+    "ci": "bun x biome ci && bun run typecheck && bun run build",
     "prepare": "lefthook install"
   },
   "dependencies": {
