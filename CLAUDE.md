@@ -1,29 +1,30 @@
 # Tetris Game Project
 
-A fully-featured Tetris game built with modern web technologies.
+A fully-featured Tetris game implementation using modern web technologies and comprehensive test coverage.
 
-## Key Features
+## Architecture Overview
 
-- **Classic Tetris Gameplay**: All 7 tetromino types with line clearing and progressive difficulty
-- **Smooth Animations**: Polished visual effects powered by Framer Motion
-- **Mobile-Friendly**: Touch controls and responsive design for all devices
-- **High Score System**: Persistent local score tracking and leaderboards
-- **Bilingual Support**: Real-time English/Japanese language switching (English default)
-- **Ghost Piece**: Landing position preview for better gameplay
-- **Hold Mechanics**: Save and swap pieces for strategic play
+This project implements a complete Tetris game using a modular architecture with functional programming patterns, comprehensive test coverage, and strict TypeScript typing.
 
-## Game Features
+## Implemented Features
 
-### Core Mechanics
-- All 7 standard tetromino types (I, O, T, S, Z, J, L)
-- Fluid piece movement, rotation, and instant drop
-- Hold system for piece saving and swapping
-- Line clearing with combo scoring
-- Progressive difficulty with faster piece drops
-- Pause, resume, and restart functionality
+### Core Tetris Mechanics
+- All 7 standard tetromino types (I, O, T, S, Z, J, L) with complete gameplay
+- 7-Bag System for fair piece distribution (all pieces appear once before repeat)
+- SRS Wall Kick System with intelligent rotation mechanics
 - Ghost piece preview showing landing position
-- 7-Bag System: Ensures fair piece distribution—all 7 pieces appear once before any repeat
-- SRS Wall Kicks: Super Rotation System with intelligent wall kick mechanics for smoother gameplay
+- Hold system for piece saving and swapping with usage restrictions
+- Line clearing with multi-line support and scoring
+- Progressive difficulty with level-based speed increases
+- Pause/resume functionality with game state preservation
+
+### Platform & Interface
+- Touch gesture controls for mobile devices (swipe and tap)
+- Responsive design adapting to desktop and mobile
+- Bilingual interface (English/Japanese) with instant switching
+- High score tracking with persistent local storage
+- Settings panel with customizable options
+- Smooth animations powered by Framer Motion
 
 ### User Interface
 - Live game stats (score, lines cleared, current level)
@@ -54,133 +55,94 @@ A fully-featured Tetris game built with modern web technologies.
 
 ## Technology Stack
 
+### Runtime & Build System
+- **Bun**: 1.2.17 — Primary runtime for package management, testing, and development scripts
+- **Vite**: 7.0.3 (rolldown-vite) — Rolldown-powered bundler for enhanced performance and dev/build consistency
+- **TypeScript**: 5.8.3 — ESNext target with strict type checking, incremental compilation
+
 ### Frontend Framework
-- **React**: 19.1.0 — Modern functional components with Hooks
-- **TypeScript**: 5.8.3 — ESNext target with strict type checking for cutting-edge JS features
-- **Zustand**: 5.0.6 — Lightweight, scalable state management
-
-### Build Tools & Runtime
-- **Bun**: 1.2.17 — Fast package manager and test runner
-- **Rolldown-Vite**: 7.0.3 — Rust-powered bundler for optimal performance
-
-### UI & Styling
-- **Tailwind CSS**: 4.1.11 — Utility-first CSS framework via Vite plugin
-- **Framer Motion**: 12.19.2 — Production-ready animation library
-- **Radix UI**: Dialog 1.1.14, Slot 1.2.3 — Headless UI components
-- **class-variance-authority**: 0.7.1 — Type-safe component variants
-- **clsx + tailwind-merge**: 2.1.1/3.3.1 — Intelligent class name utilities
-- **Lucide React**: 0.524.0 — Beautiful, customizable icon library
-
-### Core Features
-- **react-hotkeys-hook**: 5.1.0 — Declarative keyboard shortcut handling
-- **i18next + react-i18next**: 25.2.1/15.5.3 — Robust internationalization
-
-### Development & Quality Assurance
-- **Biome**: 2.0.6 — Fast linter and formatter in Rust
-- **Bun Test**: 1.2.17 — Native test runner with Jest compatibility
-- **happy-dom**: 18.0.1 — Lightweight DOM environment for testing
-- **Testing Library**: React 16.3.0, DOM 10.4.0, jest-dom 6.6.3 — Simple, intuitive component testing
-- **Lefthook**: 1.11.14 — Fast Git hooks manager
-- **knip**: 5.61.2 — Finds unused files, dependencies, and exports
+- **React**: 19.1.0 — Functional components with latest concurrent features
 - **@vitejs/plugin-react-oxc**: 0.2.3 — High-performance React plugin with oxc parser
+
+### State Management & Data Flow
+- **Zustand**: 5.0.6 — Lightweight state management with immutable state updates
+- **react-hotkeys-hook**: 5.1.0 — Declarative keyboard input handling
+
+### UI Framework & Styling
+- **Tailwind CSS**: 4.1.11 — Utility-first CSS via @tailwindcss/vite plugin
+- **Framer Motion**: 12.19.2 — Animation library for smooth transitions and effects
+- **Radix UI**: Dialog 1.1.14, Slot 1.2.3 — Headless accessible components
+- **class-variance-authority**: 0.7.1 — Type-safe component variants
+- **clsx + tailwind-merge**: 2.1.1/3.3.1 — Class name composition utilities
+- **Lucide React**: 0.524.0 — SVG icon library
+
+### Internationalization
+- **i18next**: 25.2.1 — Core i18n framework
+- **react-i18next**: 15.5.3 — React-specific i18n hooks and components
+
+### Development & Quality Tools
+- **Biome**: 2.0.6 — Rust-based linter and formatter with strict rules
+- **Testing Library**: React 16.3.0, DOM 10.4.0, jest-dom 6.6.3 — Component testing utilities
+- **happy-dom**: 18.0.1 — Lightweight DOM environment for test execution
+- **Lefthook**: 1.11.14 — Git hooks manager with parallel execution
+- **knip**: 5.61.2 — Dead code detection and dependency analysis
 
 ## Architecture & Design
 
 ### State Management
 Built on **Zustand** for clean, scalable state management:
-- **GameStore**: Centralized game state using pure function reducers
+- **GameStore**: Centralized game state with immutable updates
 - **SettingsStore**: User preferences (language, ghost piece visibility) with persistence
 - **HighScoreStore**: Score tracking and leaderboard management
-- Performance-optimized selectors with automatic memoization  
-- Immutable updates ensuring predictable state transitions
+- Performance-optimized selectors for efficient state access
+- Functional approach ensuring predictable state transitions
 
 ### Project Structure
-```
-src/
-├── components/          # React UI components
-│   ├── game/           # Game-specific components
-│   ├── layout/         # Layout and shell components
-│   └── ui/             # Reusable UI primitives
-├── game/               # Pure game logic functions
-├── hooks/              # Custom React hooks
-├── store/              # Zustand state stores
-├── types/              # TypeScript type definitions
-├── utils/              # Shared utility functions
-├── locales/            # Translation files
-└── i18n/               # Internationalization config
-```
+- **components/**: React UI components organized by domain (game, layout, ui)
+- **game/**: Pure game logic functions (board manipulation, tetrominos, piece bag, wall kicks)
+- **hooks/**: Custom React hooks categorized by purpose (controls, core game loop, UI, selectors)
+- **store/**: Zustand state stores for game state, settings, and high scores
+- **types/**: TypeScript type definitions for game entities
+- **utils/**: Shared utility functions and constants
+- **locales/**: i18n translation files (English/Japanese)
+- **test/**: Test configuration and utilities
 
-## Custom Hooks
+## Custom Hooks Strategy
 
 ### Game Controls
-- **useGameLoop**: Manages the core game loop using requestAnimationFrame
-- **useKeyboardControls**: Handles keyboard input with react-hotkeys-hook
-- **useTouchGestures**: Processes touch gestures for mobile gameplay
-- **useTouchActions**: Handles touch-based game actions
-- **useTouchDetection**: Processes gesture detection logic
-- **useGameActions**: Provides game action dispatchers
-- **useGameActionHandler**: Coordinates action execution
+Custom hooks handle input management across keyboard and touch interfaces, with debouncing and cooldown systems to ensure responsive gameplay.
 
 ### Animation System
-- **useAnimatedValue**: Manages animation triggers and spring controls
-- **useAnimationCompletionHandler**: Handles animation lifecycle events
-- **useCellAnimation**: Controls individual cell animation states
+Hooks manage Framer Motion animations for piece movements, line clears, and UI transitions with proper lifecycle handling.
 
 ### State Selection & Data
-- **useBoardData**: Provides memoized board state selections
-- **useScoreState**: Provides memoized score state selections
-- **useHighScore**: Manages high score data and local storage
-- **useHighScoreSideEffect**: Handles high score persistence
+Memoized selectors provide optimized access to game state slices, while data hooks handle persistence and side effects.
 
 ## Core Game Logic
 
-### game/game.ts
-- `createInitialGameState()` — Initializes game state with ghost piece positioning
-- `moveTetrominoBy()` — Handles piece movement with ghost updates
-- `rotateTetrominoCW()` — Processes clockwise rotation with ghost recalculation
-- `hardDropTetromino()` — Executes instant piece drops
-- `holdCurrentPiece()` — Manages piece saving and swapping
-- `calculateGhostPosition()` — Computes landing position preview
-- `placePieceOnBoard()` — Places pieces on the board with collision detection
-- `clearCompletedLines()` — Handles line clearing logic and scoring
-- `spawnNextPiece()` — Generates next tetromino from piece bag
-- `checkGameOver()` — Validates game over conditions
+### Game State Management
+Pure functional approach to game state with immutable updates. All game logic separated from UI concerns for easy testing and maintenance.
 
-### game/board.ts
-- `createEmptyBoard()` — Generates clean game board
-- `isValidPosition()` — Validates piece placement
-- `placeTetromino()` — Places pieces on the board
-- `clearLines()` — Detects and removes completed lines
+### Board System
+Standard 20×10 Tetris board with collision detection, line clearing, and immutable state updates.
 
-### game/tetrominos.ts
-- `getTetrominoShape()` — Returns piece shape matrices
-- `rotateTetromino()` — 90-degree clockwise rotation logic
-- `createTetromino()` — Creates new tetromino instances
-- `getTetrominoColorIndex()` — Maps piece types to color indices
+### Tetromino System
+Complete implementation of all 7 standard Tetris pieces with matrix-based rotation and positioning.
 
-### game/pieceBag.ts
-**7-Bag System** — Ensures fair piece distribution:
-- `PieceBagManager` class managing the bag state
-- `getNextPiece()` — Retrieves pieces with automatic bag refill
-- `refillBag()` — Shuffles and replenishes the bag
-- Fisher-Yates shuffle for true randomization
+### 7-Bag Randomization
+Fair piece distribution system ensuring balanced gameplay by guaranteeing all 7 pieces appear before any repeat.
 
-### game/wallKick.ts
-**SRS Wall Kick System** — Advanced rotation mechanics:
-- `getWallKickOffsets()` — Provides rotation offset data
-- `tryRotateWithWallKick()` — Attempts rotation with fallback positions
-- Separate tables for I-piece vs. JLSTZ pieces
-- Full clockwise and counter-clockwise support
+### SRS Wall Kick System
+Super Rotation System implementation with proper wall kick mechanics for smooth rotation behavior, including separate handling for I-pieces vs. other pieces.
 
 ## Data Persistence
 
-### Local Storage (utils/localStorage.ts)
+### Local Storage
 Robust client-side data management:
 - High score tracking with leaderboard functionality
 - Persistent game settings (language, ghost piece visibility)  
-- Type-safe JSON serialization
-- Graceful error handling and fallbacks
-- Custom event system for score updates
+- Type-safe JSON serialization with error handling
+- Automatic data persistence and retrieval
 
 ## Visual Effects
 
@@ -205,7 +167,7 @@ Built with **i18next** for seamless language support:
 ## Cross-Platform Design
 
 ### Touch Interface
-Intuitive mobile controls via **useTouchGestures**:
+Intuitive mobile controls with gesture detection:
 - **Horizontal Swipes**: Natural left/right piece movement
 - **Quick Down Swipe**: Soft drop for faster placement
 - **Long Down Swipe**: Instant hard drop
@@ -220,55 +182,45 @@ Adaptive design for any screen:
 
 ## Quality Assurance
 
-### Testing Approach
-Comprehensive test coverage with **Bun Test**:
-- **Pure Functions**: Exhaustive game logic testing
-- **Custom Hooks**: Behavior verification in isolation
-- **React Components**: Rendering and interaction tests
-- **CI/CD Ready**: Seamless integration with Vercel and GitHub Actions
+### Testing Infrastructure
+- **Test Runner**: Bun Test with happy-dom environment for fast execution
+- **Coverage**: Comprehensive testing of game logic, hooks, and components
+- **Environment**: Type-safe happy-dom setup with proper DOM mocking
+- **Test Organization**: Co-located test files with descriptive naming
+
+### Testing Strategy
+- **Pure Function Testing**: Complete coverage of game logic in `src/game/`
+- **Hook Testing**: Isolated behavior verification using React Testing Library
+- **Component Testing**: Rendering and interaction testing with proper accessibility
+- **Integration Testing**: Full game flow testing with realistic scenarios
+- **Mocking Strategy**: Minimal mocking with focus on isolated unit testing
 
 ## Development Standards
 
-### Code Excellence
-- **Strict TypeScript**: ESNext target with zero tolerance for type errors, enabling cutting-edge JavaScript features
-- **Functional Paradigm**: Pure functions and immutable data patterns
-- **Test-First Development**: Every feature backed by comprehensive tests
-- **Type Safety**: Leveraging discriminated unions and type guards
+### Development Configuration
 
-### Performance Focus
-- **React Compiler**: Automatic optimizations eliminating manual memoization
-- **Concurrent Features**: useTransition for responsive UI updates
-- **Lightweight State**: Zustand's minimal overhead approach
-- **Fast Builds**: Rust-powered Rolldown-Vite bundler
-
-### Code Organization
-- **Components**: PascalCase naming (Board.tsx, Game.tsx)
-- **Hooks**: camelCase with 'use' prefix (useGameLoop.ts)
-- **Utilities**: camelCase for consistency (gameStore.ts, colors.ts)
-- **Tests**: Co-located `*.test.ts` files for easy maintenance
+- **Bun Runtime**: Primary toolchain for package management, testing, and development
+- **Code Quality**: Biome for linting and formatting with strict rules
+- **Git Hooks**: Automated formatting and conventional commit enforcement
+- **TypeScript**: Strict mode with ESNext target and cutting-edge JavaScript features
+- **Build Optimization**: Rolldown-vite for enhanced performance and improved dev/build consistency
+- **Testing**: Bun Test with happy-dom for fast, lightweight test execution
+- **Deployment**: Vercel with Bun-optimized build pipeline
 
 ## Development Commands
 
 ```bash
-# Development & Build
-bun run dev                    # Start development server
-bun run build                  # Production build
-bun run preview                # Preview build output
+# Core Development
+bun run dev          # Development server
+bun run build        # Production build
+bun test             # Run all tests
 
-# Testing & Quality
-bun test                       # Run all tests
-bun run test:fast              # Fast subset tests (game logic & hooks)
-bun run lint                   # Run Biome lint
-bun run format                 # Run Biome format
-bun run typecheck              # TypeScript type checking
-bun run knip                   # Dead code detection
-bun run check                  # Type check + dead code detection
-bun run prepare                # Setup Git hooks with Lefthook
-
-# Package Management
-bun install                    # Install dependencies
-bun add <package>              # Add package
-bun remove <package>           # Remove package
+# Quality Assurance
+bun run lint         # Code linting
+bun run format       # Code formatting
+bun run typecheck    # Type checking
+bun run check        # Full quality check
+bun run ci           # CI pipeline
 ```
 
 ## Browser Testing
