@@ -2,17 +2,9 @@ import { useKeyboardControls } from "../../hooks/controls/useKeyboardControls";
 import { useTouchGestures } from "../../hooks/controls/useTouchGestures";
 import { useGameLoop } from "../../hooks/core/useGameLoop";
 import { useHighScoreSideEffect } from "../../hooks/effects/useHighScoreSideEffect";
-import {
-  Board,
-  Controls,
-  GameOverlay,
-  HighScore,
-  HoldPiece,
-  NextPiece,
-  ScoreBoard,
-  TouchControls,
-} from "../game";
+import { Board, Controls, GameOverlay, HighScore, HoldPiece, NextPiece, ScoreBoard } from "../game";
 import { GameSettings } from "./GameSettings";
+import { MobileGameLayout } from "./MobileGameLayout";
 
 export function Game() {
   useGameLoop();
@@ -21,46 +13,46 @@ export function Game() {
   const { handleTouchStart, handleTouchEnd } = useTouchGestures();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white p-4 relative">
-      <GameSettings />
+    <>
+      {/* Mobile layout */}
+      <div className="md:hidden">
+        <MobileGameLayout />
+      </div>
 
-      <main
-        className="flex flex-col md:grid md:grid-cols-[240px_1fr] gap-6 md:gap-8 md:items-start md:justify-center md:min-h-[calc(100vh-2rem)] pt-12 md:pt-4"
-        aria-label="Tetris Game"
-      >
-        {/* Sidebar - Top on mobile, left side on desktop */}
-        <aside
-          className="flex flex-col gap-3 w-full max-w-sm md:max-w-none mx-auto md:mx-0 order-1 md:order-none md:sticky md:top-4 md:max-h-[calc(100vh-2rem)] md:overflow-y-auto md:pr-2"
-          aria-label="Game Information"
+      {/* Desktop layout */}
+      <div className="hidden md:block min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white p-4 relative">
+        <GameSettings />
+
+        <main
+          className="grid grid-cols-[240px_1fr] gap-8 items-start justify-center min-h-[calc(100vh-2rem)] pt-4"
+          aria-label="Tetris Game"
         >
-          <ScoreBoard />
-          <HighScore />
-          <HoldPiece />
-          <NextPiece />
-          <div className="hidden md:block">
-            <Controls />
-          </div>
-        </aside>
-
-        {/* Game board area */}
-        <div className="order-2 md:order-none flex flex-col items-center md:justify-center">
-          <section
-            className="relative"
-            aria-label="Game Board Area"
-            onTouchStart={handleTouchStart}
-            onTouchEnd={handleTouchEnd}
+          {/* Sidebar - left side on desktop */}
+          <aside
+            className="flex flex-col gap-3 sticky top-4 max-h-[calc(100vh-2rem)] overflow-y-auto pr-2"
+            aria-label="Game Information"
           >
-            <Board />
-            <GameOverlay />
-          </section>
-
-          {/* Mobile controls */}
-          <section className="w-full max-w-sm mt-6 md:hidden" aria-label="Game Controls">
-            <TouchControls className="mb-4" />
+            <ScoreBoard />
+            <HighScore />
+            <HoldPiece />
+            <NextPiece />
             <Controls />
-          </section>
-        </div>
-      </main>
-    </div>
+          </aside>
+
+          {/* Game board area */}
+          <div className="flex flex-col items-center justify-center">
+            <section
+              className="relative"
+              aria-label="Game Board Area"
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
+            >
+              <Board />
+              <GameOverlay />
+            </section>
+          </div>
+        </main>
+      </div>
+    </>
   );
 }

@@ -16,6 +16,7 @@ interface BoardCellProps {
   isClearingLine: boolean;
   animationTrigger: AnimationTriggerKey;
   onAnimationComplete: () => void;
+  cellSize?: number;
 }
 
 /**
@@ -31,6 +32,7 @@ export function BoardCell({
   isClearingLine,
   animationTrigger,
   onAnimationComplete,
+  cellSize = GAME_CONSTANTS.BOARD.CELL_SIZE,
 }: BoardCellProps) {
   const { initialAnimation, animateProps, transitionProps } = useCellAnimation({
     isCurrentPiece,
@@ -52,9 +54,14 @@ export function BoardCell({
     isClearingLine && BOARD_STYLES.clearingLine,
   );
 
+  const cellStyle = {
+    width: `${cellSize}px`,
+    height: `${cellSize}px`,
+  };
+
   // Use regular div for static cells to improve performance
   if (!needsAnimation) {
-    return <div className={cellClasses} data-testid="board-cell" />;
+    return <div className={cellClasses} style={cellStyle} data-testid="board-cell" />;
   }
 
   // Use motion.div only when animation is needed
@@ -66,6 +73,7 @@ export function BoardCell({
       transition={transitionProps}
       onAnimationComplete={onAnimationComplete}
       className={cellClasses}
+      style={cellStyle}
       data-testid="board-cell"
     />
   );

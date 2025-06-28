@@ -47,7 +47,7 @@ export function GameSettings() {
       <AnimatedButton onClick={() => setIsOpen(!isOpen)} className={CONTROL_STYLES.button}>
         <div className="flex items-center gap-2">
           <Settings className="h-4 w-4" />
-          <span>{t("game.settings.title")}</span>
+          <span className="hidden md:block">{t("game.settings.title")}</span>
         </div>
       </AnimatedButton>
 

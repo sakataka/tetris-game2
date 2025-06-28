@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils";
 import { useBoardData } from "../../hooks/selectors/useBoardSelectors";
 import { useAnimationCompletionHandler } from "../../hooks/ui/useAnimationCompletionHandler";
+import { useResponsiveBoard } from "../../hooks/ui/useResponsiveBoard";
 import { GAME_CONSTANTS } from "../../utils/gameConstants";
 import { BOARD_STYLES, CARD_STYLES } from "../../utils/styles";
 import { Card } from "../ui/card";
@@ -16,22 +17,17 @@ export function Board() {
     animationTriggerKey,
   } = useBoardData();
   const { handleAnimationComplete } = useAnimationCompletionHandler();
+  const { cellSize } = useResponsiveBoard();
 
   return (
-    <Card
-      className={cn(
-        CARD_STYLES.base,
-        CARD_STYLES.hover,
-        `p-6 min-w-[${GAME_CONSTANTS.BOARD.MIN_WIDTH_PX}px] min-h-[${GAME_CONSTANTS.BOARD.MIN_HEIGHT_PX}px] shadow-2xl hover:shadow-3xl`,
-      )}
-    >
+    <Card className={cn(CARD_STYLES.base, CARD_STYLES.hover, "p-3 md:p-6")}>
       <div
         className={BOARD_STYLES.container}
         aria-label="Tetris game board"
         role="img"
         style={{
-          gridTemplateColumns: `repeat(${GAME_CONSTANTS.BOARD.WIDTH}, ${GAME_CONSTANTS.BOARD.CELL_SIZE}px)`,
-          gridTemplateRows: `repeat(${GAME_CONSTANTS.BOARD.HEIGHT}, ${GAME_CONSTANTS.BOARD.CELL_SIZE}px)`,
+          gridTemplateColumns: `repeat(${GAME_CONSTANTS.BOARD.WIDTH}, ${cellSize}px)`,
+          gridTemplateRows: `repeat(${GAME_CONSTANTS.BOARD.HEIGHT}, ${cellSize}px)`,
         }}
       >
         {displayBoard.map((row, y) =>
@@ -57,6 +53,7 @@ export function Board() {
                 isClearingLine={isClearingLine}
                 animationTrigger={animationTriggerKey}
                 onAnimationComplete={() => handleAnimationComplete(isClearingLine, isPlacedPiece)}
+                cellSize={cellSize}
               />
             );
           }),
