@@ -94,49 +94,6 @@ Built on **Zustand** for clean, scalable state management:
 - Performance-optimized selectors with automatic memoization  
 - Immutable updates ensuring predictable state transitions
 
-### Game State Type Definition
-```typescript
-interface GameState {
-  board: GameBoard;
-  boardBeforeClear: GameBoard | null;
-  currentPiece: Tetromino | null;
-  nextPiece: TetrominoTypeName;
-  heldPiece: TetrominoTypeName | null;
-  canHold: boolean;
-  score: number;
-  lines: number;
-  level: number;
-  isGameOver: boolean;
-  isPaused: boolean;
-  placedPositions: Position[];
-  clearingLines: number[];
-  animationTriggerKey: AnimationTriggerKey;
-  ghostPosition: Position | null;
-  pieceBag: TetrominoTypeName[]; // 7-Bag system state
-}
-```
-
-### Core Type Definitions
-```typescript
-// Union type for tetromino piece names
-export type TetrominoTypeName = "I" | "O" | "T" | "S" | "Z" | "J" | "L";
-
-// Tetromino piece with position and rotation state
-export interface Tetromino {
-  type: TetrominoTypeName;
-  position: Position;
-  rotation: RotationState; // 0=spawn, 1=right, 2=180, 3=left
-  shape: CellValue[][];
-}
-
-// Settings managed separately in SettingsStore
-interface GameSettings {
-  language: "ja" | "en";
-  volume: number;
-  showGhostPiece: boolean; // Ghost piece visibility toggle
-}
-```
-
 ### Project Structure
 ```
 src/
@@ -300,16 +257,12 @@ bun run preview                # Preview build output
 
 # Testing & Quality
 bun test                       # Run all tests
-bun test --watch               # Watch mode
 bun run test:fast              # Fast subset tests (game logic & hooks)
-bun run test:components        # Component-specific tests
-bun run test:ci                # CI tests
 bun run lint                   # Run Biome lint
 bun run format                 # Run Biome format
 bun run typecheck              # TypeScript type checking
 bun run knip                   # Dead code detection
 bun run check                  # Type check + dead code detection
-bun run ci                     # Full CI pipeline (format, lint, typecheck, test, build)
 bun run prepare                # Setup Git hooks with Lefthook
 
 # Package Management
