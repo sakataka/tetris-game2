@@ -76,12 +76,12 @@ mock.module("@/lib/utils", () => ({
 }));
 
 // ==============================
-// TEST HELPERS - t_wada style: テストのためのヘルパー関数
+// TEST HELPERS - t_wada style: Helper functions for testing
 // ==============================
 
 /**
  * Create board with specific tetromino placed at position
- * アサーションファースト: 期待する配置状態から逆算して作成
+ * Assertion First: Create by working backwards from expected placement state
  */
 function createBoardWithTetromino(
   type: TetrominoTypeName,
@@ -131,7 +131,7 @@ function getCellAt(container: HTMLElement, x: number, y: number): HTMLElement {
 
 /**
  * Assert cell has expected tetromino properties
- * アサーションファースト: 期待する色と状態を明確に定義
+ * Assertion First: Clearly define expected color and state
  */
 function expectCellToBeTetrominoType(
   cell: HTMLElement,
@@ -157,43 +157,43 @@ function expectCellToBeTetrominoType(
 }
 
 // ==============================
-// TESTS - t_wada style: アサーションファースト & 三角測量
+// TESTS - t_wada style: Assertion First & Triangulation
 // ==============================
 
 describe("Board.tsx - t_wada TDD Style", () => {
   // ==============================
-  // 基本レンダリングテスト
+  // Basic Rendering Test
   // ==============================
 
   describe("Basic Rendering", () => {
     test("should render board container with correct structure", () => {
-      // Arrange: 空のボード状態を準備
+      // Arrange: Prepare empty board state
       setupBoardDataMock({});
 
-      // Act: Boardコンポーネントをレンダリング
+      // Act: Render Board component
       const { getByTestId } = render(<Board />);
 
-      // Assert: 期待する構造が描画されていることを確認
+      // Assert: Verify expected structure is rendered
       const container = getByTestId("board-container");
       expect(container).toBeInTheDocument();
       expect(container).toHaveClass("bg-gray-900/50");
     });
 
     test("should render all 200 cells (10x20 board)", () => {
-      // Arrange: 標準ボードサイズの設定
+      // Arrange: Set up standard board size
       setupBoardDataMock({});
 
-      // Act: レンダリング
+      // Act: Render
       const { container } = render(<Board />);
 
-      // Assert: 200個（10×20）のセルが存在することを確認
+      // Assert: Verify 200 cells (10x20) exist
       const cells = container.querySelectorAll("[data-testid^='board-cell-']");
       expect(cells).toHaveLength(GAME_CONSTANTS.BOARD.WIDTH * GAME_CONSTANTS.BOARD.HEIGHT);
     });
   });
 
   // ==============================
-  // 三角測量: 全7種類のテトロミノ表示テスト
+  // Triangulation: Display test for all 7 tetromino types
   // ==============================
 
   describe("Tetromino Display - Triangulation", () => {
@@ -208,17 +208,17 @@ describe("Board.tsx - t_wada TDD Style", () => {
     ])(
       "should render %s with correct color index %d",
       (_description, type, expectedColorIndex, position) => {
-        // Arrange: アサーションファースト - 期待する表示状態を定義
+        // Arrange: Assertion First - Define expected display state
         const { board, piecePositions } = createBoardWithTetromino(type, position);
         setupBoardDataMock({
           board,
           currentPiecePositions: piecePositions,
         });
 
-        // Act: レンダリング
+        // Act: Render
         const { container } = render(<Board />);
 
-        // Assert: 三角測量 - 各ピースが正しい色で表示されることを確認
+        // Assert: Triangulation - Verify each piece displays with correct color
         for (const positionKey of piecePositions) {
           const [x, y] = positionKey.split(",").map(Number);
           const cell = getCellAt(container, x, y);
@@ -229,7 +229,7 @@ describe("Board.tsx - t_wada TDD Style", () => {
   });
 
   // ==============================
-  // 境界値テスト - ボード境界での表示
+  // Boundary Value Testing - Display at board edges
   // ==============================
 
   describe("Boundary Value Testing", () => {
@@ -240,17 +240,17 @@ describe("Board.tsx - t_wada TDD Style", () => {
       ["bottom-right corner", { x: 8, y: 18 }],
       ["center position", { x: 4, y: 10 }],
     ])("should render O-piece at %s boundary", (_description, position) => {
-      // Arrange: 境界値での配置状態を準備
+      // Arrange: Prepare boundary value placement state
       const { board, piecePositions } = createBoardWithTetromino("O", position);
       setupBoardDataMock({
         board,
         currentPiecePositions: piecePositions,
       });
 
-      // Act: レンダリング
+      // Act: Render
       const { container } = render(<Board />);
 
-      // Assert: 境界位置でも正しく表示されることを確認
+      // Assert: Verify correct display at boundary positions
       for (const positionKey of piecePositions) {
         const [x, y] = positionKey.split(",").map(Number);
         const cell = getCellAt(container, x, y);
@@ -259,7 +259,7 @@ describe("Board.tsx - t_wada TDD Style", () => {
     });
 
     test("should handle positions near board edges correctly", () => {
-      // Arrange: エッジケースの配置
+      // Arrange: Edge case placement
       const board = createEmptyBoard();
       board[19][9] = 1; // Place I-piece color at edge
 
@@ -268,22 +268,22 @@ describe("Board.tsx - t_wada TDD Style", () => {
         currentPiecePositions: new Set(["9,19"]),
       });
 
-      // Act: レンダリング
+      // Act: Render
       const { container } = render(<Board />);
 
-      // Assert: エッジ位置の1セルが正しく表示
+      // Assert: Single cell at edge position displays correctly
       const cell = getCellAt(container, 9, 19);
       expectCellToBeTetrominoType(cell, 1, true);
     });
   });
 
   // ==============================
-  // ゴーストピース表示テスト
+  // Ghost Piece Display Test
   // ==============================
 
   describe("Ghost Piece Display", () => {
     test("should render ghost piece with transparent appearance", () => {
-      // Arrange: ゴーストピース表示状態を準備
+      // Arrange: Prepare ghost piece display state
       const currentPosition = { x: 4, y: 5 };
       const ghostPosition = { x: 4, y: 17 };
       const { board: currentBoard, piecePositions: currentPositions } = createBoardWithTetromino(
@@ -298,10 +298,10 @@ describe("Board.tsx - t_wada TDD Style", () => {
         ghostPiecePositions: ghostPositions,
       });
 
-      // Act: レンダリング
+      // Act: Render
       const { container } = render(<Board />);
 
-      // Assert: 現在のピースとゴーストピースが区別されて表示
+      // Assert: Current piece and ghost piece are displayed distinctly
       // Current piece cells
       for (const positionKey of currentPositions) {
         const [x, y] = positionKey.split(",").map(Number);
@@ -318,7 +318,7 @@ describe("Board.tsx - t_wada TDD Style", () => {
     });
 
     test("should not show ghost piece where current piece exists", () => {
-      // Arrange: 現在のピースとゴーストピースが重複する位置
+      // Arrange: Position where current piece and ghost piece overlap
       const position = { x: 4, y: 10 };
       const { board, piecePositions } = createBoardWithTetromino("I", position);
 
@@ -328,10 +328,10 @@ describe("Board.tsx - t_wada TDD Style", () => {
         ghostPiecePositions: piecePositions, // Same positions
       });
 
-      // Act: レンダリング
+      // Act: Render
       const { container } = render(<Board />);
 
-      // Assert: 現在のピースのみ表示され、ゴーストは表示されない
+      // Assert: Only current piece is displayed, ghost is not shown
       for (const positionKey of piecePositions) {
         const [x, y] = positionKey.split(",").map(Number);
         const cell = getCellAt(container, x, y);
@@ -341,12 +341,12 @@ describe("Board.tsx - t_wada TDD Style", () => {
   });
 
   // ==============================
-  // ゲーム状態別表示テスト
+  // Game State Display Test
   // ==============================
 
   describe("Game State Display", () => {
     test("should render line clearing animation state", () => {
-      // Arrange: ライン消去アニメーション状態を準備
+      // Arrange: Prepare line clearing animation state
       const board = createEmptyBoard();
       // Fill bottom line for clearing
       for (let x = 0; x < GAME_CONSTANTS.BOARD.WIDTH; x++) {
@@ -358,10 +358,10 @@ describe("Board.tsx - t_wada TDD Style", () => {
         clearingLines: [19],
       });
 
-      // Act: レンダリング
+      // Act: Render
       const { container } = render(<Board />);
 
-      // Assert: 消去ラインのセルが特別なプロパティを持つ
+      // Assert: Clearing line cells have special properties
       for (let x = 0; x < GAME_CONSTANTS.BOARD.WIDTH; x++) {
         const cell = getCellAt(container, x, 19);
         expect(cell).toHaveAttribute("data-is-clearing-line", "true");
@@ -369,7 +369,7 @@ describe("Board.tsx - t_wada TDD Style", () => {
     });
 
     test("should render placed pieces correctly", () => {
-      // Arrange: 配置済みピース状態を準備
+      // Arrange: Prepare placed piece state
       const board = createEmptyBoard();
       board[18][4] = 3; // T-piece color
       board[18][5] = 3;
@@ -380,10 +380,10 @@ describe("Board.tsx - t_wada TDD Style", () => {
         placedPositionsSet: placedPositions,
       });
 
-      // Act: レンダリング
+      // Act: Render
       const { container } = render(<Board />);
 
-      // Assert: 配置済みピースが正しく表示
+      // Assert: Placed pieces display correctly
       const cell1 = getCellAt(container, 4, 18);
       const cell2 = getCellAt(container, 5, 18);
 
@@ -394,15 +394,15 @@ describe("Board.tsx - t_wada TDD Style", () => {
     });
 
     test("should handle empty board correctly", () => {
-      // Arrange: 完全に空のボード
+      // Arrange: Completely empty board
       setupBoardDataMock({
         board: createEmptyBoard(),
       });
 
-      // Act: レンダリング
+      // Act: Render
       const { container } = render(<Board />);
 
-      // Assert: 全セルが空状態で表示
+      // Assert: All cells display as empty state
       for (let y = 0; y < GAME_CONSTANTS.BOARD.HEIGHT; y++) {
         for (let x = 0; x < GAME_CONSTANTS.BOARD.WIDTH; x++) {
           const cell = getCellAt(container, x, y);
@@ -413,12 +413,12 @@ describe("Board.tsx - t_wada TDD Style", () => {
   });
 
   // ==============================
-  // 複合状態テスト - 実際のゲームプレイに近い状態
+  // Complex State Testing - Near actual gameplay state
   // ==============================
 
   describe("Complex Game State", () => {
     test("should render multiple game elements simultaneously", () => {
-      // Arrange: 複合状態 - 現在のピース、ゴースト、配置済み、消去ライン
+      // Arrange: Complex state - current piece, ghost, placed, clearing line
       const board = createEmptyBoard();
 
       // Place some pieces on the board (these are background/placed pieces)
@@ -453,10 +453,10 @@ describe("Board.tsx - t_wada TDD Style", () => {
         clearingLines: [19],
       });
 
-      // Act: レンダリング
+      // Act: Render
       const { container } = render(<Board />);
 
-      // Assert: 各要素が正しく表示される
+      // Assert: Each element displays correctly
       // Current piece - should have T-piece color (3)
       for (const positionKey of currentPositions) {
         const [x, y] = positionKey.split(",").map(Number);
@@ -486,12 +486,12 @@ describe("Board.tsx - t_wada TDD Style", () => {
   });
 
   // ==============================
-  // パフォーマンステスト - 大量データでの動作確認
+  // Performance Testing - Operation verification with large data
   // ==============================
 
   describe("Performance Testing", () => {
     test("should handle board with many placed pieces efficiently", () => {
-      // Arrange: 大量の配置済みピースがあるボード
+      // Arrange: Board with many placed pieces
       const board = createEmptyBoard();
       const placedPositions = new Set<string>();
 
@@ -508,13 +508,13 @@ describe("Board.tsx - t_wada TDD Style", () => {
         placedPositionsSet: placedPositions,
       });
 
-      // Act: レンダリング（パフォーマンス測定）
+      // Act: Render (performance measurement)
       const startTime = performance.now();
       const { container } = render(<Board />);
       const endTime = performance.now();
 
-      // Assert: レンダリング時間が合理的範囲内 & 正しく表示
-      expect(endTime - startTime).toBeLessThan(100); // 100ms以内
+      // Assert: Rendering time within reasonable range & correct display
+      expect(endTime - startTime).toBeLessThan(100); // Within 100ms
 
       // Verify a few cells are rendered correctly
       const cell = getCellAt(container, 0, 10);

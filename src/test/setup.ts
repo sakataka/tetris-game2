@@ -38,4 +38,9 @@ beforeAll(() => {
 // Clean up after each test
 afterEach(() => {
   cleanup();
+  // Clear all timers after each test
+  global.setTimeout = globalThis.setTimeout;
+  global.clearTimeout = globalThis.clearTimeout;
+  global.setInterval = globalThis.setInterval;
+  global.clearInterval = globalThis.clearInterval;
 });
