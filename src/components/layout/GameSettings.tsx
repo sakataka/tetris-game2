@@ -19,8 +19,15 @@ export function GameSettings() {
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
+      const target = event.target as Node;
+
+      // Check if click is outside the dropdown trigger button
+      if (dropdownRef.current && !dropdownRef.current.contains(target)) {
+        // Also check if click is not inside the settings panel
+        const settingsPanel = document.querySelector("[data-settings-panel]");
+        if (!settingsPanel || !settingsPanel.contains(target)) {
+          setIsOpen(false);
+        }
       }
     };
 
@@ -39,7 +46,7 @@ export function GameSettings() {
   const handleLanguageChange = async (value: string) => {
     await i18n.changeLanguage(value);
     setLanguage(value as "ja" | "en");
-    setIsOpen(false);
+    // Don't close the dropdown immediately - let user see the change
   };
 
   const handleGhostPieceToggle = () => {
@@ -57,7 +64,10 @@ export function GameSettings() {
 
       {isOpen &&
         createPortal(
-          <Card className={`fixed top-16 right-4 ${MODAL_STYLES.panel} min-w-[240px] p-0 z-[9999]`}>
+          <Card
+            className={`fixed top-16 right-4 ${MODAL_STYLES.panel} min-w-[240px] p-0 z-[9999]`}
+            data-settings-panel
+          >
             {/* Language Section */}
             <div className="px-3 py-2">
               <div className="text-xs text-gray-400 uppercase font-semibold mb-2">
@@ -68,7 +78,10 @@ export function GameSettings() {
                   key={lang.value}
                   type="button"
                   className={`${CONTROL_STYLES.interactiveItem} flex items-center justify-between p-2 rounded cursor-pointer w-full text-left`}
-                  onClick={() => handleLanguageChange(lang.value)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleLanguageChange(lang.value);
+                  }}
                 >
                   <div className="flex items-center gap-2">
                     <span>{lang.flag}</span>
@@ -94,7 +107,10 @@ export function GameSettings() {
               <button
                 type="button"
                 className={`${CONTROL_STYLES.interactiveItem} flex items-center justify-between p-2 rounded cursor-pointer w-full text-left`}
-                onClick={handleGhostPieceToggle}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleGhostPieceToggle();
+                }}
               >
                 <div className="flex flex-col">
                   <span className="text-white text-sm">
@@ -102,9 +118,6 @@ export function GameSettings() {
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-400">
-                    {showGhostPiece ? t("game.settings.enabled") : t("game.settings.disabled")}
-                  </span>
                   <div
                     className={`w-10 h-5 rounded-full p-1 transition-colors ${
                       showGhostPiece ? CONTROL_STYLES.toggleOn : CONTROL_STYLES.toggleOff
