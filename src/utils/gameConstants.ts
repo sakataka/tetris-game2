@@ -58,6 +58,7 @@ export const GAME_CONSTANTS = {
     },
     LINE_CLEAR_DURATION: 0.2,
     PIECE_PLACE_DURATION: 0.15,
+    COMPLETION_DELAY: 10, // Minimal delay to ensure animation DOM updates complete
   },
   TOUCH: {
     MIN_SWIPE_DISTANCE: 30,

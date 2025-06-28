@@ -1,6 +1,6 @@
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronsDown, RotateCw } from "lucide-react";
-import { useTransition } from "react";
 import { useRotationControl } from "../../hooks/controls/useRotationControl";
+import { useGameActionHandler } from "../../hooks/core/useGameActionHandler";
 import { useGameStore } from "../../store/gameStore";
 import { AnimatedButton } from "../ui/AnimatedButton";
 
@@ -15,23 +15,13 @@ export function TouchControls({ className }: TouchControlsProps) {
   const drop = useGameStore((state) => state.drop);
   const isPaused = useGameStore((state) => state.isPaused);
   const isGameOver = useGameStore((state) => state.isGameOver);
-  const [, startTransition] = useTransition();
   const { handleRotate } = useRotationControl();
-
-  // Helper for game actions with common conditions
-  const executeGameAction = (action: () => void, useTransitionWrapper = true) => {
-    if (isGameOver || isPaused) return;
-    if (useTransitionWrapper) {
-      startTransition(action);
-    } else {
-      action();
-    }
-  };
+  const executeGameAction = useGameActionHandler();
 
   const handleMoveLeft = () => executeGameAction(moveLeft);
   const handleMoveRight = () => executeGameAction(moveRight);
   const handleMoveDown = () => executeGameAction(moveDown);
-  const handleDrop = () => executeGameAction(drop, false);
+  const handleDrop = () => executeGameAction(drop, true); // urgent = true for hard drop
 
   return (
     <div className={`grid grid-cols-3 gap-2 ${className}`}>

@@ -33,7 +33,11 @@ export const useGameStore = create<GameStore>((set) => ({
   drop: () => set((state) => hardDropTetromino(state)),
   holdPiece: () => set((state) => holdCurrentPiece(state)),
 
-  togglePause: () => set((state) => ({ isPaused: !state.isPaused })),
+  togglePause: () =>
+    set((state) => {
+      if (state.isGameOver) return state; // Cannot pause when game is over
+      return { isPaused: !state.isPaused };
+    }),
   resetGame: () =>
     set(() => ({
       ...createInitialGameState(),

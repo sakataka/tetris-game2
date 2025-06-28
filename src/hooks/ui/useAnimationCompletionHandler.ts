@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
+import { GAME_CONSTANTS } from "../../utils/gameConstants";
 import { useGameActions } from "../actions/useGameActions";
 
 export function useAnimationCompletionHandler() {
@@ -21,7 +22,7 @@ export function useAnimationCompletionHandler() {
         clearTimeoutRef.current = window.setTimeout(() => {
           clearAnimationData();
           clearTimeoutRef.current = null;
-        }, 10); // Minimal delay to ensure animation DOM updates complete
+        }, GAME_CONSTANTS.ANIMATION.COMPLETION_DELAY);
       } else if (isPlacedPiece) {
         // Cancel any pending clear operations to prevent duplicate calls
         if (clearTimeoutRef.current) {
