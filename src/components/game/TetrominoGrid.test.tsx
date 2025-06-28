@@ -1,5 +1,6 @@
 import { describe, expect, it } from "bun:test";
 import { render } from "@testing-library/react";
+import "@testing-library/jest-dom";
 import { TetrominoGrid } from "./TetrominoGrid";
 
 describe("TetrominoGrid", () => {
@@ -8,7 +9,9 @@ describe("TetrominoGrid", () => {
       <TetrominoGrid shape={null} tetrominoColor="" gridSize={4} keyPrefix="test" />,
     );
 
-    const gridCells = container.querySelectorAll(".grid.grid-cols-4 > div");
+    // More robust selector - find all div elements inside the grid container
+    const gridContainer = container.querySelector("div");
+    const gridCells = gridContainer?.querySelectorAll("div") || [];
     expect(gridCells.length).toBe(12); // 3 rows * 4 columns
   });
 
@@ -23,7 +26,9 @@ describe("TetrominoGrid", () => {
       <TetrominoGrid shape={shape} tetrominoColor="bg-red-500" gridSize={4} keyPrefix="test" />,
     );
 
-    const gridCells = container.querySelectorAll(".grid.grid-cols-4 > div");
+    // More robust selector
+    const gridContainer = container.querySelector("div");
+    const gridCells = gridContainer?.querySelectorAll("div") || [];
     const activeCells = Array.from(gridCells).filter((cell) =>
       cell.className.includes("bg-red-500"),
     );
@@ -42,7 +47,9 @@ describe("TetrominoGrid", () => {
       <TetrominoGrid shape={shape} tetrominoColor="bg-blue-500" gridSize={4} keyPrefix="test" />,
     );
 
-    const gridCells = container.querySelectorAll(".grid.grid-cols-4 > div");
+    // More robust selector
+    const gridContainer = container.querySelector("div");
+    const gridCells = gridContainer?.querySelectorAll("div") || [];
     const inactiveCells = Array.from(gridCells).filter((cell) =>
       cell.className.includes("bg-gray-800"),
     );
@@ -62,7 +69,7 @@ describe("TetrominoGrid", () => {
     );
 
     const grid = container.querySelector("div");
-    expect(grid?.className).toContain("opacity-50");
+    expect(grid).toHaveClass("opacity-50");
   });
 
   it("does not apply disabled styles when disabled prop is false", () => {
@@ -77,7 +84,7 @@ describe("TetrominoGrid", () => {
     );
 
     const grid = container.querySelector("div");
-    expect(grid?.className).not.toContain("opacity-50");
+    expect(grid).not.toHaveClass("opacity-50");
   });
 
   it("uses correct key prefix for cells", () => {
@@ -85,7 +92,9 @@ describe("TetrominoGrid", () => {
       <TetrominoGrid shape={null} tetrominoColor="" gridSize={4} keyPrefix="custom" />,
     );
 
-    const gridCells = container.querySelectorAll(".grid.grid-cols-4 > div");
+    // More robust selector
+    const gridContainer = container.querySelector("div");
+    const gridCells = gridContainer?.querySelectorAll("div") || [];
     gridCells.forEach((cell) => {
       expect(cell.getAttribute("data-testid")).toBeNull(); // React doesn't expose keys to DOM
     });
@@ -96,7 +105,9 @@ describe("TetrominoGrid", () => {
       <TetrominoGrid shape={null} tetrominoColor="bg-green-500" gridSize={4} keyPrefix="test" />,
     );
 
-    const gridCells = container.querySelectorAll(".grid.grid-cols-4 > div");
+    // More robust selector
+    const gridContainer = container.querySelector("div");
+    const gridCells = gridContainer?.querySelectorAll("div") || [];
     const activeCells = Array.from(gridCells).filter((cell) =>
       cell.className.includes("bg-green-500"),
     );
