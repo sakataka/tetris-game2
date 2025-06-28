@@ -275,17 +275,10 @@ bun remove <package>           # Remove package
 
 ### Live Development Testing
 Interactive testing using **MCP (Model Context Protocol)** with Playwright:
-
-```bash
-# 1. Start the development server
-bun run dev
-
-# 2. Use Playwright tools in Claude Code:
-# - mcp__playwright__browser_navigate — Navigate to pages
-# - mcp__playwright__browser_click — Interact with elements  
-# - mcp__playwright__browser_take_screenshot — Capture visuals
-# - mcp__playwright__browser_snapshot — Analyze page structure
-```
+- mcp__playwright__browser_navigate — Navigate to pages
+- mcp__playwright__browser_click — Interact with elements  
+- mcp__playwright__browser_take_screenshot — Capture visuals
+- mcp__playwright__browser_snapshot — Analyze page structure
 
 **Perfect for:**
 - Visual UI validation and screenshot comparison
