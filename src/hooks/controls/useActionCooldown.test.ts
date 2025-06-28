@@ -3,64 +3,63 @@ import { act, renderHook } from "@testing-library/react";
 import { useActionCooldown } from "./useActionCooldown";
 
 describe("useActionCooldown", () => {
-  it("should return a function that executes the action", () => {
-    let callCount = 0;
-    let lastCallArgs: unknown[] = [];
+  it("should return a function that executes the action", async () => {
+    const results: unknown[][] = [];
     const mockAction = (...args: unknown[]) => {
-      callCount++;
-      lastCallArgs = args;
+      results.push(args);
     };
 
     const { result } = renderHook(() => useActionCooldown(mockAction, 0));
 
     expect(typeof result.current).toBe("function");
 
-    act(() => {
+    await act(async () => {
       result.current("test");
+      // Give some time for the action to execute
+      await new Promise((resolve) => setTimeout(resolve, 1));
     });
 
-    expect(callCount).toBe(1);
-    expect(lastCallArgs).toEqual(["test"]);
+    expect(results).toHaveLength(1);
+    expect(results[0]).toEqual(["test"]);
   });
 
-  it("should allow action execution after cooldown period", () => {
-    let callCount = 0;
-    const mockAction = () => {
-      callCount++;
-    };
-
-    // Use 0ms cooldown to ensure immediate execution
-    const { result } = renderHook(() => useActionCooldown(mockAction, 0));
-
-    act(() => {
-      result.current();
-    });
-
-    expect(callCount).toBe(1);
-
-    // Even with 0ms cooldown, the execution should work
-    act(() => {
-      result.current();
-    });
-
-    expect(callCount).toBe(2);
-  });
-
-  it("should handle multiple arguments correctly", () => {
-    let callCount = 0;
-    let lastCallArgs: unknown[] = [];
+  it("should allow action execution after cooldown period", async () => {
+    const results: unknown[][] = [];
     const mockAction = (...args: unknown[]) => {
-      callCount++;
-      lastCallArgs = args;
+      results.push(args);
     };
 
     const { result } = renderHook(() => useActionCooldown(mockAction, 0));
 
-    act(() => {
-      result.current("arg1", 42, true);
+    await act(async () => {
+      result.current();
+      await new Promise((resolve) => setTimeout(resolve, 1));
     });
 
-    expect(callCount).toBe(1);
-    expect(lastCallArgs).toEqual(["arg1", 42, true]);
+    expect(results).toHaveLength(1);
+
+    await act(async () => {
+      result.current();
+      await new Promise((resolve) => setTimeout(resolve, 1));
+    });
+
+    expect(results).toHaveLength(2);
+  });
+
+  it("should handle multiple arguments correctly", async () => {
+    const results: unknown[][] = [];
+    const mockAction = (...args: unknown[]) => {
+      results.push(args);
+    };
+
+    const { result } = renderHook(() => useActionCooldown(mockAction, 0));
+
+    await act(async () => {
+      result.current("arg1", 42, true);
+      await new Promise((resolve) => setTimeout(resolve, 1));
+    });
+
+    expect(results).toHaveLength(1);
+    expect(results[0]).toEqual(["arg1", 42, true]);
   });
 });
