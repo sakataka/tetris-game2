@@ -14,9 +14,7 @@ describe("useActionCooldown", () => {
     expect(typeof result.current).toBe("function");
 
     await act(async () => {
-      result.current("test");
-      // Give some time for the action to execute
-      await new Promise((resolve) => setTimeout(resolve, 1));
+      await result.current("test");
     });
 
     expect(results).toHaveLength(1);
@@ -32,15 +30,13 @@ describe("useActionCooldown", () => {
     const { result } = renderHook(() => useActionCooldown(mockAction, 0));
 
     await act(async () => {
-      result.current();
-      await new Promise((resolve) => setTimeout(resolve, 1));
+      await result.current();
     });
 
     expect(results).toHaveLength(1);
 
     await act(async () => {
-      result.current();
-      await new Promise((resolve) => setTimeout(resolve, 1));
+      await result.current();
     });
 
     expect(results).toHaveLength(2);
@@ -55,8 +51,7 @@ describe("useActionCooldown", () => {
     const { result } = renderHook(() => useActionCooldown(mockAction, 0));
 
     await act(async () => {
-      result.current("arg1", 42, true);
-      await new Promise((resolve) => setTimeout(resolve, 1));
+      await result.current("arg1", 42, true);
     });
 
     expect(results).toHaveLength(1);

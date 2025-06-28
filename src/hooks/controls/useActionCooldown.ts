@@ -15,7 +15,7 @@ export function useActionCooldown<T extends unknown[]>(
   const isProcessingRef = useRef<boolean>(false);
 
   const executeWithCooldown = useCallback(
-    (...args: T) => {
+    async (...args: T) => {
       // Prevent re-entrant calls
       if (isProcessingRef.current) {
         return;
@@ -27,8 +27,11 @@ export function useActionCooldown<T extends unknown[]>(
       if (cooldownMs === 0) {
         isProcessingRef.current = true;
         lastExecutionTimeRef.current = now;
-        action(...args);
-        isProcessingRef.current = false;
+        try {
+          await Promise.resolve(action(...args));
+        } finally {
+          isProcessingRef.current = false;
+        }
         return;
       }
 
@@ -40,8 +43,11 @@ export function useActionCooldown<T extends unknown[]>(
       // Update last execution time and execute action
       isProcessingRef.current = true;
       lastExecutionTimeRef.current = now;
-      action(...args);
-      isProcessingRef.current = false;
+      try {
+        await Promise.resolve(action(...args));
+      } finally {
+        isProcessingRef.current = false;
+      }
     },
     [action, cooldownMs],
   );
