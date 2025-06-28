@@ -28,6 +28,9 @@ const mockTranslations: Record<string, string> = {
   "game.score.level": "Level",
   "game.score.next": "Next",
 
+  // Hold piece translations
+  "game.hold": "HOLD",
+
   // Language selector
   "language.selector": "Language",
   "language.japanese": "日本語",
