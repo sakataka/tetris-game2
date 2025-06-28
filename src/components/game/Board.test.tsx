@@ -14,7 +14,7 @@ import { Board } from "./Board";
 
 // Create a mutable mock data holder
 let mockBoardData = {
-  displayBoard: createEmptyBoard(),
+  displayBoard: [] as number[][],
   currentPiecePositions: new Set<string>(),
   ghostPiecePositions: new Set<string>(),
   placedPositionsSet: new Set<string>(),
