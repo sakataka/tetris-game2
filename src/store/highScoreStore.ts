@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { devtools, persist } from "zustand/middleware";
 import type { HighScore } from "../types/storage";
 import { GAME_CONSTANTS } from "../utils/gameConstants";
 
@@ -10,37 +10,40 @@ interface HighScoreStore {
 }
 
 export const useHighScoreStore = create<HighScoreStore>()(
-  persist(
-    (set, get) => ({
-      currentHighScore: null,
-      highScoresList: [],
+  devtools(
+    persist(
+      (set, get) => ({
+        currentHighScore: null,
+        highScoresList: [],
 
-      addNewHighScore: (score: number, lines: number, level: number) => {
-        const currentHighScore = get().currentHighScore;
+        addNewHighScore: (score: number, lines: number, level: number) => {
+          const currentHighScore = get().currentHighScore;
 
-        // Check if this is a new high score
-        if (!currentHighScore || score > currentHighScore.score) {
-          const newHighScore: HighScore = {
-            score,
-            lines,
-            level,
-            date: new Date().toISOString(),
-          };
+          // Check if this is a new high score
+          if (!currentHighScore || score > currentHighScore.score) {
+            const newHighScore: HighScore = {
+              score,
+              lines,
+              level,
+              date: new Date().toISOString(),
+            };
 
-          // Update current high score
-          set({ currentHighScore: newHighScore });
+            // Update current high score
+            set({ currentHighScore: newHighScore });
 
-          // Add to high scores list and keep top scores
-          const updatedList = [...get().highScoresList, newHighScore]
-            .sort((a, b) => b.score - a.score)
-            .slice(0, GAME_CONSTANTS.UI.HIGH_SCORE_LIST_MAX);
+            // Add to high scores list and keep top scores
+            const updatedList = [...get().highScoresList, newHighScore]
+              .sort((a, b) => b.score - a.score)
+              .slice(0, GAME_CONSTANTS.UI.HIGH_SCORE_LIST_MAX);
 
-          set({ highScoresList: updatedList });
-        }
+            set({ highScoresList: updatedList });
+          }
+        },
+      }),
+      {
+        name: "tetris-high-scores",
       },
-    }),
-    {
-      name: "tetris-high-scores",
-    },
+    ),
+    { name: "high-score-store" },
   ),
 );

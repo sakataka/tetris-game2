@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { devtools, persist } from "zustand/middleware";
 import type { GameSettings } from "../types/storage";
 import { GAME_CONSTANTS } from "../utils/gameConstants";
 
@@ -19,27 +19,30 @@ const DEFAULT_SETTINGS: GameSettings = {
 console.log("[SettingsStore] Default settings:", DEFAULT_SETTINGS);
 
 export const useSettingsStore = create<SettingsStore>()(
-  persist(
-    (set) => ({
-      ...DEFAULT_SETTINGS,
+  devtools(
+    persist(
+      (set) => ({
+        ...DEFAULT_SETTINGS,
 
-      setLanguage: (language) => {
-        console.log("[SettingsStore] Setting language to:", language);
-        set({ language });
+        setLanguage: (language) => {
+          console.log("[SettingsStore] Setting language to:", language);
+          set({ language });
+        },
+
+        toggleShowGhostPiece: () => set((state) => ({ showGhostPiece: !state.showGhostPiece })),
+
+        setVolume: (volume) => set({ volume }),
+      }),
+      {
+        name: "tetris-settings",
+        onRehydrateStorage: () => (state) => {
+          console.log("[SettingsStore] Rehydrated from localStorage:", state);
+          if (state?.language) {
+            console.log("[SettingsStore] Language restored as:", state.language);
+          }
+        },
       },
-
-      toggleShowGhostPiece: () => set((state) => ({ showGhostPiece: !state.showGhostPiece })),
-
-      setVolume: (volume) => set({ volume }),
-    }),
-    {
-      name: "tetris-settings",
-      onRehydrateStorage: () => (state) => {
-        console.log("[SettingsStore] Rehydrated from localStorage:", state);
-        if (state?.language) {
-          console.log("[SettingsStore] Language restored as:", state.language);
-        }
-      },
-    },
+    ),
+    { name: "settings-store" },
   ),
 );
