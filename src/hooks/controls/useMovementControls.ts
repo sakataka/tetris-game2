@@ -19,30 +19,30 @@ export function useMovementControls() {
   const MOVEMENT_COOLDOWN = 150; // Slightly faster than rotation for better feel
   const DROP_COOLDOWN = 200; // Same as rotation for consistency
 
-  const handleMoveLeft = useActionCooldown(
+  const moveLeftAction = useActionCooldown(
     useCallback(() => executeAction(moveLeft), [executeAction, moveLeft]),
     MOVEMENT_COOLDOWN,
   );
 
-  const handleMoveRight = useActionCooldown(
+  const moveRightAction = useActionCooldown(
     useCallback(() => executeAction(moveRight), [executeAction, moveRight]),
     MOVEMENT_COOLDOWN,
   );
 
-  const handleMoveDown = useActionCooldown(
+  const moveDownAction = useActionCooldown(
     useCallback(() => executeAction(moveDown), [executeAction, moveDown]),
     MOVEMENT_COOLDOWN,
   );
 
-  const handleDrop = useActionCooldown(
+  const dropAction = useActionCooldown(
     useCallback(() => executeAction(drop, true), [executeAction, drop]), // urgent = true for hard drop
     DROP_COOLDOWN,
   );
 
   return {
-    handleMoveLeft,
-    handleMoveRight,
-    handleMoveDown,
-    handleDrop,
+    handleMoveLeft: moveLeftAction.execute,
+    handleMoveRight: moveRightAction.execute,
+    handleMoveDown: moveDownAction.execute,
+    handleDrop: dropAction.execute,
   };
 }

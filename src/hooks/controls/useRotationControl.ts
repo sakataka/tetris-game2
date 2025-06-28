@@ -15,10 +15,10 @@ export function useRotationControl() {
   // Cooldown period in milliseconds to prevent double rotation
   const ROTATION_COOLDOWN = 200;
 
-  const handleRotate = useActionCooldown(
+  const rotateAction = useActionCooldown(
     useCallback(() => executeAction(rotate), [executeAction, rotate]),
     ROTATION_COOLDOWN,
   );
 
-  return { handleRotate };
+  return { handleRotate: rotateAction.execute };
 }

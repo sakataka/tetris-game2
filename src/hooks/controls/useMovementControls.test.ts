@@ -35,7 +35,12 @@ mock.module("../core/useGameActionHandler", () => ({
 }));
 
 mock.module("./useActionCooldown", () => ({
-  useActionCooldown: mock((action) => action),
+  useActionCooldown: mock((action) => ({
+    execute: action,
+    isOnCooldown: false,
+    remainingCooldown: 0,
+    reset: mock(),
+  })),
 }));
 
 describe("useMovementControls", () => {

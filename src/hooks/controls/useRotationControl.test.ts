@@ -22,9 +22,14 @@ mock.module("../core/useGameActionHandler", () => ({
   useGameActionHandler: mock(() => mockExecuteAction),
 }));
 
-// Simply return a mock function for useActionCooldown
+// Return a mock object with the new API structure for useActionCooldown
 mock.module("./useActionCooldown", () => ({
-  useActionCooldown: mock(() => mock()),
+  useActionCooldown: mock(() => ({
+    execute: mock(),
+    isOnCooldown: false,
+    remainingCooldown: 0,
+    reset: mock(),
+  })),
 }));
 
 describe("useRotationControl", () => {
