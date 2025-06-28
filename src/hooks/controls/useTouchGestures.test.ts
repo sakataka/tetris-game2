@@ -46,6 +46,14 @@ mock.module("react", () => ({
   useTransition: () => [false, mockStartTransition],
 }));
 
+// Mock useRotationControl
+const mockHandleRotate = mock();
+mock.module("./useRotationControl", () => ({
+  useRotationControl: () => ({
+    handleRotate: mockHandleRotate,
+  }),
+}));
+
 describe("useTouchGestures", () => {
   beforeEach(() => {
     // Reset game state
@@ -60,6 +68,7 @@ describe("useTouchGestures", () => {
       mockFn.mockClear();
     });
     mockStartTransition.mockClear();
+    mockHandleRotate.mockClear();
   });
 
   const createTouchEvent = (type: string, touches: Touch[]) => {
@@ -174,7 +183,7 @@ describe("useTouchGestures", () => {
       await new Promise((resolve) => setTimeout(resolve, 350)); // Wait longer than doubleTapTime (300ms)
     });
 
-    expect(mockGameActions.rotate).toHaveBeenCalledTimes(1);
+    expect(mockHandleRotate).toHaveBeenCalledTimes(1);
   });
 
   it("handles double tap to hard drop", async () => {
@@ -241,7 +250,7 @@ describe("useTouchGestures", () => {
     });
 
     // Both taps should trigger rotate, no drop
-    expect(mockGameActions.rotate).toHaveBeenCalledTimes(2);
+    expect(mockHandleRotate).toHaveBeenCalledTimes(2);
     expect(mockGameActions.drop).toHaveBeenCalledTimes(0);
   });
 
