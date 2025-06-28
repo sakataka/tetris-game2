@@ -1,4 +1,6 @@
+import { Pause, Play } from "lucide-react";
 import { useGameStore } from "../../store/gameStore";
+import { AnimatedButton } from "../ui/AnimatedButton";
 import { GameSettings } from "./GameSettings";
 
 export function MobileHeader() {
@@ -7,6 +9,11 @@ export function MobileHeader() {
   const level = useGameStore((state) => state.level);
   const nextPiece = useGameStore((state) => state.nextPiece);
   const heldPiece = useGameStore((state) => state.heldPiece);
+  const isPaused = useGameStore((state) => state.isPaused);
+  const isGameOver = useGameStore((state) => state.isGameOver);
+  const togglePause = useGameStore((state) => state.togglePause);
+  const holdPiece = useGameStore((state) => state.holdPiece);
+  const canHold = useGameStore((state) => state.canHold);
 
   return (
     <div className="flex items-center px-4 py-2 bg-slate-900/50 backdrop-blur-sm">
@@ -29,9 +36,18 @@ export function MobileHeader() {
         <div className="flex gap-3 ml-2">
           <div className="text-center">
             <div className="text-xs text-slate-400 mb-1">Hold</div>
-            <div className="w-8 h-8 bg-slate-800 rounded border border-slate-700 flex items-center justify-center">
+            <AnimatedButton
+              variant="outline"
+              size="sm"
+              onClick={holdPiece}
+              disabled={!canHold || isPaused || isGameOver}
+              className={`w-8 h-8 bg-slate-800 border border-slate-700 hover:bg-slate-700 flex items-center justify-center ${
+                !canHold ? "opacity-50" : ""
+              }`}
+              aria-label="Hold current piece"
+            >
               {heldPiece && <span className="text-xs font-bold text-slate-300">{heldPiece}</span>}
-            </div>
+            </AnimatedButton>
           </div>
           <div className="text-center">
             <div className="text-xs text-slate-400 mb-1">Next</div>
@@ -42,8 +58,18 @@ export function MobileHeader() {
         </div>
       </div>
 
-      {/* Right side - Settings icon only */}
-      <div>
+      {/* Right side - Pause and Settings */}
+      <div className="flex gap-2">
+        <AnimatedButton
+          variant="outline"
+          size="sm"
+          onClick={togglePause}
+          disabled={isGameOver}
+          className="h-8 w-8 bg-slate-800/70 border-slate-600 hover:bg-slate-700/50"
+          aria-label={isPaused ? "Resume game" : "Pause game"}
+        >
+          {isPaused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
+        </AnimatedButton>
         <GameSettings />
       </div>
     </div>

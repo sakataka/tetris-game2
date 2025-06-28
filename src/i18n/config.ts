@@ -9,7 +9,7 @@ const getSavedLanguage = () => {
     const saved = localStorage.getItem("tetris-settings");
     if (saved) {
       const settings = JSON.parse(saved);
-      return settings.state?.language || "en";
+      return settings.language || "en";
     }
   } catch (error) {
     console.error("Failed to load saved language:", error);
