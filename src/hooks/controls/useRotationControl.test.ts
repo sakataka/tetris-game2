@@ -5,6 +5,7 @@ import { useRotationControl } from "./useRotationControl";
 // Mock the dependencies
 const mockRotate = mock();
 const mockExecuteAction = mock();
+const mockActionCooldown = mock();
 
 mock.module("../../store/gameStore", () => ({
   useGameStore: mock((selector) => {
@@ -22,53 +23,47 @@ mock.module("../core/useGameActionHandler", () => ({
   useGameActionHandler: mock(() => mockExecuteAction),
 }));
 
+mock.module("./useActionCooldown", () => ({
+  useActionCooldown: mock((action, cooldownMs) => {
+    // Store the action for later verification
+    mockActionCooldown.action = action;
+    mockActionCooldown.cooldownMs = cooldownMs;
+
+    // Return a mock function that tracks calls
+    return mockActionCooldown;
+  }),
+}));
+
 describe("useRotationControl", () => {
   beforeEach(() => {
     mockRotate.mockClear();
     mockExecuteAction.mockClear();
+    mockActionCooldown.mockClear();
   });
 
-  it("should execute rotation when called", () => {
+  it("should return handleRotate function", () => {
+    const { result } = renderHook(() => useRotationControl());
+
+    expect(typeof result.current.handleRotate).toBe("function");
+  });
+
+  it("should call useActionCooldown with correct parameters", () => {
+    renderHook(() => useRotationControl());
+
+    // Verify useActionCooldown was called with correct cooldown time
+    expect(mockActionCooldown.cooldownMs).toBe(200);
+
+    // Verify the action function exists
+    expect(typeof mockActionCooldown.action).toBe("function");
+  });
+
+  it("should execute the action when handleRotate is called", () => {
     const { result } = renderHook(() => useRotationControl());
 
     act(() => {
       result.current.handleRotate();
     });
 
-    expect(mockExecuteAction).toHaveBeenCalledWith(mockRotate);
-    expect(mockExecuteAction).toHaveBeenCalledTimes(1);
-  });
-
-  it("should prevent double rotation within cooldown period", () => {
-    const { result } = renderHook(() => useRotationControl());
-
-    // First rotation
-    act(() => {
-      result.current.handleRotate();
-    });
-
-    expect(mockExecuteAction).toHaveBeenCalledTimes(1);
-
-    // Second rotation within cooldown period (should be ignored)
-    act(() => {
-      result.current.handleRotate();
-    });
-
-    expect(mockExecuteAction).toHaveBeenCalledTimes(1); // Still only called once
-  });
-
-  it("should ignore rapid sequential calls", () => {
-    const { result } = renderHook(() => useRotationControl());
-
-    // Simulate rapid button presses
-    act(() => {
-      result.current.handleRotate();
-      result.current.handleRotate();
-      result.current.handleRotate();
-      result.current.handleRotate();
-    });
-
-    // Only the first call should execute
-    expect(mockExecuteAction).toHaveBeenCalledTimes(1);
+    expect(mockActionCooldown).toHaveBeenCalledTimes(1);
   });
 });

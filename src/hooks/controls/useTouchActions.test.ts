@@ -47,6 +47,14 @@ mock.module("react", () => ({
   useTransition: () => [false, mockStartTransition],
 }));
 
+// Mock useRotationControl
+const mockHandleRotate = mock();
+mock.module("./useRotationControl", () => ({
+  useRotationControl: () => ({
+    handleRotate: mockHandleRotate,
+  }),
+}));
+
 describe("useTouchActions", () => {
   beforeEach(() => {
     // Reset game state
@@ -61,6 +69,7 @@ describe("useTouchActions", () => {
       mockFn.mockClear();
     });
     mockStartTransition.mockClear();
+    mockHandleRotate.mockClear();
   });
 
   it("returns action handlers", () => {
@@ -163,7 +172,7 @@ describe("useTouchActions", () => {
 
       result.current.handleTap(tapGesture);
 
-      expect(mockGameActions.rotate).toHaveBeenCalledTimes(1);
+      expect(mockHandleRotate).toHaveBeenCalledTimes(1);
     });
   });
 
