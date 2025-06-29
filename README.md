@@ -2,68 +2,36 @@
 
 A modern, full-featured Tetris game built with React and TypeScript, featuring authentic gameplay mechanics, smooth animations, and cross-platform compatibility.
 
-## 🎮 Game Features
+## 🎮 About This Game
 
-### Core Gameplay
-- **Authentic Tetris Experience**: Complete implementation of classic Tetris with all 7 standard tetromino pieces (I, O, T, S, Z, J, L)
-- **7-Bag Randomization System**: Fair piece distribution ensuring balanced gameplay and preventing long droughts
-- **Super Rotation System (SRS)**: Advanced rotation mechanics with wall kicks for smooth piece placement
-- **Progressive Difficulty**: Dynamic level progression with increasing drop speed for continuous challenge
-- **Multi-line Clearing**: Support for single, double, triple, and Tetris (4-line) clears with appropriate scoring
+A complete Tetris implementation with authentic gameplay mechanics, featuring all 7 tetromino pieces, advanced rotation system (SRS), and fair randomization. Includes hold system, ghost piece preview, progressive difficulty, and comprehensive scoring with local leaderboards.
 
-### Advanced Mechanics
-- **Hold System**: Save any piece for later use with visual hold indicator and usage restrictions
-- **Ghost Piece**: Transparent preview showing exactly where the current piece will land
-- **Soft Drop & Hard Drop**: Controlled descent with soft drop (↓) and instant placement with hard drop (Space)
-- **Line Clear Effects**: Satisfying visual feedback with flash animations and smooth row clearing
-- **Pause/Resume**: Full game state preservation with overlay controls
-
-### Scoring & Progression
-- **Comprehensive Scoring System**: Points awarded for piece placement, line clears, and drop bonuses
-- **Level Progression**: Automatic level advancement based on lines cleared with speed increases
-- **High Score Tracking**: Persistent local leaderboard with top scores and player names
-- **Real-time Statistics**: Live display of current score, lines cleared, and level information
-
-### User Interface & Experience
-- **Responsive Design**: Seamless adaptation from desktop to mobile devices
-- **Touch Controls**: Intuitive gesture-based input for mobile play (swipe to move, tap to rotate)
-- **Smooth Animations**: Framer Motion-powered transitions for piece movement and UI interactions
-- **Visual Polish**: Modern UI with clean aesthetics and satisfying visual feedback
-- **Settings Panel**: Integrated dropdown with customizable game preferences
-
-### Internationalization
-- **Bilingual Support**: Complete English and Japanese localization with instant language switching
-- **Locale Persistence**: User language preference saved automatically across sessions
-- **Cultural Adaptation**: Appropriate number formatting and text rendering for each language
+**Key Features:**
+- Classic Tetris gameplay with modern enhancements
+- Cross-platform support (desktop & mobile with touch controls)
+- Bilingual interface (English/Japanese)
+- Smooth animations and visual effects
+- Local high score tracking
 
 ## 🎯 How to Play
 
-### Objective
-Arrange falling tetromino pieces to create complete horizontal lines, which will clear and award points. The game ends when pieces reach the top of the playing field.
+**Objective:** Arrange falling pieces to create complete horizontal lines, which clear and award points.
 
-### Gameplay Mechanics
-1. **Piece Movement**: Use arrow keys or swipe gestures to position falling pieces
-2. **Rotation**: Rotate pieces to fit them into available spaces
-3. **Line Clearing**: Complete horizontal lines disappear and award points
-4. **Level Progression**: Clear lines to advance levels and increase game speed
-5. **Hold Strategy**: Save pieces for optimal placement using the hold function
+**Basic Controls:**
+- **Arrow Keys**: Move and rotate pieces
+- **Space**: Drop piece instantly
+- **C**: Hold current piece for later use
+- **P**: Pause/Resume game
 
-### Scoring System
-- **Single Line**: 100 × level points
-- **Double Lines**: 300 × level points  
-- **Triple Lines**: 500 × level points
-- **Tetris (4 lines)**: 800 × level points
-- **Soft Drop**: 1 point per cell
-- **Hard Drop**: 2 points per cell
+**Scoring:** Points awarded for line clears (Tetris = 4 lines = highest points), piece drops, and level progression.
 
-### Pro Tips
-- Plan ahead using the next piece preview
-- Use the hold function strategically to save I-pieces for Tetris clears
-- Focus on creating Tetris opportunities for maximum points
-- Keep the playing field low to avoid game over
-- Use hard drops for speed and bonus points
+**Strategy:** Use the next piece preview and hold function strategically. Focus on creating Tetris clears for maximum points.
 
-## 🛠 Tech Stack
+---
+
+# 🔧 For Developers
+
+## Tech Stack
 
 - **React 19** + **TypeScript** - Modern frontend with strict typing
 - **Bun** - Fast package management and testing
@@ -73,11 +41,10 @@ Arrange falling tetromino pieces to create complete horizontal lines, which will
 - **Radix UI** - Accessible component primitives
 - **i18next** - Internationalization framework
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - **[Bun](https://bun.sh/docs/installation)** - Modern JavaScript runtime and package manager
-- **Node.js 18+** (alternative to Bun)
 - Modern web browser with JavaScript enabled
 
 ### Quick Start
@@ -106,7 +73,23 @@ bun run preview
 
 The production build will be generated in the `dist/` directory, ready for deployment to any static hosting service.
 
-## 🎯 Controls
+## Development Commands
+
+```bash
+# Development
+bun run dev                    # Start development server
+bun run build                  # Create production build
+bun run preview                # Preview production build
+
+# Testing & Quality Assurance
+bun test                       # Run test suite
+bun run lint                   # Lint code with Biome
+bun run format                 # Format code with Biome
+bun run typecheck              # TypeScript type checking
+bun run ci                     # Full CI pipeline (lint + typecheck + test + build)
+```
+
+## Detailed Controls Reference
 
 ### Desktop Controls
 | Key | Action | Description |
@@ -134,22 +117,6 @@ The production build will be generated in the `dist/` directory, ready for deplo
 - **Paused State**: Press 'P' or click Resume to continue
 - **Settings**: Access via gear icon in top-right corner
 - **Language Toggle**: Switch between English/Japanese in settings
-
-## 🔧 Development Commands
-
-```bash
-# Development
-bun run dev                    # Start development server
-bun run build                  # Create production build
-bun run preview                # Preview production build
-
-# Testing & Quality Assurance
-bun test                       # Run test suite
-bun run lint                   # Lint code with Biome
-bun run format                 # Format code with Biome
-bun run typecheck              # TypeScript type checking
-bun run ci                     # Full CI pipeline (lint + typecheck + test + build)
-```
 
 ## 🌟 Key Highlights
 
