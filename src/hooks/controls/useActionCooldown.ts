@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState, useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 // Branded type for milliseconds to ensure type safety
 type Milliseconds = number & { readonly __brand: "Milliseconds" };

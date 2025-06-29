@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
-import { cn } from "@/lib/utils";
 import { useCellAnimation } from "@/hooks/ui/useCellAnimation";
+import { cn } from "@/lib/utils";
 import type { AnimationTriggerKey, CellValue } from "@/types/game";
 import { getCellColor } from "@/utils/colors";
 import { GAME_CONSTANTS } from "@/utils/gameConstants";

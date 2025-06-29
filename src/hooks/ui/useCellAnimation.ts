@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { ANIMATION_PRESETS, ANIMATION_DURATIONS } from "@/utils/animationConstants";
+import { ANIMATION_DURATIONS, ANIMATION_PRESETS } from "@/utils/animationConstants";
 
 interface CellAnimationState {
   isCurrentPiece: boolean;

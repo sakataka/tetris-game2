@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useGameStore } from "@/store/gameStore";
-import { useKeyboardInput } from "./useKeyboardInput";
-import { useGameInputActions, type GameInputActions } from "./useGameInputActions";
 import { useInputDebounce } from "@/hooks/common/useInputDebounce";
+import { useGameStore } from "@/store/gameStore";
+import { type GameInputActions, useGameInputActions } from "./useGameInputActions";
+import { useKeyboardInput } from "./useKeyboardInput";
 
 /**
  * Key mapping configuration

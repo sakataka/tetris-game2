@@ -8,7 +8,7 @@
     "dev": "bun --bun vite",
     "build": "bun x vite build",
     "test": "bun test src/ --ignore '**/visual/**'",
-    "lint": "bun x biome lint --write",
+    "lint": "bun x biome check --write",
     "format": "bun x biome format --write",
     "typecheck": "bun x tsc --noEmit",
     "preview": "bun x vite preview",

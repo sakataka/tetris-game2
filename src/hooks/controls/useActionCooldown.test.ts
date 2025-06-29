@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test";
-import { renderHook, act } from "@testing-library/react";
-import { useActionCooldown, milliseconds } from "./useActionCooldown";
+import { act, renderHook } from "@testing-library/react";
+import { milliseconds, useActionCooldown } from "./useActionCooldown";
 
 describe("useActionCooldown", () => {
   it("should return an object with execute function and cooldown state", () => {

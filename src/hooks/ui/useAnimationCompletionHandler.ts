@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
-import { GAME_CONSTANTS } from "@/utils/gameConstants";
 import { useGameActions } from "@/hooks/actions/useGameActions";
+import { GAME_CONSTANTS } from "@/utils/gameConstants";
 
 export function useAnimationCompletionHandler() {
   const { clearAnimationData } = useGameActions();

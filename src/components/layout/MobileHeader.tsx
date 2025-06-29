@@ -1,6 +1,6 @@
 import { Pause, Play } from "lucide-react";
-import { useGameStore } from "@/store/gameStore";
 import { AnimatedButton } from "@/components/ui/AnimatedButton";
+import { useGameStore } from "@/store/gameStore";
 import { GameSettings } from "./GameSettings";
 
 export function MobileHeader() {

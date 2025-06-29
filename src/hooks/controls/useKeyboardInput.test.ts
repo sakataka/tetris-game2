@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, test, mock } from "bun:test";
-import { renderHook, act } from "@testing-library/react";
+import { beforeEach, describe, expect, mock, test } from "bun:test";
+import { act, renderHook } from "@testing-library/react";
 import { useKeyboardInput } from "./useKeyboardInput";
 
 // Mock KeyboardEvent for test environment

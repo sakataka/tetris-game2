@@ -1,11 +1,11 @@
-import { cn } from "@/lib/utils";
+import { Card } from "@/components/ui/card";
 import { useBoardData } from "@/hooks/selectors/useBoardSelectors";
 import { useAnimationCompletionHandler } from "@/hooks/ui/useAnimationCompletionHandler";
 import { useResponsiveBoard } from "@/hooks/ui/useResponsiveBoard";
+import { cn } from "@/lib/utils";
 import { createCellKey } from "@/utils/boardUtils";
 import { GAME_CONSTANTS } from "@/utils/gameConstants";
 import { BOARD_STYLES, CARD_STYLES } from "@/utils/styles";
-import { Card } from "@/components/ui/card";
 import { BoardCell } from "./BoardCell";
 
 export function Board() {

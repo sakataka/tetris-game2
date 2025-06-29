@@ -1,8 +1,8 @@
 import { useTranslation } from "react-i18next";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useScoreState } from "@/hooks/selectors/useScoreSelectors";
 import { useAnimatedValue } from "@/hooks/ui/useAnimatedValue";
 import { CARD_STYLES } from "@/utils/styles";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AnimatedScoreItem } from "./AnimatedScoreItem";
 
 export function ScoreBoard() {

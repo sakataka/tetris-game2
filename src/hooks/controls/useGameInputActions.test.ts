@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test, mock } from "bun:test";
+import { beforeEach, describe, expect, mock, test } from "bun:test";
 import { renderHook } from "@testing-library/react";
 import { useGameInputActions } from "./useGameInputActions";
 

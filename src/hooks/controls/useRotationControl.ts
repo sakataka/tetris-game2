@@ -1,6 +1,6 @@
 import { useCallback } from "react";
-import { useGameStore } from "@/store/gameStore";
 import { useGameActionHandler } from "@/hooks/core/useGameActionHandler";
+import { useGameStore } from "@/store/gameStore";
 import { useActionCooldown } from "./useActionCooldown";
 
 /**
