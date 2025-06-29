@@ -1,8 +1,13 @@
-import type { CellValue, GameBoard, Position } from "@/types/game";
-import { isValidBoardPosition } from "@/utils/boardUtils";
-import { GAME_CONSTANTS } from "@/utils/gameConstants";
+import type { CellValue, GameBoard, Position } from "../types/game";
+import { isValidBoardPosition } from "../utils/boardUtils";
+import { GAME_CONSTANTS } from "../utils/gameConstants";
 
 export function createEmptyBoard(): GameBoard {
+  // Defensive checks for CI environment compatibility
+  if (!GAME_CONSTANTS || !GAME_CONSTANTS.BOARD) {
+    throw new Error("GAME_CONSTANTS or GAME_CONSTANTS.BOARD is undefined");
+  }
+
   const height = GAME_CONSTANTS.BOARD.HEIGHT;
   const width = GAME_CONSTANTS.BOARD.WIDTH;
 
