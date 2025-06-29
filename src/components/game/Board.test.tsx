@@ -204,7 +204,7 @@ function expectCellToBeTetrominoType(
 // TESTS - t_wada style: Assertion First & Triangulation
 // ==============================
 
-describe.skip("Board.tsx - t_wada TDD Style", () => {
+describe("Board.tsx - 伊藤淳一氏スタイル", () => {
   // ==============================
   // Basic Rendering Test
   // ==============================
