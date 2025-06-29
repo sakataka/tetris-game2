@@ -9,13 +9,13 @@
       "command": "npx",
       "args": ["-y", "@upstash/context7-mcp"],
       "env": {}
-    }
-  },
-  "aivisspeech": {
-    "command": "npx",
-    "args": ["@shinshin86/mcp-simple-aivisspeech@latest"],
-    "env": {
-      "AIVISSPEECH_URL": "http://127.0.0.1:10101"
+    },
+    "aivisspeech": {
+      "command": "npx",
+      "args": ["@shinshin86/mcp-simple-aivisspeech@latest"],
+      "env": {
+        "AIVISSPEECH_URL": "http://127.0.0.1:10101"
+      }
     }
   }
 }
