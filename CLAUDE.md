@@ -21,7 +21,6 @@ src/
 ├── i18n/          # i18n configuration
 ├── lib/           # Shared utility functions
 ├── test/          # Test configuration and utilities
-└── tests/         # Additional test helpers
 ```
 
 ### State Management
@@ -130,12 +129,12 @@ bun run ci           # CI pipeline (lint + typecheck + test + build)
 ## Quality Assurance
 
 ### Testing Strategy
-- **Pure Function Testing**: Complete coverage of game logic
-- **Component Testing**: Bun Test with React components
-- **Integration Testing**: Full game flow scenarios  
-- **Hook Testing**: Isolated custom hook behavior
-- **Browser Testing**: Playwright for E2E and visual testing
-- **Minimal Mocking**: Focus on isolated unit testing
+- **Pure Function Testing**: Complete coverage of game logic and business rules
+- **UI Component Policy**: No automated tests for React UI components - focus on pure function testing
+- **Integration Testing**: Full game flow scenarios for core game mechanics
+- **Hook Testing**: Isolated custom hook behavior (pure logic only)
+- **Browser Testing**: Playwright for E2E and visual validation when necessary
+- **Minimal Mocking**: Focus on isolated unit testing of pure functions
 
 ### Testing Infrastructure
 - **Test Runner**: Bun Test with happy-dom environment
@@ -213,8 +212,28 @@ mcp__context7__get-library-docs "/oven-sh/bun"
 # → Latest Bun features, API changes, configuration options
 ```
 
-### AivisSpeech
-- **Purpose**: Task completion audio notifications
-- **Usage**: Play audio notification when tasks are completed
-- **Message**: Japanese completion messages (e.g., "タスクが完了しました。お疲れ様でした。")
-- **IMPORTANT**: Always use `mcp__aivisspeech__speak` (NOT `notify_completion`) with volumeScale=0.3
+### AivisSpeech MCP - Task Completion Notifications
+
+**When to use:**
+- Multi-step todo list completion notifications
+- Long-running task completion alerts  
+- Background process completion awareness
+- Extended development session progress tracking
+
+**Key functions:**
+- `mcp__aivisspeech__speak` — Text-to-speech with customizable settings
+- `mcp__aivisspeech__get_speakers` — Available voice character list
+- `mcp__aivisspeech__check_engine_status` — Service availability check
+
+**Usage guidelines:**
+- Trigger notifications ONLY when ALL items in a TodoWrite task list are completed
+- Do not notify for individual task completions - wait for entire list completion
+- Use for extended multi-step tasks where user may step away from terminal
+- Apply reasonable volume settings (volumeScale=0.1) for non-intrusive alerts
+- Prefer Japanese completion messages for consistent user experience
+
+**Usage example:**
+```bash
+# Only after ALL todo items are marked as completed
+mcp__aivisspeech__speak "すべてのタスクが完了しました" --volumeScale=0.1
+```

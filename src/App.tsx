@@ -15,15 +15,19 @@ function App() {
 
   // Initialize language from persisted settings only once
   useEffect(() => {
-    console.log("[App] Language sync check:", {
-      hasInitialized: hasInitialized.current,
-      settingsLanguage: language,
-      i18nLanguage: i18n.language,
-    });
+    if (import.meta.env.DEV) {
+      console.log("[App] Language sync check:", {
+        hasInitialized: hasInitialized.current,
+        settingsLanguage: language,
+        i18nLanguage: i18n.language,
+      });
+    }
 
     if (!hasInitialized.current && language && language !== i18n.language) {
       hasInitialized.current = true;
-      console.log("[App] Changing language to:", language);
+      if (import.meta.env.DEV) {
+        console.log("[App] Changing language to:", language);
+      }
       i18n.changeLanguage(language);
     }
   }, [language, i18n]);

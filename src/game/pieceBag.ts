@@ -82,6 +82,7 @@ export const getNextPiece = (bag: PieceBag): [TetrominoTypeName, PieceBag] => {
  * @param bag Current bag state
  * @returns true if the bag contains no pieces
  */
+export const isBagEmpty = (bag: PieceBag): boolean => bag.currentBag.length === 0;
 
 /**
  * Gets the current bag contents as an immutable array.
@@ -119,6 +120,7 @@ export const setBagForTesting = (
  * @param bag Current bag state
  * @returns Number of pieces remaining
  */
+export const getRemainingCount = (bag: PieceBag): number => bag.currentBag.length;
 
 /**
  * Gets the history of all generated pieces.
@@ -127,6 +129,9 @@ export const setBagForTesting = (
  * @param bag Current bag state
  * @returns Array of all previously generated pieces
  */
+export const getGeneratedHistory = (bag: PieceBag): readonly TetrominoTypeName[] => [
+  ...bag.generatedPieces,
+];
 
 /**
  * Resets the bag to initial state while preserving seed.
@@ -135,6 +140,7 @@ export const setBagForTesting = (
  * @param bag Current bag state
  * @returns New bag state reset to initial condition
  */
+export const resetBag = (bag: PieceBag): PieceBag => createPieceBag(bag.seed);
 
 // === UTILITY FUNCTIONS ===
 

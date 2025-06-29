@@ -15,8 +15,10 @@ const DEFAULT_SETTINGS: GameSettings = {
   showGhostPiece: true,
 };
 
-// Log default settings for debugging
-console.log("[SettingsStore] Default settings:", DEFAULT_SETTINGS);
+// Log default settings for debugging in development only
+if (import.meta.env.DEV) {
+  console.log("[SettingsStore] Default settings:", DEFAULT_SETTINGS);
+}
 
 export const useSettingsStore = create<SettingsStore>()(
   devtools(
@@ -25,7 +27,9 @@ export const useSettingsStore = create<SettingsStore>()(
         ...DEFAULT_SETTINGS,
 
         setLanguage: (language) => {
-          console.log("[SettingsStore] Setting language to:", language);
+          if (import.meta.env.DEV) {
+            console.log("[SettingsStore] Setting language to:", language);
+          }
           set({ language });
         },
 
@@ -36,9 +40,11 @@ export const useSettingsStore = create<SettingsStore>()(
       {
         name: "tetris-settings",
         onRehydrateStorage: () => (state) => {
-          console.log("[SettingsStore] Rehydrated from localStorage:", state);
-          if (state?.language) {
-            console.log("[SettingsStore] Language restored as:", state.language);
+          if (import.meta.env.DEV) {
+            console.log("[SettingsStore] Rehydrated from localStorage:", state);
+            if (state?.language) {
+              console.log("[SettingsStore] Language restored as:", state.language);
+            }
           }
         },
       },
