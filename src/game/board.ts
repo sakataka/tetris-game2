@@ -3,9 +3,15 @@ import { isValidBoardPosition } from "@/utils/boardUtils";
 import { GAME_CONSTANTS } from "@/utils/gameConstants";
 
 export function createEmptyBoard(): GameBoard {
-  return Array(GAME_CONSTANTS.BOARD.HEIGHT)
-    .fill(null)
-    .map(() => Array(GAME_CONSTANTS.BOARD.WIDTH).fill(0)) as GameBoard;
+  const height = GAME_CONSTANTS.BOARD.HEIGHT;
+  const width = GAME_CONSTANTS.BOARD.WIDTH;
+
+  // Ensure constants are valid numbers
+  if (typeof height !== "number" || typeof width !== "number" || height <= 0 || width <= 0) {
+    throw new Error(`Invalid board dimensions: height=${height}, width=${width}`);
+  }
+
+  return Array.from({ length: height }, () => Array.from({ length: width }, () => 0 as CellValue));
 }
 
 export function isValidPosition(board: GameBoard, shape: number[][], position: Position): boolean {
