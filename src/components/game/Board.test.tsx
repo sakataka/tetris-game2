@@ -9,7 +9,7 @@ import { GAME_CONSTANTS } from "@/utils/gameConstants";
 import { Board } from "./Board";
 
 // ==============================
-// MOCKS - t_wada style: Mock只外部依存関係
+// MOCKS - t_wada style: Mock external dependencies only
 // ==============================
 
 // Create a mutable mock data holder
@@ -204,7 +204,7 @@ function expectCellToBeTetrominoType(
 // TESTS - t_wada style: Assertion First & Triangulation
 // ==============================
 
-describe("Board.tsx - 伊藤淳一氏スタイル", () => {
+describe("Board.tsx - Junichi Ito Style", () => {
   // ==============================
   // Basic Rendering Test
   // ==============================

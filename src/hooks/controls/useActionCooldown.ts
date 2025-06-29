@@ -65,41 +65,21 @@ export function useActionCooldown<TArgs extends readonly unknown[] = readonly []
   const [isOnCooldown, setIsOnCooldown] = useState(false);
   const [remainingCooldown, setRemainingCooldown] = useState(0);
   const cooldownTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const isExecutingRef = useRef<boolean>(false);
 
-  // Update cooldown state
+  // Cleanup timer on unmount
   useEffect(() => {
-    const updateCooldownState = () => {
-      // Skip update if no action has been executed yet
-      if (lastExecutionTimeRef.current === 0) {
-        return;
-      }
-
-      const now = Date.now();
-      const timeSinceLastExecution = now - lastExecutionTimeRef.current;
-      const remaining = Math.max(0, cooldownDuration - timeSinceLastExecution);
-
-      setRemainingCooldown(remaining);
-      setIsOnCooldown(remaining > 0);
-
-      if (remaining > 0) {
-        cooldownTimerRef.current = setTimeout(updateCooldownState, 50);
-      }
-    };
-
-    // Initial call to set state
-    updateCooldownState();
-
     return () => {
       if (cooldownTimerRef.current) {
         clearTimeout(cooldownTimerRef.current);
       }
     };
-  }, [cooldownDuration]);
+  }, []);
 
   const executeWithCooldown: ActionWithCooldown<TArgs> = useCallback(
     async (...args: TArgs): Promise<void> => {
       // Prevent re-entrant calls
-      if (isProcessingRef.current) {
+      if (isProcessingRef.current || isExecutingRef.current) {
         return;
       }
 
@@ -122,9 +102,12 @@ export function useActionCooldown<TArgs extends readonly unknown[] = readonly []
         return; // Ignore this execution attempt
       }
 
-      // Update last execution time and execute action
-      isProcessingRef.current = true;
+      // Update last execution time and set executing state
       lastExecutionTimeRef.current = now;
+      isProcessingRef.current = true;
+      isExecutingRef.current = true;
+
+      // Set cooldown state immediately
       setIsOnCooldown(true);
       setRemainingCooldown(cooldownDuration);
 
@@ -141,6 +124,7 @@ export function useActionCooldown<TArgs extends readonly unknown[] = readonly []
         await Promise.resolve(action(...args));
       } finally {
         isProcessingRef.current = false;
+        isExecutingRef.current = false;
       }
     },
     [action, cooldownDuration],

@@ -78,9 +78,9 @@ function _moveTetrominoToPosition(state: GameState, targetX: number, targetY: nu
 // Test Implementation - Junichi Ito Practical Patterns
 // ==============================
 
-describe("ゲームロジック - 伊藤淳一氏スタイル", () => {
-  describe("初期ゲーム状態の作成", () => {
-    test("正しい初期状態でゲームが開始される", () => {
+describe("Game Logic - Junichi Ito Style", () => {
+  describe("Initial Game State Creation", () => {
+    test("Game starts with correct initial state", () => {
       // Given: Game initialization
       // When: Create initial game state
       const state = createInitialGameState();
@@ -99,7 +99,7 @@ describe("ゲームロジック - 伊藤淳一氏スタイル", () => {
       expect(Array.isArray(state.pieceBag)).toBe(true);
     });
 
-    test("7-bagシステムで正しくピースが生成される", () => {
+    test("Pieces are generated correctly with 7-bag system", () => {
       // Given: 7-bag system for piece generation
       // When: Create initial state
       const state = createInitialGameState();
@@ -112,7 +112,7 @@ describe("ゲームロジック - 伊藤淳一氏スタイル", () => {
       expect(state.pieceBag.length).toBeLessThanOrEqual(7);
     });
 
-    test("ボードは空の状態で初期化される", () => {
+    test("Board is initialized in empty state", () => {
       // Given: New game start
       // When: Create initial state
       const state = createInitialGameState();
@@ -126,90 +126,90 @@ describe("ゲームロジック - 伊藤淳一氏スタイル", () => {
     });
   });
 
-  describe("テトロミノの移動", () => {
-    describe("正常系 - 基本移動", () => {
-      test("左方向に1マス移動できる", () => {
-        // Given: 初期状態のゲーム
+  describe("Tetromino movement", () => {
+    describe("Normal cases - Basic movement", () => {
+      test("Can move 1 cell to the left", () => {
+        // Given: Initial game state
         const state = createInitialGameState();
         const initialX = state.currentPiece?.position.x ?? 0;
 
-        // When: 左に1マス移動
+        // When: Move 1 cell to the left
         const newState = moveTetrominoBy(state, -1, 0);
 
-        // Then: X座標が1減少する
+        // Then: X coordinate decreases by 1
         expect(newState.currentPiece?.position.x).toBe(initialX - 1);
       });
 
-      test("右方向に1マス移動できる", () => {
-        // Given: 初期状態のゲーム
+      test("Can move 1 cell to the right", () => {
+        // Given: Initial game state
         const state = createInitialGameState();
         const initialX = state.currentPiece?.position.x ?? 0;
 
-        // When: 右に1マス移動
+        // When: Move 1 cell to the right
         const newState = moveTetrominoBy(state, 1, 0);
 
-        // Then: X座標が1増加する
+        // Then: X coordinate increases by 1
         expect(newState.currentPiece?.position.x).toBe(initialX + 1);
       });
 
-      test("下方向に1マス移動できる", () => {
-        // Given: 初期状態のゲーム
+      test("Can move 1 cell downward", () => {
+        // Given: Initial game state
         const state = createInitialGameState();
         const initialY = state.currentPiece?.position.y ?? 0;
 
-        // When: 下に1マス移動
+        // When: Move 1 cell downward
         const newState = moveTetrominoBy(state, 0, 1);
 
-        // Then: Y座標が1増加する
+        // Then: Y coordinate increases by 1
         expect(newState.currentPiece?.position.y).toBe(initialY + 1);
       });
 
-      test("複数方向への移動が正しく処理される", () => {
-        // Given: 初期状態のゲーム
+      test("Multi-directional movement is processed correctly", () => {
+        // Given: Initial game state
         const state = createInitialGameState();
         const initialX = state.currentPiece?.position.x ?? 0;
         const initialY = state.currentPiece?.position.y ?? 0;
 
-        // When: 右下に移動
+        // When: Move to bottom-right
         const newState = moveTetrominoBy(state, 2, 3);
 
-        // Then: 両方向に正しく移動する
+        // Then: Moves correctly in both directions
         expect(newState.currentPiece?.position.x).toBe(initialX + 2);
         expect(newState.currentPiece?.position.y).toBe(initialY + 3);
       });
     });
 
-    describe("境界値テスト", () => {
-      test("左端の壁で移動が制限される", () => {
-        // Given: ピースを左端まで移動
+    describe("Boundary value tests", () => {
+      test("Movement is restricted by left wall", () => {
+        // Given: Move piece to left edge
         let state = createInitialGameState();
         for (let i = 0; i < GAME_CONSTANTS.BOARD.WIDTH; i++) {
           state = moveTetrominoBy(state, -1, 0);
         }
 
-        // When: さらに左に移動を試みる
+        // When: Attempt to move further left
         const finalState = moveTetrominoBy(state, -1, 0);
 
-        // Then: 移動せず元の位置に留まる
+        // Then: Stays in original position without moving
         expect(finalState.currentPiece?.position.x).toBe(state.currentPiece?.position.x);
       });
 
-      test("右端の壁で移動が制限される", () => {
-        // Given: ピースを右端まで移動
+      test("Movement is restricted by right wall", () => {
+        // Given: Move piece to right edge
         let state = createInitialGameState();
         for (let i = 0; i < GAME_CONSTANTS.BOARD.WIDTH; i++) {
           state = moveTetrominoBy(state, 1, 0);
         }
 
-        // When: さらに右に移動を試みる
+        // When: Attempt to move further right
         const finalState = moveTetrominoBy(state, 1, 0);
 
-        // Then: 移動せず元の位置に留まる
+        // Then: Stays in original position without moving
         expect(finalState.currentPiece?.position.x).toBe(state.currentPiece?.position.x);
       });
 
-      test("ボード下端で移動が制限される", () => {
-        // Given: ピースを下端近くまで移動
+      test("Movement is restricted by board bottom", () => {
+        // Given: Move piece near bottom edge
         let state = createInitialGameState();
         let _previousState = state;
 
@@ -235,100 +235,100 @@ describe("ゲームロジック - 伊藤淳一氏スタイル", () => {
         expect(positionUnchanged || pieceWasPlaced).toBe(true);
       });
 
-      test("最小移動量（1マス）が正しく処理される", () => {
-        // Given: 初期状態
+      test("Minimum movement (1 cell) is processed correctly", () => {
+        // Given: Initial state
         const state = createInitialGameState();
         const initialPosition = {
           x: state.currentPiece?.position.x ?? 0,
           y: state.currentPiece?.position.y ?? 0,
         };
 
-        // When: 最小単位で移動
+        // When: Move in minimum unit
         const newState = moveTetrominoBy(state, 1, 1);
 
-        // Then: 正確に1マスずつ移動する
+        // Then: Moves exactly 1 cell at a time
         expect(newState.currentPiece?.position.x).toBe(initialPosition.x + 1);
         expect(newState.currentPiece?.position.y).toBe(initialPosition.y + 1);
       });
     });
 
-    describe("異常系テスト", () => {
-      test("ゲームが一時停止中は移動しない", () => {
-        // Given: 一時停止状態のゲーム
+    describe("Error handling tests", () => {
+      test("No movement when game is paused", () => {
+        // Given: Game in paused state
         const state = createTestGameState({ isPaused: true });
         const initialPosition = {
           x: state.currentPiece?.position.x ?? 0,
           y: state.currentPiece?.position.y ?? 0,
         };
 
-        // When: 移動を試みる
+        // When: Attempt to move
         const newState = moveTetrominoBy(state, 1, 1);
 
-        // Then: 位置が変わらない
+        // Then: Position does not change
         expect(newState.currentPiece?.position.x).toBe(initialPosition.x);
         expect(newState.currentPiece?.position.y).toBe(initialPosition.y);
       });
 
-      test("ゲームオーバー時は移動しない", () => {
-        // Given: ゲームオーバー状態
+      test("No movement when game is over", () => {
+        // Given: Game over state
         const state = createTestGameState({ isGameOver: true });
         const initialPosition = {
           x: state.currentPiece?.position.x ?? 0,
           y: state.currentPiece?.position.y ?? 0,
         };
 
-        // When: 移動を試みる
+        // When: Attempt to move
         const newState = moveTetrominoBy(state, 1, 1);
 
-        // Then: 位置が変わらない
+        // Then: Position does not change
         expect(newState.currentPiece?.position.x).toBe(initialPosition.x);
         expect(newState.currentPiece?.position.y).toBe(initialPosition.y);
       });
 
-      test("現在のピースがnullの場合エラーにならない", () => {
-        // Given: currentPieceがnullの状態
+      test("No error when current piece is null", () => {
+        // Given: State with currentPiece as null
         const state = createTestGameState({ currentPiece: null });
 
-        // When: 移動を試みる
-        // Then: エラーが発生しない
+        // When: Attempt to move
+        // Then: No error occurs
         expect(() => moveTetrominoBy(state, 1, 1)).not.toThrow();
       });
 
-      test("他のピースとの衝突で移動が制限される", () => {
-        // Given: ボード上に配置済みピースがある状態
+      test("Movement is restricted by collision with other pieces", () => {
+        // Given: State with placed pieces on board
         const state = createInitialGameState();
         const board = state.board.map((row) => [...row]);
-        // 左下に障害物を配置
+        // Place obstacle in bottom-left
         board[GAME_CONSTANTS.BOARD.HEIGHT - 1][0] = 1;
         const stateWithObstacle = { ...state, board };
 
-        // ピースを下端近くまで移動
+        // Move piece near bottom
         let newState = stateWithObstacle;
         for (let i = 0; i < GAME_CONSTANTS.BOARD.HEIGHT - 2; i++) {
           newState = moveTetrominoBy(newState, 0, 1);
         }
 
-        // When: 障害物のある方向に移動を試みる
+        // When: Attempt to move toward obstacle
         const beforeX = newState.currentPiece?.position.x ?? 0;
         const finalState = moveTetrominoBy(newState, -1 * beforeX, 0);
 
-        // Then: 衝突により移動が制限される
-        // （正確な制限は実装による）
+        // Then: Movement is restricted by collision
+        // (Exact restriction depends on implementation)
         expect(finalState.currentPiece).toBeDefined();
       });
 
-      test("負の移動量が正しく処理される", () => {
-        // Given: 中央付近にピースがある状態
+      test("Negative movement amounts are processed correctly", () => {
+        // Given: State with piece near center
         let state = createInitialGameState();
-        state = moveTetrominoBy(state, 2, 2); // 中央寄りに移動
+        state = moveTetrominoBy(state, 2, 2); // Move toward center
 
         const initialX = state.currentPiece?.position.x ?? 0;
         const initialY = state.currentPiece?.position.y ?? 0;
 
-        // When: 負の移動量で移動
+        // When: Move with negative amounts
         const newState = moveTetrominoBy(state, -1, -1);
 
-        // Then: 逆方向に移動する
+        // Then: Moves in reverse direction
         expect(newState.currentPiece?.position.x).toBe(initialX - 1);
         expect(newState.currentPiece?.position.y).toBe(initialY - 1);
       });
