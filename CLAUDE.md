@@ -18,7 +18,10 @@ src/
 ├── types/         # TypeScript definitions
 ├── utils/         # Shared utilities and constants
 ├── locales/       # i18n translation files
-└── test/          # Test configuration and utilities
+├── i18n/          # i18n configuration
+├── lib/           # Shared utility functions
+├── test/          # Test configuration and utilities
+└── tests/         # Additional test helpers
 ```
 
 ### State Management
@@ -46,13 +49,15 @@ Built on **Zustand** with functional programming principles:
 ### Frontend Framework
 - **React**: 19.1.0 — Functional components with concurrent features
 - **Zustand**: 5.0.6 — Lightweight state management
-- **react-hotkeys-hook**: 5.1.0 — Keyboard input handling
 
 ### UI & Styling
 - **Tailwind CSS**: 4.1.11 — Utility-first CSS via Vite plugin
 - **Framer Motion**: 12.19.2 — Animation framework
 - **Radix UI**: Headless accessible components
-- **Lucide React**: 0.524.0 — SVG icons
+- **Lucide React**: 0.525.0 — SVG icons
+- **class-variance-authority**: 0.7.1 — Component variant utilities
+- **clsx**: 2.1.1 — Conditional CSS class names
+- **tailwind-merge**: 3.3.1 — Tailwind class merging
 
 ### Internationalization
 - **i18next**: 25.2.1 — Core i18n framework
@@ -60,9 +65,11 @@ Built on **Zustand** with functional programming principles:
 
 ### Development Tools
 - **Biome**: 2.0.6 — Rust-based linter and formatter
-- **Testing Library**: Component and integration testing
-- **happy-dom**: Lightweight DOM environment
-- **Lefthook**: Git hooks automation
+- **Playwright**: 1.53.1 — Browser testing framework
+- **happy-dom**: 18.0.1 — Lightweight DOM environment
+- **Lefthook**: 1.11.14 — Git hooks automation
+- **Knip**: 5.61.3 — Dead code elimination
+- **Bundle Analyzer**: Via rollup-plugin-visualizer for performance monitoring
 
 ## Development Setup
 
@@ -77,15 +84,15 @@ bun test             # Run all tests
 bun run lint         # Code linting
 bun run format       # Code formatting
 bun run typecheck    # Type checking
-bun run check        # Full quality check
-bun run ci           # CI pipeline
+bun run ci           # CI pipeline (lint + typecheck + test + build)
 ```
 
 ### Configuration
 - **Bun Runtime**: Primary toolchain for all operations
 - **Rolldown-Vite**: Enhanced performance and dev/build consistency
+- **React OXC Plugin**: High-performance React transformation
 - **TypeScript**: Strict mode with cutting-edge JavaScript features
-- **Git Hooks**: Automated formatting and conventional commits
+- **Git Hooks**: Automated formatting and conventional commits via Lefthook
 
 ## Core Features
 
@@ -124,9 +131,10 @@ bun run ci           # CI pipeline
 
 ### Testing Strategy
 - **Pure Function Testing**: Complete coverage of game logic
-- **Component Testing**: React Testing Library for UI verification
-- **Integration Testing**: Full game flow scenarios
+- **Component Testing**: Bun Test with React components
+- **Integration Testing**: Full game flow scenarios  
 - **Hook Testing**: Isolated custom hook behavior
+- **Browser Testing**: Playwright for E2E and visual testing
 - **Minimal Mocking**: Focus on isolated unit testing
 
 ### Testing Infrastructure
