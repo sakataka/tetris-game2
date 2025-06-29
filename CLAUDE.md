@@ -212,3 +212,9 @@ mcp__context7__resolve-library-id "bun"
 mcp__context7__get-library-docs "/oven-sh/bun"
 # → Latest Bun features, API changes, configuration options
 ```
+
+### AivisSpeech
+- **Purpose**: Task completion audio notifications
+- **Usage**: Play audio notification when tasks are completed
+- **Message**: Japanese completion messages (e.g., "タスクが完了しました。お疲れ様でした。")
+- **IMPORTANT**: Always use `mcp__aivisspeech__speak` (NOT `notify_completion`) with volumeScale=0.3
