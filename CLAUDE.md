@@ -1,271 +1,273 @@
 # Tetris Game Project
 
-A complete Tetris game implementation using modern web technologies with comprehensive test coverage, bilingual support, and cross-platform compatibility.
+## EXECUTION PRIORITY: Critical Development Rules
 
-## Project Overview
+### ABSOLUTE PROHIBITIONS (Never Override)
+1. **Type Error Resolution**: NEVER relax TypeScript checks to resolve issues
+2. **Test Bypassing**: NEVER skip tests or use inappropriate mocks for error avoidance  
+3. **Output Hardcoding**: NEVER hardcode user-facing text or API responses
+4. **Error Suppression**: NEVER hide or ignore error messages
+5. **Temporary Fixes**: NEVER implement temporary solutions that create technical debt
 
-This project implements a fully-featured Tetris game using functional programming patterns, strict TypeScript typing, and modular architecture. The game includes all standard Tetris mechanics, responsive design for desktop and mobile, bilingual interface (English/Japanese), and comprehensive visual effects.
+### MANDATORY EXECUTION PATTERNS
+- **Pre-commit Validation**: ALWAYS run `bun run lint` and `bun run typecheck` before any commit
+- **Path Import Rules**: ALWAYS use `@/` for cross-directory imports, `./` for same-directory imports
+- **i18n Compliance**: ALL user-facing text MUST use translation files in `/src/locales/`
+- **Functional Programming**: ALWAYS prefer pure functions over class-based implementations
+- **Test Focus**: ONLY test pure functions, utility modules, and business logic - NEVER test React components or framework behavior
 
-## Architecture & Design
+## Project Architecture Definition
 
-### Project Structure
+### Core Implementation Stack
+- **Runtime Environment**: Bun 1.2.17 (package management, testing, development)
+- **Build System**: Vite 7.0.3 (rolldown-vite) with enhanced performance
+- **Type System**: TypeScript 5.8.3 with strict mode and ESNext target
+- **Frontend Framework**: React 19.1.0 (functional components with concurrent features)
+- **State Management**: Zustand 5.0.6 (lightweight, functional state management)
+- **Styling Framework**: Tailwind CSS 4.1.11 via @tailwindcss/vite plugin
+- **Animation System**: Framer Motion 12.19.2 for physics-based animations
+- **Internationalization**: i18next 25.2.1 + react-i18next 15.5.3
+
+### Directory Structure and Component Organization
+
 ```
 src/
-├── components/     # React UI components
-│   ├── game/      # Game-specific components (Board, Cell, Score, etc.)
-│   ├── layout/    # Layout components (GameLayout, MobileLayout)
-│   └── ui/        # Reusable UI components
-├── game/          # Pure game logic (board, tetrominos, mechanics)
-├── hooks/         # Custom React hooks (organized by functionality)
-│   ├── actions/   # Game action hooks (useGameActions, useGameInputActions)
-│   ├── common/    # Shared utility hooks (useMediaQuery)
-│   ├── controls/  # Input handling hooks (useGameControls, useKeyboardControls, useTouchControls)
-│   ├── core/      # Core game hooks (useGameLoop, useGameInit)
-│   ├── data/      # Data hooks (useHighScores, useNextPieces)
-│   ├── effects/   # Visual effect hooks (useCellAnimations, useScoreAnimation)
-│   ├── selectors/ # State selector hooks (useGameState, useIsGameActive)
-│   └── ui/        # UI-specific hooks (useDropdown, useSettings)
-├── store/         # Zustand state management
-├── types/         # TypeScript definitions
-├── utils/         # Shared utilities and constants
-├── locales/       # i18n translation files
-├── i18n/          # i18n configuration
-├── lib/           # Shared utility functions
-├── test/          # Test configuration and utilities
+├── components/     # React UI components (DO NOT TEST)
+│   ├── game/      # Game-specific components: Board, BoardCell, Controls, GameOverlay, 
+│   │              # HighScore, HoldPiece, NextPiece, ScoreBoard, TetrominoGrid, TouchControls
+│   ├── layout/    # Layout components: Game, GameSettings, MobileGameLayout, MobileHeader
+│   └── ui/        # Reusable UI components: AnimatedButton, badge, button, card, dialog
+├── game/          # Pure game logic (TEST ALL FUNCTIONS)
+│   │              # Files: board.ts, game.ts, pieceBag.ts, tetrominos.ts, wallKick.ts
+├── hooks/         # Custom React hooks (TEST ONLY EXTRACTED PURE FUNCTIONS)
+│   ├── actions/   # Game action hooks: useGameActions
+│   ├── common/    # Shared utility hooks: useHapticFeedback, useInputDebounce
+│   ├── controls/  # Input handling: useActionCooldown, useGameInputActions, useKeyboardControls,
+│   │              # useKeyboardInput, useMovementControls, useRotationControl, useTouchActions
+│   ├── core/      # Core game hooks: useGameActionHandler, useGameLoop
+│   ├── data/      # Data hooks: useHighScore
+│   ├── effects/   # Visual effect hooks: useHighScoreSideEffect
+│   ├── selectors/ # State selector hooks: useBoardSelectors, useScoreSelectors
+│   └── ui/        # UI-specific hooks: useAnimatedValue, useAnimationCompletionHandler,
+│                  # useCellAnimation, useResponsiveBoard
+├── store/         # Zustand state management (TEST ALL STORE LOGIC)
+│   │              # Files: gameStore.ts, highScoreStore.ts, settingsStore.ts
+├── types/         # TypeScript definitions: game.ts, storage.ts
+├── utils/         # Shared utilities and constants (TEST ALL FUNCTIONS)
+│   │              # Files: animationConstants.ts, boardUtils.ts, colors.ts, debugLanguage.ts,
+│   │              # gameConstants.ts, gameValidation.ts, styles.ts, typeGuards.ts
+├── locales/       # i18n translation files: en.json, ja.json
+├── i18n/          # i18n configuration: config.ts
+├── lib/           # Shared utility functions: utils.ts
+├── test/          # Test configuration and utilities: setup.ts, __mocks__/
 ```
 
-### State Management
-Built on **Zustand** with functional programming principles:
-- **GameStore**: Centralized game state with immutable updates
-- **SettingsStore**: User preferences with local persistence
-- **HighScoreStore**: Score tracking and leaderboard management
-- Memoized selectors for optimized state access
-- Pure functions for predictable state transitions
+### State Management Architecture
+**Store Implementation**: Zustand with functional programming patterns
 
-### Core Game Logic
-- **Board System**: Standard 20×10 Tetris grid with collision detection
-- **Tetromino System**: All 7 standard pieces with matrix-based operations
-- **7-Bag Randomization**: Fair piece distribution system
-- **SRS Wall Kicks**: Super Rotation System with I-piece handling
-- **Game State**: Pure functional approach, UI-agnostic logic
+**Store Modules** (Located in `/src/store/`):
+1. **GameStore** (`gameStore.ts`): 
+   - Centralized game state with immutable updates
+   - Contains: board state, current piece, score, level, game status
+   - Pattern: Pure functions for all state transitions
+2. **SettingsStore** (`settingsStore.ts`):
+   - User preferences with localStorage persistence
+   - Contains: language, controls, audio settings
+3. **HighScoreStore** (`highScoreStore.ts`):
+   - Score tracking and leaderboard management
+   - Persistent storage with validation
 
-## Technology Stack
+**State Access Pattern**:
+- Use memoized selectors from `/src/hooks/selectors/`
+- Prefer specific selectors over direct store access
+- All state mutations through pure functions
 
-### Runtime & Build
-- **Bun**: 1.2.17 — Package management, testing, development
-- **Vite**: 7.0.3 (rolldown-vite) — Enhanced build performance
-- **TypeScript**: 5.8.3 — Strict typing with ESNext target
+### Core Game Logic Implementation
+**Game Mechanics** (Located in `/src/game/`):
 
-### Frontend Framework
-- **React**: 19.1.0 — Functional components with concurrent features
-- **Zustand**: 5.0.6 — Lightweight state management
+1. **Board System** (`board.ts`):
+   - Standard 20×10 Tetris grid with collision detection
+   - Function signatures for testing: `isValidPosition()`, `placePiece()`, `clearLines()`
 
-### UI & Styling
-- **Tailwind CSS**: 4.1.11 — Utility-first CSS via Vite plugin
-- **Framer Motion**: 12.19.2 — Animation framework
-- **Radix UI**: Headless accessible components
-- **Lucide React**: 0.525.0 — SVG icons
-- **class-variance-authority**: 0.7.1 — Component variant utilities
-- **clsx**: 2.1.1 — Conditional CSS class names
-- **tailwind-merge**: 3.3.1 — Tailwind class merging
+2. **Tetromino System** (`tetrominos.ts`):
+   - All 7 standard pieces (I, O, T, S, Z, J, L) with matrix-based operations
+   - Function signatures for testing: `rotatePiece()`, `getTetrominoData()`
 
-### Internationalization
-- **i18next**: 25.2.1 — Core i18n framework
-- **react-i18next**: 15.5.3 — React i18n integration
+3. **Piece Distribution** (`pieceBag.ts`):
+   - 7-Bag randomization for fair piece distribution
+   - Function signatures for testing: `generatePieceBag()`, `getNextPiece()`
 
-### Development Tools
-- **Biome**: 2.0.6 — Rust-based linter and formatter
-- **Playwright**: 1.53.1 — Browser testing framework
-- **happy-dom**: 18.0.1 — Lightweight DOM environment
-- **Lefthook**: 1.11.14 — Git hooks automation
-- **Knip**: 5.61.3 — Dead code elimination
-- **Bundle Analyzer**: Via rollup-plugin-visualizer for performance monitoring
+4. **Rotation System** (`wallKick.ts`):
+   - Super Rotation System (SRS) with I-piece handling
+   - Function signatures for testing: `performWallKick()`, `getKickData()`
 
-## Development Setup
+**Game State Management** (`game.ts`):
+- Pure functional approach, UI-agnostic logic
+- Function signatures for testing: `updateGameState()`, `processGameTick()`
 
-### Commands
+## Development Commands and Execution
+
+### REQUIRED COMMANDS (Execute in this order for development)
 ```bash
-# Core Development
-bun run dev          # Development server
-bun run build        # Production build
-bun test             # Run all tests
+# Development Workflow
+bun run dev          # Start development server (http://localhost:5173)
+bun test             # Run all tests (MUST pass before commits)
+bun run lint         # Code linting (MUST pass before commits)
+bun run typecheck    # Type checking (MUST pass before commits)
+bun run build        # Production build (MUST succeed before commits)
 
-# Quality Assurance
-bun run lint         # Code linting
-bun run format       # Code formatting
-bun run typecheck    # Type checking
-bun run ci           # CI pipeline (lint + typecheck + test + build)
+# Quality Assurance Pipeline
+bun run ci           # Complete CI pipeline (lint + typecheck + test + build)
 ```
 
-### Configuration
-- **Bun Runtime**: Primary toolchain for all operations
-- **Rolldown-Vite**: Enhanced performance and dev/build consistency
-- **React OXC Plugin**: High-performance React transformation
-- **TypeScript**: Strict mode with cutting-edge JavaScript features
-- **Git Hooks**: Automated formatting and conventional commits via Lefthook
+### EXECUTION CONDITIONS
+- **Before ANY commit**: Run `bun run lint` AND `bun run typecheck`
+- **After code changes**: Run `bun test` to verify no regressions
+- **Before production deployment**: Run `bun run ci` to ensure all checks pass
+- **Git hooks**: Lefthook automatically runs formatting and validation
 
-## Core Features
+## TESTING STRATEGY AND IMPLEMENTATION
 
-### Game Mechanics
-- **Standard Tetris Gameplay**: All 7 tetromino types (I, O, T, S, Z, J, L)
-- **7-Bag System**: Fair piece distribution ensuring balanced gameplay
-- **SRS Wall Kicks**: Intelligent rotation with proper collision handling
-- **Ghost Piece**: Preview showing landing position
-- **Hold System**: Piece saving with usage restrictions
-- **Line Clearing**: Multi-line support with scoring system
-- **Progressive Difficulty**: Level-based speed increases
-- **Pause/Resume**: Game state preservation
+### TESTING RULES (Strict Enforcement)
+1. **TEST TARGETS**: 
+   - ✅ Pure functions in `/src/game/`, `/src/utils/`, `/src/store/`
+   - ✅ Business logic extracted from hooks
+   - ❌ React components, DOM interactions, UI behavior
+   - ❌ React hooks themselves (only extracted pure functions)
+   - ❌ Framework-specific behavior (React, Zustand)
 
-### User Interface
-- **Live Statistics**: Score, lines cleared, current level display
-- **Next Piece Preview**: Upcoming tetromino visibility
-- **Hold Indicator**: Current held piece with availability status
-- **High Score Leaderboard**: Persistent score tracking
-- **Settings Panel**: Integrated dropdown with customization options
-- **Game State Overlays**: Pause, game over, and control reference
+2. **TEST EXECUTION**:
+   - Command: `bun test src/ --ignore '**/visual/**'`
+   - Environment: Bun Test with happy-dom
+   - Pattern: Co-located test files (e.g., `board.test.ts` alongside `board.ts`)
 
-### Cross-Platform Support
-- **Responsive Design**: Adaptive layouts for desktop and mobile
-- **Touch Controls**: Intuitive gesture-based input (swipe and tap)
-- **Keyboard Controls**: Full keyboard support with customizable bindings
-- **Bilingual Interface**: English/Japanese with instant switching
-- **Local Persistence**: Settings and scores saved automatically
+3. **MOCKING STRATEGY**:
+   - Use real implementations whenever possible
+   - Mock ONLY external dependencies (localStorage, i18n)
+   - Available mocks: `/src/test/__mocks__/react-i18next.ts`
 
-### Visual Polish
-- **Smooth Animations**: Framer Motion-powered piece movements
-- **Visual Effects**: Line clear animations with flash and glow
-- **Responsive Feedback**: Spring physics for score updates
-- **UI Transitions**: Polished modal and overlay animations
+### TEST IMPLEMENTATION PRIORITIES
+**High Priority** (Must have comprehensive coverage):
+- `/src/game/board.ts` - Board collision detection and line clearing
+- `/src/game/tetrominos.ts` - Piece rotation and positioning
+- `/src/game/pieceBag.ts` - 7-bag randomization algorithm
+- `/src/game/wallKick.ts` - SRS wall kick implementation
+- `/src/utils/gameValidation.ts` - Game state validation
+- `/src/utils/boardUtils.ts` - Board utility functions
 
-## Quality Assurance
+**Medium Priority** (Store logic testing):
+- `/src/store/gameStore.ts` - Pure state transition functions
+- `/src/store/highScoreStore.ts` - Score persistence logic
+- `/src/store/settingsStore.ts` - Settings validation and persistence
 
-### Testing Strategy
-- **Pure Function Focus**: Test ONLY pure functions, utility modules, and business logic
-- **Zero UI Component Tests**: NO testing of React components, DOM interactions, or UI behavior
-- **Game Logic Coverage**: Comprehensive testing of core game mechanics, state transitions, and algorithms
-- **Hook Logic Testing**: Test only the pure functions and logic extracted from hooks, NOT the hooks themselves
-- **No Framework Testing**: Avoid testing React, Zustand, or other framework-specific behavior
-- **Minimal Mocking**: Use real implementations whenever possible; mock only external dependencies
-- **E2E for Critical Paths**: Use Playwright sparingly for critical user journeys only
+**E2E Testing** (Playwright - Use sparingly):
+- Critical user journey: Start game → Play → Score → Game over
+- Mobile touch controls functionality
+- Language switching behavior
 
-### Testing Infrastructure
-- **Test Runner**: Bun Test with happy-dom environment
-- **Test Organization**: Co-located test files with descriptive naming
-- **Type-Safe Testing**: Full TypeScript integration
-- **Fast Execution**: Lightweight DOM environment for speed
+## IMPORT PATH DECISION TREE (CRITICAL)
 
-## Development Standards
+### IMPORT PATH RULES (Follow exactly)
+```
+IF importing from different directory THEN use `@/` alias
+  ✅ import { GameStore } from '@/store/gameStore'
+  ✅ import { BoardUtils } from '@/utils/boardUtils'
+  ❌ import { GameStore } from '../store/gameStore'
+  ❌ import { BoardUtils } from '../../utils/boardUtils'
 
-### Code Quality Rules
-- **Zero Type Errors**: Never relax TypeScript checks to resolve issues
-- **No Test Skipping**: Address root causes instead of bypassing tests
-- **Anti-Hardcoding**: All user-facing text must use i18n resources
-- **Transparent Errors**: Never suppress or hide error messages
-- **Permanent Solutions**: No temporary fixes or technical debt
+IF importing from same directory THEN use `./` relative path
+  ✅ import { helper } from './utils'
+  ✅ import { Component } from './Component'
+  ❌ import { helper } from '@/current-dir/utils'
 
-### Technology Decisions
-- **Bun Everywhere**: Primary choice for package management, testing, and scripts
-- **Tailwind Via Vite**: Using @tailwindcss/vite plugin for optimal performance
-- **i18n Required**: No hardcoded UI strings—everything through translation files
-- **Functional Programming**: Prefer pure functions over class-based approaches
+EXCEPTION: Test mocks may use relative paths when required by testing framework
+  ✅ import mockData from '../__mocks__/data'
+```
 
-### Import Guidelines (CRITICAL)
-- **Cross-directory imports**: ALWAYS use `@/` path aliases (e.g., `import { GameStore } from '@/store/gameStore'`)
-- **Same directory imports**: Use relative `./` paths for better performance (e.g., `import { helper } from './utils'`)
-- **Never use relative paths for cross-directory**: NO `../../../` style imports - use `@/` instead
-- **Test files exception**: Only test mocks may use relative paths when required by testing framework
-- **Consistency is key**: All developers must follow these rules without exception
+### CODE QUALITY ENFORCEMENT
 
-### Development Configuration
-- **Bun Runtime**: Primary toolchain for all operations
-- **Code Quality**: Biome for linting and formatting with strict rules
-- **Git Hooks**: Automated formatting and conventional commit enforcement
-- **TypeScript**: Strict mode with ESNext target
-- **Deployment**: Vercel with Bun-optimized build pipeline
+**Error Handling Policy**:
+- IF TypeScript error occurs THEN fix root cause, NEVER relax checks
+- IF test fails THEN address root cause, NEVER skip test
+- IF error message appears THEN investigate cause, NEVER suppress
 
-## Recent Changes & Improvements
+**Text Content Policy**:
+- IF user-facing text needed THEN use i18n from `/src/locales/`
+- IF hardcoded string detected THEN move to translation files
+- Available languages: English (`en.json`), Japanese (`ja.json`)
 
-### Code Architecture Refactoring
-- **Hooks Reorganization**: Restructured hooks directory into functional categories (actions, controls, core, data, effects, selectors, ui) for better code organization and maintainability
-- **Code Duplication Elimination**: Merged duplicate logic between `useGameActions` and `useGameInputActions` to reduce redundancy
-- **Path Alias Implementation**: Enforced `@/` aliases for cross-directory imports to improve code readability and maintainability
+**Architecture Enforcement**:
+- IF new code needed THEN prefer pure functions over classes
+- IF state management needed THEN use Zustand functional patterns
+- IF styling needed THEN use Tailwind CSS classes
 
-### Testing Strategy Evolution
-- **Focus on Pure Functions**: Shifted testing strategy to concentrate exclusively on pure functions and business logic
-- **UI Test Removal**: Eliminated React component tests to maintain focus on core functionality testing
-- **Hook Test Refinement**: Test only the pure logic within hooks, not React-specific behavior
-- **Improved Test Coverage**: Better coverage of game mechanics, state transitions, and utility functions
+### DEVELOPMENT TOOLS CONFIGURATION
+- **Primary Runtime**: Bun (package management, testing, development)
+- **Code Quality**: Biome with strict rules (auto-format via Lefthook)
+- **Type Checking**: TypeScript strict mode with ESNext target
+- **Git Workflow**: Conventional commits enforced via Lefthook hooks
 
-### Production Readiness Enhancements
-- **Type Safety Improvements**: Stricter TypeScript configurations and better type inference
-- **Performance Optimizations**: Reduced bundle size through code splitting and tree shaking
-- **Build Process Enhancement**: Leveraging rolldown-vite for faster builds and better optimization
-- **Documentation Consolidation**: Unified project documentation into CLAUDE.md for single source of truth
+## MCP TOOLS USAGE PROTOCOLS
 
-## Tools & Utilities
+### PLAYWRIGHT MCP - Browser Testing
+**ACTIVATION CONDITIONS**:
+- IF visual UI validation needed THEN use Playwright
+- IF user interaction testing required THEN use browser automation
+- IF responsive design verification needed THEN use Playwright
+- IF animation behavior analysis required THEN use Playwright
 
-### Playwright MCP - Browser Testing
-
-**When to use:**
-- Visual UI validation and layout verification
-- User interaction testing (click, input, navigation)
-- Responsive design behavior verification
-- Animation timing and behavior analysis
-
-**Key functions:**
-- `mcp__playwright__browser_navigate` — Page navigation
-- `mcp__playwright__browser_click` — Element interaction
-- `mcp__playwright__browser_take_screenshot` — Visual capture
-- `mcp__playwright__browser_snapshot` — Page structure analysis
-
-**Usage example:**
+**EXECUTION WORKFLOW**:
 ```bash
-bun run dev  # Run development server
+# Step 1: Start development server
+bun run dev
+
+# Step 2: Navigate to application
 mcp__playwright__browser_navigate "http://localhost:5173"
-mcp__playwright__browser_snapshot  # Analyze page structure
+
+# Step 3: Analyze page structure
+mcp__playwright__browser_snapshot
+
+# Step 4: Interact with elements (if needed)
+mcp__playwright__browser_click <element> <ref>
+
+# Step 5: Capture results
+mcp__playwright__browser_take_screenshot
 ```
 
-### Context7 MCP - Library Documentation
+### CONTEXT7 MCP - Library Documentation
+**ACTIVATION CONDITIONS**:
+- IF researching latest library features THEN use Context7
+- IF checking breaking changes before updates THEN use Context7
+- IF discovering performance optimization techniques THEN use Context7
+- IF troubleshooting with current documentation THEN use Context7
 
-**When to use:**
-- Researching latest library features and changes
-- Checking breaking changes before updates
-- Discovering performance optimization techniques
-- Troubleshooting with current documentation
-
-**Usage workflow:**
-1. Resolve library ID: `mcp__context7__resolve-library-id <library-name>`
-2. Get documentation: `mcp__context7__get-library-docs <context7-library-id>`
-
-**Usage example:**
+**EXECUTION WORKFLOW**:
 ```bash
+# Step 1: Resolve library ID
+mcp__context7__resolve-library-id "<library-name>"
+
+# Step 2: Get documentation
+mcp__context7__get-library-docs "<context7-library-id>"
+
+# Example for Bun:
 mcp__context7__resolve-library-id "bun"
-# → Returns `/oven-sh/bun`
+# Returns: `/oven-sh/bun`
 mcp__context7__get-library-docs "/oven-sh/bun"
-# → Latest Bun features, API changes, configuration options
 ```
 
-### AivisSpeech MCP - Task Completion Notifications
+### AIVISSPEECH MCP - Task Completion Notifications
+**ACTIVATION CONDITIONS**:
+- IF ALL TodoWrite task list items completed THEN use AivisSpeech
+- IF long-running task completed THEN use AivisSpeech
+- IF background process completion awareness needed THEN use AivisSpeech
 
-**When to use:**
-- Multi-step todo list completion notifications
-- Long-running task completion alerts  
-- Background process completion awareness
-- Extended development session progress tracking
+**EXECUTION RULES**:
+- ✅ Trigger ONLY when ALL todo items marked as completed
+- ❌ Do NOT notify for individual task completions
+- ✅ Use reasonable volume settings (volumeScale=0.1)
+- ✅ Prefer Japanese completion messages
 
-**Key functions:**
-- `mcp__aivisspeech__speak` — Text-to-speech with customizable settings
-- `mcp__aivisspeech__get_speakers` — Available voice character list
-- `mcp__aivisspeech__check_engine_status` — Service availability check
-
-**Usage guidelines:**
-- Trigger notifications ONLY when ALL items in a TodoWrite task list are completed
-- Do not notify for individual task completions - wait for entire list completion
-- Use for extended multi-step tasks where user may step away from terminal
-- Apply reasonable volume settings (volumeScale=0.1) for non-intrusive alerts
-- Prefer Japanese completion messages for consistent user experience
-
-**Usage example:**
+**EXECUTION WORKFLOW**:
 ```bash
 # Only after ALL todo items are marked as completed
 mcp__aivisspeech__speak "すべてのタスクが完了しました" --volumeScale=0.1
