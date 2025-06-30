@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useGameStore } from "@/store/gameStore";
+import { useGameActions } from "@/hooks/actions/useGameActions";
 
 /**
  * Game input actions interface
@@ -21,36 +21,29 @@ export interface GameInputActions {
  * Game-specific action transformation hook following koba04 React best practices
  *
  * Responsibilities:
- * - Maps store actions to a consistent interface
- * - Provides domain-specific action names
- * - Memoizes actions for performance
+ * - Maps core game actions to input-specific interface
+ * - Provides domain-specific action names for different input types
+ * - Leverages useGameActions for DRY principle
  *
- * @returns Game input actions object
+ * @returns Game input actions object with semantic naming
  */
 export function useGameInputActions(): GameInputActions {
-  // Get actions from store
-  const moveLeft = useGameStore((state) => state.moveLeft);
-  const moveRight = useGameStore((state) => state.moveRight);
-  const moveDown = useGameStore((state) => state.moveDown);
-  const rotate = useGameStore((state) => state.rotate);
-  const drop = useGameStore((state) => state.drop);
-  const holdPiece = useGameStore((state) => state.holdPiece);
-  const togglePause = useGameStore((state) => state.togglePause);
-  const resetGame = useGameStore((state) => state.resetGame);
+  // Get core actions from base hook (eliminates duplication)
+  const actions = useGameActions();
 
-  // Memoize actions to prevent unnecessary re-renders
+  // Transform core actions to input-specific semantic names
   return useMemo(
     () => ({
-      moveLeft,
-      moveRight,
-      rotateClockwise: rotate,
-      rotateCounterClockwise: rotate, // In current implementation, both use same rotation
-      softDrop: moveDown,
-      hardDrop: drop,
-      hold: holdPiece,
-      pause: togglePause,
-      reset: resetGame,
+      moveLeft: actions.moveLeft,
+      moveRight: actions.moveRight,
+      rotateClockwise: actions.rotate,
+      rotateCounterClockwise: actions.rotate, // In current implementation, both use same rotation
+      softDrop: actions.moveDown,
+      hardDrop: actions.drop,
+      hold: actions.holdPiece,
+      pause: actions.togglePause,
+      reset: actions.resetGame,
     }),
-    [moveLeft, moveRight, moveDown, rotate, drop, holdPiece, togglePause, resetGame],
+    [actions],
   );
 }
