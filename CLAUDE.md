@@ -26,9 +26,12 @@
 - **Styling Framework**: Tailwind CSS 4.1.11 (utility-first CSS framework)
 - **Animation System**: Motion 12.20.1 (physics-based animations)
 - **Internationalization**: i18next 25.3.0 + react-i18next 15.5.3
-- **UI Components**: Radix UI (dialog, slot) for accessible components
+- **UI Component System**: shadcn/ui (copy-paste component library)
+  - Components: button, card, dialog, badge (located in `/src/components/ui/`)
+  - Built on: Radix UI primitives + Tailwind CSS
+  - Utilities: class-variance-authority 0.7.1 (variant management)
 - **Icons**: Lucide React 0.525.0 (icon library)
-- **Utilities**: clsx 2.1.1 + tailwind-merge 3.3.1 (className utilities)
+- **Utilities**: clsx 2.1.1 + tailwind-merge 3.3.1 (className utilities via `cn()` function)
 
 #### Development & Build Tools
 - **Runtime Environment**: Bun 1.2.17 (package manager, test runner, development server)
@@ -213,6 +216,8 @@ EXCEPTION: Test mocks may use relative paths when required by testing framework
 - IF new code needed THEN prefer pure functions over classes
 - IF state management needed THEN use Zustand functional patterns
 - IF styling needed THEN use Tailwind CSS classes
+- IF UI component needed THEN check existing shadcn/ui components first
+- IF custom component needed THEN follow shadcn/ui patterns (Radix UI + Tailwind + CVA)
 
 ### DEVELOPMENT TOOLS CONFIGURATION
 - **Primary Runtime**: Bun (package management, testing, development)
