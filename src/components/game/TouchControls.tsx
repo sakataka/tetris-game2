@@ -1,5 +1,6 @@
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronsDown, RotateCw } from "lucide-react";
 import { AnimatedButton } from "@/components/ui/AnimatedButton";
+import { useHapticFeedback } from "@/hooks/common/useHapticFeedback";
 import { useMovementControls } from "@/hooks/controls/useMovementControls";
 import { useRotationControl } from "@/hooks/controls/useRotationControl";
 import { useGameStore } from "@/store/gameStore";
@@ -13,6 +14,32 @@ export function TouchControls({ className }: TouchControlsProps) {
   const isGameOver = useGameStore((state) => state.isGameOver);
   const { handleRotate } = useRotationControl();
   const { handleMoveLeft, handleMoveRight, handleMoveDown, handleDrop } = useMovementControls();
+  const { lightImpact, mediumImpact } = useHapticFeedback();
+
+  const handleMoveLeftWithHaptic = () => {
+    lightImpact();
+    handleMoveLeft();
+  };
+
+  const handleMoveRightWithHaptic = () => {
+    lightImpact();
+    handleMoveRight();
+  };
+
+  const handleMoveDownWithHaptic = () => {
+    lightImpact();
+    handleMoveDown();
+  };
+
+  const handleRotateWithHaptic = () => {
+    lightImpact();
+    handleRotate();
+  };
+
+  const handleDropWithHaptic = () => {
+    mediumImpact();
+    handleDrop();
+  };
 
   return (
     <div className={`grid grid-cols-3 gap-2 ${className}`}>
@@ -21,8 +48,8 @@ export function TouchControls({ className }: TouchControlsProps) {
         <AnimatedButton
           variant="outline"
           size="lg"
-          onTouchStart={handleMoveLeft}
-          onClick={handleMoveLeft}
+          onTouchStart={handleMoveLeftWithHaptic}
+          onClick={handleMoveLeftWithHaptic}
           disabled={isGameOver || isPaused}
           className="h-12 w-12 bg-slate-800/70 border-slate-600 hover:bg-slate-700/50 touch-manipulation"
           aria-label="Move left"
@@ -38,8 +65,8 @@ export function TouchControls({ className }: TouchControlsProps) {
           <AnimatedButton
             variant="outline"
             size="lg"
-            onTouchStart={handleRotate}
-            onClick={handleRotate}
+            onTouchStart={handleRotateWithHaptic}
+            onClick={handleRotateWithHaptic}
             disabled={isGameOver || isPaused}
             className="h-10 w-10 bg-slate-800/70 border-slate-600 hover:bg-slate-700/50 touch-manipulation"
             aria-label="Rotate piece"
@@ -50,8 +77,8 @@ export function TouchControls({ className }: TouchControlsProps) {
           <AnimatedButton
             variant="outline"
             size="lg"
-            onTouchStart={handleDrop}
-            onClick={handleDrop}
+            onTouchStart={handleDropWithHaptic}
+            onClick={handleDropWithHaptic}
             disabled={isGameOver || isPaused}
             className="h-10 w-10 bg-slate-800/70 border-slate-600 hover:bg-slate-700/50 touch-manipulation"
             aria-label="Hard drop"
@@ -64,8 +91,8 @@ export function TouchControls({ className }: TouchControlsProps) {
           <AnimatedButton
             variant="outline"
             size="lg"
-            onTouchStart={handleMoveDown}
-            onClick={handleMoveDown}
+            onTouchStart={handleMoveDownWithHaptic}
+            onClick={handleMoveDownWithHaptic}
             disabled={isGameOver || isPaused}
             className="h-10 w-10 bg-slate-800/70 border-slate-600 hover:bg-slate-700/50 touch-manipulation"
             aria-label="Soft drop"
@@ -81,8 +108,8 @@ export function TouchControls({ className }: TouchControlsProps) {
         <AnimatedButton
           variant="outline"
           size="lg"
-          onTouchStart={handleMoveRight}
-          onClick={handleMoveRight}
+          onTouchStart={handleMoveRightWithHaptic}
+          onClick={handleMoveRightWithHaptic}
           disabled={isGameOver || isPaused}
           className="h-12 w-12 bg-slate-800/70 border-slate-600 hover:bg-slate-700/50 touch-manipulation"
           aria-label="Move right"

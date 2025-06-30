@@ -28,6 +28,7 @@ const DEFAULT_KEY_MAPPING: KeyMapping = {
   ShiftLeft: { action: "hold", repeat: false, cooldown: 200, preventDefaultAction: true },
   ShiftRight: { action: "hold", repeat: false, cooldown: 200, preventDefaultAction: true },
   KeyP: { action: "pause", repeat: false, cooldown: 200, preventDefaultAction: true },
+  KeyR: { action: "reset", repeat: false, cooldown: 300, preventDefaultAction: true },
   Enter: { action: "reset", repeat: false, cooldown: 300, preventDefaultAction: true },
 };
 

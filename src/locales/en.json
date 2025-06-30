@@ -1,11 +1,7 @@
 {
   "game": {
     "title": "Tetris",
-    "score": {
-      "title": "Score",
-      "lines": "Lines",
-      "level": "Level"
-    },
+    "score": "Score",
     "lines": "Lines",
     "level": "Level",
     "next": "Next",
@@ -17,7 +13,10 @@
     "newGame": "New Game",
     "resume": "Resume",
     "resumeHint": "Press P to resume",
-    "highScore": {
+    "shortcuts": "Shortcuts",
+    "newHighScore": "New High Score",
+    "highScore": "High Score",
+    "highScores": {
       "title": "High Score",
       "topScores": "Top Scores",
       "noScore": "No score yet",
