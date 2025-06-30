@@ -13,14 +13,14 @@ export function MobileHeader() {
   const isPaused = useGameStore((state) => state.isPaused);
   const isGameOver = useGameStore((state) => state.isGameOver);
   const togglePause = useGameStore((state) => state.togglePause);
-  const resetGame = useGameStore((state) => state.resetGame);
+  const showResetDialog = useGameStore((state) => state.showResetDialog);
   const holdPiece = useGameStore((state) => state.holdPiece);
   const canHold = useGameStore((state) => state.canHold);
   const { lightImpact, heavyImpact } = useHapticFeedback();
 
   const handleReset = () => {
     heavyImpact();
-    resetGame();
+    showResetDialog();
   };
 
   const handleTogglePause = () => {
@@ -78,13 +78,13 @@ export function MobileHeader() {
 
       {/* Right side - Pause, Reset and Settings */}
       <div className="flex gap-2">
-        {isGameOver && (
+        {!isGameOver && !isPaused && (
           <AnimatedButton
             variant="outline"
             size="sm"
             onClick={handleReset}
-            className="h-8 w-8 bg-red-800/70 border-red-600 hover:bg-red-700/50"
-            aria-label="Start new game"
+            className="h-8 w-8 bg-orange-800/70 border-orange-600 hover:bg-orange-700/50"
+            aria-label="Reset game"
           >
             <RefreshCw className="h-4 w-4" />
           </AnimatedButton>

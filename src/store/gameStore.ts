@@ -10,6 +10,7 @@ import {
 import type { GameState } from "@/types/game";
 
 interface GameStore extends GameState {
+  showResetConfirmation: boolean;
   moveLeft: () => void;
   moveRight: () => void;
   moveDown: () => void;
@@ -18,6 +19,9 @@ interface GameStore extends GameState {
   holdPiece: () => void;
   togglePause: () => void;
   resetGame: () => void;
+  showResetDialog: () => void;
+  hideResetDialog: () => void;
+  confirmReset: () => void;
   clearAnimationData: () => void;
 }
 
@@ -28,6 +32,7 @@ export const useGameStore = create<GameStore>()(
   devtools(
     (set) => ({
       ...INITIAL_STATE,
+      showResetConfirmation: false,
 
       moveLeft: () => set((state) => moveTetrominoBy(state, -1, 0)),
       moveRight: () => set((state) => moveTetrominoBy(state, 1, 0)),
@@ -44,6 +49,21 @@ export const useGameStore = create<GameStore>()(
       resetGame: () =>
         set(() => ({
           ...createInitialGameState(),
+          showResetConfirmation: false,
+        })),
+      showResetDialog: () =>
+        set((state) => {
+          // Only show reset dialog during active gameplay
+          if (!state.isGameOver && !state.isPaused) {
+            return { showResetConfirmation: true };
+          }
+          return state;
+        }),
+      hideResetDialog: () => set({ showResetConfirmation: false }),
+      confirmReset: () =>
+        set(() => ({
+          ...createInitialGameState(),
+          showResetConfirmation: false,
         })),
       clearAnimationData: () =>
         set((state) => {

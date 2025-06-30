@@ -4,5 +4,6 @@ export { GameOverlay } from "./GameOverlay";
 export { HighScore } from "./HighScore";
 export { HoldPiece } from "./HoldPiece";
 export { NextPiece } from "./NextPiece";
+export { ResetConfirmationDialog } from "./ResetConfirmationDialog";
 export { ScoreBoard } from "./ScoreBoard";
 export { TouchControls } from "./TouchControls";

@@ -42,7 +42,7 @@ export function useGameInputActions(): GameInputActions {
       hardDrop: actions.drop,
       hold: actions.holdPiece,
       pause: actions.togglePause,
-      reset: actions.resetGame,
+      reset: actions.showResetDialog,
     }),
     [actions],
   );

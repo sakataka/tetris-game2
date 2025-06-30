@@ -78,29 +78,16 @@ export function GameOverlay() {
           {isPaused && (
             <div className="space-y-4">
               <p className="text-center text-gray-300">{t("game.resumeHint")}</p>
-              <div className="flex flex-col gap-3">
-                <div className="flex justify-center">
-                  <AnimatedButton
-                    onClick={togglePause}
-                    variant="default"
-                    size="lg"
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
-                  >
-                    {t("game.resume")}
-                  </AnimatedButton>
-                </div>
-                <div className="flex justify-center">
-                  <AnimatedButton
-                    onClick={resetGame}
-                    variant="outline"
-                    size="sm"
-                    className="text-gray-300 border-gray-600 hover:bg-gray-800"
-                  >
-                    {t("game.newGame")}
-                  </AnimatedButton>
-                </div>
+              <div className="flex justify-center">
+                <AnimatedButton
+                  onClick={togglePause}
+                  variant="default"
+                  size="lg"
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  {t("game.resume")}
+                </AnimatedButton>
               </div>
-              <p className="text-center text-sm text-gray-400">{t("game.shortcuts")}: P</p>
             </div>
           )}
         </DialogContent>

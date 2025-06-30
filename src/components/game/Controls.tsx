@@ -13,6 +13,7 @@ export function Controls() {
     { key: "Space", action: t("game.controls.hardDrop") },
     { key: "Shift", action: t("game.controls.hold") },
     { key: "P", action: t("game.controls.pause") },
+    { key: "R", action: t("game.controls.reset") },
   ];
 
   return (

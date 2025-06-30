@@ -16,20 +16,21 @@ export function useGameLoop() {
   const moveDown = useGameStore((state) => state.moveDown);
   const isPaused = useGameStore((state) => state.isPaused);
   const isGameOver = useGameStore((state) => state.isGameOver);
+  const showResetConfirmation = useGameStore((state) => state.showResetConfirmation);
   const level = useGameStore((state) => state.level);
   const lastUpdateTime = useRef(0);
   const animationIdRef = useRef<number | null>(null);
   const executeAction = useGameActionHandler();
 
   useEffect(() => {
-    if (isPaused || isGameOver) return;
+    if (isPaused || isGameOver || showResetConfirmation) return;
 
     const gameSpeed = getGameSpeed(level);
 
     const gameLoop = (currentTime: number) => {
       // Check game state before processing - safety check for state changes during execution
       const currentState = useGameStore.getState();
-      if (currentState.isPaused || currentState.isGameOver) {
+      if (currentState.isPaused || currentState.isGameOver || currentState.showResetConfirmation) {
         return; // Stop the loop immediately if game state changed
       }
 
@@ -40,7 +41,11 @@ export function useGameLoop() {
       }
 
       // Only continue the loop if the game is still active
-      if (!currentState.isPaused && !currentState.isGameOver) {
+      if (
+        !currentState.isPaused &&
+        !currentState.isGameOver &&
+        !currentState.showResetConfirmation
+      ) {
         animationIdRef.current = requestAnimationFrame(gameLoop);
       }
     };
@@ -53,5 +58,5 @@ export function useGameLoop() {
         animationIdRef.current = null;
       }
     };
-  }, [moveDown, isPaused, isGameOver, level, executeAction]);
+  }, [moveDown, isPaused, isGameOver, showResetConfirmation, level, executeAction]);
 }

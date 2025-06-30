@@ -1,9 +1,6 @@
 {
   "game": {
     "title": "Tetris",
-    "score": "Score",
-    "lines": "Lines",
-    "level": "Level",
     "next": "Next",
     "hold": "Hold",
     "holdPiece": "Hold Piece",
@@ -15,7 +12,14 @@
     "resumeHint": "Press P to resume",
     "shortcuts": "Shortcuts",
     "newHighScore": "New High Score",
-    "highScore": "High Score",
+    "score": {
+      "title": "Score",
+      "lines": "Lines",
+      "level": "Level"
+    },
+    "highScore": {
+      "title": "High Score"
+    },
     "highScores": {
       "title": "High Score",
       "topScores": "Top Scores",
@@ -29,7 +33,8 @@
       "rotate": "Rotate",
       "hardDrop": "Hard Drop",
       "hold": "Hold",
-      "pause": "Pause"
+      "pause": "Pause",
+      "reset": "Reset"
     },
     "settings": {
       "title": "Settings",
@@ -39,6 +44,13 @@
       "ghostPieceDescription": "Ghost Piece Display",
       "enabled": "Enabled",
       "disabled": "Disabled"
+    },
+    "resetConfirmation": {
+      "title": "Reset Game",
+      "message": "Reset the current game?",
+      "scoreNotice": "Your score will be saved.",
+      "confirm": "Yes",
+      "cancel": "No"
     }
   }
 }

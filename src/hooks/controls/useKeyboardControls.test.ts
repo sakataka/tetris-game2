@@ -12,6 +12,7 @@ const mockGameActions = {
   holdPiece: mock(),
   togglePause: mock(),
   resetGame: mock(),
+  showResetDialog: mock(),
 };
 
 // Mock game state
@@ -53,7 +54,7 @@ const mockGameInputActions = {
   hardDrop: mockGameActions.drop,
   hold: mockGameActions.holdPiece,
   pause: mockGameActions.togglePause,
-  reset: mockGameActions.resetGame,
+  reset: mockGameActions.showResetDialog,
 };
 
 mock.module("./useGameInputActions", () => ({
@@ -174,16 +175,17 @@ describe("useKeyboardControls", () => {
     expect(mockGameActions.togglePause).toHaveBeenCalledTimes(1);
   });
 
-  test("should execute reset action only when game is over", () => {
-    mockGameState.isGameOver = true;
+  test("should execute reset action only when game is active", () => {
+    mockGameState.isGameOver = false;
+    mockGameState.isPaused = false;
 
     const { result } = renderHook(() => useKeyboardControls());
 
     act(() => {
-      result.current.executeKeyAction("Enter");
+      result.current.executeKeyAction("KeyR");
     });
 
-    expect(mockGameActions.resetGame).toHaveBeenCalledTimes(1);
+    expect(mockGameActions.showResetDialog).toHaveBeenCalledTimes(1);
   });
 
   // Note: Reset action test removed due to complex mock setup

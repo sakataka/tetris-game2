@@ -5,6 +5,7 @@ import {
   HighScore,
   HoldPiece,
   NextPiece,
+  ResetConfirmationDialog,
   ScoreBoard,
 } from "@/components/game";
 import { useKeyboardControls } from "@/hooks/controls/useKeyboardControls";
@@ -61,6 +62,9 @@ export function Game() {
           </div>
         </main>
       </div>
+
+      {/* Reset confirmation dialog */}
+      <ResetConfirmationDialog />
     </>
   );
 }

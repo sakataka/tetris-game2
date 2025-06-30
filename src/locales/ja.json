@@ -1,9 +1,6 @@
 {
   "game": {
     "title": "テトリス",
-    "score": "スコア",
-    "lines": "ライン",
-    "level": "レベル",
     "next": "次のピース",
     "hold": "ホールド",
     "holdPiece": "ホールドピース",
@@ -15,7 +12,14 @@
     "resumeHint": "Pキーで再開",
     "shortcuts": "ショートカット",
     "newHighScore": "ハイスコア更新",
-    "highScore": "ハイスコア",
+    "score": {
+      "title": "スコア",
+      "lines": "ライン",
+      "level": "レベル"
+    },
+    "highScore": {
+      "title": "ハイスコア"
+    },
     "highScores": {
       "title": "ハイスコア",
       "topScores": "トップスコア",
@@ -29,7 +33,8 @@
       "rotate": "回転",
       "hardDrop": "ハードドロップ",
       "hold": "ホールド",
-      "pause": "一時停止"
+      "pause": "一時停止",
+      "reset": "リセット"
     },
     "settings": {
       "title": "設定",
@@ -39,6 +44,13 @@
       "ghostPieceDescription": "ゴーストピース表示",
       "enabled": "有効",
       "disabled": "無効"
+    },
+    "resetConfirmation": {
+      "title": "ゲームリセット",
+      "message": "現在のゲームをリセットしますか？",
+      "scoreNotice": "スコアは記録されます。",
+      "confirm": "はい",
+      "cancel": "いいえ"
     }
   }
 }

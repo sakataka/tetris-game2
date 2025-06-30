@@ -84,8 +84,8 @@ export function useKeyboardControls(keyMapping: KeyMapping = DEFAULT_KEY_MAPPING
         // Special handling for pause and reset
         if (mapping.action === "pause" && !isGameOver) {
           action();
-        } else if (mapping.action === "reset" && isGameOver) {
-          action();
+        } else if (mapping.action === "reset" && isGameActive) {
+          action(); // Reset only during active gameplay (not paused, not game over)
         } else if (isGameActive) {
           action();
         }

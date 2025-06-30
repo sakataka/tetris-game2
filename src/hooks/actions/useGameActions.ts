@@ -14,6 +14,7 @@ export interface GameActions {
   readonly holdPiece: () => void;
   readonly togglePause: () => void;
   readonly resetGame: () => void;
+  readonly showResetDialog: () => void;
   readonly clearAnimationData: () => void;
 }
 
@@ -30,6 +31,7 @@ export const useGameActions = (): GameActions => {
   const holdPiece = useGameStore((state) => state.holdPiece);
   const togglePause = useGameStore((state) => state.togglePause);
   const resetGame = useGameStore((state) => state.resetGame);
+  const showResetDialog = useGameStore((state) => state.showResetDialog);
   const clearAnimationData = useGameStore((state) => state.clearAnimationData);
 
   return useMemo(
@@ -42,6 +44,7 @@ export const useGameActions = (): GameActions => {
       holdPiece,
       togglePause,
       resetGame,
+      showResetDialog,
       clearAnimationData,
     }),
     [
@@ -53,6 +56,7 @@ export const useGameActions = (): GameActions => {
       holdPiece,
       togglePause,
       resetGame,
+      showResetDialog,
       clearAnimationData,
     ],
   );
