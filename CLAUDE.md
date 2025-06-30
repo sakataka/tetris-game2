@@ -11,9 +11,20 @@ This project implements a fully-featured Tetris game using functional programmin
 ### Project Structure
 ```
 src/
-├── components/     # React UI components (game, layout, ui)
+├── components/     # React UI components
+│   ├── game/      # Game-specific components (Board, Cell, Score, etc.)
+│   ├── layout/    # Layout components (GameLayout, MobileLayout)
+│   └── ui/        # Reusable UI components
 ├── game/          # Pure game logic (board, tetrominos, mechanics)
-├── hooks/         # Custom React hooks (controls, game loop, UI)
+├── hooks/         # Custom React hooks (organized by functionality)
+│   ├── actions/   # Game action hooks (useGameActions, useGameInputActions)
+│   ├── common/    # Shared utility hooks (useMediaQuery)
+│   ├── controls/  # Input handling hooks (useGameControls, useKeyboardControls, useTouchControls)
+│   ├── core/      # Core game hooks (useGameLoop, useGameInit)
+│   ├── data/      # Data hooks (useHighScores, useNextPieces)
+│   ├── effects/   # Visual effect hooks (useCellAnimations, useScoreAnimation)
+│   ├── selectors/ # State selector hooks (useGameState, useIsGameActive)
+│   └── ui/        # UI-specific hooks (useDropdown, useSettings)
 ├── store/         # Zustand state management
 ├── types/         # TypeScript definitions
 ├── utils/         # Shared utilities and constants
@@ -129,12 +140,13 @@ bun run ci           # CI pipeline (lint + typecheck + test + build)
 ## Quality Assurance
 
 ### Testing Strategy
-- **Pure Function Testing**: Complete coverage of game logic and business rules
-- **UI Component Policy**: No automated tests for React UI components - focus on pure function testing
-- **Integration Testing**: Full game flow scenarios for core game mechanics
-- **Hook Testing**: Isolated custom hook behavior (pure logic only)
-- **Browser Testing**: Playwright for E2E and visual validation when necessary
-- **Minimal Mocking**: Focus on isolated unit testing of pure functions
+- **Pure Function Focus**: Test ONLY pure functions, utility modules, and business logic
+- **Zero UI Component Tests**: NO testing of React components, DOM interactions, or UI behavior
+- **Game Logic Coverage**: Comprehensive testing of core game mechanics, state transitions, and algorithms
+- **Hook Logic Testing**: Test only the pure functions and logic extracted from hooks, NOT the hooks themselves
+- **No Framework Testing**: Avoid testing React, Zustand, or other framework-specific behavior
+- **Minimal Mocking**: Use real implementations whenever possible; mock only external dependencies
+- **E2E for Critical Paths**: Use Playwright sparingly for critical user journeys only
 
 ### Testing Infrastructure
 - **Test Runner**: Bun Test with happy-dom environment
@@ -157,10 +169,12 @@ bun run ci           # CI pipeline (lint + typecheck + test + build)
 - **i18n Required**: No hardcoded UI strings—everything through translation files
 - **Functional Programming**: Prefer pure functions over class-based approaches
 
-### Import Guidelines
-- **Cross-directory imports**: MUST use `@/` path aliases
-- **Same directory imports**: Use relative `./` paths for performance
-- **Test mocks**: Exception for test frameworks requiring relative paths
+### Import Guidelines (CRITICAL)
+- **Cross-directory imports**: ALWAYS use `@/` path aliases (e.g., `import { GameStore } from '@/store/gameStore'`)
+- **Same directory imports**: Use relative `./` paths for better performance (e.g., `import { helper } from './utils'`)
+- **Never use relative paths for cross-directory**: NO `../../../` style imports - use `@/` instead
+- **Test files exception**: Only test mocks may use relative paths when required by testing framework
+- **Consistency is key**: All developers must follow these rules without exception
 
 ### Development Configuration
 - **Bun Runtime**: Primary toolchain for all operations
@@ -168,6 +182,25 @@ bun run ci           # CI pipeline (lint + typecheck + test + build)
 - **Git Hooks**: Automated formatting and conventional commit enforcement
 - **TypeScript**: Strict mode with ESNext target
 - **Deployment**: Vercel with Bun-optimized build pipeline
+
+## Recent Changes & Improvements
+
+### Code Architecture Refactoring
+- **Hooks Reorganization**: Restructured hooks directory into functional categories (actions, controls, core, data, effects, selectors, ui) for better code organization and maintainability
+- **Code Duplication Elimination**: Merged duplicate logic between `useGameActions` and `useGameInputActions` to reduce redundancy
+- **Path Alias Implementation**: Enforced `@/` aliases for cross-directory imports to improve code readability and maintainability
+
+### Testing Strategy Evolution
+- **Focus on Pure Functions**: Shifted testing strategy to concentrate exclusively on pure functions and business logic
+- **UI Test Removal**: Eliminated React component tests to maintain focus on core functionality testing
+- **Hook Test Refinement**: Test only the pure logic within hooks, not React-specific behavior
+- **Improved Test Coverage**: Better coverage of game mechanics, state transitions, and utility functions
+
+### Production Readiness Enhancements
+- **Type Safety Improvements**: Stricter TypeScript configurations and better type inference
+- **Performance Optimizations**: Reduced bundle size through code splitting and tree shaking
+- **Build Process Enhancement**: Leveraging rolldown-vite for faster builds and better optimization
+- **Documentation Consolidation**: Unified project documentation into CLAUDE.md for single source of truth
 
 ## Tools & Utilities
 
