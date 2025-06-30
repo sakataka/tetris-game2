@@ -76,15 +76,6 @@ export const getNextPiece = (bag: PieceBag): [TetrominoTypeName, PieceBag] => {
 };
 
 /**
- * Checks if the bag is currently empty.
- * Pure function for testing bag state.
- *
- * @param bag Current bag state
- * @returns true if the bag contains no pieces
- */
-export const isBagEmpty = (bag: PieceBag): boolean => bag.currentBag.length === 0;
-
-/**
  * Gets the current bag contents as an immutable array.
  * Returns a copy to ensure external code cannot modify the internal state.
  *
@@ -112,35 +103,6 @@ export const setBagForTesting = (
   ...bag,
   currentBag: [...pieces],
 });
-
-/**
- * Gets the number of pieces remaining in the current bag.
- * Pure function for bag state inspection.
- *
- * @param bag Current bag state
- * @returns Number of pieces remaining
- */
-export const getRemainingCount = (bag: PieceBag): number => bag.currentBag.length;
-
-/**
- * Gets the history of all generated pieces.
- * Useful for testing and debugging.
- *
- * @param bag Current bag state
- * @returns Array of all previously generated pieces
- */
-export const getGeneratedHistory = (bag: PieceBag): readonly TetrominoTypeName[] => [
-  ...bag.generatedPieces,
-];
-
-/**
- * Resets the bag to initial state while preserving seed.
- * Pure function that creates a new bag instance.
- *
- * @param bag Current bag state
- * @returns New bag state reset to initial condition
- */
-export const resetBag = (bag: PieceBag): PieceBag => createPieceBag(bag.seed);
 
 // === UTILITY FUNCTIONS ===
 
