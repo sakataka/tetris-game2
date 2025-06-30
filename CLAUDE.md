@@ -19,14 +19,27 @@
 ## Project Architecture Definition
 
 ### Core Implementation Stack
-- **Runtime Environment**: Bun 1.2.17 (package management, testing, development)
-- **Build System**: Vite 7.0.3 (rolldown-vite) with enhanced performance
-- **Type System**: TypeScript 5.8.3 with strict mode and ESNext target
+
+#### Application Libraries
 - **Frontend Framework**: React 19.1.0 (functional components with concurrent features)
 - **State Management**: Zustand 5.0.6 (lightweight, functional state management)
-- **Styling Framework**: Tailwind CSS 4.1.11 via @tailwindcss/vite plugin
-- **Animation System**: Motion 12.20.1 for physics-based animations
-- **Internationalization**: i18next 25.2.1 + react-i18next 15.5.3
+- **Styling Framework**: Tailwind CSS 4.1.11 (utility-first CSS framework)
+- **Animation System**: Motion 12.20.1 (physics-based animations)
+- **Internationalization**: i18next 25.3.0 + react-i18next 15.5.3
+- **UI Components**: Radix UI (dialog, slot) for accessible components
+- **Icons**: Lucide React 0.525.0 (icon library)
+- **Utilities**: clsx 2.1.1 + tailwind-merge 3.3.1 (className utilities)
+
+#### Development & Build Tools
+- **Runtime Environment**: Bun 1.2.17 (package manager, test runner, development server)
+- **Build System**: Vite 7.0.3 (rolldown-vite) with enhanced performance
+- **Type System**: TypeScript 5.8.3 with strict mode and ESNext target
+- **Code Quality**: Biome 2.0.6 (linting, formatting, static analysis)
+- **Git Hooks**: Lefthook 1.11.14 (pre-commit validation, commit message linting)
+- **Testing**: Bun Test with happy-dom 18.0.1 (DOM simulation)
+- **E2E Testing**: Playwright 1.53.2 (browser automation)
+- **Bundle Analysis**: rollup-plugin-visualizer 6.0.3
+- **CSS Processing**: @tailwindcss/vite 4.1.11 plugin
 
 ### Directory Structure and Component Organization
 
