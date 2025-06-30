@@ -25,7 +25,7 @@
 - **Frontend Framework**: React 19.1.0 (functional components with concurrent features)
 - **State Management**: Zustand 5.0.6 (lightweight, functional state management)
 - **Styling Framework**: Tailwind CSS 4.1.11 via @tailwindcss/vite plugin
-- **Animation System**: Framer Motion 12.19.2 for physics-based animations
+- **Animation System**: Motion 12.20.1 for physics-based animations
 - **Internationalization**: i18next 25.2.1 + react-i18next 15.5.3
 
 ### Directory Structure and Component Organization

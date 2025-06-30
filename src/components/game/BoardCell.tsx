@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { useCellAnimation } from "@/hooks/ui/useCellAnimation";
 import { cn } from "@/lib/utils";
 import type { AnimationTriggerKey, CellValue } from "@/types/game";

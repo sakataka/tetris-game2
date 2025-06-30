@@ -8,9 +8,9 @@
         "@radix-ui/react-slot": "^1.2.3",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
-        "framer-motion": "^12.19.2",
-        "i18next": "25.2.1",
+        "i18next": "25.3.0",
         "lucide-react": "^0.525.0",
+        "motion": "^12.20.1",
         "react": "19.1.0",
         "react-dom": "19.1.0",
         "react-i18next": "15.5.3",
@@ -19,7 +19,7 @@
       },
       "devDependencies": {
         "@biomejs/biome": "2.0.6",
-        "@playwright/test": "^1.53.1",
+        "@playwright/test": "^1.53.2",
         "@tailwindcss/vite": "^4.1.11",
         "@testing-library/jest-dom": "^6.6.3",
         "@testing-library/react": "^16.3.0",
@@ -122,7 +122,7 @@
 
     "@oxc-resolver/binding-win32-x64-msvc": ["@oxc-resolver/binding-win32-x64-msvc@11.2.0", "", { "os": "win32", "cpu": "x64" }, "sha512-r19cQc7HaEJ76HFsMsbiKMTIV2YqFGSof8H5hB7e5Jkb/23Y8Isv1YrSzkDaGhcw02I/COsrPo+eEmjy35eFuA=="],
 
-    "@playwright/test": ["@playwright/test@1.53.1", "", { "dependencies": { "playwright": "1.53.1" }, "bin": { "playwright": "cli.js" } }, "sha512-Z4c23LHV0muZ8hfv4jw6HngPJkbbtZxTkxPNIg7cJcTc9C28N/p2q7g3JZS2SiKBBHJ3uM1dgDye66bB7LEk5w=="],
+    "@playwright/test": ["@playwright/test@1.53.2", "", { "dependencies": { "playwright": "1.53.2" }, "bin": { "playwright": "cli.js" } }, "sha512-tEB2U5z74ebBeyfGNZ3Jfg29AnW+5HlWhvHtb/Mqco9pFdZU1ZLNdVb2UtB5CvmiilNr2ZfVH/qMmAROG/XTzw=="],
 
     "@radix-ui/primitive": ["@radix-ui/primitive@1.1.2", "", {}, "sha512-XnbHrrprsNqZKQhStrSwgRUQzoCI1glLzdw79xiZPoofhGICeZRSQ3dIxAKH1gb3OHfNf4d6f+vAv3kil2eggA=="],
 
@@ -298,7 +298,7 @@
 
     "formatly": ["formatly@0.2.4", "", { "dependencies": { "fd-package-json": "^2.0.0" }, "bin": { "formatly": "bin/index.mjs" } }, "sha512-lIN7GpcvX/l/i24r/L9bnJ0I8Qn01qijWpQpDDvTLL29nKqSaJJu4h20+7VJ6m2CAhQ2/En/GbxDiHCzq/0MyA=="],
 
-    "framer-motion": ["framer-motion@12.19.2", "", { "dependencies": { "motion-dom": "^12.19.0", "motion-utils": "^12.19.0", "tslib": "^2.4.0" }, "peerDependencies": { "@emotion/is-prop-valid": "*", "react": "^18.0.0 || ^19.0.0", "react-dom": "^18.0.0 || ^19.0.0" }, "optionalPeers": ["@emotion/is-prop-valid", "react", "react-dom"] }, "sha512-0cWMLkYr+i0emeXC4hkLF+5aYpzo32nRdQ0D/5DI460B3O7biQ3l2BpDzIGsAHYuZ0fpBP0DC8XBkVf6RPAlZw=="],
+    "framer-motion": ["framer-motion@12.20.1", "", { "dependencies": { "motion-dom": "^12.20.1", "motion-utils": "^12.19.0", "tslib": "^2.4.0" }, "peerDependencies": { "@emotion/is-prop-valid": "*", "react": "^18.0.0 || ^19.0.0", "react-dom": "^18.0.0 || ^19.0.0" }, "optionalPeers": ["@emotion/is-prop-valid", "react", "react-dom"] }, "sha512-NW2t2GHQcNvLHq18JyNVY15VKrwru+nkNyhLdqf4MbxbGhxZcSDi68iNcAy6O1nG0yYAQJbLioBIH1Kmg8Xr1g=="],
 
     "fsevents": ["fsevents@2.3.3", "", { "os": "darwin" }, "sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw=="],
 
@@ -316,7 +316,7 @@
 
     "html-parse-stringify": ["html-parse-stringify@3.0.1", "", { "dependencies": { "void-elements": "3.1.0" } }, "sha512-KknJ50kTInJ7qIScF3jeaFRpMpE8/lfiTdzf/twXyPBLAGrLRTmkz3AdTnKeh40X8k9L2fdYwEp/42WGXIRGcg=="],
 
-    "i18next": ["i18next@25.2.1", "", { "dependencies": { "@babel/runtime": "^7.27.1" }, "peerDependencies": { "typescript": "^5" }, "optionalPeers": ["typescript"] }, "sha512-+UoXK5wh+VlE1Zy5p6MjcvctHXAhRwQKCxiJD8noKZzIXmnAX8gdHX5fLPA3MEVxEN4vbZkQFy8N0LyD9tUqPw=="],
+    "i18next": ["i18next@25.3.0", "", { "dependencies": { "@babel/runtime": "^7.27.6" }, "peerDependencies": { "typescript": "^5" }, "optionalPeers": ["typescript"] }, "sha512-ZSQIiNGfqSG6yoLHaCvrkPp16UejHI8PCDxFYaNG/1qxtmqNmqEg4JlWKlxkrUmrin2sEjsy+Mjy1TRozBhOgw=="],
 
     "indent-string": ["indent-string@4.0.0", "", {}, "sha512-EdDDZu4A2OyIK7Lr/2zG+w5jmbuk1DVBnEwREQvBzspBJkCEbRa8GxU1lghYcaGJCnRWibjDXlq779X1/y5xwg=="],
 
@@ -406,7 +406,9 @@
 
     "mkdirp": ["mkdirp@3.0.1", "", { "bin": { "mkdirp": "dist/cjs/src/bin.js" } }, "sha512-+NsyUUAZDmo6YVHzL/stxSu3t9YS1iljliy3BSDrXJ/dkn1KYdmtZODGGjLcc9XLgVVpH4KshHB8XmZgMhaBXg=="],
 
-    "motion-dom": ["motion-dom@12.19.0", "", { "dependencies": { "motion-utils": "^12.19.0" } }, "sha512-m96uqq8VbwxFLU0mtmlsIVe8NGGSdpBvBSHbnnOJQxniPaabvVdGgxSamhuDwBsRhwX7xPxdICgVJlOpzn/5bw=="],
+    "motion": ["motion@12.20.1", "", { "dependencies": { "framer-motion": "^12.20.1", "tslib": "^2.4.0" }, "peerDependencies": { "@emotion/is-prop-valid": "*", "react": "^18.0.0 || ^19.0.0", "react-dom": "^18.0.0 || ^19.0.0" }, "optionalPeers": ["@emotion/is-prop-valid", "react", "react-dom"] }, "sha512-UPUsh8jVxmcTPWqcdU5ZcNhO8EU4sfG+UcvKAUXFIwUE1oZJFxtyDui9tD7zlVau1eIBXqZ4Qe0hK2r8pOjDcQ=="],
+
+    "motion-dom": ["motion-dom@12.20.1", "", { "dependencies": { "motion-utils": "^12.19.0" } }, "sha512-XyveLJ9dmQTmaEsP9RlcuoNFxWlRIGdasdPJBB4aOwPr8bRcJdhltudAbiEjRQBmsGD30sjJdaEjhkHsAHapLQ=="],
 
     "motion-utils": ["motion-utils@12.19.0", "", {}, "sha512-BuFTHINYmV07pdWs6lj6aI63vr2N4dg0vR+td0rtrdpWOhBzIkEklZyLcvKBoEtwSqx8Jg06vUB5RS0xDiUybw=="],
 
@@ -420,9 +422,9 @@
 
     "picomatch": ["picomatch@4.0.2", "", {}, "sha512-M7BAV6Rlcy5u+m6oPhAPFgJTzAioX/6B0DxyvDlo9l8+T3nLKbrczg2WLUyzd45L8RqfUMyGPzekbMvX2Ldkwg=="],
 
-    "playwright": ["playwright@1.53.1", "", { "dependencies": { "playwright-core": "1.53.1" }, "optionalDependencies": { "fsevents": "2.3.2" }, "bin": { "playwright": "cli.js" } }, "sha512-LJ13YLr/ocweuwxyGf1XNFWIU4M2zUSo149Qbp+A4cpwDjsxRPj7k6H25LBrEHiEwxvRbD8HdwvQmRMSvquhYw=="],
+    "playwright": ["playwright@1.53.2", "", { "dependencies": { "playwright-core": "1.53.2" }, "optionalDependencies": { "fsevents": "2.3.2" }, "bin": { "playwright": "cli.js" } }, "sha512-6K/qQxVFuVQhRQhFsVZ9fGeatxirtrpPgxzBYWyZLEXJzqYwuL4fuNmfOfD5et1tJE4GScKyPNeLhZeRwuTU3A=="],
 
-    "playwright-core": ["playwright-core@1.53.1", "", { "bin": { "playwright-core": "cli.js" } }, "sha512-Z46Oq7tLAyT0lGoFx4DOuB1IA9D1TPj0QkYxpPVUnGDqHHvDpCftu1J2hM2PiWsNMoZh8+LQaarAWcDfPBc6zg=="],
+    "playwright-core": ["playwright-core@1.53.2", "", { "bin": { "playwright-core": "cli.js" } }, "sha512-ox/OytMy+2w1jcYEYlOo1Hhp8hZkLCximMTUTMBXjGUA1KoFfiSZ+DU+3a739jsPY0yoKH2TFy9S2fsJas8yAw=="],
 
     "postcss": ["postcss@8.5.6", "", { "dependencies": { "nanoid": "^3.3.11", "picocolors": "^1.1.1", "source-map-js": "^1.2.1" } }, "sha512-3Ybi1tAuwAP9s0r1UQ2J4n5Y0G05bJkpUIO0/bI9MhwmD70S5aTWbXGBwxHrelT+XM1k6dM0pk+SwNkpTRN7Pg=="],
 

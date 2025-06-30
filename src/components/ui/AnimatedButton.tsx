@@ -1,4 +1,4 @@
-import { type MotionProps, motion } from "framer-motion";
+import { type MotionProps, motion } from "motion/react";
 import { forwardRef } from "react";
 import { ANIMATION_PRESETS } from "@/utils/animationConstants";
 import { Button, type ButtonProps } from "./button";
