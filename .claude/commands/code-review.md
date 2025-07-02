@@ -2,6 +2,10 @@
 
 Perform a comprehensive code review for any repository, analyzing code quality, best practices, and potential improvements.
 
+## Initial Analysis
+
+Before starting the code review, use ultrathink to deeply analyze the codebase structure, identify potential areas of concern, and formulate a strategic approach for the review.
+
 ## Instructions
 
 Follow these steps to conduct a thorough code review:
@@ -54,3 +58,15 @@ Follow these steps to conduct a thorough code review:
    - Create a summary report with next steps
 
 Remember to be constructive and provide specific examples with file paths and line numbers where applicable.
+
+## Output Format
+
+Create a new markdown file in the `docs/` directory with the following naming convention:
+- `docs/code-review-YYYY-MM-DD.md` (using the current date)
+
+The review document should include:
+- Executive summary
+- Detailed findings organized by severity
+- Specific code examples with file paths and line numbers
+- Actionable recommendations with priority levels
+- Suggested next steps and improvement roadmap
