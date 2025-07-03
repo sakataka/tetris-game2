@@ -281,12 +281,5 @@ mcp__context7__get-library-docs "/oven-sh/bun"
 
 **EXECUTION RULES**:
 - ✅ Trigger ONLY when ALL todo items marked as completed
-- ❌ Do NOT notify for individual task completions
 - ✅ Use reasonable volume settings (volumeScale=0.1)
 - ✅ Prefer Japanese completion messages
-
-**EXECUTION WORKFLOW**:
-```bash
-# Only after ALL todo items are marked as completed
-mcp__aivisspeech__speak "すべてのタスクが完了しました" --volumeScale=0.1
-```
