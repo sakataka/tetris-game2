@@ -27,7 +27,7 @@ test.describe("Tetris Line Clear Test", () => {
       const scoreText = await scoreElement.textContent();
       initialScore = Number.parseInt(scoreText?.match(/\d+/)?.[0] || "0");
       console.log("Initial score:", initialScore);
-    } catch (e) {
+    } catch (_e) {
       console.log("Could not read initial score, starting from 0");
     }
 
@@ -134,7 +134,7 @@ test.describe("Tetris Line Clear Test", () => {
 
           return; // Success - at least one line cleared
         }
-      } catch (e) {
+      } catch (_e) {
         // Continue if score reading fails
       }
 
@@ -152,7 +152,7 @@ test.describe("Tetris Line Clear Test", () => {
           await page.screenshot({ path: "screenshots/game-over-no-line-clear.png" });
           break;
         }
-      } catch (e) {
+      } catch (_e) {
         // Continue if dialog check fails
       }
     }

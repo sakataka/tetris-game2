@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
+import { immer } from "zustand/middleware/immer";
 import type { GameSettings } from "@/types/storage";
 import { GAME_CONSTANTS } from "@/utils/gameConstants";
 
@@ -23,20 +24,28 @@ if (import.meta.env.DEV) {
 export const useSettingsStore = create<SettingsStore>()(
   devtools(
     persist(
-      (set) => ({
+      immer((set) => ({
         ...DEFAULT_SETTINGS,
 
         setLanguage: (language) => {
           if (import.meta.env.DEV) {
             console.log("[SettingsStore] Setting language to:", language);
           }
-          set({ language });
+          set((state) => {
+            state.language = language;
+          });
         },
 
-        toggleShowGhostPiece: () => set((state) => ({ showGhostPiece: !state.showGhostPiece })),
+        toggleShowGhostPiece: () =>
+          set((state) => {
+            state.showGhostPiece = !state.showGhostPiece;
+          }),
 
-        setVolume: (volume) => set({ volume }),
-      }),
+        setVolume: (volume) =>
+          set((state) => {
+            state.volume = volume;
+          }),
+      })),
       {
         name: "tetris-settings",
         onRehydrateStorage: () => (state) => {

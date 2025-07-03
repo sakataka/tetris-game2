@@ -74,7 +74,7 @@ test.describe("Strategic Line Clear Test", () => {
         if (currentScore > 0) {
           console.log(`📈 Score increased to ${currentScore} (no line clear yet)`);
         }
-      } catch (e) {
+      } catch (_e) {
         console.log("📊 Could not read score, continuing...");
       }
 
@@ -86,7 +86,7 @@ test.describe("Strategic Line Clear Test", () => {
           await page.waitForTimeout(2000);
           break;
         }
-      } catch (e) {
+      } catch (_e) {
         // Continue if check fails
       }
 
@@ -153,7 +153,7 @@ test.describe("Strategic Line Clear Test", () => {
             return;
           }
         }
-      } catch (e) {
+      } catch (_e) {
         // Continue
       }
 
@@ -165,7 +165,7 @@ test.describe("Strategic Line Clear Test", () => {
           await page.waitForTimeout(2000);
           break;
         }
-      } catch (e) {
+      } catch (_e) {
         // Continue
       }
     }

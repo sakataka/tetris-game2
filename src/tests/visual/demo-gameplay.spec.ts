@@ -89,7 +89,7 @@ test.describe("Tetris Visual Demo", () => {
           await page.waitForTimeout(3000); // Show game over screen
           return;
         }
-      } catch (e) {
+      } catch (_e) {
         // Continue if check fails
       }
     }

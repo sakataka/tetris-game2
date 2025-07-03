@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
+import { immer } from "zustand/middleware/immer";
 import type { HighScore } from "@/types/storage";
 import { GAME_CONSTANTS } from "@/utils/gameConstants";
 
@@ -12,7 +13,7 @@ interface HighScoreStore {
 export const useHighScoreStore = create<HighScoreStore>()(
   devtools(
     persist(
-      (set, get) => ({
+      immer((set, get) => ({
         currentHighScore: null,
         highScoresList: [],
 
@@ -28,18 +29,21 @@ export const useHighScoreStore = create<HighScoreStore>()(
               date: new Date().toISOString(),
             };
 
-            // Update current high score
-            set({ currentHighScore: newHighScore });
+            set((state) => {
+              // Update current high score
+              state.currentHighScore = newHighScore;
 
-            // Add to high scores list and keep top scores
-            const updatedList = [...get().highScoresList, newHighScore]
-              .sort((a, b) => b.score - a.score)
-              .slice(0, GAME_CONSTANTS.UI.HIGH_SCORE_LIST_MAX);
-
-            set({ highScoresList: updatedList });
+              // Add to high scores list and keep top scores
+              state.highScoresList.push(newHighScore);
+              state.highScoresList.sort((a, b) => b.score - a.score);
+              state.highScoresList = state.highScoresList.slice(
+                0,
+                GAME_CONSTANTS.UI.HIGH_SCORE_LIST_MAX,
+              );
+            });
           }
         },
-      }),
+      })),
       {
         name: "tetris-high-scores",
       },

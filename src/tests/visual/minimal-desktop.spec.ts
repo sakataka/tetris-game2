@@ -128,7 +128,7 @@ test.describe("Minimal Desktop Tetris Test", () => {
       const scoreText = await scoreElement.textContent();
       initialScore = Number.parseInt(scoreText?.match(/\d+/)?.[0] || "0");
       console.log("Initial score:", initialScore);
-    } catch (e) {
+    } catch (_e) {
       console.log("Could not read initial score, continuing...");
     }
 
@@ -166,7 +166,7 @@ test.describe("Minimal Desktop Tetris Test", () => {
           await page.screenshot({ path: "screenshots/line-cleared-success.png" });
           return; // Success!
         }
-      } catch (e) {
+      } catch (_e) {
         // Continue if score reading fails
       }
 

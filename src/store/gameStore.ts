@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
+import { immer } from "zustand/middleware/immer";
 import {
   createInitialGameState,
   hardDropTetromino,
@@ -30,7 +31,7 @@ const INITIAL_STATE = createInitialGameState();
 
 export const useGameStore = create<GameStore>()(
   devtools(
-    (set) => ({
+    immer((set) => ({
       ...INITIAL_STATE,
       showResetConfirmation: false,
 
@@ -43,46 +44,47 @@ export const useGameStore = create<GameStore>()(
 
       togglePause: () =>
         set((state) => {
-          if (state.isGameOver) return state; // Cannot pause when game is over
-          return { isPaused: !state.isPaused };
+          if (!state.isGameOver) {
+            state.isPaused = !state.isPaused;
+          }
         }),
       resetGame: () =>
-        set(() => ({
-          ...createInitialGameState(),
-          showResetConfirmation: false,
-        })),
+        set((state) => {
+          const newState = createInitialGameState();
+          Object.assign(state, newState);
+          state.showResetConfirmation = false;
+        }),
       showResetDialog: () =>
         set((state) => {
           // Only show reset dialog during active gameplay
           if (!state.isGameOver && !state.isPaused) {
-            return { showResetConfirmation: true };
+            state.showResetConfirmation = true;
           }
-          return state;
         }),
-      hideResetDialog: () => set({ showResetConfirmation: false }),
+      hideResetDialog: () =>
+        set((state) => {
+          state.showResetConfirmation = false;
+        }),
       confirmReset: () =>
-        set(() => ({
-          ...createInitialGameState(),
-          showResetConfirmation: false,
-        })),
+        set((state) => {
+          const newState = createInitialGameState();
+          Object.assign(state, newState);
+          state.showResetConfirmation = false;
+        }),
       clearAnimationData: () =>
         set((state) => {
           // Prevent unnecessary updates if animation states are already empty
           if (
-            state.placedPositions.length === 0 &&
-            state.clearingLines.length === 0 &&
-            state.boardBeforeClear === null
+            state.placedPositions.length > 0 ||
+            state.clearingLines.length > 0 ||
+            state.boardBeforeClear !== null
           ) {
-            return state;
+            state.placedPositions = [];
+            state.clearingLines = [];
+            state.boardBeforeClear = null;
           }
-          return {
-            ...state,
-            placedPositions: [],
-            clearingLines: [],
-            boardBeforeClear: null,
-          };
         }),
-    }),
+    })),
     { name: "game-store" },
   ),
 );
