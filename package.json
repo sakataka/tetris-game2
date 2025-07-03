@@ -13,7 +13,11 @@
     "typecheck": "bun x tsc --noEmit",
     "preview": "bun x vite preview",
     "ci": "bun x biome ci && bun run typecheck && bun test && bun run build",
-    "prepare": "lefthook install"
+    "prepare": "lefthook install",
+    "e2e": "bun x playwright test --config=playwright.config.ts",
+    "e2e:headed": "bun x playwright test --config=playwright.config.ts --headed",
+    "e2e:debug": "bun x playwright test --config=playwright.config.ts --debug",
+    "e2e:ui": "bun x playwright test --config=playwright.config.ts --ui"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.14",

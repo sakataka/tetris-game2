@@ -8,5 +8,6 @@ Follow these steps:
 5. Ensure the code passes linting and type checking.
 6. Create a descriptive commit message.
 7. Push.
+8. Close the issue using 'gh issue close' command. 
 
 Remember to use the GitHub CLI ('gh') for all Github-related tasks.
