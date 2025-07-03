@@ -2,7 +2,7 @@
   "name": "tetris-game2",
   "version": "1.0.0",
   "type": "module",
-  "packageManager": "bun@1.2.17",
+  "packageManager": "bun@1.2.18",
   "license": "ISC",
   "scripts": {
     "dev": "bun --bun vite",

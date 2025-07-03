@@ -1,5 +1,5 @@
-import { afterEach, beforeEach, describe, expect, mock, test } from "bun:test";
-import { act, cleanup, renderHook } from "@testing-library/react";
+import { describe, expect, mock, test } from "bun:test";
+import { act, renderHook } from "@testing-library/react";
 import { milliseconds, useActionCooldown } from "./useActionCooldown";
 
 // ==============================
@@ -24,11 +24,38 @@ function createMockAction() {
  * Helper to render useActionCooldown hook with enhanced error handling
  */
 function renderActionCooldownHook(action: (...args: unknown[]) => void, cooldownMs: number) {
-  const hookResult = renderHook(() => useActionCooldown(action, cooldownMs));
+  let hookResult: ReturnType<typeof renderHook>;
 
-  // Ensure result is properly initialized
+  try {
+    hookResult = renderHook(() => useActionCooldown(action, cooldownMs));
+  } catch (error) {
+    throw new Error(`Failed to render hook: ${error}`);
+  }
+
+  // Give React a moment to initialize the hook
+  act(() => {
+    // Force update if needed
+  });
+
+  // Ensure result is properly initialized with retry logic
+  let attempts = 0;
+  while (!hookResult.result.current && attempts < 5) {
+    act(() => {
+      // Force re-render
+    });
+    attempts++;
+  }
+
   if (!hookResult.result.current) {
-    throw new Error("Hook failed to render properly - result.current is null");
+    console.error("Hook render debug info:", {
+      hasResult: !!hookResult.result,
+      current: hookResult.result.current,
+      error: hookResult.result.error,
+      attempts,
+    });
+    throw new Error(
+      `Hook failed to render properly after ${attempts} attempts - result.current is null`,
+    );
   }
 
   return hookResult;
@@ -46,15 +73,8 @@ function waitForMs(ms: number): Promise<void> {
 // ==============================
 
 describe("useActionCooldown - Real Timer Approach", () => {
-  beforeEach(() => {
-    // Ensure clean test environment
-    cleanup();
-  });
-
-  afterEach(() => {
-    // Clean up after each test to prevent interference
-    cleanup();
-  });
+  // Test setup is handled by global setup.ts file
+  // No additional cleanup needed here
   describe("Basic API Structure", () => {
     test("Hook returns expected API", () => {
       // Given: Mock action and cooldown configuration
