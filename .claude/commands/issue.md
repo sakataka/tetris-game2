@@ -2,7 +2,7 @@ Please analyze and fix the GitHub issue: $ARGUMENTS.
 
 Follow these steps:
 1. Use 'gh issue view' to get the issue details.
-2. Understand the problem described in the issue.
+2. Understand the problem described in the issue. ULTRATHINK!
 3. Search the codebase for relevant files.
 4. Implement the necessary changes to fix the issue.
 5. Ensure the code passes linting and type checking.

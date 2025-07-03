@@ -1,9 +1,9 @@
-import { afterEach, beforeEach, describe, expect, test, vi } from "bun:test";
+import { afterEach, beforeEach, describe, expect, mock, test } from "bun:test";
 import { act, cleanup, renderHook } from "@testing-library/react";
 import { milliseconds, useActionCooldown } from "./useActionCooldown";
 
 // ==============================
-// Test Helper Functions - Junichi Ito Style
+// Test Helper Functions - Practical Approach
 // ==============================
 
 /**
@@ -11,7 +11,7 @@ import { milliseconds, useActionCooldown } from "./useActionCooldown";
  * Tracks execution count and arguments
  */
 function createMockAction() {
-  const mockAction = vi.fn();
+  const mockAction = mock(() => {});
   return {
     action: mockAction,
     getCallCount: () => mockAction.mock.calls.length,
@@ -29,21 +29,17 @@ function renderActionCooldownHook(action: (...args: unknown[]) => void, cooldown
 }
 
 /**
- * Helper to skip tests when hook initialization fails
+ * Helper to wait for a specific duration (for real timer tests)
  */
-function skipIfHookNotInitialized(result: { current: unknown }): boolean {
-  if (!result.current) {
-    console.warn("Skipping test due to hook initialization failure in test isolation environment");
-    return true;
-  }
-  return false;
+function waitForMs(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 // ==============================
-// Test Implementation - Junichi Ito Practical Patterns
+// Test Implementation - Real Timer Approach
 // ==============================
 
-describe("useActionCooldown - Junichi Ito Style", () => {
+describe("useActionCooldown - Real Timer Approach", () => {
   beforeEach(() => {
     // Ensure clean test environment
     cleanup();
@@ -56,7 +52,7 @@ describe("useActionCooldown - Junichi Ito Style", () => {
   describe("Basic API Structure", () => {
     test("Hook returns expected API", () => {
       // Given: Mock action and cooldown configuration
-      const mockAction = vi.fn();
+      const mockAction = mock(() => {});
       const cooldownMs = 100;
 
       // When: Render the hook
@@ -72,7 +68,7 @@ describe("useActionCooldown - Junichi Ito Style", () => {
 
     test("Initial state has no cooldown", () => {
       // Given: Initial state of hook
-      const mockAction = vi.fn();
+      const mockAction = mock(() => {});
       const { result } = renderActionCooldownHook(mockAction, 100);
 
       // When: After initial rendering
@@ -98,13 +94,11 @@ describe("useActionCooldown - Junichi Ito Style", () => {
       expect(mockActionHelper.getCallCount()).toBe(1);
     });
 
-    test.skip("Consecutive execution is limited during cooldown period", async () => {
+    test("Consecutive execution is limited during cooldown period", async () => {
       // Given: Short cooldown configuration
       const mockActionHelper = createMockAction();
       const cooldownMs = 50;
       const { result } = renderActionCooldownHook(mockActionHelper.action, cooldownMs);
-
-      if (skipIfHookNotInitialized(result)) return;
 
       // When: Attempt to execute twice in short time
       await act(async () => {
@@ -130,9 +124,9 @@ describe("useActionCooldown - Junichi Ito Style", () => {
       // Only once after initial execution
       expect(mockActionHelper.getCallCount()).toBe(1);
 
-      // Wait for cooldown period
+      // Wait for cooldown period using real timers
       await act(async () => {
-        await new Promise((resolve) => setTimeout(resolve, cooldownMs + 10));
+        await waitForMs(cooldownMs + 10);
       });
 
       // Re-execute
@@ -163,13 +157,11 @@ describe("useActionCooldown - Junichi Ito Style", () => {
   });
 
   describe("Cooldown state management", () => {
-    test.skip("Enters cooldown state after action execution", async () => {
+    test("Enters cooldown state after action execution", async () => {
       // Given: Cooldown configuration
-      const mockAction = vi.fn();
+      const mockAction = mock(() => {});
       const cooldownMs = 100;
       const { result } = renderActionCooldownHook(mockAction, cooldownMs);
-
-      if (skipIfHookNotInitialized(result)) return;
 
       // When: Execute action
       await act(async () => {
@@ -183,7 +175,7 @@ describe("useActionCooldown - Junichi Ito Style", () => {
 
     test("State is reset after cooldown period ends", async () => {
       // Given: Short cooldown configuration
-      const mockAction = vi.fn();
+      const mockAction = mock(() => {});
       const cooldownMs = 50;
       const { result } = renderActionCooldownHook(mockAction, cooldownMs);
 
@@ -193,7 +185,7 @@ describe("useActionCooldown - Junichi Ito Style", () => {
       });
 
       await act(async () => {
-        await new Promise((resolve) => setTimeout(resolve, cooldownMs + 10));
+        await waitForMs(cooldownMs + 10);
       });
 
       // Then: Cooldown state is cleared
@@ -221,7 +213,7 @@ describe("useActionCooldown - Junichi Ito Style", () => {
 
     test("Branded Milliseconds type is processed correctly", () => {
       // Given: Cooldown time with branded Milliseconds type
-      const mockAction = vi.fn();
+      const mockAction = mock(() => {});
       const cooldownMs = milliseconds(150);
 
       // When: Render hook
@@ -231,13 +223,11 @@ describe("useActionCooldown - Junichi Ito Style", () => {
       expect(typeof result.current.execute).toBe("function");
     });
 
-    test.skip("Cooldown behavior with minimum value", async () => {
+    test("Cooldown behavior with minimum value", async () => {
       // Given: Minimum cooldown time (1ms)
       const mockActionHelper = createMockAction();
       const cooldownMs = 1;
       const { result } = renderActionCooldownHook(mockActionHelper.action, cooldownMs);
-
-      if (skipIfHookNotInitialized(result)) return;
 
       // When: Attempt consecutive execution
       await act(async () => {
@@ -251,10 +241,10 @@ describe("useActionCooldown - Junichi Ito Style", () => {
   });
 
   describe("Error handling tests", () => {
-    test.skip("Re-execution during processing is prevented", async () => {
+    test("Re-execution during processing is prevented", async () => {
       // Given: Long-running action
       let resolveFn: () => void = () => {};
-      const longRunningAction = vi.fn(
+      const longRunningAction = mock(
         () =>
           new Promise<void>((resolve) => {
             resolveFn = resolve;
@@ -293,13 +283,11 @@ describe("useActionCooldown - Junichi Ito Style", () => {
   });
 
   describe("Reset functionality", () => {
-    test.skip("reset() clears cooldown state", async () => {
+    test("reset() clears cooldown state", async () => {
       // Given: State during cooldown
-      const mockAction = vi.fn();
+      const mockAction = mock(() => {});
       const cooldownMs = 100;
       const { result } = renderActionCooldownHook(mockAction, cooldownMs);
-
-      if (skipIfHookNotInitialized(result)) return;
 
       // Execute action to enter cooldown state
       await act(async () => {
@@ -323,8 +311,6 @@ describe("useActionCooldown - Junichi Ito Style", () => {
       const mockActionHelper = createMockAction();
       const cooldownMs = 1000; // Long cooldown
       const { result } = renderActionCooldownHook(mockActionHelper.action, cooldownMs);
-
-      if (skipIfHookNotInitialized(result)) return;
 
       // Initial execution
       await act(async () => {
@@ -356,19 +342,19 @@ describe("useActionCooldown - Junichi Ito Style", () => {
 
     test("Async actions are processed correctly", async () => {
       // Given: Async action
-      const asyncAction = vi.fn(async () => {
-        // Use fake timer instead of waitMs
+      const asyncAction = mock(async () => {
+        // Use real timer for async action
         return new Promise((resolve) => {
           setTimeout(() => resolve("completed"), 10);
         });
       });
       const { result } = renderActionCooldownHook(asyncAction, 50);
 
-      if (skipIfHookNotInitialized(result)) return;
-
       // When: Execute async action
       await act(async () => {
         await result.current.execute();
+        // Wait for async action to complete
+        await waitForMs(15);
       });
 
       // Then: Executed successfully
