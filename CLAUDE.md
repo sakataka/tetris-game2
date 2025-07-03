@@ -24,8 +24,8 @@
 - **Frontend Framework**: React 19.1.0 (functional components with concurrent features)
 - **State Management**: Zustand 5.0.6 (lightweight, functional state management)
 - **Styling Framework**: Tailwind CSS 4.1.11 (utility-first CSS framework)
-- **Animation System**: Motion 12.20.1 (physics-based animations)
-- **Internationalization**: i18next 25.3.0 + react-i18next 15.5.3
+- **Animation System**: Motion 12.23.0 (physics-based animations)
+- **Internationalization**: i18next 25.3.0 + react-i18next 15.6.0
 - **UI Component System**: shadcn/ui (copy-paste component library)
   - Components: button, card, dialog, badge (located in `/src/components/ui/`)
   - Built on: Radix UI primitives + Tailwind CSS
@@ -35,10 +35,10 @@
 
 #### Development & Build Tools
 - **Runtime Environment**: Bun 1.2.17 (package manager, test runner, development server)
-- **Build System**: Vite 7.0.3 (rolldown-vite) with enhanced performance
+- **Build System**: Vite 7.0.4 (rolldown-vite) with enhanced performance
 - **Type System**: TypeScript 5.8.3 with strict mode and ESNext target
 - **Code Quality**: Biome 2.0.6 (linting, formatting, static analysis)
-- **Git Hooks**: Lefthook 1.11.14 (pre-commit validation, commit message linting)
+- **Git Hooks**: Lefthook 1.11.16 (pre-commit validation, commit message linting)
 - **Testing**: Bun Test with happy-dom 18.0.1 (DOM simulation)
 - **E2E Testing**: Playwright 1.53.2 (browser automation)
 - **Bundle Analysis**: rollup-plugin-visualizer 6.0.3

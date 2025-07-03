@@ -25,6 +25,12 @@ function createMockAction() {
  */
 function renderActionCooldownHook(action: (...args: unknown[]) => void, cooldownMs: number) {
   const hookResult = renderHook(() => useActionCooldown(action, cooldownMs));
+
+  // Ensure result is properly initialized
+  if (!hookResult.result.current) {
+    throw new Error("Hook failed to render properly - result.current is null");
+  }
+
   return hookResult;
 }
 
