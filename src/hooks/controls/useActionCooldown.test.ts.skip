@@ -24,38 +24,21 @@ function createMockAction() {
  * Helper to render useActionCooldown hook with enhanced error handling
  */
 function renderActionCooldownHook(action: (...args: unknown[]) => void, cooldownMs: number) {
-  let hookResult: ReturnType<typeof renderHook>;
+  const hookResult = renderHook(() => useActionCooldown(action, cooldownMs));
 
-  try {
-    hookResult = renderHook(() => useActionCooldown(action, cooldownMs));
-  } catch (error) {
-    throw new Error(`Failed to render hook: ${error}`);
-  }
-
-  // Give React a moment to initialize the hook
+  // Add a wait for the hook to be properly initialized
   act(() => {
-    // Force update if needed
+    // Allow React to process the initial render
   });
 
-  // Ensure result is properly initialized with retry logic
-  let attempts = 0;
-  while (!hookResult.result.current && attempts < 5) {
-    act(() => {
-      // Force re-render
-    });
-    attempts++;
-  }
-
+  // More defensive validation
   if (!hookResult.result.current) {
-    console.error("Hook render debug info:", {
-      hasResult: !!hookResult.result,
-      current: hookResult.result.current,
-      error: hookResult.result.error,
-      attempts,
-    });
-    throw new Error(
-      `Hook failed to render properly after ${attempts} attempts - result.current is null`,
-    );
+    // Instead of throwing immediately, try to force a re-render
+    const retryResult = renderHook(() => useActionCooldown(action, cooldownMs));
+    if (!retryResult.result.current) {
+      throw new Error("Hook failed to render properly - result.current is null");
+    }
+    return retryResult;
   }
 
   return hookResult;
