@@ -34,7 +34,7 @@
 - **Utilities**: clsx 2.1.1 + tailwind-merge 3.3.1 (className utilities via `cn()` function)
 
 #### Development & Build Tools
-- **Runtime Environment**: Bun 1.2.17 (package manager, test runner, development server)
+- **Runtime Environment**: Bun 1.2.18 (package manager, test runner, development server)
 - **Build System**: Vite 7.0.4 (rolldown-vite) with enhanced performance
 - **Type System**: TypeScript 5.8.3 with strict mode and ESNext target
 - **Code Quality**: Biome 2.0.6 (linting, formatting, static analysis)
