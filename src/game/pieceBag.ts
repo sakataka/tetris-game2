@@ -53,23 +53,37 @@ export const createPieceBag = (seed?: number): PieceBag => ({
  * @throws Error if bag operations fail unexpectedly
  */
 export const getNextPiece = (bag: PieceBag): [TetrominoTypeName, PieceBag] => {
-  const workingBag =
-    bag.currentBag.length > 0
-      ? bag.currentBag
-      : shuffleWithSeed([...GAME_CONSTANTS.TYPES.TETROMINO_TYPES], bag.seed);
+  // Handle empty bag case - generate new bag with updated seed
+  if (bag.currentBag.length === 0) {
+    const newSeed = bag.seed !== undefined ? bag.seed + bag.bagCount : undefined;
+    const newBag = shuffleWithSeed([...GAME_CONSTANTS.TYPES.TETROMINO_TYPES], newSeed);
 
-  if (workingBag.length === 0) {
-    throw new Error("Failed to get piece from bag - this should never happen");
+    if (newBag.length === 0) {
+      throw new Error("Failed to generate new bag - this should never happen");
+    }
+
+    const [nextPiece, ...remainingPieces] = newBag;
+
+    return [
+      nextPiece,
+      {
+        currentBag: remainingPieces,
+        generatedPieces: [...bag.generatedPieces, nextPiece],
+        bagCount: bag.bagCount + 1,
+        seed: newSeed,
+      },
+    ];
   }
 
-  const [nextPiece, ...remainingPieces] = workingBag;
+  // Handle existing bag case
+  const [nextPiece, ...remainingPieces] = bag.currentBag;
 
   return [
     nextPiece,
     {
       currentBag: remainingPieces,
       generatedPieces: [...bag.generatedPieces, nextPiece],
-      bagCount: bag.currentBag.length === 0 ? bag.bagCount + 1 : bag.bagCount,
+      bagCount: bag.bagCount,
       seed: bag.seed,
     },
   ];
@@ -107,6 +121,21 @@ export const setBagForTesting = (
 // === UTILITY FUNCTIONS ===
 
 /**
+ * Xorshift32 pseudo-random number generator for high-quality reproducible randomness.
+ * Provides better distribution than Linear Congruential Generator (LCG).
+ *
+ * @param seed Initial seed value
+ * @returns New pseudo-random number
+ */
+const xorshift32 = (seed: number): number => {
+  let value = seed;
+  value ^= value << 13;
+  value ^= value >> 17;
+  value ^= value << 5;
+  return value;
+};
+
+/**
  * Fisher-Yates shuffle algorithm with optional seed for reproducible randomness.
  * Pure function that does not modify the input array.
  *
@@ -118,11 +147,12 @@ const shuffleWithSeed = (array: TetrominoTypeName[], seed?: number): TetrominoTy
   const shuffled = [...array];
 
   if (seed !== undefined) {
-    // Reproducible shuffle using Linear Congruential Generator
+    // Reproducible shuffle using Xorshift32 for high-quality randomness
     let currentSeed = seed;
     for (let i = shuffled.length - 1; i > 0; i--) {
-      currentSeed = (currentSeed * 9301 + 49297) % 233280;
-      const randomValue = currentSeed / 233280;
+      currentSeed = xorshift32(currentSeed);
+      // Convert to [0, 1) range using unsigned 32-bit division
+      const randomValue = (currentSeed >>> 0) / 0x100000000;
       const j = Math.floor(randomValue * (i + 1));
       [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }

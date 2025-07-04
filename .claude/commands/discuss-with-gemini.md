@@ -59,22 +59,22 @@ Before using this command, ensure:
    The complete discussion will be saved for future reference:
    ```bash
    # Create discussion log directory if needed
-   mkdir -p .claude/discussion_logs
+   mkdir -p ./docs/discussion_logs
    
    # Save timestamped log with all rounds and detailed discussion content
-   echo "[Complete discussion content from all rounds]" > .claude/discussion_logs/gemini_discussion_$(date +%Y%m%d_%H%M%S).md
+   echo "[Complete discussion content from all rounds]" > ./docs/discussion_logs/gemini_discussion_$(date +%Y%m%d_%H%M%S).md
    
    # Each round's output will be appended to preserve the complete conversation
-   echo "=== ROUND 1: Initial Analysis and Recommendations ===" >> .claude/discussion_logs/gemini_discussion_$(date +%Y%m%d_%H%M%S).md
-   [Round 1 Gemini output] >> .claude/discussion_logs/gemini_discussion_$(date +%Y%m%d_%H%M%S).md
+   echo "=== ROUND 1: Initial Analysis and Recommendations ===" >> ./docs/discussion_logs/gemini_discussion_$(date +%Y%m%d_%H%M%S).md
+   [Round 1 Gemini output] >> ./docs/discussion_logs/gemini_discussion_$(date +%Y%m%d_%H%M%S).md
    
-   echo "=== ROUND 2: Deep Dive into Critical Areas ===" >> .claude/discussion_logs/gemini_discussion_$(date +%Y%m%d_%H%M%S).md
-   [Round 2 Gemini output] >> .claude/discussion_logs/gemini_discussion_$(date +%Y%m%d_%H%M%S).md
+   echo "=== ROUND 2: Deep Dive into Critical Areas ===" >> ./docs/discussion_logs/gemini_discussion_$(date +%Y%m%d_%H%M%S).md
+   [Round 2 Gemini output] >> ./docs/discussion_logs/gemini_discussion_$(date +%Y%m%d_%H%M%S).md
    
    # Continue for all rounds...
    
    # Generate comprehensive summary at the end
-   echo "=== FINAL SUMMARY ===" >> .claude/discussion_logs/gemini_discussion_$(date +%Y%m%d_%H%M%S).md
+   echo "=== FINAL SUMMARY ===" >> ./docs/discussion_logs/gemini_discussion_$(date +%Y%m%d_%H%M%S).md
    
    # Clean up temporary files
    rm -f .claude/temp_gemini_discussion_*.md
