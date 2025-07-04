@@ -1,125 +1,139 @@
 # discuss-with-gemini
 
-Use Gemini CLI to conduct in-depth discussions about current work, enhancing Claude Code's accuracy through multi-perspective analysis and iterative refinement.
+Gemini CLI を使用して現在の作業について詳細な議論を行い、多角的な分析と反復的な改善を通じて Claude Code の精度を向上させます。
 
-## Prerequisites
-Before using this command, ensure:
-- Gemini CLI is installed (`gemini` command available)
-- Authenticated via `gcloud auth application-default login`
+## 前提条件
+このコマンドを使用する前に、以下を確認してください：
+- Gemini CLI がインストールされている（`gemini` コマンドが利用可能）
+- `gcloud auth application-default login` で認証済み
 
-## Execution Steps
+## 実行手順
 
-1. **Gather Current Context**
-   First, I'll collect information about your current work:
+1. **現在のコンテキストの収集**
+   まず、現在の作業に関する情報を収集します：
    ```bash
-   # Check Git status and recent changes
+   # Git状態と最近の変更を確認
    git status --porcelain
    git diff --cached
    git diff
    git log --oneline -10
    ```
 
-2. **Prepare Discussion Topics**
-   Based on the context, I'll prepare discussion points covering:
-   - Architecture and design patterns
-   - Performance and scalability
-   - Maintainability and code quality
-   - Security considerations
-   - Best practices alignment
+2. **議論トピックの準備**
+   コンテキストに基づいて、以下を含む議論ポイントを準備します：
+   - アーキテクチャとデザインパターン
+   - パフォーマンスとスケーラビリティ
+   - 保守性とコード品質
+   - セキュリティ考慮事項
+   - ベストプラクティスの整合性
 
-3. **Initiate Gemini Discussion**
-   I'll create a comprehensive prompt and start the discussion:
+3. **Gemini議論の開始**
+   包括的なプロンプトを作成し、議論を開始します：
    ```bash
-   # Create temporary file with context and questions
-   echo "[Gathered context and discussion topics]" > .claude/temp_gemini_discussion_$(date +%Y%m%d_%H%M%S).md
+   # コンテキストと質問を含む一時ファイルを作成
+   echo "[収集されたコンテキストと議論トピック]" > .claude/temp_gemini_discussion_$(date +%Y%m%d_%H%M%S).md
    
-   # Start batch discussion with Gemini using --prompt flag
-   cat .claude/temp_gemini_discussion_*.md | gemini --prompt "Analyze the provided context and discuss the topics. Provide your insights and recommendations. 最終的な出力は日本語でお願いします。"
+   # Geminiとの議論を開始（日本語で実行）
+   cat .claude/temp_gemini_discussion_*.md | gemini --prompt "提供されたコンテキストを分析し、トピックについて議論してください。洞察と推奨事項を日本語で提供してください。"
    ```
 
-4. **Iterative Refinement**
-   I'll conduct 3-5 rounds of automated discussion in Japanese:
-   - Round 1: Initial analysis and recommendations
-   - Round 2: Deep dive into critical areas
-   - Round 3: Implementation specifics and code examples
-   - Round 4: Risk assessment and mitigation strategies
-   - Round 5: Final synthesis and prioritization
+4. **反復的な改善**
+   5 ラウンドの自動議論を日本語で実行します：
+   - ラウンド1: 初期分析と推奨事項
+   - ラウンド2: 重要な領域への深掘り
+   - ラウンド3: 実装の詳細とコード例
+   - ラウンド4: リスク評価と緩和戦略
+   - ラウンド5: 最終統合と優先順位付け
    
-   Each round will automatically build upon the previous responses and all content will be preserved in the log.
+   各ラウンドは前の応答を基に自動的に構築され、すべての内容がログに保存されます。
 
-5. **Generate Action Plan**
-   After all discussion rounds, I'll synthesize an actionable plan in Japanese:
-   - Immediate implementation items (High priority)
-   - Short-term improvements (Medium priority)
-   - Long-term considerations (Low priority)
-   - Implementation guidelines and anti-patterns to avoid
-   - Detailed summary of all discussion points and recommendations
+5. **アクションプランの生成**
+   すべての議論ラウンド後、実行可能なプランを日本語で統合します：
+   - 即座の実装項目（高優先度）
+   - 短期的な改善（中優先度）
+   - 長期的な検討事項（低優先度）
+   - 実装ガイドラインと避けるべきアンチパターン
+   - すべての議論ポイントと推奨事項の詳細な要約
 
-6. **Save Discussion Log**
-   The complete discussion will be saved for future reference:
+6. **議論ログの保存**
+   完全な議論を将来の参照のために保存します：
    ```bash
-   # Create discussion log directory if needed
-   mkdir -p ./docs/discussion_logs
+  
+   # タイムスタンプ付きのログファイルを作成
+   TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+   LOG_FILE="./docs/discussion_logs/gemini_discussion_${TIMESTAMP}.md"
    
-   # Save timestamped log with all rounds and detailed discussion content
-   echo "[Complete discussion content from all rounds]" > ./docs/discussion_logs/gemini_discussion_$(date +%Y%m%d_%H%M%S).md
+   # 各ラウンドの出力を順次保存
+   echo "# Gemini議論ログ - ${TIMESTAMP}" > "${LOG_FILE}"
+   echo "" >> "${LOG_FILE}"
+   echo "## 議論概要" >> "${LOG_FILE}"
+   echo "- トピック: [議論されたトピック]" >> "${LOG_FILE}"
+   echo "- 実行日時: $(date)" >> "${LOG_FILE}"
+   echo "- 議論ラウンド数: [実行されたラウンド数]" >> "${LOG_FILE}"
+   echo "" >> "${LOG_FILE}"
    
-   # Each round's output will be appended to preserve the complete conversation
-   echo "=== ROUND 1: Initial Analysis and Recommendations ===" >> ./docs/discussion_logs/gemini_discussion_$(date +%Y%m%d_%H%M%S).md
-   [Round 1 Gemini output] >> ./docs/discussion_logs/gemini_discussion_$(date +%Y%m%d_%H%M%S).md
+   # 各ラウンドの詳細な議論内容を保存
+   echo "=== ラウンド1: 初期分析と推奨事項 ===" >> "${LOG_FILE}"
+   echo "[ラウンド1のGemini出力]" >> "${LOG_FILE}"
+   echo "" >> "${LOG_FILE}"
    
-   echo "=== ROUND 2: Deep Dive into Critical Areas ===" >> ./docs/discussion_logs/gemini_discussion_$(date +%Y%m%d_%H%M%S).md
-   [Round 2 Gemini output] >> ./docs/discussion_logs/gemini_discussion_$(date +%Y%m%d_%H%M%S).md
+   echo "=== ラウンド2: 重要領域への深掘り ===" >> "${LOG_FILE}"
+   echo "[ラウンド2のGemini出力]" >> "${LOG_FILE}"
+   echo "" >> "${LOG_FILE}"
    
-   # Continue for all rounds...
+   # 継続して他のラウンドも記録...
    
-   # Generate comprehensive summary at the end
-   echo "=== FINAL SUMMARY ===" >> ./docs/discussion_logs/gemini_discussion_$(date +%Y%m%d_%H%M%S).md
+   # 最終的な包括的要約を生成
+   echo "=== 最終要約 ===" >> "${LOG_FILE}"
+   echo "[すべての議論内容を統合した最終要約]" >> "${LOG_FILE}"
+   echo "" >> "${LOG_FILE}"
+   echo "## 実装推奨事項" >> "${LOG_FILE}"
+   echo "### 高優先度" >> "${LOG_FILE}"
+   echo "- [即座に実装すべき項目]" >> "${LOG_FILE}"
+   echo "### 中優先度" >> "${LOG_FILE}"
+   echo "- [短期的な改善項目]" >> "${LOG_FILE}"
+   echo "### 低優先度" >> "${LOG_FILE}"
+   echo "- [長期的な検討項目]" >> "${LOG_FILE}"
    
-   # Clean up temporary files
+   # 一時ファイルを削除
    rm -f .claude/temp_gemini_discussion_*.md
    ```
 
-## Usage Examples
+## 使用例
 
-### Basic Discussion
+### 基本的な議論
 ```
 /discuss-with-gemini
 ```
-Analyzes current Git changes and work context
+現在のGit変更と作業コンテキストを分析します
 
-### Specific Topic Discussion
+### 特定トピックの議論
 ```
-/discuss-with-gemini GraphQL schema optimization
+/discuss-with-gemini GraphQL スキーマ最適化
 ```
-Focuses discussion on a particular area
+特定の領域に議論を焦点化します
 
-### File-Specific Analysis
+### ファイル固有の分析
 ```
-/discuss-with-gemini Review the implementation in backend/apps/cotomu/domain/usecases/file_operations.go
+/discuss-with-gemini @src/game/board.ts の実装をレビューして
 ```
-Analyzes a specific file with Gemini's insights
+Geminiの洞察により特定のファイルを分析します
 
-### Deep Analysis Mode
-```
-/discuss-with-gemini --deep Performance optimization for large file uploads
-```
-Conducts 5 rounds of discussion instead of the default 3
-
-## Additional Instructions
+## 追加指示
 $ARGUMENTS
 
-## Expected Outcomes
-- Deeper understanding of code quality issues
-- Concrete improvement suggestions with examples
-- Prioritized action items for implementation
-- Documentation of architectural decisions
-- Early detection of potential problems
+## 期待される成果
+- コード品質問題のより深い理解
+- 具体的な改善提案と実例
+- 実装のための優先順位付けされたアクション項目
+- アーキテクチャ決定の文書化
+- 潜在的な問題の早期発見
 
-## Notes
-- The discussion will be conducted entirely in Japanese for better understanding and communication
-- Each discussion round builds upon previous insights in an automated batch process
-- All intermediate discussion content is preserved in the log file for complete traceability
-- The final action plan will include specific code examples where applicable
-- All discussions are logged for future reference and decision tracking
-- Both detailed round-by-round discussions and comprehensive summaries are saved
+## 注意事項
+- 議論は理解とコミュニケーションの向上のために完全に日本語で実行されます
+- 各議論ラウンドは自動化されたバッチプロセスで前の洞察を基に構築されます
+- すべての中間議論内容は完全な追跡のためにログファイルに保存されます
+- 最終的なアクションプランには適用可能な具体的なコード例が含まれます
+- すべての議論は将来の参照と決定追跡のためにログに記録されます
+- 詳細なラウンドごとの議論と包括的な要約の両方が保存されます
+- 議論ログは `./docs/discussion_logs/` ディレクトリに日本語で保存されます
