@@ -38,21 +38,22 @@ Before using this command, ensure:
    ```
 
 4. **Iterative Refinement**
-   I'll conduct 3-5 rounds of automated discussion:
+   I'll conduct 3-5 rounds of automated discussion in Japanese:
    - Round 1: Initial analysis and recommendations
    - Round 2: Deep dive into critical areas
    - Round 3: Implementation specifics and code examples
    - Round 4: Risk assessment and mitigation strategies
    - Round 5: Final synthesis and prioritization
    
-   Each round will automatically build upon the previous responses.
+   Each round will automatically build upon the previous responses and all content will be preserved in the log.
 
 5. **Generate Action Plan**
-   After all discussion rounds, I'll synthesize an actionable plan:
+   After all discussion rounds, I'll synthesize an actionable plan in Japanese:
    - Immediate implementation items (High priority)
    - Short-term improvements (Medium priority)
    - Long-term considerations (Low priority)
    - Implementation guidelines and anti-patterns to avoid
+   - Detailed summary of all discussion points and recommendations
 
 6. **Save Discussion Log**
    The complete discussion will be saved for future reference:
@@ -60,8 +61,20 @@ Before using this command, ensure:
    # Create discussion log directory if needed
    mkdir -p .claude/discussion_logs
    
-   # Save timestamped log with all rounds
+   # Save timestamped log with all rounds and detailed discussion content
    echo "[Complete discussion content from all rounds]" > .claude/discussion_logs/gemini_discussion_$(date +%Y%m%d_%H%M%S).md
+   
+   # Each round's output will be appended to preserve the complete conversation
+   echo "=== ROUND 1: Initial Analysis and Recommendations ===" >> .claude/discussion_logs/gemini_discussion_$(date +%Y%m%d_%H%M%S).md
+   [Round 1 Gemini output] >> .claude/discussion_logs/gemini_discussion_$(date +%Y%m%d_%H%M%S).md
+   
+   echo "=== ROUND 2: Deep Dive into Critical Areas ===" >> .claude/discussion_logs/gemini_discussion_$(date +%Y%m%d_%H%M%S).md
+   [Round 2 Gemini output] >> .claude/discussion_logs/gemini_discussion_$(date +%Y%m%d_%H%M%S).md
+   
+   # Continue for all rounds...
+   
+   # Generate comprehensive summary at the end
+   echo "=== FINAL SUMMARY ===" >> .claude/discussion_logs/gemini_discussion_$(date +%Y%m%d_%H%M%S).md
    
    # Clean up temporary files
    rm -f .claude/temp_gemini_discussion_*.md
@@ -104,7 +117,9 @@ $ARGUMENTS
 - Early detection of potential problems
 
 ## Notes
-- The discussion will be conducted entirely in English for optimal AI interaction, with final output in Japanese
+- The discussion will be conducted entirely in Japanese for better understanding and communication
 - Each discussion round builds upon previous insights in an automated batch process
+- All intermediate discussion content is preserved in the log file for complete traceability
 - The final action plan will include specific code examples where applicable
 - All discussions are logged for future reference and decision tracking
+- Both detailed round-by-round discussions and comprehensive summaries are saved
