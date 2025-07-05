@@ -44,6 +44,33 @@ export interface Tetromino {
 export type GameBoard = CellValue[][];
 
 /**
+ * Game animation state machine states
+ */
+export type GameAnimationState =
+  | "idle" // 通常のゲームプレイ
+  | "line-clearing" // ライン消去アニメーション中
+  | "line-falling" // 重力アニメーション中
+  | "piece-placing"; // ピース配置アニメーション中
+
+/**
+ * Data for line clear animation
+ */
+export interface LineClearAnimationData {
+  readonly clearedLineIndices: readonly number[];
+  readonly animationStartTime: number;
+  readonly expectedDuration: number;
+  readonly lineCount: 1 | 2 | 3 | 4; // シングル/ダブル/トリプル/テトリス
+}
+
+/**
+ * Animation controller interface (placeholder for future implementation)
+ */
+export interface AnimationController {
+  // To be implemented based on specific animation library needs
+  [key: string]: unknown;
+}
+
+/**
  * Complete game state containing all information needed to render and update the game.
  */
 export interface GameState {

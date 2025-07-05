@@ -11,7 +11,13 @@ import {
 } from "@/game/game";
 import { createDebugBag } from "@/game/pieceBag";
 import { createTetromino } from "@/game/tetrominos";
-import type { GameState, TetrominoTypeName } from "@/types/game";
+import type {
+  AnimationController,
+  GameAnimationState,
+  GameState,
+  LineClearAnimationData,
+  TetrominoTypeName,
+} from "@/types/game";
 import { type DebugParams, parseDebugParams } from "@/utils/debugParams";
 import { getDebugPreset } from "@/utils/debugPresets";
 
@@ -19,6 +25,13 @@ interface GameStore extends GameState {
   showResetConfirmation: boolean;
   debugMode: boolean;
   debugParams: DebugParams | null;
+
+  // Animation state fields
+  animationState: GameAnimationState;
+  lineClearData: LineClearAnimationData | null;
+  animationController: AnimationController | null;
+
+  // Movement and game actions
   moveLeft: () => void;
   moveRight: () => void;
   moveDown: () => void;
@@ -33,12 +46,26 @@ interface GameStore extends GameState {
   clearAnimationData: () => void;
   applyDebugPreset: (presetName: string) => void;
   setDebugQueue: (pieces: TetrominoTypeName[]) => void;
+
+  // Animation control actions
+  startLineClearAnimation: (data: LineClearAnimationData) => void;
+  completeLineClearAnimation: () => void;
+  startLineFallAnimation: () => void;
+  completeLineFallAnimation: () => void;
+  resetToPlayingState: () => void; // Error recovery
+
+  // Derived state selectors
+  isGameLoopPaused: () => boolean;
+  isAnimationActive: () => boolean;
 }
 
 // Create initial state with debug parameters if present
 function createInitialStateWithDebug(): GameState & {
   debugMode: boolean;
   debugParams: DebugParams | null;
+  animationState: GameAnimationState;
+  lineClearData: LineClearAnimationData | null;
+  animationController: AnimationController | null;
 } {
   const debugParams = parseDebugParams();
   const initialState = createInitialGameState();
@@ -47,6 +74,9 @@ function createInitialStateWithDebug(): GameState & {
     ...initialState,
     debugMode: debugParams.enabled,
     debugParams: debugParams.enabled ? debugParams : null,
+    animationState: "idle" as GameAnimationState,
+    lineClearData: null,
+    animationController: null,
   };
 
   if (debugParams.enabled) {
@@ -95,11 +125,14 @@ const INITIAL_STATE = createInitialStateWithDebug();
 const resetGameState = (state: GameStore) => {
   Object.assign(state, createInitialStateWithDebug());
   state.showResetConfirmation = false;
+  state.animationState = "idle";
+  state.lineClearData = null;
+  state.animationController = null;
 };
 
 export const useGameStore = create<GameStore>()(
   devtools(
-    immer((set) => ({
+    immer((set, get) => ({
       ...INITIAL_STATE,
       showResetConfirmation: false,
 
@@ -177,6 +210,54 @@ export const useGameStore = create<GameStore>()(
           // Recalculate ghost position
           state.ghostPosition = calculateGhostPosition(state);
         }),
+
+      // Animation control actions
+      startLineClearAnimation: (data: LineClearAnimationData) =>
+        set((state) => {
+          state.animationState = "line-clearing";
+          // Create a new object to work with immer's draft type
+          state.lineClearData = {
+            clearedLineIndices: [...data.clearedLineIndices],
+            animationStartTime: data.animationStartTime,
+            expectedDuration: data.expectedDuration,
+            lineCount: data.lineCount,
+          };
+        }),
+
+      completeLineClearAnimation: () =>
+        set((state) => {
+          state.animationState = "line-falling";
+          state.lineClearData = null;
+        }),
+
+      startLineFallAnimation: () =>
+        set((state) => {
+          state.animationState = "line-falling";
+        }),
+
+      completeLineFallAnimation: () =>
+        set((state) => {
+          state.animationState = "idle";
+        }),
+
+      resetToPlayingState: () =>
+        set((state) => {
+          // Error recovery - reset to idle state
+          state.animationState = "idle";
+          state.lineClearData = null;
+          state.animationController = null;
+        }),
+
+      // Derived state selectors
+      isGameLoopPaused: () => {
+        const state = get();
+        return state.animationState !== "idle" || state.isPaused || state.isGameOver;
+      },
+
+      isAnimationActive: () => {
+        const state = get();
+        return state.animationState !== "idle";
+      },
     })),
     { name: "game-store" },
   ),
