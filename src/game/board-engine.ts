@@ -80,14 +80,97 @@ class LegacyBoardEngine implements BoardEngine {
 }
 
 /**
- * TypedArray board engine implementation (future optimization)
+ * TypedArray board engine implementation - 1D array optimization
  * Uses typed arrays for better memory efficiency and performance
+ * Optimized for cache efficiency and CPU branch prediction
  */
 class TypedArrayBoardEngine implements BoardEngine {
+  private readonly width: number;
+  private readonly height: number;
+
+  constructor() {
+    this.width = 10; // GAME_CONSTANTS.BOARD.WIDTH
+    this.height = 20; // GAME_CONSTANTS.BOARD.HEIGHT
+  }
+
+  /**
+   * Convert 2D board to 1D typed array for optimized access
+   * @param board - 2D board array
+   * @returns 1D typed array representation
+   */
+  private boardTo1D(board: GameBoard): Uint8Array {
+    const buffer = new Uint8Array(this.width * this.height);
+    for (let y = 0; y < this.height; y++) {
+      for (let x = 0; x < this.width; x++) {
+        buffer[y * this.width + x] = board[y][x];
+      }
+    }
+    return buffer;
+  }
+
+  /**
+   * Convert 1D typed array back to 2D board
+   * @param buffer - 1D typed array
+   * @returns 2D board array
+   */
+  private bufferTo2D(buffer: Uint8Array): GameBoard {
+    const board: GameBoard = [];
+    for (let y = 0; y < this.height; y++) {
+      const row: CellValue[] = [];
+      for (let x = 0; x < this.width; x++) {
+        row.push(buffer[y * this.width + x] as CellValue);
+      }
+      board.push(row);
+    }
+    return board;
+  }
+
+  /**
+   * Optimized position validation with statistical frequency-based condition ordering
+   * Order based on statistical frequency:
+   * 1. Bottom boundary check (most frequent - pieces dropping)
+   * 2. Cell occupation check (2nd most frequent - collision detection)
+   * 3. Left/Right boundary check (medium frequency - rotation/movement)
+   * 4. Top boundary check (least frequent - spawn position only)
+   */
   isValidPosition(board: GameBoard, shape: TetrominoShape, position: Position): boolean {
-    // TODO: Implement optimized version using typed arrays
-    // For now, fallback to legacy implementation
-    return new LegacyBoardEngine().isValidPosition(board, shape, position);
+    const boardBuffer = this.boardTo1D(board);
+
+    // Optimized loop order: row-first for better cache locality
+    for (let y = 0; y < shape.length; y++) {
+      const boardY = position.y + y;
+
+      // Early exit for bottom boundary (most frequent check)
+      if (boardY >= this.height) {
+        return false;
+      }
+
+      // Skip rows that are above the board (negative y)
+      if (boardY < 0) {
+        continue;
+      }
+
+      const row = shape[y];
+      for (let x = 0; x < row.length; x++) {
+        if (!row[x]) continue; // Skip empty cells
+
+        const boardX = position.x + x;
+
+        // Left/Right boundary checks (medium frequency)
+        if (boardX < 0 || boardX >= this.width) {
+          return false;
+        }
+
+        // Cell occupation check (2nd most frequent)
+        // Use 1D array access for better cache performance
+        const cellIndex = boardY * this.width + boardX;
+        if (boardBuffer[cellIndex] !== 0) {
+          return false;
+        }
+      }
+    }
+
+    return true;
   }
 
   placePiece(
@@ -96,9 +179,36 @@ class TypedArrayBoardEngine implements BoardEngine {
     position: Position,
     colorIndex: CellValue,
   ): GameBoard {
-    // TODO: Implement optimized version using typed arrays
-    // For now, fallback to legacy implementation
-    return new LegacyBoardEngine().placePiece(board, shape, position, colorIndex);
+    const boardBuffer = this.boardTo1D(board);
+    const newBuffer = new Uint8Array(boardBuffer);
+
+    // Optimized piece placement with 1D array access
+    for (let y = 0; y < shape.length; y++) {
+      const boardY = position.y + y;
+
+      // Bounds check
+      if (boardY < 0 || boardY >= this.height) {
+        continue;
+      }
+
+      const row = shape[y];
+      for (let x = 0; x < row.length; x++) {
+        if (!row[x]) continue; // Skip empty cells
+
+        const boardX = position.x + x;
+
+        // Bounds check
+        if (boardX < 0 || boardX >= this.width) {
+          continue;
+        }
+
+        // Place piece using 1D array access
+        const cellIndex = boardY * this.width + boardX;
+        newBuffer[cellIndex] = colorIndex;
+      }
+    }
+
+    return this.bufferTo2D(newBuffer);
   }
 
   clearLines(board: GameBoard): {
@@ -106,9 +216,56 @@ class TypedArrayBoardEngine implements BoardEngine {
     linesCleared: number;
     clearedLineIndices: number[];
   } {
-    // TODO: Implement optimized version using typed arrays
-    // For now, fallback to legacy implementation
-    return new LegacyBoardEngine().clearLines(board);
+    const boardBuffer = this.boardTo1D(board);
+    const clearedLineIndices: number[] = [];
+
+    // Identify complete lines using 1D array access
+    for (let y = 0; y < this.height; y++) {
+      let isComplete = true;
+      const rowStart = y * this.width;
+
+      for (let x = 0; x < this.width; x++) {
+        if (boardBuffer[rowStart + x] === 0) {
+          isComplete = false;
+          break;
+        }
+      }
+
+      if (isComplete) {
+        clearedLineIndices.push(y);
+      }
+    }
+
+    if (clearedLineIndices.length === 0) {
+      return { board, linesCleared: 0, clearedLineIndices: [] };
+    }
+
+    // Build new buffer with cleared lines removed
+    const newBuffer = new Uint8Array(this.width * this.height);
+    const clearedSet = new Set(clearedLineIndices);
+    let newY = this.height - 1;
+
+    // Copy non-cleared lines from bottom to top
+    for (let y = this.height - 1; y >= 0; y--) {
+      if (!clearedSet.has(y)) {
+        const sourceRowStart = y * this.width;
+        const targetRowStart = newY * this.width;
+
+        for (let x = 0; x < this.width; x++) {
+          newBuffer[targetRowStart + x] = boardBuffer[sourceRowStart + x];
+        }
+
+        newY--;
+      }
+    }
+
+    // Fill top rows with empty cells (already zero-initialized)
+
+    return {
+      board: this.bufferTo2D(newBuffer),
+      linesCleared: clearedLineIndices.length,
+      clearedLineIndices,
+    };
   }
 }
 
