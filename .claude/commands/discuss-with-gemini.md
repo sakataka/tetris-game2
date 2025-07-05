@@ -2,37 +2,9 @@
 
 Gemini CLI を使用して現在の作業について詳細な議論を行い、多角的な分析と反復的な改善を通じて Claude Code の精度を向上させます。Claudeが主導で分析・提案を行い、Geminiの客観的評価を参考にして最終的な実装プランを策定します。
 
-## オプション
-
-### 議論の方向性制御
-```bash
-/discuss-with-gemini --focus technical    # 技術的分析重視
-/discuss-with-gemini --focus strategic   # 戦略・アーキテクチャ重視  
-/discuss-with-gemini --focus tactical    # 実装・実行計画重視
-/discuss-with-gemini --focus holistic    # 包括的（デフォルト）
-```
-
-### 専門領域特化
-```bash
-/discuss-with-gemini --domain performance   # パフォーマンス分析特化
-/discuss-with-gemini --domain architecture  # アーキテクチャ設計特化
-/discuss-with-gemini --domain security      # セキュリティ分析特化
-/discuss-with-gemini --domain testing       # テスト戦略特化
-```
-
 ## 実行手順
 
-1. **現在のコンテキストの収集**
-   まず、現在の作業に関する情報を収集します：
-   ```bash
-   # Git状態と最近の変更を確認
-   git status --porcelain
-   git diff --cached
-   git diff
-   git log --oneline -10
-   ```
-
-2. **実装制約と議論トピックの準備**
+1. **実装制約と議論トピックの準備**
    コンテキストに基づいて、実装制約を明確化し議論ポイントを準備します。
    
    **関連する過去議論の検索**（ナレッジベース機能）：
@@ -80,7 +52,7 @@ Gemini CLI を使用して現在の作業について詳細な議論を行い、
    - セキュリティ考慮事項
    - ベストプラクティスの整合性
 
-3. **3ラウンドの累積的議論プロセス**
+2. **3ラウンドの累積的議論プロセス**
    
    Claude主導で各ラウンドを実行し、Geminiの客観的評価を参考にして段階的に議論を深化させます：
 
@@ -341,7 +313,7 @@ Gemini CLI を使用して現在の作業について詳細な議論を行い、
    echo "- 計画の精度向上: [議論を通じた実装計画の改善度]" >> "${ROUND3_LOG}"
    ```
 
-4. **最終結論の生成（GitHub Issue準備版）**
+3. **最終結論の生成（GitHub Issue準備版）**
    3ラウンドの議論完了後、GitHub Issue登録に最適化されたタスクベースの結論を生成：
    ```bash
    # GitHub Issue準備版結論ファイルの作成
@@ -452,9 +424,6 @@ Gemini CLI を使用して現在の作業について詳細な議論を行い、
 ```
 Geminiの洞察により特定のファイルを分析します
 
-## 追加指示
-$ARGUMENTS
-
 ## 期待される成果
 - **議論ログ（各ラウンドごと）**：
   - ClaudeとGeminiの完全な対話履歴
@@ -472,7 +441,6 @@ $ARGUMENTS
 - 議論は理解とコミュニケーションの向上のために完全に日本語で実行されます
 - Geminiは前回の記憶を保持しないため、各ラウンドで前回までの議論内容を明示的にインプットとして提供します
 - 各ラウンドのログファイルは個別に保存され、完全な対話プロセスが追跡可能です
-- 最終結論ファイルには結論のみを記載し、議論の過程は各ラウンドのログで確認できます
 - ファイル保存場所：
   - 議論ログ: `./docs/discussion_logs/gemini_discussion_round[1-3]_${TIMESTAMP}.md`
   - 最終結論: `./docs/discussion_logs/gemini_conclusion_${TIMESTAMP}.md`

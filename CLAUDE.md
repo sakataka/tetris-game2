@@ -25,12 +25,13 @@
 - **State Management**: Zustand 5.0.6 (lightweight, functional state management)
 - **Styling Framework**: Tailwind CSS 4.1.11 (utility-first CSS framework)
 - **Animation System**: Motion 12.23.0 (physics-based animations)
-- **Internationalization**: i18next 25.3.0 + react-i18next 15.6.0
+- **Internationalization**: i18next 25.3.1 + react-i18next 15.6.0
 - **UI Component System**: shadcn/ui (copy-paste component library)
   - Components: button, card, dialog, badge (located in `/src/components/ui/`)
   - Built on: Radix UI primitives + Tailwind CSS
   - Utilities: class-variance-authority 0.7.1 (variant management)
 - **Icons**: Lucide React 0.525.0 (icon library)
+- **State Management**: immer 10.1.1 (immutable state updates, used with Zustand)
 - **Utilities**: clsx 2.1.1 + tailwind-merge 3.3.1 (className utilities via `cn()` function)
 
 #### Development & Build Tools
@@ -40,7 +41,11 @@
 - **Code Quality**: Biome 2.0.6 (linting, formatting, static analysis)
 - **Git Hooks**: Lefthook 1.11.16 (pre-commit validation, commit message linting)
 - **Testing**: Bun Test with happy-dom 18.0.1 (DOM simulation)
+- **Testing Libraries**: @testing-library/jest-dom 6.6.3, @testing-library/react 16.3.0
+- **Property Testing**: fast-check 4.1.1 (property-based testing)
 - **E2E Testing**: Playwright 1.53.2 (browser automation)
+- **React Plugin**: @vitejs/plugin-react-oxc 0.2.3 (Vite React plugin)
+- **Unused Dependencies Detection**: knip 5.61.3
 - **Bundle Analysis**: rollup-plugin-visualizer 6.0.3
 - **CSS Processing**: @tailwindcss/vite 4.1.11 plugin
 
@@ -49,8 +54,10 @@
 ```
 src/
 ├── components/     # React UI components (DO NOT TEST)
-│   ├── game/      # Game-specific components: Board, BoardCell, Controls, GameOverlay, 
-│   │              # HighScore, HoldPiece, NextPiece, ScoreBoard, TetrominoGrid, TouchControls
+│   ├── game/      # Game-specific components: AnimatedScoreItem, Board, BoardCell, Controls,
+│   │              # CurrentHighScore, GameOverlay, HighScore, HighScoreItem, HighScoreList,
+│   │              # HoldPiece, NextPiece, NoHighScore, ResetConfirmationDialog, ScoreBoard,
+│   │              # TetrominoGrid, TouchControls
 │   ├── layout/    # Layout components: Game, GameSettings, MobileGameLayout, MobileHeader
 │   └── ui/        # Reusable UI components: AnimatedButton, badge, button, card, dialog
 ├── game/          # Pure game logic (TEST ALL FUNCTIONS)
@@ -76,6 +83,7 @@ src/
 ├── i18n/          # i18n configuration: config.ts
 ├── lib/           # Shared utility functions: utils.ts
 ├── test/          # Test configuration and utilities: setup.ts, __mocks__/
+├── tests/         # E2E tests and visual testing
 ```
 
 ### State Management Architecture
@@ -127,10 +135,17 @@ src/
 ```bash
 # Development Workflow
 bun run dev          # Start development server (http://localhost:5173)
-bun test             # Run all tests (MUST pass before commits)
+bun test             # Run pure function tests (game, utils, lib directories)
+bun run test:dom     # Run DOM-related tests (hooks, store directories)
+bun run test:all     # Run all tests (MUST pass before commits)
 bun run lint         # Code linting (MUST pass before commits)
+bun run format       # Code formatting with Biome
 bun run typecheck    # Type checking (MUST pass before commits)
 bun run build        # Production build (MUST succeed before commits)
+
+# E2E Testing
+bun run e2e          # Run Playwright E2E tests (headless)
+bun run e2e:headed   # Run Playwright E2E tests (with browser UI)
 
 # Quality Assurance Pipeline
 bun run ci           # Complete CI pipeline (lint + typecheck + test + build)
@@ -153,7 +168,9 @@ bun run ci           # Complete CI pipeline (lint + typecheck + test + build)
    - ❌ Framework-specific behavior (React, Zustand)
 
 2. **TEST EXECUTION**:
-   - Command: `bun test src/ --ignore '**/visual/**'`
+   - Pure function tests: `bun test src/game/ src/utils/ src/lib/ --ignore '**/visual/**'`
+   - DOM-related tests: `bun test src/hooks/ src/store/ --ignore '**/visual/**'`
+   - All tests: `bun test src/ --ignore '**/visual/**'`
    - Environment: Bun Test with happy-dom
    - Pattern: Co-located test files (e.g., `board.test.ts` alongside `board.ts`)
 
@@ -224,6 +241,7 @@ EXCEPTION: Test mocks may use relative paths when required by testing framework
 - **Code Quality**: Biome with strict rules (auto-format via Lefthook)
 - **Type Checking**: TypeScript strict mode with ESNext target
 - **Git Workflow**: Conventional commits enforced via Lefthook hooks
+- **Trusted Dependencies**: @tailwindcss/oxide (explicit trust for native dependencies)
 
 ## MCP TOOLS USAGE PROTOCOLS
 

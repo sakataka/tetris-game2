@@ -52,5 +52,8 @@
     "tailwindcss": "4.1.11",
     "typescript": "5.8.3",
     "vite": "npm:rolldown-vite@^7.0.4"
-  }
+  },
+  "trustedDependencies": [
+    "@tailwindcss/oxide"
+  ]
 }
