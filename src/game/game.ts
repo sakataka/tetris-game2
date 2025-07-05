@@ -1,4 +1,11 @@
-import type { GameBoard, GameState, Position, Tetromino, TetrominoTypeName } from "@/types/game";
+import type {
+  GameBoard,
+  GameState,
+  Position,
+  Tetromino,
+  TetrominoShape,
+  TetrominoTypeName,
+} from "@/types/game";
 import { GAME_CONSTANTS } from "@/utils/gameConstants";
 import { canPerformHoldAction, isGameOverState, isGamePlayable } from "@/utils/gameValidation";
 import { normalizeRotationState } from "@/utils/typeGuards";
@@ -99,7 +106,11 @@ export function rotateTetrominoCW(state: GameState): GameState {
  * Find the lowest valid position where a tetromino can be placed when dropped
  * Used by both hard drop and ghost piece calculations
  */
-function _findDropPosition(board: GameBoard, shape: number[][], startPosition: Position): Position {
+function _findDropPosition(
+  board: GameBoard,
+  shape: TetrominoShape,
+  startPosition: Position,
+): Position {
   let dropPosition = startPosition;
   let iterations = 0;
 

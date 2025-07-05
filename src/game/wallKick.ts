@@ -1,4 +1,10 @@
-import type { CellValue, Position, RotationState, TetrominoTypeName } from "@/types/game";
+import type {
+  CellValue,
+  Position,
+  RotationState,
+  TetrominoShape,
+  TetrominoTypeName,
+} from "@/types/game";
 
 type RotationTransition = "0->1" | "1->2" | "2->3" | "3->0" | "1->0" | "2->1" | "3->2" | "0->3";
 type WallKickData = { [K in RotationTransition]: Position[] };
@@ -85,12 +91,12 @@ export function applyWallKickOffset(position: Position, offset: Position): Posit
  */
 export function tryRotateWithWallKick(
   board: CellValue[][],
-  rotatedShape: CellValue[][],
+  rotatedShape: TetrominoShape,
   position: Position,
   pieceType: TetrominoTypeName,
   fromRotation: RotationState,
   toRotation: RotationState,
-  isValidPositionFn: (board: CellValue[][], shape: CellValue[][], position: Position) => boolean,
+  isValidPositionFn: (board: CellValue[][], shape: TetrominoShape, position: Position) => boolean,
 ): Position | null {
   const wallKickOffsets = getWallKickOffsets(pieceType, fromRotation, toRotation);
 

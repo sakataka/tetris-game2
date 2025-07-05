@@ -1,4 +1,4 @@
-import type { CellValue, GameBoard, Position } from "../types/game";
+import type { CellValue, GameBoard, Position, TetrominoShape } from "../types/game";
 import { isValidBoardPosition } from "../utils/boardUtils";
 import { GAME_CONSTANTS } from "../utils/gameConstants";
 
@@ -19,7 +19,11 @@ export function createEmptyBoard(): GameBoard {
   return Array.from({ length: height }, () => Array.from({ length: width }, () => 0 as CellValue));
 }
 
-export function isValidPosition(board: GameBoard, shape: number[][], position: Position): boolean {
+export function isValidPosition(
+  board: GameBoard,
+  shape: TetrominoShape,
+  position: Position,
+): boolean {
   return shape.every((row, y) =>
     row.every((cell, x) => {
       if (!cell) return true;
@@ -41,7 +45,7 @@ export function isValidPosition(board: GameBoard, shape: number[][], position: P
  * Calls the callback for each filled cell with board coordinates
  */
 export function forEachPieceCell(
-  shape: number[][],
+  shape: TetrominoShape,
   position: Position,
   callback: (boardX: number, boardY: number, shapeX: number, shapeY: number) => void,
 ): void {
@@ -58,7 +62,7 @@ export function forEachPieceCell(
 
 export function placeTetromino(
   board: GameBoard,
-  shape: CellValue[][],
+  shape: TetrominoShape,
   position: Position,
   colorIndex: CellValue,
 ): GameBoard {

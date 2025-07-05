@@ -1,4 +1,4 @@
-import type { CellValue, Tetromino, TetrominoTypeName } from "@/types/game";
+import type { CellValue, Tetromino, TetrominoShape, TetrominoTypeName } from "@/types/game";
 import { GAME_CONSTANTS } from "@/utils/gameConstants";
 
 // Type-safe color index mapping
@@ -16,7 +16,7 @@ export function getTetrominoColorIndex(type: TetrominoTypeName): CellValue {
   return TETROMINO_COLOR_MAP[type];
 }
 
-export const TETROMINOS: Record<TetrominoTypeName, CellValue[][]> = {
+export const TETROMINOS: Record<TetrominoTypeName, TetrominoShape> = {
   I: [
     [0, 0, 0, 0],
     [1, 1, 1, 1],
@@ -54,11 +54,11 @@ export const TETROMINOS: Record<TetrominoTypeName, CellValue[][]> = {
   ],
 };
 
-export function getTetrominoShape(type: TetrominoTypeName): CellValue[][] {
+export function getTetrominoShape(type: TetrominoTypeName): TetrominoShape {
   return TETROMINOS[type].map((row) => [...row]);
 }
 
-export const rotateTetromino = (shape: CellValue[][]): CellValue[][] =>
+export const rotateTetromino = (shape: TetrominoShape): TetrominoShape =>
   shape[0].map((_, i) => shape.map((row) => row[i]).reverse());
 
 export function createTetromino(type: TetrominoTypeName): Tetromino {

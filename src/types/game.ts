@@ -10,9 +10,25 @@ export type TetrominoTypeName = "I" | "O" | "T" | "S" | "Z" | "J" | "L";
 export type RotationState = 0 | 1 | 2 | 3;
 
 /**
- * Cell values for board matrix (0=empty, 1-7=tetromino color indices)
+ * Cell values for board matrix (0=empty, 1-9=tetromino color indices)
+ * Extended to 0-9 for future expansion support
  */
-export type CellValue = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
+export type CellValue = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
+
+/**
+ * Empty cell value (always 0)
+ */
+export type EmptyCell = 0;
+
+/**
+ * Filled cell values (excluding empty)
+ */
+export type FilledCell = Exclude<CellValue, EmptyCell>;
+
+/**
+ * Type-safe tetromino shape matrix
+ */
+export type TetrominoShape = CellValue[][];
 
 /**
  * Animation trigger for board cell animations
@@ -34,7 +50,7 @@ export interface Tetromino {
   type: TetrominoTypeName;
   position: Position;
   rotation: RotationState; // Type-safe rotation states
-  shape: CellValue[][]; // 2D matrix representing the piece shape with type-safe values
+  shape: TetrominoShape; // Type-safe tetromino shape matrix
 }
 
 /**
