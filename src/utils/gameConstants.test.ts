@@ -13,6 +13,7 @@ describe("gameConstants", () => {
         "UI",
         "SCORING",
         "TYPES",
+        "PIECE_BAG",
       ];
 
       expect(Object.keys(GAME_CONSTANTS)).toEqual(expectedKeys);
@@ -240,6 +241,24 @@ describe("gameConstants", () => {
     test("should have all expected types keys", () => {
       const expectedKeys = ["TETROMINO_TYPES"];
       expect(Object.keys(GAME_CONSTANTS.TYPES)).toEqual(expectedKeys);
+    });
+  });
+
+  describe("PIECE_BAG constants", () => {
+    test("should have expected piece bag values", () => {
+      expect(GAME_CONSTANTS.PIECE_BAG.HISTORY_SIZE).toBe(14);
+    });
+
+    test("should have all expected piece bag keys", () => {
+      const expectedKeys = ["HISTORY_SIZE"];
+      expect(Object.keys(GAME_CONSTANTS.PIECE_BAG)).toEqual(expectedKeys);
+    });
+
+    test("should have logical piece bag relationships", () => {
+      expect(GAME_CONSTANTS.PIECE_BAG.HISTORY_SIZE).toBeGreaterThan(0);
+      expect(GAME_CONSTANTS.PIECE_BAG.HISTORY_SIZE).toBeGreaterThan(
+        GAME_CONSTANTS.TYPES.TETROMINO_TYPES.length,
+      );
     });
   });
 
