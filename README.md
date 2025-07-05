@@ -129,6 +129,127 @@ bun run ci                     # Full CI pipeline (lint + typecheck + test + bui
 - **Settings**: Access via gear icon in top-right corner
 - **Language Toggle**: Switch between English/Japanese in settings
 
+## 🐛 Debug Mode (Development Only)
+
+Debug mode allows developers to quickly test specific game states that would be difficult or time-consuming to reproduce during normal gameplay.
+
+### Enabling Debug Mode
+
+Add URL parameters to activate debug mode:
+```
+http://localhost:5173/?debug=true
+```
+
+### Available Debug Parameters
+
+#### 1. Preset Board States
+Use the `preset` parameter to load predefined game states:
+
+```bash
+# Single line clear setup
+http://localhost:5173/?debug=true&preset=singleLine
+
+# Double line clear setup
+http://localhost:5173/?debug=true&preset=doubleLine
+
+# Triple line clear setup
+http://localhost:5173/?debug=true&preset=tripleLine
+
+# Tetris (4-line) clear setup
+http://localhost:5173/?debug=true&preset=tetris
+
+# Near game over state
+http://localhost:5173/?debug=true&preset=nearGameOver
+
+# Near high score state
+http://localhost:5173/?debug=true&preset=nearHighScore
+
+# T-Spin setup
+http://localhost:5173/?debug=true&preset=tSpinSetup
+
+# Complex board with gaps
+http://localhost:5173/?debug=true&preset=complexBoard
+
+# Empty board
+http://localhost:5173/?debug=true&preset=empty
+```
+
+#### 2. Custom Piece Queue
+Control the sequence of pieces with the `queue` parameter:
+
+```bash
+# Specific piece order
+http://localhost:5173/?debug=true&queue=IJLOSTZ
+
+# All O pieces followed by all I pieces
+http://localhost:5173/?debug=true&queue=OOOOIIII
+
+# Comma-separated format also works
+http://localhost:5173/?debug=true&queue=I,J,L,O,S,T,Z
+```
+
+#### 3. Game State Parameters
+Set specific game values:
+
+```bash
+# Set custom score, level, and lines
+http://localhost:5173/?debug=true&score=99900&level=10&lines=95
+
+# Combine with presets
+http://localhost:5173/?debug=true&preset=tetris&score=50000
+
+# Random seed for reproducible games
+http://localhost:5173/?debug=true&seed=12345
+```
+
+### Debug UI Features
+
+When debug mode is active, a red panel appears in the top-right corner showing:
+- Current debug mode status
+- Active preset name (if any)
+- Current piece queue
+- Random seed (if set)
+
+The debug panel also provides:
+- **Quick Presets**: Buttons to instantly switch between different presets
+- **Custom Queue**: Input field to dynamically change the piece sequence (press Enter to apply)
+
+### Usage Examples
+
+#### Testing Line Clear Animations
+```bash
+# Load single line clear state
+http://localhost:5173/?debug=true&preset=singleLine
+# Drop the I piece to trigger the animation
+```
+
+#### Testing High Score Updates
+```bash
+# Start with a score just below the current high score
+http://localhost:5173/?debug=true&preset=nearHighScore
+# Clear a few lines to trigger high score update
+```
+
+#### Testing Specific Piece Sequences
+```bash
+# Test handling of multiple S and Z pieces
+http://localhost:5173/?debug=true&queue=SZSZSZ
+```
+
+#### Reproducing Bug Reports
+```bash
+# Use seed for deterministic piece generation
+http://localhost:5173/?debug=true&seed=42&level=15
+```
+
+### Development Workflow Tips
+
+1. **Quick Testing**: Use debug presets to jump directly to the game state you need to test
+2. **Animation Testing**: Use line clear presets to test clearing animations without playing full games
+3. **Difficulty Testing**: Set high levels to test increased game speed
+4. **Edge Case Testing**: Use custom queues to test difficult piece combinations
+5. **Bug Reproduction**: Use seeds to create reproducible test scenarios
+
 ## 🌟 Key Highlights
 
 - **🎮 Authentic Experience**: Faithful implementation of classic Tetris mechanics

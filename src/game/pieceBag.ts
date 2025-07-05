@@ -167,5 +167,21 @@ const shuffleWithSeed = (array: TetrominoTypeName[], seed?: number): TetrominoTy
   return shuffled;
 };
 
+/**
+ * Sets the global bag state for debug/testing purposes.
+ * Creates a new bag with only the specified pieces.
+ *
+ * ⚠️ **FOR DEBUG/TESTING ONLY** ⚠️
+ * This is a simplified version that bypasses normal bag creation.
+ *
+ * @param pieces Array of tetromino types to use as the sequence
+ * @returns New bag state for testing
+ */
+export const createDebugBag = (pieces: readonly TetrominoTypeName[]): PieceBag => ({
+  currentBag: [...pieces],
+  generatedPieces: [],
+  bagCount: 1,
+  seed: undefined,
+});
 // === BACKWARD COMPATIBILITY ===
 // Temporary compatibility layer for gradual migration

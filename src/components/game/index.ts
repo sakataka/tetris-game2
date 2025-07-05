@@ -1,5 +1,6 @@
 export { Board } from "./Board";
 export { Controls } from "./Controls";
+export { DebugIndicator } from "./DebugIndicator";
 export { GameOverlay } from "./GameOverlay";
 export { HighScore } from "./HighScore";
 export { HoldPiece } from "./HoldPiece";

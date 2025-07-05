@@ -1,6 +1,7 @@
 import {
   Board,
   Controls,
+  DebugIndicator,
   GameOverlay,
   HighScore,
   HoldPiece,
@@ -65,6 +66,9 @@ export function Game() {
 
       {/* Reset confirmation dialog */}
       <ResetConfirmationDialog />
+
+      {/* Debug indicator */}
+      <DebugIndicator />
     </>
   );
 }

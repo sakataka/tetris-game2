@@ -2,16 +2,23 @@ import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 import {
+  calculateGhostPosition,
   createInitialGameState,
   hardDropTetromino,
   holdCurrentPiece,
   moveTetrominoBy,
   rotateTetrominoCW,
 } from "@/game/game";
-import type { GameState } from "@/types/game";
+import { createDebugBag } from "@/game/pieceBag";
+import { createTetromino } from "@/game/tetrominos";
+import type { GameState, TetrominoTypeName } from "@/types/game";
+import { type DebugParams, parseDebugParams } from "@/utils/debugParams";
+import { getDebugPreset } from "@/utils/debugPresets";
 
 interface GameStore extends GameState {
   showResetConfirmation: boolean;
+  debugMode: boolean;
+  debugParams: DebugParams | null;
   moveLeft: () => void;
   moveRight: () => void;
   moveDown: () => void;
@@ -24,10 +31,66 @@ interface GameStore extends GameState {
   hideResetDialog: () => void;
   confirmReset: () => void;
   clearAnimationData: () => void;
+  applyDebugPreset: (presetName: string) => void;
+  setDebugQueue: (pieces: TetrominoTypeName[]) => void;
 }
 
-// Create initial state once outside the store to avoid recreation on each access
-const INITIAL_STATE = createInitialGameState();
+// Create initial state with debug parameters if present
+function createInitialStateWithDebug(): GameState & {
+  debugMode: boolean;
+  debugParams: DebugParams | null;
+} {
+  const debugParams = parseDebugParams();
+  const initialState = createInitialGameState();
+
+  const result = {
+    ...initialState,
+    debugMode: debugParams.enabled,
+    debugParams: debugParams.enabled ? debugParams : null,
+  };
+
+  if (debugParams.enabled) {
+    // Apply preset if specified
+    if (debugParams.preset) {
+      const preset = getDebugPreset(debugParams.preset);
+      if (preset) {
+        result.board = preset.board;
+
+        if (preset.score !== undefined) result.score = preset.score;
+        if (preset.level !== undefined) result.level = preset.level;
+        if (preset.lines !== undefined) result.lines = preset.lines;
+
+        // Set up piece queue if specified in preset
+        if (preset.nextPieces && preset.nextPieces.length > 0) {
+          createDebugBag(preset.nextPieces); // Initialize debug bag
+          result.currentPiece = createTetromino(preset.nextPieces[0]);
+          result.nextPiece = preset.nextPieces[1] || "T";
+          result.pieceBag = preset.nextPieces.slice(2);
+        }
+      }
+    }
+
+    // Override with URL parameters if specified
+    if (debugParams.score !== undefined) result.score = debugParams.score;
+    if (debugParams.level !== undefined) result.level = debugParams.level;
+    if (debugParams.lines !== undefined) result.lines = debugParams.lines;
+
+    // Set up custom piece queue from URL
+    if (debugParams.queue && debugParams.queue.length > 0) {
+      createDebugBag(debugParams.queue); // Initialize debug bag
+      result.currentPiece = createTetromino(debugParams.queue[0]);
+      result.nextPiece = debugParams.queue[1] || "T";
+      result.pieceBag = debugParams.queue.slice(2);
+    }
+
+    // Recalculate ghost position after debug setup
+    result.ghostPosition = calculateGhostPosition(result);
+  }
+
+  return result;
+}
+
+const INITIAL_STATE = createInitialStateWithDebug();
 
 export const useGameStore = create<GameStore>()(
   devtools(
@@ -50,7 +113,7 @@ export const useGameStore = create<GameStore>()(
         }),
       resetGame: () =>
         set((state) => {
-          const newState = createInitialGameState();
+          const newState = createInitialStateWithDebug();
           Object.assign(state, newState);
           state.showResetConfirmation = false;
         }),
@@ -67,7 +130,7 @@ export const useGameStore = create<GameStore>()(
         }),
       confirmReset: () =>
         set((state) => {
-          const newState = createInitialGameState();
+          const newState = createInitialStateWithDebug();
           Object.assign(state, newState);
           state.showResetConfirmation = false;
         }),
@@ -83,6 +146,41 @@ export const useGameStore = create<GameStore>()(
             state.clearingLines = [];
             state.boardBeforeClear = null;
           }
+        }),
+
+      applyDebugPreset: (presetName: string) =>
+        set((state) => {
+          const preset = getDebugPreset(presetName);
+          if (!preset || !state.debugMode) return;
+
+          state.board = preset.board;
+
+          if (preset.score !== undefined) state.score = preset.score;
+          if (preset.level !== undefined) state.level = preset.level;
+          if (preset.lines !== undefined) state.lines = preset.lines;
+
+          if (preset.nextPieces && preset.nextPieces.length > 0) {
+            createDebugBag(preset.nextPieces); // Initialize debug bag
+            state.currentPiece = createTetromino(preset.nextPieces[0]);
+            state.nextPiece = preset.nextPieces[1] || "T";
+            state.pieceBag = preset.nextPieces.slice(2);
+          }
+
+          // Recalculate ghost position
+          state.ghostPosition = calculateGhostPosition(state);
+        }),
+
+      setDebugQueue: (pieces: TetrominoTypeName[]) =>
+        set((state) => {
+          if (!state.debugMode || pieces.length === 0) return;
+
+          createDebugBag(pieces); // Initialize debug bag
+          state.currentPiece = createTetromino(pieces[0]);
+          state.nextPiece = pieces[1] || "T";
+          state.pieceBag = pieces.slice(2);
+
+          // Recalculate ghost position
+          state.ghostPosition = calculateGhostPosition(state);
         }),
     })),
     { name: "game-store" },
