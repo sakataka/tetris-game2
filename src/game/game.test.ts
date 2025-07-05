@@ -5,12 +5,10 @@ import { createEmptyBoard } from "./board";
 import {
   calculateScore,
   checkGameOver,
-  clearCompletedLines,
   createInitialGameState,
   hardDropTetromino,
   moveTetrominoBy,
-  placePieceOnBoard,
-  preserveBoardForAnimation,
+  processPlacementAndClearing,
   rotateTetrominoCW,
   spawnNextPiece,
 } from "./game";
@@ -414,22 +412,6 @@ describe("Game Logic - Junichi Ito Style", () => {
     });
   });
 
-  describe("preserveBoardForAnimation", () => {
-    test("should return board when clearing lines exist", () => {
-      const board = createEmptyBoard();
-      const clearingLines = [0, 1];
-      const result = preserveBoardForAnimation(board, clearingLines);
-      expect(result).toBe(board);
-    });
-
-    test("should return null when no clearing lines", () => {
-      const board = createEmptyBoard();
-      const clearingLines: number[] = [];
-      const result = preserveBoardForAnimation(board, clearingLines);
-      expect(result).toBeNull();
-    });
-  });
-
   describe("checkGameOver", () => {
     test("should return false when piece can be placed", () => {
       const board = createEmptyBoard();
@@ -474,15 +456,16 @@ describe("Game Logic - Junichi Ito Style", () => {
     });
   });
 
-  describe("clearCompletedLines", () => {
+  describe("processPlacementAndClearing", () => {
     test("should not change score when no lines cleared", () => {
-      const board = createEmptyBoard();
-      const result = clearCompletedLines(board, 100, 5, 2);
+      const state = createTestGameState({ score: 100, lines: 5, level: 2 });
+      const result = processPlacementAndClearing(state);
 
       expect(result.score).toBe(100);
       expect(result.lines).toBe(5);
       expect(result.level).toBe(1); // Level is calculated as Math.floor(lines / LINES_PER_LEVEL) + 1
       expect(result.clearingLines).toEqual([]);
+      expect(result.placedPositions.length).toBeGreaterThan(0);
     });
 
     test("should update score and level when lines cleared", () => {
@@ -492,32 +475,23 @@ describe("Game Logic - Junichi Ito Style", () => {
         board[GAME_CONSTANTS.BOARD.HEIGHT - 1][x] = 1;
       }
 
-      const result = clearCompletedLines(board, 0, 0, 1);
+      const state = createTestGameState({ board, score: 0, lines: 0, level: 1 });
+      const result = processPlacementAndClearing(state);
 
       expect(result.score).toBe(100); // 1 line * level 1
       expect(result.lines).toBe(1);
       expect(result.level).toBe(1);
       expect(result.clearingLines).toEqual([GAME_CONSTANTS.BOARD.HEIGHT - 1]);
-    });
-  });
-
-  describe("placePieceOnBoard", () => {
-    test("should place piece on board", () => {
-      const state = createInitialGameState();
-      const result = placePieceOnBoard(state);
-
-      expect(result.board).toBeDefined();
-      expect(result.placedPositions).toBeDefined();
-      expect(Array.isArray(result.placedPositions)).toBe(true);
-      expect(result.placedPositions.length).toBeGreaterThan(0);
+      expect(result.boardBeforeClear).toBeDefined();
     });
 
     test("should return empty positions when no current piece", () => {
       const state = { ...createInitialGameState(), currentPiece: null };
-      const result = placePieceOnBoard(state);
+      const result = processPlacementAndClearing(state);
 
       expect(result.board).toBe(state.board);
       expect(result.placedPositions).toEqual([]);
+      expect(result.boardBeforeClear).toBeNull();
     });
   });
 });

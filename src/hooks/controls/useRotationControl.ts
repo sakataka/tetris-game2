@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { useGameActionHandler } from "@/hooks/core/useGameActionHandler";
-import { useGameStore } from "@/store/gameStore";
+import { useGameStoreActions } from "@/hooks/core/useGameStoreActions";
 import { useActionCooldown } from "./useActionCooldown";
 
 /**
@@ -9,7 +9,7 @@ import { useActionCooldown } from "./useActionCooldown";
  * Implements a cooldown period between rotations to ensure single rotation per button press
  */
 export function useRotationControl() {
-  const rotate = useGameStore((state) => state.rotate);
+  const { rotate } = useGameStoreActions();
   const executeAction = useGameActionHandler();
 
   // Cooldown period in milliseconds to prevent double rotation

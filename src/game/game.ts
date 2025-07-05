@@ -130,59 +130,45 @@ export function hardDropTetromino(state: GameState): GameState {
   });
 }
 
-type PieceLockResult = { board: GameBoard; placedPositions: Position[] };
-type LineClearResult = {
-  board: GameBoard;
-  score: number;
-  lines: number;
-  level: number;
-  clearingLines: number[];
-};
-
-function recordPlacedPositions(currentPiece: Tetromino): Position[] {
-  const positions: Position[] = [];
-  forEachPieceCell(currentPiece.shape, currentPiece.position, (boardX, boardY) =>
-    positions.push({ x: boardX, y: boardY }),
-  );
-  return positions;
-}
-
-export function placePieceOnBoard(state: GameState): PieceLockResult {
-  if (!state.currentPiece) return { board: state.board, placedPositions: [] };
+export function processPlacementAndClearing(state: GameState): PlacementResult {
+  if (!state.currentPiece) {
+    return {
+      board: state.board,
+      boardBeforeClear: null,
+      score: state.score,
+      lines: state.lines,
+      level: state.level,
+      placedPositions: [],
+      clearingLines: [],
+    };
+  }
 
   const colorIndex = getTetrominoColorIndex(state.currentPiece.type);
-  const placedPositions = recordPlacedPositions(state.currentPiece);
-  const board = placeTetromino(
+  const placedPositions: Position[] = [];
+  forEachPieceCell(state.currentPiece.shape, state.currentPiece.position, (boardX, boardY) =>
+    placedPositions.push({ x: boardX, y: boardY }),
+  );
+
+  const boardAfterLock = placeTetromino(
     state.board,
     state.currentPiece.shape,
     state.currentPiece.position,
     colorIndex,
   );
-  return { board, placedPositions };
-}
 
-export function clearCompletedLines(
-  board: GameBoard,
-  currentScore: number,
-  currentLines: number,
-  currentLevel: number,
-): LineClearResult {
-  const { board: clearedBoard, linesCleared, clearedLineIndices } = clearLines(board);
-  const lines = currentLines + linesCleared;
+  const { board: boardAfterClear, linesCleared, clearedLineIndices } = clearLines(boardAfterLock);
+  const lines = state.lines + linesCleared;
+  const boardBeforeClear = clearedLineIndices.length > 0 ? boardAfterLock : null;
+
   return {
-    board: clearedBoard,
-    score: currentScore + calculateScore(linesCleared, currentLevel),
+    board: boardAfterClear,
+    boardBeforeClear,
+    score: state.score + calculateScore(linesCleared, state.level),
     lines,
     level: Math.floor(lines / GAME_CONSTANTS.SCORING.LINES_PER_LEVEL) + 1,
+    placedPositions,
     clearingLines: clearedLineIndices.length > 0 ? clearedLineIndices : [],
   };
-}
-
-export function preserveBoardForAnimation(
-  board: GameBoard,
-  clearingLines: number[],
-): GameBoard | null {
-  return clearingLines.length > 0 ? board : null;
 }
 
 export function checkGameOver(board: GameBoard, piece: Tetromino): boolean {
@@ -210,32 +196,6 @@ type PlacementResult = {
   placedPositions: Position[];
   clearingLines: number[];
 };
-
-/**
- * Processes piece placement and line clearing in a single operation
- * Combines placement, clearing, scoring, and animation setup
- */
-function processPlacementAndClearing(state: GameState): PlacementResult {
-  const { board: boardAfterLock, placedPositions } = placePieceOnBoard(state);
-  const {
-    board: boardAfterClear,
-    score,
-    lines,
-    level,
-    clearingLines,
-  } = clearCompletedLines(boardAfterLock, state.score, state.lines, state.level);
-  const boardBeforeClear = preserveBoardForAnimation(boardAfterLock, clearingLines);
-
-  return {
-    board: boardAfterClear,
-    boardBeforeClear,
-    score,
-    lines,
-    level,
-    placedPositions,
-    clearingLines,
-  };
-}
 
 type NextPieceResult = {
   currentPiece: Tetromino | null;

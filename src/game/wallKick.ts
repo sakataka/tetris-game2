@@ -7,7 +7,16 @@ function createRotationTransition(from: RotationState, to: RotationState): Rotat
   return `${from}->${to}` as RotationTransition;
 }
 
-const COMMON_OFFSETS = {
+const I_PIECE_OFFSETS = {
+  LEFT_2: { x: -2, y: 0 },
+  RIGHT_2: { x: 2, y: 0 },
+  LEFT_2_DOWN: { x: -2, y: -1 },
+  LEFT_2_UP: { x: -2, y: 1 },
+  RIGHT_2_DOWN: { x: 2, y: -1 },
+  RIGHT_2_UP: { x: 2, y: 1 },
+} as const;
+
+const ALL_OFFSETS = {
   NONE: { x: 0, y: 0 },
   LEFT: { x: -1, y: 0 },
   RIGHT: { x: 1, y: 0 },
@@ -21,11 +30,11 @@ const COMMON_OFFSETS = {
   RIGHT_DOWN: { x: 1, y: -1 },
   RIGHT_DOWN_2: { x: 1, y: -2 },
   RIGHT_UP_2: { x: 1, y: 2 },
+  ...I_PIECE_OFFSETS,
 } as const;
 
-function createOffsetPattern(...offsets: (keyof typeof COMMON_OFFSETS)[]): Position[] {
-  return offsets.map((key) => COMMON_OFFSETS[key]);
-}
+const createOffsetPattern = (...keys: (keyof typeof ALL_OFFSETS)[]) =>
+  keys.map((key) => ALL_OFFSETS[key]);
 
 const JLSTZ_WALL_KICK_DATA: WallKickData = {
   "0->1": createOffsetPattern("NONE", "LEFT", "LEFT_UP", "DOWN_2", "LEFT_DOWN_2"),
@@ -38,34 +47,15 @@ const JLSTZ_WALL_KICK_DATA: WallKickData = {
   "0->3": createOffsetPattern("NONE", "RIGHT", "RIGHT_DOWN", "UP_2", "RIGHT_UP_2"),
 };
 
-const I_PIECE_OFFSETS = {
-  LEFT_2: { x: -2, y: 0 },
-  RIGHT_2: { x: 2, y: 0 },
-  LEFT_2_DOWN: { x: -2, y: -1 },
-  LEFT_2_UP: { x: -2, y: 1 },
-  RIGHT_2_DOWN: { x: 2, y: -1 },
-  RIGHT_2_UP: { x: 2, y: 1 },
-} as const;
-
-function createIPieceOffsetPattern(
-  ...offsets: (keyof typeof COMMON_OFFSETS | keyof typeof I_PIECE_OFFSETS)[]
-): Position[] {
-  return offsets.map((key) =>
-    key in COMMON_OFFSETS
-      ? COMMON_OFFSETS[key as keyof typeof COMMON_OFFSETS]
-      : I_PIECE_OFFSETS[key as keyof typeof I_PIECE_OFFSETS],
-  );
-}
-
 const I_WALL_KICK_DATA: WallKickData = {
-  "0->1": createIPieceOffsetPattern("NONE", "LEFT_2", "RIGHT", "LEFT_2_DOWN", "RIGHT_UP_2"),
-  "1->2": createIPieceOffsetPattern("NONE", "LEFT", "RIGHT_2", "LEFT_UP_2", "RIGHT_2_DOWN"),
-  "2->3": createIPieceOffsetPattern("NONE", "RIGHT_2", "LEFT", "RIGHT_2_UP", "LEFT_DOWN_2"),
-  "3->0": createIPieceOffsetPattern("NONE", "RIGHT", "LEFT_2", "RIGHT_DOWN_2", "LEFT_2_UP"),
-  "1->0": createIPieceOffsetPattern("NONE", "RIGHT_2", "LEFT", "RIGHT_2_UP", "LEFT_DOWN_2"),
-  "2->1": createIPieceOffsetPattern("NONE", "RIGHT", "LEFT_2", "RIGHT_DOWN_2", "LEFT_2_UP"),
-  "3->2": createIPieceOffsetPattern("NONE", "LEFT_2", "RIGHT", "LEFT_2_DOWN", "RIGHT_UP_2"),
-  "0->3": createIPieceOffsetPattern("NONE", "LEFT", "RIGHT_2", "LEFT_UP_2", "RIGHT_2_DOWN"),
+  "0->1": createOffsetPattern("NONE", "LEFT_2", "RIGHT", "LEFT_2_DOWN", "RIGHT_UP_2"),
+  "1->2": createOffsetPattern("NONE", "LEFT", "RIGHT_2", "LEFT_UP_2", "RIGHT_2_DOWN"),
+  "2->3": createOffsetPattern("NONE", "RIGHT_2", "LEFT", "RIGHT_2_UP", "LEFT_DOWN_2"),
+  "3->0": createOffsetPattern("NONE", "RIGHT", "LEFT_2", "RIGHT_DOWN_2", "LEFT_2_UP"),
+  "1->0": createOffsetPattern("NONE", "RIGHT_2", "LEFT", "RIGHT_2_UP", "LEFT_DOWN_2"),
+  "2->1": createOffsetPattern("NONE", "RIGHT", "LEFT_2", "RIGHT_DOWN_2", "LEFT_2_UP"),
+  "3->2": createOffsetPattern("NONE", "LEFT_2", "RIGHT", "LEFT_2_DOWN", "RIGHT_UP_2"),
+  "0->3": createOffsetPattern("NONE", "LEFT", "RIGHT_2", "LEFT_UP_2", "RIGHT_2_DOWN"),
 };
 
 /**

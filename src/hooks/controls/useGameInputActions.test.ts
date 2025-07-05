@@ -75,10 +75,13 @@ describe("useGameInputActions", () => {
 
     const firstResult = result.current;
 
-    // Rerender should return the same reference
+    // Rerender should return the same reference for individual action functions
     rerender();
 
-    expect(result.current).toBe(firstResult);
+    // Test individual action stability instead of whole object reference
+    expect(result.current.moveLeft).toBe(firstResult.moveLeft);
+    expect(result.current.moveRight).toBe(firstResult.moveRight);
+    expect(result.current.rotateClockwise).toBe(firstResult.rotateClockwise);
   });
 
   test("should return functions for all actions", () => {

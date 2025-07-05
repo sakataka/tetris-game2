@@ -20,25 +20,20 @@ export function createEmptyBoard(): GameBoard {
 }
 
 export function isValidPosition(board: GameBoard, shape: number[][], position: Position): boolean {
-  for (let y = 0; y < shape.length; y++) {
-    for (let x = 0; x < shape[y].length; x++) {
-      if (shape[y][x]) {
-        const boardX = position.x + x;
-        const boardY = position.y + y;
-
-        if (
-          boardX < 0 ||
-          boardX >= GAME_CONSTANTS.BOARD.WIDTH ||
-          boardY < 0 ||
-          boardY >= GAME_CONSTANTS.BOARD.HEIGHT ||
-          board[boardY]?.[boardX]
-        ) {
-          return false;
-        }
-      }
-    }
-  }
-  return true;
+  return shape.every((row, y) =>
+    row.every((cell, x) => {
+      if (!cell) return true;
+      const boardX = position.x + x;
+      const boardY = position.y + y;
+      return (
+        boardX >= 0 &&
+        boardX < GAME_CONSTANTS.BOARD.WIDTH &&
+        boardY >= 0 &&
+        boardY < GAME_CONSTANTS.BOARD.HEIGHT &&
+        !board[boardY]?.[boardX]
+      );
+    }),
+  );
 }
 
 /**
@@ -84,9 +79,8 @@ export function clearLines(board: GameBoard): {
   clearedLineIndices: number[];
 } {
   const clearedLineIndices = board
-    .map((row, index) => ({ row, index }))
-    .filter(({ row }) => row.every((cell) => cell !== 0))
-    .map(({ index }) => index);
+    .map((row, i) => (row.every((cell) => cell !== 0) ? i : -1))
+    .filter((i) => i !== -1);
 
   if (clearedLineIndices.length === 0) {
     return { board, linesCleared: 0, clearedLineIndices: [] };

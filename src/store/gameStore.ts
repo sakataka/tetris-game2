@@ -92,6 +92,11 @@ function createInitialStateWithDebug(): GameState & {
 
 const INITIAL_STATE = createInitialStateWithDebug();
 
+const resetGameState = (state: GameStore) => {
+  Object.assign(state, createInitialStateWithDebug());
+  state.showResetConfirmation = false;
+};
+
 export const useGameStore = create<GameStore>()(
   devtools(
     immer((set) => ({
@@ -111,12 +116,7 @@ export const useGameStore = create<GameStore>()(
             state.isPaused = !state.isPaused;
           }
         }),
-      resetGame: () =>
-        set((state) => {
-          const newState = createInitialStateWithDebug();
-          Object.assign(state, newState);
-          state.showResetConfirmation = false;
-        }),
+      resetGame: () => set(resetGameState),
       showResetDialog: () =>
         set((state) => {
           // Only show reset dialog during active gameplay
@@ -128,12 +128,7 @@ export const useGameStore = create<GameStore>()(
         set((state) => {
           state.showResetConfirmation = false;
         }),
-      confirmReset: () =>
-        set((state) => {
-          const newState = createInitialStateWithDebug();
-          Object.assign(state, newState);
-          state.showResetConfirmation = false;
-        }),
+      confirmReset: () => set(resetGameState),
       clearAnimationData: () =>
         set((state) => {
           // Prevent unnecessary updates if animation states are already empty

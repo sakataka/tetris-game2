@@ -1,5 +1,4 @@
-import { useMemo } from "react";
-import { useGameStore } from "@/store/gameStore";
+import { useGameStoreActions } from "@/hooks/core/useGameStoreActions";
 
 /**
  * Core game actions interface
@@ -20,44 +19,6 @@ export interface GameActions {
 
 /**
  * Core game action hooks
- * Provides direct access to all game store actions with memoization
+ * Provides direct access to all game store actions
  */
-export const useGameActions = (): GameActions => {
-  const moveLeft = useGameStore((state) => state.moveLeft);
-  const moveRight = useGameStore((state) => state.moveRight);
-  const moveDown = useGameStore((state) => state.moveDown);
-  const rotate = useGameStore((state) => state.rotate);
-  const drop = useGameStore((state) => state.drop);
-  const holdPiece = useGameStore((state) => state.holdPiece);
-  const togglePause = useGameStore((state) => state.togglePause);
-  const resetGame = useGameStore((state) => state.resetGame);
-  const showResetDialog = useGameStore((state) => state.showResetDialog);
-  const clearAnimationData = useGameStore((state) => state.clearAnimationData);
-
-  return useMemo(
-    () => ({
-      moveLeft,
-      moveRight,
-      moveDown,
-      rotate,
-      drop,
-      holdPiece,
-      togglePause,
-      resetGame,
-      showResetDialog,
-      clearAnimationData,
-    }),
-    [
-      moveLeft,
-      moveRight,
-      moveDown,
-      rotate,
-      drop,
-      holdPiece,
-      togglePause,
-      resetGame,
-      showResetDialog,
-      clearAnimationData,
-    ],
-  );
-};
+export const useGameActions = (): GameActions => useGameStoreActions();

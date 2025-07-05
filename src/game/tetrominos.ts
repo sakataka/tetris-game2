@@ -58,20 +58,8 @@ export function getTetrominoShape(type: TetrominoTypeName): CellValue[][] {
   return TETROMINOS[type].map((row) => [...row]);
 }
 
-export function rotateTetromino(shape: CellValue[][]): CellValue[][] {
-  const n = shape.length;
-  const rotated = Array(n)
-    .fill(null)
-    .map(() => Array(n).fill(0));
-
-  for (let i = 0; i < n; i++) {
-    for (let j = 0; j < n; j++) {
-      rotated[j][n - 1 - i] = shape[i][j];
-    }
-  }
-
-  return rotated;
-}
+export const rotateTetromino = (shape: CellValue[][]): CellValue[][] =>
+  shape[0].map((_, i) => shape.map((row) => row[i]).reverse());
 
 export function createTetromino(type: TetrominoTypeName): Tetromino {
   const shape = getTetrominoShape(type);

@@ -9,25 +9,13 @@ const mockMoveDown = mock();
 const mockDrop = mock();
 const mockExecuteAction = mock();
 
-mock.module("../../store/gameStore", () => ({
-  useGameStore: mock((selector) => {
-    if (typeof selector === "function") {
-      const selectorStr = selector.toString();
-      if (selectorStr.includes("moveLeft")) {
-        return mockMoveLeft;
-      }
-      if (selectorStr.includes("moveRight")) {
-        return mockMoveRight;
-      }
-      if (selectorStr.includes("moveDown")) {
-        return mockMoveDown;
-      }
-      if (selectorStr.includes("drop")) {
-        return mockDrop;
-      }
-    }
-    return mock();
-  }),
+mock.module("../core/useGameStoreActions", () => ({
+  useGameStoreActions: mock(() => ({
+    moveLeft: mockMoveLeft,
+    moveRight: mockMoveRight,
+    moveDown: mockMoveDown,
+    drop: mockDrop,
+  })),
 }));
 
 mock.module("../core/useGameActionHandler", () => ({

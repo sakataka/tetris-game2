@@ -1,5 +1,5 @@
 import { useGameActionHandler } from "@/hooks/core/useGameActionHandler";
-import { useGameStore } from "@/store/gameStore";
+import { useGameStoreActions } from "@/hooks/core/useGameStoreActions";
 import { useRotationControl } from "./useRotationControl";
 import type { SwipeGesture, TapGesture } from "./useTouchDetection";
 
@@ -10,10 +10,7 @@ export interface TouchActionsReturn {
 }
 
 export function useTouchActions(): TouchActionsReturn {
-  const moveLeft = useGameStore((state) => state.moveLeft);
-  const moveRight = useGameStore((state) => state.moveRight);
-  const moveDown = useGameStore((state) => state.moveDown);
-  const drop = useGameStore((state) => state.drop);
+  const { moveLeft, moveRight, moveDown, drop } = useGameStoreActions();
   const executeAction = useGameActionHandler();
   const { handleRotate } = useRotationControl();
 
