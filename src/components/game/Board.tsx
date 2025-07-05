@@ -5,6 +5,7 @@ import { useResponsiveBoard } from "@/hooks/ui/useResponsiveBoard";
 import { cn } from "@/lib/utils";
 import { useGameStore } from "@/store/gameStore";
 import type { LineClearAnimationData } from "@/types/game";
+import { ANIMATION_PRESETS } from "@/utils/animationConstants";
 import { GAME_CONSTANTS } from "@/utils/gameConstants";
 import { BOARD_STYLES, CARD_STYLES } from "@/utils/styles";
 import { BoardCell } from "./BoardCell";
@@ -63,6 +64,67 @@ export function Board() {
     [animate],
   );
 
+  // Calculate affected rows for non-continuous line clearing
+  const calculateAffectedRows = useCallback((clearedLineIndices: readonly number[]) => {
+    if (clearedLineIndices.length === 0) return [];
+
+    const maxClearedIndex = Math.max(...clearedLineIndices);
+    const affectedRows = [];
+
+    // All rows above the highest cleared line are affected
+    for (let row = 0; row < maxClearedIndex; row++) {
+      if (!clearedLineIndices.includes(row)) {
+        affectedRows.push(row);
+      }
+    }
+
+    return affectedRows;
+  }, []);
+
+  // Execute line fall animation with physics-based gravity
+  const executeLineFallAnimation = useCallback(
+    async (signal: AbortSignal) => {
+      if (!lineClearData) return;
+
+      try {
+        // Calculate affected rows for non-continuous line clearing
+        const affectedRows = calculateAffectedRows(lineClearData.clearedLineIndices);
+        if (affectedRows.length === 0) {
+          useGameStore.getState().completeLineFallAnimation();
+          return;
+        }
+
+        // Calculate fall distance based on number of cleared lines
+        const fallDistance =
+          lineClearData.clearedLineIndices.length * GAME_CONSTANTS.BOARD.CELL_SIZE;
+
+        // Create selectors for affected rows
+        const rowSelectors = affectedRows.map((row) => `[data-line="${row}"]`);
+
+        // Physics-based gravity animation with spring parameters from issue
+        await animate(
+          rowSelectors.join(", "),
+          {
+            y: `${fallDistance}px`,
+          },
+          ANIMATION_PRESETS.lineFall,
+        );
+
+        if (signal.aborted) return;
+        useGameStore.getState().completeLineFallAnimation();
+      } catch (error) {
+        console.error("Line fall animation failed:", error);
+      } finally {
+        // Ensure reliable state recovery
+        const { animationState: currentState } = useGameStore.getState();
+        if (currentState === "line-falling") {
+          useGameStore.getState().completeLineFallAnimation();
+        }
+      }
+    },
+    [lineClearData, animate, calculateAffectedRows],
+  );
+
   // Effect for managing line clear animation
   useEffect(() => {
     if (animationState === "line-clearing" && lineClearData) {
@@ -86,6 +148,22 @@ export function Board() {
       }
     };
   }, [animationState, lineClearData, executeLineClearAnimation]);
+
+  // Effect for managing line fall animation
+  useEffect(() => {
+    if (animationState === "line-falling" && lineClearData) {
+      // Cancel any existing animation
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+
+      // Create new abort controller
+      abortControllerRef.current = new AbortController();
+
+      // Execute line fall animation
+      executeLineFallAnimation(abortControllerRef.current.signal);
+    }
+  }, [animationState, lineClearData, executeLineFallAnimation]);
 
   // Generate all cell positions (20 rows x 10 columns)
   const cellPositions = Array.from({ length: GAME_CONSTANTS.BOARD.HEIGHT }, (_, row) =>

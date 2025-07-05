@@ -9,6 +9,7 @@ describe("animationConstants", () => {
         "pieceDrop",
         "pieceRotation",
         "lineClear",
+        "lineFall",
         "scoreUpdate",
         "levelUp",
         "modalEnter",
@@ -122,6 +123,7 @@ describe("animationConstants", () => {
         "pieceSpawnAnimation",
         "piecePlaceAnimation",
         "lineClearAnimation",
+        "lineFallAnimation",
         "buttonHoverAnimation",
       ];
 

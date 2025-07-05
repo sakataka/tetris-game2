@@ -36,6 +36,12 @@ export const ANIMATION_PRESETS = {
     damping: 25,
     mass: 0.7,
   },
+  lineFall: {
+    type: "spring" as const,
+    stiffness: 400,
+    damping: 30,
+    mass: 0.8,
+  },
 
   // Score and UI updates
   scoreUpdate: {
@@ -148,6 +154,13 @@ export const COMPLETE_ANIMATIONS = {
     initial: { opacity: 1, scale: 1 },
     animate: { opacity: [1, 0, 1, 0], scale: [1, 1.1, 1, 0.9] },
     transition: { duration: ANIMATION_DURATIONS.normal, repeat: 0 },
+  },
+
+  // Line fall gravity animation
+  lineFallAnimation: {
+    initial: { y: 0 },
+    animate: { y: 0 },
+    transition: ANIMATION_PRESETS.lineFall,
   },
 
   // Button hover effect
