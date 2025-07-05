@@ -1,13 +1,14 @@
-import { useMemo } from "react";
+import { useShallow } from "zustand/shallow";
 import { useGameStore } from "@/store/gameStore";
 
 /**
  * Score-related state selectors
  */
-export const useScoreState = () => {
-  const score = useGameStore((state) => state.score);
-  const lines = useGameStore((state) => state.lines);
-  const level = useGameStore((state) => state.level);
-
-  return useMemo(() => ({ score, lines, level }), [score, lines, level]);
-};
+export const useScoreState = () =>
+  useGameStore(
+    useShallow((state) => ({
+      score: state.score,
+      lines: state.lines,
+      level: state.level,
+    })),
+  );

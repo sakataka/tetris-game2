@@ -14,12 +14,9 @@ export function Board() {
   const [scope, animate] = useAnimate();
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  // Get animation state from store
-  const { animationState, lineClearData, completeLineClearAnimation } = useGameStore((state) => ({
-    animationState: state.animationState,
-    lineClearData: state.lineClearData,
-    completeLineClearAnimation: state.completeLineClearAnimation,
-  }));
+  // Get animation state from store with stable selectors
+  const animationState = useGameStore((state) => state.animationState);
+  const lineClearData = useGameStore((state) => state.lineClearData);
 
   // Execute line clear animation with AbortController
   const executeLineClearAnimation = useCallback(
@@ -52,18 +49,18 @@ export function Board() {
         );
 
         if (signal.aborted) return;
-        completeLineClearAnimation();
+        useGameStore.getState().completeLineClearAnimation();
       } catch (error) {
         console.error("Line clear animation failed:", error);
       } finally {
         // Ensure reliable state recovery
         const { animationState: currentState } = useGameStore.getState();
         if (currentState === "line-clearing") {
-          completeLineClearAnimation();
+          useGameStore.getState().completeLineClearAnimation();
         }
       }
     },
-    [animate, completeLineClearAnimation],
+    [animate],
   );
 
   // Effect for managing line clear animation

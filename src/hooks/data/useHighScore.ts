@@ -1,3 +1,4 @@
+import { useShallow } from "zustand/shallow";
 import { useHighScoreStore } from "@/store/highScoreStore";
 
 /**
@@ -5,11 +6,10 @@ import { useHighScoreStore } from "@/store/highScoreStore";
  * This hook uses Zustand store with persist middleware
  */
 export function useHighScore() {
-  const currentHighScore = useHighScoreStore((state) => state.currentHighScore);
-  const highScoresList = useHighScoreStore((state) => state.highScoresList);
-
-  return {
-    currentHighScore,
-    highScoresList,
-  };
+  return useHighScoreStore(
+    useShallow((state) => ({
+      currentHighScore: state.currentHighScore,
+      highScoresList: state.highScoresList,
+    })),
+  );
 }

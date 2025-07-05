@@ -10,7 +10,6 @@
 5. **Temporary Fixes**: NEVER implement temporary solutions that create technical debt
 
 ### MANDATORY EXECUTION PATTERNS
-- **Pre-commit Validation**: ALWAYS run `bun run lint` and `bun run typecheck` before any commit
 - **Path Import Rules**: ALWAYS use `@/` for cross-directory imports, `./` for same-directory imports
 - **i18n Compliance**: ALL user-facing text MUST use translation files in `/src/locales/`
 - **Functional Programming**: ALWAYS prefer pure functions over class-based implementations
@@ -87,7 +86,7 @@ src/
 ```
 
 ### State Management Architecture
-**Store Implementation**: Zustand with functional programming patterns
+**Store Implementation**: Zustand 5.0.6 with functional programming patterns
 
 **Store Modules** (Located in `/src/store/`):
 1. **GameStore** (`gameStore.ts`): 
@@ -105,6 +104,25 @@ src/
 - Use memoized selectors from `/src/hooks/selectors/`
 - Prefer specific selectors over direct store access
 - All state mutations through pure functions
+
+**CRITICAL: Zustand v5 Selector Requirements** (MUST FOLLOW):
+- **NEVER** return new objects/arrays directly from selectors
+- **ALWAYS** use `useShallow` for object/array selectors
+- **AVOID** `useStore((state) => ({ key: state.value }))` patterns
+- **PREFER** individual primitive selectors when possible
+
+```typescript
+// ❌ WRONG: Creates new object every render → infinite loop
+const { a, b } = useStore((state) => ({ a: state.a, b: state.b }));
+
+// ✅ CORRECT: Use useShallow for object selectors
+import { useShallow } from "zustand/shallow";
+const { a, b } = useStore(useShallow((state) => ({ a: state.a, b: state.b })));
+
+// ✅ BEST: Individual primitive selectors (most stable)
+const a = useStore((state) => state.a);
+const b = useStore((state) => state.b);
+```
 
 ### Core Game Logic Implementation
 **Game Mechanics** (Located in `/src/game/`):
@@ -183,24 +201,12 @@ bun run ci           # Complete CI pipeline (lint + typecheck + test + build)
    - Mock ONLY external dependencies (localStorage, i18n)
    - Available mocks: `/src/test/__mocks__/react-i18next.ts`
 
-### TEST IMPLEMENTATION PRIORITIES
-**High Priority** (Must have comprehensive coverage):
-- `/src/game/board.ts` - Board collision detection and line clearing
-- `/src/game/tetrominos.ts` - Piece rotation and positioning
-- `/src/game/pieceBag.ts` - 7-bag randomization algorithm
-- `/src/game/wallKick.ts` - SRS wall kick implementation
-- `/src/utils/gameValidation.ts` - Game state validation
-- `/src/utils/boardUtils.ts` - Board utility functions
-
-**Medium Priority** (Store logic testing):
-- `/src/store/gameStore.ts` - Pure state transition functions
-- `/src/store/highScoreStore.ts` - Score persistence logic
-- `/src/store/settingsStore.ts` - Settings validation and persistence
-
-**E2E Testing** (Playwright - Use sparingly):
-- Critical user journey: Start game → Play → Score → Game over
-- Mobile touch controls functionality
-- Language switching behavior
+4. **ZUSTAND TESTING PATTERNS**:
+   - Test store actions and state transitions, NOT selectors
+   - Use `act()` wrapper for store updates in React components
+   - Test custom hooks with `useShallow` pattern separately from component integration
+   - Verify selector stability with multiple renders in test environment
+   - Mock external store dependencies (localStorage, persist middleware)
 
 ## IMPORT PATH DECISION TREE (CRITICAL)
 
@@ -239,6 +245,13 @@ EXCEPTION: Test mocks may use relative paths when required by testing framework
 - IF styling needed THEN use Tailwind CSS classes
 - IF UI component needed THEN check existing shadcn/ui components first
 - IF custom component needed THEN follow shadcn/ui patterns (Radix UI + Tailwind + CVA)
+
+**Zustand v5 Debugging Guidelines**:
+- IF "getSnapshot should be cached" error occurs THEN check for object/array selectors
+- IF "Maximum update depth exceeded" error occurs THEN use `useShallow` for complex selectors
+- IF infinite rendering detected THEN verify all selectors return stable references
+- IF custom hook returns objects THEN wrap with `useShallow` or split into primitives
+- IF debugging selector issues THEN use React DevTools Profiler to identify re-render sources
 
 ### DEVELOPMENT TOOLS CONFIGURATION
 - **Primary Runtime**: Bun (package management, testing, development)
@@ -312,19 +325,6 @@ mcp__context7__get-library-docs "/oven-sh/bun"
 - IF unable to resolve complex errors THEN consult o3 MCP
 - IF uncertain about architectural decisions THEN use o3 MCP
 - IF needing alternative implementation approaches THEN use o3 MCP
-
-**EXECUTION WORKFLOW**:
-```bash
-# Use o3 MCP for technical consultation
-mcp__o3__o3-search "Technical problem description in detail"
-
-# Example scenarios:
-# - Complex TypeScript type errors
-# - Performance optimization strategies
-# - Architecture pattern decisions
-# - Library integration issues
-# - Algorithm implementation challenges
-```
 
 **USAGE GUIDELINES**:
 - Provide detailed context about the problem
