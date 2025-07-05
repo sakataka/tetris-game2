@@ -83,7 +83,7 @@ export const GAME_CONSTANTS = {
     TETROMINO_TYPES: ["I", "O", "T", "S", "Z", "J", "L"] as const,
   },
   PIECE_BAG: {
-    HISTORY_SIZE: 14, // 2bag分の履歴を保持
+    HISTORY_SIZE: 14, // Keep history for 2 bags
   },
 } as const;
 

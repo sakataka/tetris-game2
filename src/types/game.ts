@@ -47,10 +47,10 @@ export type GameBoard = CellValue[][];
  * Game animation state machine states
  */
 export type GameAnimationState =
-  | "idle" // 通常のゲームプレイ
-  | "line-clearing" // ライン消去アニメーション中
-  | "line-falling" // 重力アニメーション中
-  | "piece-placing"; // ピース配置アニメーション中
+  | "idle" // Normal gameplay
+  | "line-clearing" // Line clear animation in progress
+  | "line-falling" // Gravity animation in progress
+  | "piece-placing"; // Piece placement animation in progress
 
 /**
  * Data for line clear animation
@@ -59,7 +59,7 @@ export interface LineClearAnimationData {
   readonly clearedLineIndices: readonly number[];
   readonly animationStartTime: number;
   readonly expectedDuration: number;
-  readonly lineCount: 1 | 2 | 3 | 4; // シングル/ダブル/トリプル/テトリス
+  readonly lineCount: 1 | 2 | 3 | 4; // Single/Double/Triple/Tetris
 }
 
 /**
