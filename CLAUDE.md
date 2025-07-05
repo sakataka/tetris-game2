@@ -112,9 +112,6 @@ src/
 - **PREFER** individual primitive selectors when possible
 
 ```typescript
-// ❌ WRONG: Creates new object every render → infinite loop
-const { a, b } = useStore((state) => ({ a: state.a, b: state.b }));
-
 // ✅ CORRECT: Use useShallow for object selectors
 import { useShallow } from "zustand/shallow";
 const { a, b } = useStore(useShallow((state) => ({ a: state.a, b: state.b })));
@@ -129,23 +126,18 @@ const b = useStore((state) => state.b);
 
 1. **Board System** (`board.ts`):
    - Standard 20×10 Tetris grid with collision detection
-   - Function signatures for testing: `isValidPosition()`, `placePiece()`, `clearLines()`
 
 2. **Tetromino System** (`tetrominos.ts`):
    - All 7 standard pieces (I, O, T, S, Z, J, L) with matrix-based operations
-   - Function signatures for testing: `rotatePiece()`, `getTetrominoData()`
 
 3. **Piece Distribution** (`pieceBag.ts`):
    - 7-Bag randomization for fair piece distribution
-   - Function signatures for testing: `generatePieceBag()`, `getNextPiece()`
 
 4. **Rotation System** (`wallKick.ts`):
    - Super Rotation System (SRS) with I-piece handling
-   - Function signatures for testing: `performWallKick()`, `getKickData()`
 
 **Game State Management** (`game.ts`):
 - Pure functional approach, UI-agnostic logic
-- Function signatures for testing: `updateGameState()`, `processGameTick()`
 
 ## Development Commands and Execution
 

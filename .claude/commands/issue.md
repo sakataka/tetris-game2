@@ -11,3 +11,5 @@ Follow these steps:
 8. Close the issue using 'gh issue close' command. 
 
 Remember to use the GitHub CLI ('gh') for all Github-related tasks.
+
+If you encounter technical blockers during analysis or implementation, or need guidance on architectural decisions, consult the O3 MCP tool for expert assistance.
