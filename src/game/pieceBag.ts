@@ -64,11 +64,18 @@ export const getNextPiece = (bag: PieceBag): [TetrominoTypeName, PieceBag] => {
 
     const [nextPiece, ...remainingPieces] = newBag;
 
+    // Memory optimization: limit generatedPieces history
+    const newGeneratedPieces = [...bag.generatedPieces, nextPiece];
+    const limitedHistory =
+      newGeneratedPieces.length > GAME_CONSTANTS.PIECE_BAG.HISTORY_SIZE
+        ? newGeneratedPieces.slice(-GAME_CONSTANTS.PIECE_BAG.HISTORY_SIZE)
+        : newGeneratedPieces;
+
     return [
       nextPiece,
       {
         currentBag: remainingPieces,
-        generatedPieces: [...bag.generatedPieces, nextPiece],
+        generatedPieces: limitedHistory,
         bagCount: bag.bagCount + 1,
         seed: newSeed,
       },
@@ -78,11 +85,18 @@ export const getNextPiece = (bag: PieceBag): [TetrominoTypeName, PieceBag] => {
   // Handle existing bag case
   const [nextPiece, ...remainingPieces] = bag.currentBag;
 
+  // Memory optimization: limit generatedPieces history
+  const newGeneratedPieces = [...bag.generatedPieces, nextPiece];
+  const limitedHistory =
+    newGeneratedPieces.length > GAME_CONSTANTS.PIECE_BAG.HISTORY_SIZE
+      ? newGeneratedPieces.slice(-GAME_CONSTANTS.PIECE_BAG.HISTORY_SIZE)
+      : newGeneratedPieces;
+
   return [
     nextPiece,
     {
       currentBag: remainingPieces,
-      generatedPieces: [...bag.generatedPieces, nextPiece],
+      generatedPieces: limitedHistory,
       bagCount: bag.bagCount,
       seed: bag.seed,
     },

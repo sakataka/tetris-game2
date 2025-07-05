@@ -188,6 +188,75 @@ describe("Functional PieceBag (mizchi-style)", () => {
     });
   });
 
+  describe("Memory optimization", () => {
+    it("should limit generatedPieces history to 14 items", () => {
+      let bag = createPieceBag();
+
+      // Generate 20 pieces (more than the limit)
+      for (let i = 0; i < 20; i++) {
+        const [, newBag] = getNextPiece(bag);
+        bag = newBag;
+      }
+
+      // Should not exceed the limit
+      expect(bag.generatedPieces.length).toBe(14);
+    });
+
+    it("should keep the most recent pieces when limiting", () => {
+      let bag = createPieceBag();
+      const allPieces = [];
+
+      // Generate 20 pieces
+      for (let i = 0; i < 20; i++) {
+        const [piece, newBag] = getNextPiece(bag);
+        allPieces.push(piece);
+        bag = newBag;
+      }
+
+      // generatedPieces should contain the last 14 pieces
+      expect(bag.generatedPieces).toEqual(allPieces.slice(-14));
+    });
+
+    it("should maintain functionality under 14 pieces", () => {
+      let bag = createPieceBag();
+
+      // Generate 10 pieces (less than the limit)
+      for (let i = 0; i < 10; i++) {
+        const [, newBag] = getNextPiece(bag);
+        bag = newBag;
+      }
+
+      // Should contain all 10 pieces
+      expect(bag.generatedPieces.length).toBe(10);
+    });
+
+    it("should handle memory optimization with 100 pieces", () => {
+      let bag = createPieceBag();
+
+      // Generate 100 pieces
+      for (let i = 0; i < 100; i++) {
+        const [, newBag] = getNextPiece(bag);
+        bag = newBag;
+      }
+
+      // Should not exceed the limit
+      expect(bag.generatedPieces.length).toBe(14);
+    });
+
+    it("should handle memory optimization with 1000 pieces", () => {
+      let bag = createPieceBag();
+
+      // Generate 1000 pieces
+      for (let i = 0; i < 1000; i++) {
+        const [, newBag] = getNextPiece(bag);
+        bag = newBag;
+      }
+
+      // Should not exceed the limit even with many pieces
+      expect(bag.generatedPieces.length).toBe(14);
+    });
+  });
+
   describe("Property-based testing with fast-check", () => {
     it("should always create bags with exactly 7 unique pieces", () => {
       fc.assert(

@@ -82,6 +82,9 @@ export const GAME_CONSTANTS = {
   TYPES: {
     TETROMINO_TYPES: ["I", "O", "T", "S", "Z", "J", "L"] as const,
   },
+  PIECE_BAG: {
+    HISTORY_SIZE: 14, // 2bag分の履歴を保持
+  },
 } as const;
 
 // All constants are now accessed through the centralized GAME_CONSTANTS object
