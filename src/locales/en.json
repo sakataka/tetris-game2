@@ -1,10 +1,7 @@
 {
   "game": {
-    "title": "Tetris",
     "next": "Next",
     "hold": "Hold",
-    "holdPiece": "Hold Piece",
-    "holdDescription": "Save piece",
     "gameOver": "Game Over",
     "paused": "Paused",
     "newGame": "New Game",
@@ -21,7 +18,6 @@
       "title": "High Score"
     },
     "highScores": {
-      "title": "High Score",
       "topScores": "Top Scores",
       "noScore": "No score yet",
       "noScores": "No scores yet"
@@ -41,14 +37,11 @@
       "language": "Language",
       "current": "Current",
       "ghostPiece": "Ghost Piece",
-      "ghostPieceDescription": "Ghost Piece Display",
-      "enabled": "Enabled",
-      "disabled": "Disabled"
+      "ghostPieceDescription": "Ghost Piece Display"
     },
     "resetConfirmation": {
       "title": "Reset Game",
       "message": "Reset the current game?",
-      "scoreNotice": "Your score will be saved.",
       "confirm": "Yes",
       "cancel": "No"
     }

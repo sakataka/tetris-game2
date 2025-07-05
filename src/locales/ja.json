@@ -1,10 +1,7 @@
 {
   "game": {
-    "title": "テトリス",
     "next": "次のピース",
     "hold": "ホールド",
-    "holdPiece": "ホールドピース",
-    "holdDescription": "ピースを保存",
     "gameOver": "ゲームオーバー",
     "paused": "一時停止中",
     "newGame": "新しいゲーム",
@@ -21,7 +18,6 @@
       "title": "ハイスコア"
     },
     "highScores": {
-      "title": "ハイスコア",
       "topScores": "トップスコア",
       "noScore": "スコアがありません",
       "noScores": "スコアがありません"
@@ -41,14 +37,11 @@
       "language": "言語",
       "current": "現在",
       "ghostPiece": "ゴーストピース",
-      "ghostPieceDescription": "ゴーストピース表示",
-      "enabled": "有効",
-      "disabled": "無効"
+      "ghostPieceDescription": "ゴーストピース表示"
     },
     "resetConfirmation": {
       "title": "ゲームリセット",
       "message": "現在のゲームをリセットしますか？",
-      "scoreNotice": "スコアは記録されます。",
       "confirm": "はい",
       "cancel": "いいえ"
     }

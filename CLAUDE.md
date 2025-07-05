@@ -147,6 +147,9 @@ bun run build        # Production build (MUST succeed before commits)
 bun run e2e          # Run Playwright E2E tests (headless)
 bun run e2e:headed   # Run Playwright E2E tests (with browser UI)
 
+# i18n Management
+bun run check:i18n   # Check translation key consistency (detect missing/unused keys)
+
 # Quality Assurance Pipeline
 bun run ci           # Complete CI pipeline (lint + typecheck + test + build)
 ```
@@ -154,6 +157,7 @@ bun run ci           # Complete CI pipeline (lint + typecheck + test + build)
 ### EXECUTION CONDITIONS
 - **Before ANY commit**: Run `bun run lint` AND `bun run typecheck`
 - **After code changes**: Run `bun test` to verify no regressions
+- **After i18n changes**: Run `bun run check:i18n` to verify translation key consistency
 - **Before production deployment**: Run `bun run ci` to ensure all checks pass
 - **Git hooks**: Lefthook automatically runs formatting and validation
 
