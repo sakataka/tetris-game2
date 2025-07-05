@@ -77,15 +77,26 @@ The production build will be generated in the `dist/` directory, ready for deplo
 
 ```bash
 # Development
-bun run dev                    # Start development server
+bun run dev                    # Start development server (http://localhost:5173)
 bun run build                  # Create production build
 bun run preview                # Preview production build
 
-# Testing & Quality Assurance
-bun test                       # Run test suite
-bun run lint                   # Lint code with Biome
+# Testing
+bun test                       # Run pure function tests (game, utils, lib)
+bun run test:dom               # Run DOM-related tests (hooks, store)
+bun run test:all               # Run all tests (MUST pass before commits)
+bun run e2e                    # Run Playwright E2E tests (headless)
+bun run e2e:headed             # Run Playwright E2E tests (with browser UI)
+
+# Code Quality
+bun run lint                   # Lint code with Biome (MUST pass before commits)
 bun run format                 # Format code with Biome
-bun run typecheck              # TypeScript type checking
+bun run typecheck              # TypeScript type checking (MUST pass before commits)
+
+# i18n Management
+bun run check:i18n             # Check translation key consistency
+
+# CI Pipeline
 bun run ci                     # Full CI pipeline (lint + typecheck + test + build)
 ```
 

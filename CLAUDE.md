@@ -305,3 +305,29 @@ mcp__context7__get-library-docs "/oven-sh/bun"
 - ✅ Trigger ONLY when ALL todo items marked as completed
 - ✅ Use reasonable volume settings (volumeScale=0.1)
 - ✅ Prefer Japanese completion messages
+
+### O3 MCP - Technical Problem Solving
+**ACTIVATION CONDITIONS**:
+- IF encountering technical blockers during design/implementation THEN use o3 MCP
+- IF unable to resolve complex errors THEN consult o3 MCP
+- IF uncertain about architectural decisions THEN use o3 MCP
+- IF needing alternative implementation approaches THEN use o3 MCP
+
+**EXECUTION WORKFLOW**:
+```bash
+# Use o3 MCP for technical consultation
+mcp__o3__o3-search "Technical problem description in detail"
+
+# Example scenarios:
+# - Complex TypeScript type errors
+# - Performance optimization strategies
+# - Architecture pattern decisions
+# - Library integration issues
+# - Algorithm implementation challenges
+```
+
+**USAGE GUIDELINES**:
+- Provide detailed context about the problem
+- Include relevant code snippets and error messages
+- Specify what solutions have been attempted
+- Ask specific questions for targeted assistance
