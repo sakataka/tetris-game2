@@ -19,7 +19,7 @@ export function NoHighScore({ className }: NoHighScoreProps) {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="text-center text-gray-400">{t("game.highScore.noScore")}</div>
+        <div className="text-center text-gray-400">{t("game.highScores.noScore")}</div>
       </CardContent>
     </Card>
   );

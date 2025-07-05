@@ -50,14 +50,14 @@ export function GameOverlay() {
                     {t("game.newHighScore")}!
                   </p>
                   <p className="text-lg text-gray-300">
-                    {t("game.score")}: {score.toLocaleString()}
+                    {t("game.score.title")}: {score.toLocaleString()}
                   </p>
                 </div>
               )}
               {!isNewHighScore && currentHighScore && (
                 <div className="text-center text-gray-300">
                   <p className="text-sm">
-                    {t("game.highScore")}: {currentHighScore.score.toLocaleString()}
+                    {t("game.highScore.title")}: {currentHighScore.score.toLocaleString()}
                   </p>
                 </div>
               )}

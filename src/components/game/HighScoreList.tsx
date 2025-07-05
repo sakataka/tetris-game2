@@ -18,12 +18,12 @@ export function HighScoreList({ scores, className }: HighScoreListProps) {
       <CardHeader>
         <CardTitle className="text-base font-bold text-gray-300 text-center flex items-center justify-center gap-2">
           <Trophy className="h-5 w-5 text-yellow-500" />
-          {t("game.highScore.topScores")}
+          {t("game.highScores.topScores")}
         </CardTitle>
       </CardHeader>
       <CardContent>
         {scores.length === 0 ? (
-          <div className="text-center text-gray-400">{t("game.highScore.noScores")}</div>
+          <div className="text-center text-gray-400">{t("game.highScores.noScores")}</div>
         ) : (
           <div className="space-y-2">
             {scores.map((score, index) => (
