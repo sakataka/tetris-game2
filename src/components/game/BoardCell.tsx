@@ -131,7 +131,9 @@ export function BoardCell({ row, col, cellSize = GAME_CONSTANTS.BOARD.CELL_SIZE 
 
   // Use regular div for static cells to improve performance
   if (!needsAnimation) {
-    return <div className={cellClasses} style={cellStyle} data-testid="board-cell" />;
+    return (
+      <div className={cellClasses} style={cellStyle} data-testid="board-cell" data-line={row} />
+    );
   }
 
   // Use motion.div only when animation is needed
@@ -145,6 +147,7 @@ export function BoardCell({ row, col, cellSize = GAME_CONSTANTS.BOARD.CELL_SIZE 
       className={cellClasses}
       style={cellStyle}
       data-testid="board-cell"
+      data-line={row}
     />
   );
 }
