@@ -140,28 +140,18 @@ class TypedArrayBoardEngine implements BoardEngine {
     for (let y = 0; y < shape.length; y++) {
       const boardY = position.y + y;
 
-      // Early exit for bottom boundary (most frequent check)
-      if (boardY >= this.height) {
-        return false;
-      }
-
-      // Skip rows that are above the board (negative y)
-      if (boardY < 0) {
-        continue;
-      }
-
       const row = shape[y];
       for (let x = 0; x < row.length; x++) {
         if (!row[x]) continue; // Skip empty cells
 
         const boardX = position.x + x;
 
-        // Left/Right boundary checks (medium frequency)
-        if (boardX < 0 || boardX >= this.width) {
+        // Check boundaries first
+        if (boardX < 0 || boardX >= this.width || boardY < 0 || boardY >= this.height) {
           return false;
         }
 
-        // Cell occupation check (2nd most frequent)
+        // Cell occupation check
         // Use 1D array access for better cache performance
         const cellIndex = boardY * this.width + boardX;
         if (boardBuffer[cellIndex] !== 0) {
@@ -237,7 +227,9 @@ class TypedArrayBoardEngine implements BoardEngine {
     }
 
     if (clearedLineIndices.length === 0) {
-      return { board, linesCleared: 0, clearedLineIndices: [] };
+      // Return deep copy to preserve immutability
+      const newBoard = this.bufferTo2D(boardBuffer);
+      return { board: newBoard, linesCleared: 0, clearedLineIndices: [] };
     }
 
     // Build new buffer with cleared lines removed

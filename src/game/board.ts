@@ -29,13 +29,19 @@ export function isValidPosition(
       if (!cell) return true;
       const boardX = position.x + x;
       const boardY = position.y + y;
-      return (
-        boardX >= 0 &&
-        boardX < GAME_CONSTANTS.BOARD.WIDTH &&
-        boardY >= 0 &&
-        boardY < GAME_CONSTANTS.BOARD.HEIGHT &&
-        !board[boardY]?.[boardX]
-      );
+
+      // Check boundaries first
+      if (
+        boardX < 0 ||
+        boardX >= GAME_CONSTANTS.BOARD.WIDTH ||
+        boardY < 0 ||
+        boardY >= GAME_CONSTANTS.BOARD.HEIGHT
+      ) {
+        return false;
+      }
+
+      // Check collision with existing pieces
+      return !board[boardY][boardX];
     }),
   );
 }
@@ -87,7 +93,9 @@ export function clearLines(board: GameBoard): {
     .filter((i) => i !== -1);
 
   if (clearedLineIndices.length === 0) {
-    return { board, linesCleared: 0, clearedLineIndices: [] };
+    // Return deep copy to preserve immutability
+    const newBoard = board.map((row) => [...row]) as GameBoard;
+    return { board: newBoard, linesCleared: 0, clearedLineIndices: [] };
   }
 
   const remainingRows = board.filter((_, index) => !clearedLineIndices.includes(index));
