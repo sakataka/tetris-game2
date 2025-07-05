@@ -17,6 +17,8 @@
     "ci": "bun x biome ci && bun run typecheck && bun test && bun run build",
     "prepare": "lefthook install",
     "check:i18n": "bun run scripts/check-i18n-keys.ts",
+    "benchmark": "bun run src/benchmarks/cli.ts",
+    "benchmark:ci": "bun run src/benchmarks/cli.ts --ci",
     "e2e": "bun x playwright test --config=playwright.config.ts src/tests/visual/minimal-desktop.spec.ts --project=chromium",
     "e2e:headed": "bun x playwright test --config=playwright.config.ts src/tests/visual/strategic-line-clear.spec.ts --project=chromium --headed"
   },
