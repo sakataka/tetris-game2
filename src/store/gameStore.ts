@@ -73,7 +73,8 @@ function createInitialStateWithDebug(): GameState & {
   const debugParams = parseDebugParams();
   const initialState = createInitialGameState();
 
-  const result = {
+  // Base state with animation properties
+  const baseStateWithAnimation = {
     ...initialState,
     debugMode: debugParams.enabled,
     debugParams: debugParams.enabled ? debugParams : null,
@@ -82,45 +83,62 @@ function createInitialStateWithDebug(): GameState & {
     animationController: null,
   };
 
-  if (debugParams.enabled) {
-    // Apply preset if specified
-    if (debugParams.preset) {
-      const preset = getDebugPreset(debugParams.preset);
-      if (preset) {
-        result.board = preset.board;
-
-        if (preset.score !== undefined) result.score = preset.score;
-        if (preset.level !== undefined) result.level = preset.level;
-        if (preset.lines !== undefined) result.lines = preset.lines;
-
-        // Set up piece queue if specified in preset
-        if (preset.nextPieces && preset.nextPieces.length > 0) {
-          createDebugBag(preset.nextPieces); // Initialize debug bag
-          result.currentPiece = createTetromino(preset.nextPieces[0]);
-          result.nextPiece = preset.nextPieces[1] || "T";
-          result.pieceBag = preset.nextPieces.slice(2);
-        }
-      }
-    }
-
-    // Override with URL parameters if specified
-    if (debugParams.score !== undefined) result.score = debugParams.score;
-    if (debugParams.level !== undefined) result.level = debugParams.level;
-    if (debugParams.lines !== undefined) result.lines = debugParams.lines;
-
-    // Set up custom piece queue from URL
-    if (debugParams.queue && debugParams.queue.length > 0) {
-      createDebugBag(debugParams.queue); // Initialize debug bag
-      result.currentPiece = createTetromino(debugParams.queue[0]);
-      result.nextPiece = debugParams.queue[1] || "T";
-      result.pieceBag = debugParams.queue.slice(2);
-    }
-
-    // Recalculate ghost position after debug setup
-    result.ghostPosition = calculateGhostPosition(result);
+  if (!debugParams.enabled) {
+    return baseStateWithAnimation;
   }
 
-  return result;
+  // Apply debug modifications immutably
+  let debugModifiedState = baseStateWithAnimation;
+
+  // Apply preset if specified
+  if (debugParams.preset) {
+    const preset = getDebugPreset(debugParams.preset);
+    if (preset) {
+      debugModifiedState = {
+        ...debugModifiedState,
+        board: preset.board,
+        ...(preset.score !== undefined && { score: preset.score }),
+        ...(preset.level !== undefined && { level: preset.level }),
+        ...(preset.lines !== undefined && { lines: preset.lines }),
+      };
+
+      // Set up piece queue if specified in preset
+      if (preset.nextPieces && preset.nextPieces.length > 0) {
+        createDebugBag(preset.nextPieces); // Initialize debug bag
+        debugModifiedState = {
+          ...debugModifiedState,
+          currentPiece: createTetromino(preset.nextPieces[0]),
+          nextPiece: preset.nextPieces[1] || "T",
+          pieceBag: preset.nextPieces.slice(2),
+        };
+      }
+    }
+  }
+
+  // Override with URL parameters if specified
+  debugModifiedState = {
+    ...debugModifiedState,
+    ...(debugParams.score !== undefined && { score: debugParams.score }),
+    ...(debugParams.level !== undefined && { level: debugParams.level }),
+    ...(debugParams.lines !== undefined && { lines: debugParams.lines }),
+  };
+
+  // Set up custom piece queue from URL
+  if (debugParams.queue && debugParams.queue.length > 0) {
+    createDebugBag(debugParams.queue); // Initialize debug bag
+    debugModifiedState = {
+      ...debugModifiedState,
+      currentPiece: createTetromino(debugParams.queue[0]),
+      nextPiece: debugParams.queue[1] || "T",
+      pieceBag: debugParams.queue.slice(2),
+    };
+  }
+
+  // Recalculate ghost position after debug setup and return final state
+  return {
+    ...debugModifiedState,
+    ghostPosition: calculateGhostPosition(debugModifiedState),
+  };
 }
 
 const INITIAL_STATE = createInitialStateWithDebug();

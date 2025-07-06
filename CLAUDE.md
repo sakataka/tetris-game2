@@ -28,6 +28,7 @@
 - **UI Component System**: shadcn/ui (copy-paste component library)
   - Components: button, card, dialog, badge (located in `/src/components/ui/`)
   - Built on: Radix UI primitives + Tailwind CSS
+  - Radix UI: @radix-ui/react-dialog 1.1.14, @radix-ui/react-slot 1.2.3
   - Utilities: class-variance-authority 0.7.1 (variant management)
 - **Icons**: Lucide React 0.525.0 (icon library)
 - **State Management**: immer 10.1.1 (immutable state updates, used with Zustand)
@@ -41,7 +42,7 @@
 - **Git Hooks**: Lefthook 1.11.16 (pre-commit validation, commit message linting)
 - **Testing**: Bun Test with happy-dom 18.0.1 (DOM simulation)
 - **Testing Libraries**: @testing-library/jest-dom 6.6.3, @testing-library/react 16.3.0
-- **Property Testing**: fast-check 4.1.1 (property-based testing)
+- **Property Testing**: fast-check 4.2.0 (property-based testing)
 - **E2E Testing**: Playwright 1.53.2 (browser automation)
 - **React Plugin**: @vitejs/plugin-react-oxc 0.2.3 (Vite React plugin)
 - **Unused Dependencies Detection**: knip 5.61.3
@@ -50,40 +51,41 @@
 
 ### Directory Structure and Component Organization
 
+**Principle**: Clear separation of concerns with testability as a primary consideration
+
 ```
 src/
-├── components/     # React UI components (DO NOT TEST)
-│   ├── game/      # Game-specific components: AnimatedScoreItem, Board, BoardCell, Controls,
-│   │              # CurrentHighScore, GameOverlay, HighScore, HighScoreItem, HighScoreList,
-│   │              # HoldPiece, NextPiece, NoHighScore, ResetConfirmationDialog, ScoreBoard,
-│   │              # TetrominoGrid, TouchControls
-│   ├── layout/    # Layout components: Game, GameSettings, MobileGameLayout, MobileHeader
-│   └── ui/        # Reusable UI components: AnimatedButton, badge, button, card, dialog
+├── benchmarks/    # Performance benchmarks (TEST ALL FUNCTIONS)
+├── components/    # React UI components (DO NOT TEST)
+│   ├── game/      # Game-specific UI components and displays
+│   ├── layout/    # Application layout and structural components
+│   └── ui/        # Reusable UI primitives (shadcn/ui components)
 ├── game/          # Pure game logic (TEST ALL FUNCTIONS)
-│   │              # Files: board.ts, game.ts, pieceBag.ts, tetrominos.ts, wallKick.ts
+│                  # Core Tetris mechanics, board operations, scoring
 ├── hooks/         # Custom React hooks (TEST ONLY EXTRACTED PURE FUNCTIONS)
-│   ├── actions/   # Game action hooks: useGameActions
-│   ├── common/    # Shared utility hooks: useHapticFeedback, useInputDebounce
-│   ├── controls/  # Input handling: useActionCooldown, useGameInputActions, useKeyboardControls,
-│   │              # useKeyboardInput, useMovementControls, useRotationControl, useTouchActions
-│   ├── core/      # Core game hooks: useGameActionHandler, useGameLoop
-│   ├── data/      # Data hooks: useHighScore
-│   ├── effects/   # Visual effect hooks: useHighScoreSideEffect
-│   ├── selectors/ # State selector hooks: useBoardSelectors, useScoreSelectors
-│   └── ui/        # UI-specific hooks: useAnimatedValue, useAnimationCompletionHandler,
-│                  # useCellAnimation, useResponsiveBoard
+│   ├── actions/   # Game action orchestration hooks
+│   ├── common/    # Shared utility hooks
+│   ├── controls/  # Input handling and user interaction hooks
+│   ├── core/      # Core game lifecycle hooks
+│   ├── data/      # Data access and persistence hooks
+│   ├── effects/   # Side effects and animation hooks
+│   ├── selectors/ # State selection and computed state hooks
+│   └── ui/        # UI-specific behavior hooks
 ├── store/         # Zustand state management (TEST ALL STORE LOGIC)
-│   │              # Files: gameStore.ts, highScoreStore.ts, settingsStore.ts
-├── types/         # TypeScript definitions: game.ts, storage.ts
+├── types/         # TypeScript type definitions
 ├── utils/         # Shared utilities and constants (TEST ALL FUNCTIONS)
-│   │              # Files: animationConstants.ts, boardUtils.ts, colors.ts, debugLanguage.ts,
-│   │              # gameConstants.ts, gameValidation.ts, styles.ts, typeGuards.ts
-├── locales/       # i18n translation files: en.json, ja.json
-├── i18n/          # i18n configuration: config.ts
-├── lib/           # Shared utility functions: utils.ts
-├── test/          # Test configuration and utilities: setup.ts, __mocks__/
-├── tests/         # E2E tests and visual testing
+├── locales/       # i18n translation files
+├── i18n/          # i18n configuration
+├── lib/           # Shared utility functions
+├── test/          # Test configuration, setup, and utilities
+└── tests/         # E2E tests and visual testing
 ```
+
+**Key Architectural Decisions**:
+- **UI Components**: Never tested directly, focus on visual presentation
+- **Pure Functions**: Always tested, located in `game/`, `utils/`, `lib/`
+- **Hooks**: Only extracted pure functions tested, not hook behavior
+- **State Management**: Store logic tested, selectors verified for stability
 
 ### State Management Architecture
 **Store Implementation**: Zustand 5.0.6 with functional programming patterns
@@ -122,22 +124,15 @@ const b = useStore((state) => state.b);
 ```
 
 ### Core Game Logic Implementation
-**Game Mechanics** (Located in `/src/game/`):
+**Location**: `/src/game/` (TEST ALL FUNCTIONS)
 
-1. **Board System** (`board.ts`):
-   - Standard 20×10 Tetris grid with collision detection
-
-2. **Tetromino System** (`tetrominos.ts`):
-   - All 7 standard pieces (I, O, T, S, Z, J, L) with matrix-based operations
-
-3. **Piece Distribution** (`pieceBag.ts`):
-   - 7-Bag randomization for fair piece distribution
-
-4. **Rotation System** (`wallKick.ts`):
-   - Super Rotation System (SRS) with I-piece handling
-
-**Game State Management** (`game.ts`):
-- Pure functional approach, UI-agnostic logic
+**Key Systems**:
+- **Board Operations**: 20×10 grid with collision detection and line clearing
+- **Tetromino Management**: 7 standard pieces with Super Rotation System (SRS)
+- **Piece Distribution**: 7-Bag randomization for fair gameplay
+- **T-Spin Detection**: 3-corner rule with wall kick integration
+- **Scoring System**: Level-based progression with T-Spin multipliers
+- **Board Engine**: Strategy pattern for optimized performance
 
 ## Development Commands and Execution
 
@@ -160,6 +155,10 @@ bun run e2e:headed   # Run Playwright E2E tests (with browser UI)
 # i18n Management
 bun run check:i18n   # Check translation key consistency (detect missing/unused keys)
 
+# Performance Benchmarking
+bun run benchmark    # Run performance benchmarks (collision detection, board operations)
+bun run benchmark:ci # Run benchmarks in CI mode with automated analysis
+
 # Quality Assurance Pipeline
 bun run ci           # Complete CI pipeline (lint + typecheck + test + build)
 ```
@@ -174,31 +173,20 @@ bun run ci           # Complete CI pipeline (lint + typecheck + test + build)
 ## TESTING STRATEGY AND IMPLEMENTATION
 
 ### TESTING RULES (Strict Enforcement)
-1. **TEST TARGETS**: 
-   - ✅ Pure functions in `/src/game/`, `/src/utils/`, `/src/store/`
-   - ✅ Business logic extracted from hooks
-   - ❌ React components, DOM interactions, UI behavior
-   - ❌ React hooks themselves (only extracted pure functions)
-   - ❌ Framework-specific behavior (React, Zustand)
+**TEST TARGETS**: 
+- ✅ Pure functions in `/src/game/`, `/src/utils/`, `/src/store/`, `/src/benchmarks/`
+- ✅ Business logic extracted from hooks
+- ❌ React components, DOM interactions, UI behavior
+- ❌ React hooks themselves (only extracted pure functions)
 
-2. **TEST EXECUTION**:
-   - Pure function tests: `bun test src/game/ src/utils/ src/lib/ --ignore '**/visual/**'`
-   - DOM-related tests: `bun test src/hooks/ src/store/ --ignore '**/visual/**'`
-   - All tests: `bun test src/ --ignore '**/visual/**'`
-   - Environment: Bun Test with happy-dom
-   - Pattern: Co-located test files (e.g., `board.test.ts` alongside `board.ts`)
+**EXECUTION**:
+- Pure functions: `bun test src/game/ src/utils/ src/lib/`
+- DOM-related: `bun test src/hooks/ src/store/`
+- All tests: `bun test src/`
+- Co-located test files (e.g., `board.test.ts` alongside `board.ts`)
 
-3. **MOCKING STRATEGY**:
-   - Use real implementations whenever possible
-   - Mock ONLY external dependencies (localStorage, i18n)
-   - Available mocks: `/src/test/__mocks__/react-i18next.ts`
-
-4. **ZUSTAND TESTING PATTERNS**:
-   - Test store actions and state transitions, NOT selectors
-   - Use `act()` wrapper for store updates in React components
-   - Test custom hooks with `useShallow` pattern separately from component integration
-   - Verify selector stability with multiple renders in test environment
-   - Mock external store dependencies (localStorage, persist middleware)
+**MOCKING**: Mock ONLY external dependencies (localStorage, i18n)
+**STORE TESTING**: Test actions and state transitions, NOT selectors
 
 ## IMPORT PATH DECISION TREE (CRITICAL)
 
@@ -238,19 +226,112 @@ EXCEPTION: Test mocks may use relative paths when required by testing framework
 - IF UI component needed THEN check existing shadcn/ui components first
 - IF custom component needed THEN follow shadcn/ui patterns (Radix UI + Tailwind + CVA)
 
-**Zustand v5 Debugging Guidelines**:
-- IF "getSnapshot should be cached" error occurs THEN check for object/array selectors
-- IF "Maximum update depth exceeded" error occurs THEN use `useShallow` for complex selectors
-- IF infinite rendering detected THEN verify all selectors return stable references
-- IF custom hook returns objects THEN wrap with `useShallow` or split into primitives
-- IF debugging selector issues THEN use React DevTools Profiler to identify re-render sources
+**Zustand v5 Debugging**:
+- "getSnapshot should be cached" → Check object/array selectors
+- "Maximum update depth exceeded" → Use `useShallow` for complex selectors
+- Infinite rendering → Verify selector stability with React DevTools
 
-### DEVELOPMENT TOOLS CONFIGURATION
-- **Primary Runtime**: Bun (package management, testing, development)
-- **Code Quality**: Biome with strict rules (auto-format via Lefthook)
-- **Type Checking**: TypeScript strict mode with ESNext target
-- **Git Workflow**: Conventional commits enforced via Lefthook hooks
-- **Trusted Dependencies**: @tailwindcss/oxide (explicit trust for native dependencies)
+## DEBUG MODE SYSTEM
+
+**Purpose**: Rapid testing via URL parameters (detailed docs in README.md)
+**Key Files**: `/src/utils/debugParams.ts`, `/src/utils/debugPresets.ts`
+
+### Quick Reference
+```bash
+# Enable debug mode with preset
+http://localhost:5173/?debug=true&preset=tetris
+
+# Custom piece queue
+http://localhost:5173/?debug=true&queue=IJLOSTZ&score=50000
+```
+
+### Implementation Requirements
+- **ALWAYS** validate debug parameters for type safety
+- **ALWAYS** use immutable state initialization in debug functions
+- **NEVER** allow debug mode in production builds
+- Debug UI shows in red panel when active
+
+## STATE MANAGEMENT BEST PRACTICES
+
+### Critical Zustand v5 Requirements
+- **NEVER** return new objects/arrays directly from selectors
+- **ALWAYS** use `useShallow` for object/array selectors
+- **PREFER** individual primitive selectors when possible
+
+### Required Patterns
+```typescript
+// ✅ REQUIRED: Individual primitive selectors (most stable)
+const score = useGameStore((state) => state.score);
+const level = useGameStore((state) => state.level);
+
+// ✅ ACCEPTABLE: useShallow for object selectors
+import { useShallow } from "zustand/shallow";
+const { score, level } = useGameStore(
+  useShallow((state) => ({ score: state.score, level: state.level }))
+);
+
+// ❌ FORBIDDEN: Object creation in selector (infinite re-renders)
+const gameStats = useGameStore((state) => ({
+  score: state.score,
+  level: state.level
+})); // Creates new object on every render
+
+// ✅ REQUIRED: Functional state transitions
+const moveTetrominoBy = (state: GameState, dx: number, dy: number) => {
+  const newPosition = { x: state.currentPiece.x + dx, y: state.currentPiece.y + dy };
+  if (isValidPosition(state.board, state.currentPiece.shape, newPosition)) {
+    state.currentPiece.x = newPosition.x;
+    state.currentPiece.y = newPosition.y;
+    state.ghostPosition = calculateGhostPosition(state);
+  }
+};
+
+// ✅ REQUIRED: Conditional updates to prevent unnecessary renders
+clearAnimationData: () => set((state) => {
+  if (state.placedPositions.length > 0 || state.clearingLines.length > 0) {
+    state.placedPositions = [];
+    state.clearingLines = [];
+    state.boardBeforeClear = null;
+  }
+});
+```
+
+### Testing Requirements
+- **ALWAYS** test store actions and state transitions
+- **ALWAYS** reset store state in `beforeEach`
+- **NEVER** test selectors directly - test the business logic they access
+
+## PERFORMANCE OPTIMIZATION STRATEGIES
+
+### Critical Performance Requirements
+- **React.memo**: Use for BoardCell and expensive components with custom comparison
+- **useCallback/useMemo**: Required for game loop and animation functions
+- **requestAnimationFrame**: ALWAYS use for smooth 60fps animations
+- **Bundle Analysis**: Run `bun run build` → check `dist/stats.html` for size monitoring
+
+### Key Optimization Patterns
+```typescript
+// ✅ REQUIRED: Memoized board cells
+const BoardCell = React.memo(({ value, isGhost, isClearing }) => {
+  return <div className={getCellClassName(value, isGhost, isClearing)} />;
+}, shallowCompare);
+
+// ✅ REQUIRED: Animation cleanup
+useEffect(() => {
+  const frameId = requestAnimationFrame(gameLoop);
+  return () => cancelAnimationFrame(frameId);
+}, []);
+
+// ✅ REQUIRED: GPU-accelerated animations only
+<motion.div animate={{ scale: 1.1, opacity: 0.8 }} />
+// ❌ NEVER: Layout animations
+<motion.div animate={{ width: 200, height: 300 }} />
+```
+
+### Performance Monitoring
+- **Benchmarks**: `bun run benchmark` for collision detection and board operations
+- **Bundle Targets**: < 500KB total, < 200KB vendor chunk
+- **Runtime Targets**: 60fps gameplay, < 50MB memory growth/minute
 
 ## MCP TOOLS USAGE PROTOCOLS
 
