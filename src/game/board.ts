@@ -24,11 +24,11 @@ export function isValidPosition(
   shape: TetrominoShape,
   position: Position,
 ): boolean {
-  return shape.every((row, y) =>
-    row.every((cell, x) => {
+  return shape.every((row, rowIndex) =>
+    row.every((cell, colIndex) => {
       if (!cell) return true;
-      const boardX = position.x + x;
-      const boardY = position.y + y;
+      const boardX = position.x + colIndex;
+      const boardY = position.y + rowIndex;
 
       // Check boundaries first
       if (
