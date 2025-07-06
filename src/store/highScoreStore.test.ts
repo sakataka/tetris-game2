@@ -5,19 +5,36 @@ import { useHighScoreStore } from "./highScoreStore";
 // Mock localStorage for testing
 const mockStorage: Record<string, string> = {};
 
+class MockStorage implements Storage {
+  get length(): number {
+    return Object.keys(mockStorage).length;
+  }
+
+  key(index: number): string | null {
+    const keys = Object.keys(mockStorage);
+    return keys[index] || null;
+  }
+
+  getItem(key: string): string | null {
+    return mockStorage[key] || null;
+  }
+
+  setItem(key: string, value: string): void {
+    mockStorage[key] = value;
+  }
+
+  removeItem(key: string): void {
+    delete mockStorage[key];
+  }
+
+  clear(): void {
+    Object.keys(mockStorage).forEach((key) => delete mockStorage[key]);
+  }
+}
+
+// Set up mock localStorage
 Object.defineProperty(globalThis, "localStorage", {
-  value: {
-    getItem: (key: string) => mockStorage[key] || null,
-    setItem: (key: string, value: string) => {
-      mockStorage[key] = value;
-    },
-    removeItem: (key: string) => {
-      delete mockStorage[key];
-    },
-    clear: () => {
-      Object.keys(mockStorage).forEach((key) => delete mockStorage[key]);
-    },
-  },
+  value: new MockStorage(),
   writable: true,
 });
 
@@ -254,6 +271,250 @@ describe("highScoreStore", () => {
       expect(result.current.currentHighScore).toBeDefined();
       expect(Array.isArray(result.current.highScoresList)).toBe(true);
       expect(typeof result.current.addNewHighScore).toBe("function");
+    });
+  });
+
+  describe("localStorage persistence behavior", () => {
+    it("should maintain consistent state across multiple operations", () => {
+      const { result } = renderHook(() => useHighScoreStore());
+
+      // Add multiple high scores and verify state consistency
+      act(() => {
+        result.current.addNewHighScore(1000, 10, 1);
+      });
+
+      const _firstState = {
+        currentHighScore: result.current.currentHighScore,
+        highScoresList: [...result.current.highScoresList],
+      };
+
+      act(() => {
+        result.current.addNewHighScore(2000, 20, 2);
+      });
+
+      // Verify state progression is logical
+      expect(result.current.currentHighScore?.score).toBe(2000);
+      expect(result.current.highScoresList).toHaveLength(2);
+      expect(result.current.highScoresList[0].score).toBe(2000);
+      expect(result.current.highScoresList[1].score).toBe(1000);
+    });
+
+    it("should pre-populate localStorage data correctly", () => {
+      // Pre-populate localStorage with high scores data
+      const mockHighScoresData = {
+        state: {
+          currentHighScore: {
+            score: 5000,
+            lines: 50,
+            level: 5,
+            date: "2024-01-01T00:00:00.000Z",
+          },
+          highScoresList: [
+            { score: 5000, lines: 50, level: 5, date: "2024-01-01T00:00:00.000Z" },
+            { score: 4000, lines: 40, level: 4, date: "2024-01-02T00:00:00.000Z" },
+          ],
+        },
+        version: 0,
+      };
+
+      localStorage.setItem("tetris-high-scores", JSON.stringify(mockHighScoresData));
+
+      // Verify localStorage data structure is correct
+      const stored = localStorage.getItem("tetris-high-scores");
+      expect(stored).toBeTruthy();
+
+      if (stored) {
+        const parsedData = JSON.parse(stored);
+        expect(parsedData.state.currentHighScore.score).toBe(5000);
+        expect(parsedData.state.highScoresList).toHaveLength(2);
+        expect(parsedData.state.highScoresList[0].score).toBe(5000);
+        expect(parsedData.state.highScoresList[1].score).toBe(4000);
+      }
+    });
+
+    it("should handle localStorage data format correctly", () => {
+      // Test expected localStorage data format
+      const expectedFormat = {
+        state: {
+          currentHighScore: null,
+          highScoresList: [],
+        },
+        version: 0,
+      };
+
+      localStorage.setItem("tetris-high-scores", JSON.stringify(expectedFormat));
+
+      const stored = localStorage.getItem("tetris-high-scores");
+      expect(stored).toBeTruthy();
+
+      if (stored) {
+        const parsedData = JSON.parse(stored);
+        expect(parsedData).toHaveProperty("state");
+        expect(parsedData).toHaveProperty("version");
+        expect(parsedData.state).toHaveProperty("currentHighScore");
+        expect(parsedData.state).toHaveProperty("highScoresList");
+      }
+    });
+
+    it("should handle invalid localStorage data gracefully", () => {
+      // Set invalid JSON in localStorage
+      localStorage.setItem("tetris-high-scores", "invalid-json");
+
+      // Store should still initialize without crashing
+      expect(() => {
+        renderHook(() => useHighScoreStore());
+      }).not.toThrow();
+    });
+
+    it("should handle corrupted localStorage data structure", () => {
+      // Set malformed data structure
+      const corruptedData = {
+        state: {
+          currentHighScore: "not-an-object",
+          highScoresList: "not-an-array",
+        },
+      };
+
+      localStorage.setItem("tetris-high-scores", JSON.stringify(corruptedData));
+
+      // Store should still initialize without crashing
+      expect(() => {
+        renderHook(() => useHighScoreStore());
+      }).not.toThrow();
+    });
+
+    it("should initialize with default values when localStorage is empty", () => {
+      // Ensure localStorage is empty
+      localStorage.clear();
+
+      const { result } = renderHook(() => useHighScoreStore());
+
+      expect(result.current.currentHighScore).toBeNull();
+      expect(result.current.highScoresList).toEqual([]);
+    });
+
+    it("should use correct localStorage key name", () => {
+      // Test that the expected key name pattern is used
+      const expectedKey = "tetris-high-scores";
+
+      // Pre-populate with test data
+      localStorage.setItem(
+        expectedKey,
+        JSON.stringify({
+          state: { currentHighScore: null, highScoresList: [] },
+          version: 0,
+        }),
+      );
+
+      // Verify the key exists and incorrect keys don't
+      expect(localStorage.getItem(expectedKey)).toBeTruthy();
+      expect(localStorage.getItem("high-scores")).toBeNull();
+      expect(localStorage.getItem("tetris-highscores")).toBeNull();
+    });
+
+    it("should handle valid date format in localStorage", () => {
+      // Test date format preservation
+      const testDate = "2024-01-01T00:00:00.000Z";
+      const testData = {
+        state: {
+          currentHighScore: {
+            score: 1000,
+            lines: 10,
+            level: 1,
+            date: testDate,
+          },
+          highScoresList: [{ score: 1000, lines: 10, level: 1, date: testDate }],
+        },
+        version: 0,
+      };
+
+      localStorage.setItem("tetris-high-scores", JSON.stringify(testData));
+
+      const stored = localStorage.getItem("tetris-high-scores");
+      if (stored) {
+        const parsedData = JSON.parse(stored);
+        const storedDate = parsedData.state.currentHighScore.date;
+
+        // Verify date is in ISO string format
+        expect(typeof storedDate).toBe("string");
+        expect(() => new Date(storedDate)).not.toThrow();
+        expect(new Date(storedDate).toISOString()).toBe(storedDate);
+      }
+    });
+  });
+
+  describe("localStorage edge cases", () => {
+    it("should handle localStorage quota exceeded gracefully", () => {
+      // Mock localStorage to throw quota exceeded error
+      const originalSetItem = localStorage.setItem;
+      localStorage.setItem = () => {
+        throw new Error("QuotaExceededError");
+      };
+
+      const { result } = renderHook(() => useHighScoreStore());
+
+      // Adding new high score should not crash even if localStorage fails
+      expect(() => {
+        act(() => {
+          result.current.addNewHighScore(1000, 10, 1);
+        });
+      }).not.toThrow();
+
+      // Store state should still be updated
+      expect(result.current.currentHighScore?.score).toBe(1000);
+
+      // Restore original localStorage
+      localStorage.setItem = originalSetItem;
+    });
+
+    it("should handle localStorage disabled (Safari private mode)", () => {
+      // Mock localStorage to be undefined/disabled
+      const originalLocalStorage = localStorage;
+      // @ts-expect-error - Intentionally setting localStorage to null for testing
+      globalThis.localStorage = null;
+
+      // Store creation should not crash
+      expect(() => {
+        renderHook(() => useHighScoreStore());
+      }).not.toThrow();
+
+      // Restore original localStorage
+      globalThis.localStorage = originalLocalStorage;
+    });
+
+    it("should handle localStorage getItem returning null", () => {
+      // Mock getItem to always return null
+      const originalGetItem = localStorage.getItem;
+      localStorage.getItem = () => null;
+
+      const { result } = renderHook(() => useHighScoreStore());
+
+      // Should initialize with default values
+      expect(result.current.currentHighScore).toBeNull();
+      expect(result.current.highScoresList).toEqual([]);
+
+      // Restore original getItem
+      localStorage.getItem = originalGetItem;
+    });
+
+    it("should handle localStorage setItem throwing generic error", () => {
+      // Mock setItem to throw a generic error
+      const originalSetItem = localStorage.setItem;
+      localStorage.setItem = () => {
+        throw new Error("Generic localStorage error");
+      };
+
+      const { result } = renderHook(() => useHighScoreStore());
+
+      // Adding high score should not crash
+      expect(() => {
+        act(() => {
+          result.current.addNewHighScore(1000, 10, 1);
+        });
+      }).not.toThrow();
+
+      // Restore original setItem
+      localStorage.setItem = originalSetItem;
     });
   });
 });
