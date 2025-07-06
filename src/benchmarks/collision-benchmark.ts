@@ -54,7 +54,7 @@ export class CollisionBenchmark {
    * Run performance comparison between board engines
    */
   async runComparison(): Promise<BenchmarkResult> {
-    const engines = ["legacy", "typed-array"] as const;
+    const engines = ["legacy", "typed-array", "bitboard"] as const;
     const results: Record<string, number> = {};
 
     console.log("🚀 Starting collision benchmark comparison...");
@@ -68,7 +68,7 @@ export class CollisionBenchmark {
     const improvement = this.calculateImprovement(results);
     const statisticalSignificance = this.calculateStatisticalSignificance(
       results.legacy,
-      results["typed-array"],
+      results.bitboard,
     );
     const goNoGoDecision = this.evaluateGoNoGo(results, statisticalSignificance);
 
@@ -223,14 +223,14 @@ export class CollisionBenchmark {
    */
   private calculateImprovement(results: Record<string, number>): number {
     const legacyTime = results.legacy;
-    const typedArrayTime = results["typed-array"];
+    const bitboardTime = results.bitboard;
 
-    if (!legacyTime || !typedArrayTime) {
+    if (!legacyTime || !bitboardTime) {
       return 0;
     }
 
     // Improvement = (old - new) / old * 100
-    return ((legacyTime - typedArrayTime) / legacyTime) * 100;
+    return ((legacyTime - bitboardTime) / legacyTime) * 100;
   }
 
   /**
@@ -238,11 +238,11 @@ export class CollisionBenchmark {
    */
   private calculateStatisticalSignificance(
     legacyTime: number,
-    typedArrayTime: number,
+    bitboardTime: number,
   ): StatisticalSignificance {
     // For now, simplified t-test calculation
     // In a real implementation, we'd run multiple samples and calculate variance
-    const meanDifference = legacyTime - typedArrayTime;
+    const meanDifference = legacyTime - bitboardTime;
     const pooledVariance = (legacyTime * 0.1) ** 2; // Simplified variance estimation
     const standardError = Math.sqrt(pooledVariance);
     const tStatistic = meanDifference / standardError;
@@ -311,7 +311,8 @@ export class CollisionBenchmark {
       "🏃 Performance Results:",
       `  Legacy Engine: ${result.results.legacy?.toFixed(2)}ms`,
       `  TypedArray Engine: ${result.results["typed-array"]?.toFixed(2)}ms`,
-      `  Improvement: ${result.improvement.toFixed(1)}%`,
+      `  Bitboard Engine: ${result.results.bitboard?.toFixed(2)}ms`,
+      `  BitBoard vs Legacy Improvement: ${result.improvement.toFixed(1)}%`,
       "",
       "📈 Statistical Significance:",
       `  Significant: ${result.statisticalSignificance.isSignificant ? "✅" : "❌"}`,
@@ -339,7 +340,7 @@ export async function runCollisionBenchmarkCLI(): Promise<void> {
 
   try {
     const result = await benchmark.runComparison();
-    console.log("\n" + CollisionBenchmark.formatResults(result));
+    console.log(`\n${CollisionBenchmark.formatResults(result)}`);
 
     // Exit with appropriate code for CI
     process.exit(result.goNoGoDecision.decision === "GO" ? 0 : 1);
