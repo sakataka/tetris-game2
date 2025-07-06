@@ -1,5 +1,5 @@
 {
-  "entry": ["src/main.tsx", "**/*.test.{ts,tsx}"],
+  "entry": ["src/main.tsx", "src/game/ai/index.ts", "**/*.test.{ts,tsx}"],
   "project": ["src/**/*.{ts,tsx}", "*.{ts,js}"],
   "ignore": [
     "dist/**",
