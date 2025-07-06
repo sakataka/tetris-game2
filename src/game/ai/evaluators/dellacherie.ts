@@ -56,16 +56,17 @@ export interface Move {
 }
 
 /**
- * Optimized Dellacherie evaluation weights from ML research
- * These values achieve ~2-3x better performance than random placement
+ * Survival-focused Dellacherie evaluation weights
+ * Optimized for longer game survival and consistent performance
+ * Based on SURVIVAL preset with emphasis on avoiding dangerous situations
  */
 export const DEFAULT_WEIGHTS: EvaluationWeights = {
-  landingHeight: -4.500158825082766,
-  linesCleared: 3.4181268101392694,
-  rowTransitions: -3.2178882868487753,
-  columnTransitions: -9.348695305445199,
-  holes: -7.899265427351652,
-  wells: -3.3855972247263626,
+  landingHeight: -8.0, // Strong penalty for high placement - prioritize staying low
+  linesCleared: 8.0, // High reward for line clearing - essential for survival
+  rowTransitions: -2.5, // Moderate penalty for horizontal roughness
+  columnTransitions: -12.0, // Strong penalty for column inconsistency - keep board smooth
+  holes: -15.0, // Very high penalty for holes - critical to avoid
+  wells: -8.0, // Strong penalty for deep wells - prevent trap situations
 };
 
 /**

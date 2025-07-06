@@ -191,6 +191,116 @@ bun run ci           # Complete CI pipeline (lint + typecheck + test + build)
 **MOCKING**: Mock ONLY external dependencies (localStorage, i18n)
 **STORE TESTING**: Test actions and state transitions, NOT selectors
 
+### CRITICAL: Testing with AI Assistants (Never Run Dev Server)
+
+**❌ NEVER USE `bun run dev` for testing purposes**:
+- Development server (`bun run dev`) does NOT return responses to AI assistants
+- The command blocks indefinitely, preventing further work progression
+- AI assistants cannot effectively test interactive applications this way
+
+**✅ APPROVED TESTING METHODS for AI Assistants**:
+
+1. **Unit/Integration Tests** (Preferred method):
+   ```bash
+   bun test src/                    # All unit tests
+   bun test src/game/ai/           # Specific module tests
+   bun run test:all                # Complete test suite
+   ```
+
+2. **Playwright E2E Testing** (For UI validation):
+   ```bash
+   # Start server in background (non-blocking)
+   bun run dev > /dev/null 2>&1 &
+   sleep 5  # Wait for server startup
+   
+   # Use Playwright MCP tools for testing
+   mcp__playwright__browser_navigate "http://localhost:5173"
+   mcp__playwright__browser_snapshot
+   mcp__playwright__browser_click <element> <ref>
+   ```
+
+3. **Build Validation**:
+   ```bash
+   bun run build                   # Production build test
+   bun run lint                    # Code quality checks
+   bun run typecheck               # Type safety validation
+   ```
+
+4. **Performance Testing**:
+   ```bash
+   bun run benchmark               # Performance benchmarks
+   bun run benchmark:ci            # CI-mode benchmarks
+   ```
+
+**WHY THIS MATTERS**:
+- `bun run dev` is intended for human developers using browsers
+- AI assistants need programmatic feedback to continue workflow
+- Background server + Playwright provides automated UI testing
+- Unit tests provide immediate feedback on code functionality
+
+### CRITICAL: React useEffect Dependency Issues (Learned from Issue #102)
+
+**❌ DANGEROUS PATTERN - useEffect Circular Dependencies**:
+```typescript
+// 🚨 NEVER: State in dependency array that gets updated inside useEffect
+useEffect(() => {
+  async function continuousLoop() {
+    if (isRunning) {
+      setIsRunning(true); // ← Triggers useEffect again!
+      // ... do work
+      setIsRunning(false);
+      setTimeout(() => continuousLoop(), 200); // ← Gets overwritten by new useEffect
+    }
+  }
+}, [isRunning]); // ← isRunning causes infinite recreation
+
+// RESULT: Only first execution works, subsequent loops fail
+```
+
+**✅ CORRECT PATTERNS for Continuous Operations**:
+
+1. **useRef for Loop Control**:
+```typescript
+const isRunningRef = useRef(false);
+const enabledRef = useRef(false);
+
+useEffect(() => {
+  async function continuousLoop() {
+    if (!enabledRef.current || isRunningRef.current) return;
+    
+    isRunningRef.current = true;
+    // ... do work
+    isRunningRef.current = false;
+    
+    setTimeout(() => continuousLoop(), 200);
+  }
+  
+  if (enabled) continuousLoop();
+}, [enabled]); // ← Only trigger-conditions, not internal state
+```
+
+2. **Custom Hook Separation**:
+```typescript
+const useContinuousOperation = (enabled: boolean) => {
+  const operationRef = useRef<() => void>();
+  
+  useEffect(() => {
+    // Isolated continuous logic
+  }, [enabled]);
+};
+```
+
+**DEBUGGING PATTERNS**:
+- Always log useEffect triggers: `console.log("useEffect triggered by:", { dep1, dep2 })`
+- Monitor circular patterns: Check if setTimeout callbacks reference stale functions
+- Use React DevTools to track useEffect recreation frequency
+
+**WHEN TO SUSPECT useEffect ISSUES**:
+- Operations work once then stop
+- "isThinking" or "isLoading" states cause infinite loops  
+- setTimeout/setInterval callbacks become unresponsive
+- Complex async operations in useEffect
+
 ## IMPORT PATH DECISION TREE (CRITICAL)
 
 ### IMPORT PATH RULES (Follow exactly)

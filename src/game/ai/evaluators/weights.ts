@@ -110,13 +110,14 @@ export class DynamicWeights {
   ): EvaluationWeights {
     switch (situation.gamePhase) {
       case "early":
-        // Focus on building solid foundation
+        // Focus on building solid foundation with line clearing priority
         return {
           ...weights,
-          landingHeight: weights.landingHeight * 0.8, // Less concerned about height
-          linesCleared: weights.linesCleared * 0.9, // Don't rush line clears
+          landingHeight: weights.landingHeight * 0.9, // Still stay relatively low
+          linesCleared: weights.linesCleared * 1.2, // Encourage early line clears for practice
           rowTransitions: weights.rowTransitions * 0.9, // Allow some terrain building
           columnTransitions: weights.columnTransitions * 1.1, // Prefer smoother columns
+          holes: weights.holes * 1.2, // Strongly avoid holes from start
         };
 
       case "mid":
