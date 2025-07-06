@@ -1,18 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { BitBoard } from "@/game/ai/core/bitboard";
-import {
-  createMove,
-  DellacherieEvaluator,
-  findDropPosition,
-} from "@/game/ai/evaluators/dellacherie";
-import { DynamicWeights } from "@/game/ai/evaluators/weights";
+import { AIEngine } from "@/game/ai/core/ai-engine";
+import type { GameAction } from "@/game/ai/core/move-generator";
 import { useGameStore } from "@/store/gameStore";
-import type { RotationState, TetrominoTypeName } from "@/types/game";
+import type { GameState } from "@/types/game";
 
 export interface AIStats {
   movesPlayed: number;
   avgThinkTime: number;
   lastScore: number;
+  timeoutCount: number;
+  evaluationCount: number;
+  bestMoveScore: number;
 }
 
 /**
@@ -26,6 +24,9 @@ export function useAIController() {
     movesPlayed: 0,
     avgThinkTime: 0,
     lastScore: 0,
+    timeoutCount: 0,
+    evaluationCount: 0,
+    bestMoveScore: Number.NEGATIVE_INFINITY,
   });
 
   // Refs to prevent useEffect re-runs
@@ -35,8 +36,16 @@ export function useAIController() {
   const isActiveRef = useRef(false);
 
   // AI system instances (stable references)
-  const [evaluator] = useState(() => new DellacherieEvaluator());
-  const [dynamicWeights] = useState(() => new DynamicWeights());
+  const [aiEngine] = useState(
+    () =>
+      new AIEngine({
+        thinkingTimeLimit: 200,
+        evaluator: "dellacherie",
+        enableLogging: true,
+        fallbackOnTimeout: true,
+        useDynamicWeights: true,
+      }),
+  );
 
   // Game actions
   const moveLeft = useGameStore((state) => state.moveLeft);
@@ -44,97 +53,75 @@ export function useAIController() {
   const rotate = useGameStore((state) => state.rotate);
   const drop = useGameStore((state) => state.drop);
 
-  // Simple move generation
-  const findBestMove = useCallback(
-    async (bitBoard: BitBoard, piece: TetrominoTypeName) => {
-      let bestScore = Number.NEGATIVE_INFINITY;
-      let bestMove = null;
-
-      for (let rotation = 0; rotation < 4; rotation++) {
-        for (let x = 0; x < 8; x++) {
-          const dropY = findDropPosition(bitBoard, piece, rotation as RotationState, x);
-
-          if (dropY >= 0) {
-            const move = createMove(piece, rotation as RotationState, x, dropY);
-            const score = evaluator.evaluate(bitBoard, move);
-
-            if (score > bestScore) {
-              bestScore = score;
-              bestMove = {
-                piece,
-                rotation: rotation as RotationState,
-                x,
-                y: dropY,
-                score,
-              };
-            }
-          }
-        }
+  // AI decision making using comprehensive AI engine
+  const findBestMoveWithAI = useCallback(
+    async (gameState: GameState) => {
+      try {
+        const decision = await aiEngine.findBestMove(gameState);
+        return decision;
+      } catch (error) {
+        console.error("💥 [AI] Engine error:", error);
+        return null;
       }
-
-      return bestMove;
     },
-    [evaluator],
+    [aiEngine],
   );
 
-  // Execute move sequence
-  const executeMoveSequence = useCallback(
-    async (targetMove: {
-      piece: TetrominoTypeName;
-      rotation: RotationState;
-      x: number;
-      y: number;
-      score: number;
-    }) => {
-      const gameState = useGameStore.getState();
-      const currentPiece = gameState.currentPiece;
-      if (!currentPiece) return;
+  // Execute action sequence from AI decision
+  const executeActionSequence = useCallback(
+    async (actions: GameAction[]) => {
+      console.log("🤖 [AI] Executing action sequence:", actions);
 
-      const currentX = currentPiece.position.x;
-      const currentRotation = currentPiece.rotation;
+      for (const action of actions) {
+        // Check if AI is still active before each action
+        if (!isActiveRef.current || !aiEnabledRef.current) {
+          console.log("⏹️ [AI] Action sequence aborted - AI disabled");
+          return;
+        }
 
-      console.log("🤖 [AI] Executing move:", {
-        from: { x: currentX, rotation: currentRotation },
-        to: { x: targetMove.x, rotation: targetMove.rotation },
-        piece: targetMove.piece,
-        score: targetMove.score,
-      });
+        await delay(50); // Small delay between actions for visual feedback
 
-      // Rotate to target rotation
-      let rotationsNeeded = (targetMove.rotation - currentRotation + 4) % 4;
-      while (rotationsNeeded > 0) {
-        await delay(50);
-        rotate();
-        rotationsNeeded--;
+        switch (action.type) {
+          case "MOVE_LEFT":
+            moveLeft();
+            break;
+          case "MOVE_RIGHT":
+            moveRight();
+            break;
+          case "MOVE_DOWN":
+            // Note: moveDown not used in optimal play, only for manual input
+            break;
+          case "ROTATE_CW":
+            rotate();
+            break;
+          case "ROTATE_180":
+            // Note: rotate180 not implemented in move generator yet
+            rotate();
+            await delay(50);
+            rotate();
+            break;
+          case "HARD_DROP":
+            drop();
+            break;
+          case "HOLD":
+            // Note: Hold not enabled in Phase 1
+            console.warn("[AI] Hold action not supported in Phase 1");
+            break;
+          default:
+            console.warn("[AI] Unknown action type:", action.type);
+        }
       }
 
-      // Move to target X position
-      const moveSteps = targetMove.x - currentX;
-      if (moveSteps > 0) {
-        for (let i = 0; i < moveSteps; i++) {
-          await delay(50);
-          moveRight();
-        }
-      } else if (moveSteps < 0) {
-        for (let i = 0; i < Math.abs(moveSteps); i++) {
-          await delay(50);
-          moveLeft();
-        }
-      }
-
-      // Hard drop to target position
-      await delay(50);
-      drop();
-      console.log("✅ [AI] Move sequence completed!");
+      console.log("✅ [AI] Action sequence completed!");
     },
-    [rotate, moveLeft, moveRight, drop],
+    [moveLeft, moveRight, rotate, drop],
   );
 
   // Main AI thinking loop - completely isolated from React dependencies
   const aiThinkAndMove = useCallback(async () => {
     // Always get fresh state directly from store
     const gameState = useGameStore.getState();
-    const { currentPiece, board, lines, level, score, isGameOver, isPaused } = gameState;
+    const { currentPiece, isGameOver, isPaused, score } = gameState;
 
     console.log("🔄 [AI] Loop check:", {
       aiEnabled: aiEnabledRef.current,
@@ -167,33 +154,34 @@ export function useAIController() {
         rotation: currentPiece.rotation,
       });
 
-      // Convert current board to BitBoard for AI evaluation
-      const bitBoard = new BitBoard(board);
-      console.log("📋 [AI] BitBoard created successfully");
+      // Use comprehensive AI engine for decision making
+      console.log("🔍 [AI] Finding best move with AI engine...");
+      const decision = await findBestMoveWithAI(gameState);
+      console.log("🎯 [AI] AI decision:", decision);
 
-      // Analyze current situation for dynamic weights
-      const situation = dynamicWeights.analyzeSituation(bitBoard, lines, level);
-      const adjustedWeights = dynamicWeights.adjustWeights(situation);
-      evaluator.updateWeights(adjustedWeights);
-      console.log("⚖️ [AI] Weights adjusted:", adjustedWeights);
+      if (decision?.bestMove && isActiveRef.current) {
+        console.log("▶️ [AI] Executing best move sequence...");
+        await executeActionSequence(decision.bestMove.sequence);
 
-      // Generate and evaluate all possible moves
-      console.log("🔍 [AI] Finding best move...");
-      const bestMove = await findBestMove(bitBoard, currentPiece.type);
-      console.log("🎯 [AI] Best move found:", bestMove);
-
-      if (bestMove && isActiveRef.current) {
-        console.log("▶️ [AI] Executing best move...");
-        await executeMoveSequence(bestMove);
-
-        // Update AI stats
+        // Update AI stats with detailed metrics
         const thinkTime = performance.now() - thinkStartTime;
         setAiStats((prev) => ({
           movesPlayed: prev.movesPlayed + 1,
           avgThinkTime: (prev.avgThinkTime * prev.movesPlayed + thinkTime) / (prev.movesPlayed + 1),
           lastScore: score,
+          timeoutCount: prev.timeoutCount + (decision.timedOut ? 1 : 0),
+          evaluationCount: prev.evaluationCount + decision.evaluationCount,
+          bestMoveScore: Math.max(
+            prev.bestMoveScore,
+            decision.bestMove?.evaluationScore || Number.NEGATIVE_INFINITY,
+          ),
         }));
-        console.log("📊 [AI] Stats updated, think time:", `${thinkTime}ms`);
+        console.log("📊 [AI] Stats updated:", {
+          thinkTime: `${thinkTime}ms`,
+          timedOut: decision.timedOut,
+          evaluations: decision.evaluationCount,
+          score: decision.bestMove?.evaluationScore?.toFixed(2),
+        });
       } else {
         console.log("❌ [AI] No valid move found or AI inactive");
       }
@@ -220,7 +208,7 @@ export function useAIController() {
         }, 200);
       }
     }
-  }, [findBestMove, executeMoveSequence, evaluator, dynamicWeights]);
+  }, [findBestMoveWithAI, executeActionSequence]);
 
   // Start/stop AI effect - minimal dependencies
   useEffect(() => {
@@ -258,11 +246,24 @@ export function useAIController() {
     setAiEnabled((prev) => {
       const newEnabled = !prev;
       if (newEnabled) {
-        setAiStats({ movesPlayed: 0, avgThinkTime: 0, lastScore: gameState.score });
+        // Reset AI stats when enabling
+        setAiStats({
+          movesPlayed: 0,
+          avgThinkTime: 0,
+          lastScore: gameState.score,
+          timeoutCount: 0,
+          evaluationCount: 0,
+          bestMoveScore: Number.NEGATIVE_INFINITY,
+        });
+        // Reset AI engine stats as well
+        aiEngine.resetStats();
+      } else {
+        // Abort any ongoing thinking when disabling
+        aiEngine.abortThinking();
       }
       return newEnabled;
     });
-  }, []);
+  }, [aiEngine]);
 
   return {
     aiEnabled,
