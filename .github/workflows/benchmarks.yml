@@ -1,0 +1,19 @@
+name: Performance Benchmarks
+
+on:
+  workflow_dispatch:  # Manual trigger
+  schedule:
+    - cron: '0 2 * * 1'  # Weekly on Monday 2 AM
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v1
+      - run: bun install
+      - run: bun run benchmark:ci
+      - uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results
+          path: ./bench-results/*.md

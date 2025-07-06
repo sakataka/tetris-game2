@@ -1,7 +1,7 @@
 import { describe, test } from "bun:test";
 import type { CellValue, GameBoard, Position, TetrominoShape } from "@/types/game";
 import { GAME_CONSTANTS } from "@/utils/gameConstants";
-import { createBoardEngine } from "./board-engine";
+import { createBoardEngine } from "../game/board-engine";
 
 // Benchmark utilities
 const createTestBoard = (): GameBoard => {

@@ -113,6 +113,62 @@ TEST_ITERATIONS=50 bun test
 TEST_ITERATIONS=10 bun test
 ```
 
+## Running Benchmarks
+
+Performance benchmarks are separated from regular CI to improve build speed while preserving performance monitoring capabilities.
+
+### Available Benchmark Commands
+
+```bash
+# Run benchmark tests with verbose output
+bun run bench
+
+# Run benchmarks via CLI tool
+bun run benchmark
+
+# Run benchmarks in CI mode (structured output)
+bun run benchmark:ci
+```
+
+### Benchmark Categories
+
+The project includes several performance benchmark suites:
+
+- **Collision Detection**: Tests `isValidPosition` performance across different board engines
+- **Board Operations**: Benchmarks `placePiece` and `clearLines` operations
+- **Comprehensive Tests**: Mixed operations simulating real gameplay scenarios
+
+### Benchmark Execution
+
+Benchmarks are located in `src/benchmarks/` and excluded from regular test runs:
+
+- **Local Development**: Run `bun run bench` for immediate performance feedback
+- **Automated Testing**: GitHub workflow runs benchmarks weekly on Mondays at 2 AM
+- **Manual Triggering**: Use GitHub's "workflow_dispatch" to run benchmarks on-demand
+
+### Reading Benchmark Results
+
+Benchmark output includes:
+- Operation duration in milliseconds
+- Operations per second (throughput)
+- Performance comparison between different implementations
+- Results are stored as artifacts in GitHub Actions for historical tracking
+
+### Development Usage
+
+```bash
+# Quick performance check during development
+bun run bench
+
+# Generate structured benchmark report
+bun run benchmark:ci
+
+# View benchmark files
+ls src/benchmarks/
+```
+
+Benchmark results include commit hash and timestamp for tracking performance changes over time.
+
 # Code Quality
 bun run lint                   # Lint code with Biome (MUST pass before commits)
 bun run format                 # Format code with Biome

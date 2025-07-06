@@ -32,6 +32,7 @@ coverage
 *.lcov
 .nyc_output
 .vercel
+bench-results/
 
 # Playwright
 test-results/
