@@ -12,6 +12,8 @@ export function GameSettings() {
   const { i18n, t } = useTranslation();
   const showGhostPiece = useSettingsStore((state) => state.showGhostPiece);
   const toggleShowGhostPiece = useSettingsStore((state) => state.toggleShowGhostPiece);
+  const enableTSpinDetection = useSettingsStore((state) => state.enableTSpinDetection);
+  const toggleTSpinDetection = useSettingsStore((state) => state.toggleTSpinDetection);
   const setLanguage = useSettingsStore((state) => state.setLanguage);
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -126,6 +128,43 @@ export function GameSettings() {
                     <div
                       className={`${CONTROL_STYLES.toggleThumb} ${
                         showGhostPiece ? "translate-x-5" : "translate-x-0"
+                      }`}
+                    />
+                  </div>
+                </div>
+              </button>
+            </div>
+
+            {/* Separator */}
+            <div className={`${MODAL_STYLES.separator} mx-3 my-2`} />
+
+            {/* T-Spin Detection Section */}
+            <div className="px-3 py-2">
+              <div className="text-xs text-gray-400 uppercase font-semibold mb-2">
+                {t("game.settings.tSpinDetection")}
+              </div>
+              <button
+                type="button"
+                className={`${CONTROL_STYLES.interactiveItem} flex items-center justify-between p-2 rounded cursor-pointer w-full text-left`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleTSpinDetection();
+                }}
+              >
+                <div className="flex flex-col">
+                  <span className="text-white text-sm">
+                    {t("game.settings.tSpinDetectionDescription")}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div
+                    className={`w-10 h-5 rounded-full p-1 transition-colors ${
+                      enableTSpinDetection ? CONTROL_STYLES.toggleOn : CONTROL_STYLES.toggleOff
+                    }`}
+                  >
+                    <div
+                      className={`${CONTROL_STYLES.toggleThumb} ${
+                        enableTSpinDetection ? "translate-x-5" : "translate-x-0"
                       }`}
                     />
                   </div>

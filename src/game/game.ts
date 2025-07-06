@@ -286,7 +286,7 @@ export function processPlacementAndClearing(state: GameState): PlacementResult {
     tSpinDetectionResult = detectTSpin(
       state.board,
       state.currentPiece,
-      state.tSpinState.rotationResult as any,
+      state.tSpinState.rotationResult as RotationResult,
     );
   }
 

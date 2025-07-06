@@ -1,7 +1,5 @@
 import type { Position, Tetromino } from "@/types/game";
 
-export type RotationDirection = "clockwise" | "counterclockwise" | "180";
-
 export type RotationTransition90 =
   | "0->1"
   | "1->2"

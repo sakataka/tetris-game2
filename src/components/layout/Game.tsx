@@ -8,11 +8,14 @@ import {
   NextPiece,
   ResetConfirmationDialog,
   ScoreBoard,
+  TSpinIndicator,
 } from "@/components/game";
 import { useKeyboardControls } from "@/hooks/controls/useKeyboardControls";
 import { useTouchGestures } from "@/hooks/controls/useTouchGestures";
 import { useGameLoop } from "@/hooks/core/useGameLoop";
 import { useHighScoreSideEffect } from "@/hooks/effects/useHighScoreSideEffect";
+import { useGameStore } from "@/store/gameStore";
+import { useSettingsStore } from "@/store/settingsStore";
 import { GameSettings } from "./GameSettings";
 import { MobileGameLayout } from "./MobileGameLayout";
 
@@ -21,6 +24,11 @@ export function Game() {
   useKeyboardControls();
   useHighScoreSideEffect();
   const { handleTouchStart, handleTouchEnd } = useTouchGestures();
+
+  // T-Spin indicator state
+  const tSpinState = useGameStore((state) => state.tSpinState);
+  const enableTSpinDetection = useSettingsStore((state) => state.enableTSpinDetection);
+  const hideTSpinIndicator = useGameStore((state) => state.hideTSpinIndicator);
 
   return (
     <>
@@ -59,6 +67,16 @@ export function Game() {
             >
               <Board />
               <GameOverlay />
+
+              {/* T-Spin Indicator */}
+              {enableTSpinDetection && (
+                <TSpinIndicator
+                  tSpinType={tSpinState.type}
+                  linesCleared={tSpinState.linesCleared}
+                  show={tSpinState.show}
+                  onComplete={hideTSpinIndicator}
+                />
+              )}
             </section>
           </div>
         </main>

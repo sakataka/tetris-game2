@@ -12,12 +12,5 @@
   "ignoreExportsUsedInFile": true,
   "includeEntryExports": false,
   "ignoreBinaries": ["test"],
-  "ignoreDependencies": [
-    "@biomejs/biome",
-    "bun-types",
-    "happy-dom",
-    "@testing-library/jest-dom",
-    "@testing-library/react",
-    "fast-check"
-  ]
+  "ignoreDependencies": ["@biomejs/biome", "bun-types", "happy-dom", "@testing-library/jest-dom"]
 }
