@@ -48,6 +48,7 @@ interface GameStore extends GameState {
   clearAnimationData: () => void;
   applyDebugPreset: (presetName: string) => void;
   setDebugQueue: (pieces: TetrominoTypeName[]) => void;
+  hideTSpinIndicator: () => void;
 
   // Animation control actions
   startLineClearAnimation: (data: LineClearAnimationData) => void;
@@ -212,6 +213,11 @@ export const useGameStore = create<GameStore>()(
 
           // Recalculate ghost position
           state.ghostPosition = calculateGhostPosition(state);
+        }),
+
+      hideTSpinIndicator: () =>
+        set((state) => {
+          state.tSpinState.show = false;
         }),
 
       // Animation control actions

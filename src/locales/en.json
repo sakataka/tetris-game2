@@ -37,13 +37,19 @@
       "language": "Language",
       "current": "Current",
       "ghostPiece": "Ghost Piece",
-      "ghostPieceDescription": "Ghost Piece Display"
+      "ghostPieceDescription": "Ghost Piece Display",
+      "tSpinDetection": "T-Spin Detection",
+      "tSpinDetectionDescription": "Enable T-Spin detection and scoring"
     },
     "resetConfirmation": {
       "title": "Reset Game",
       "message": "Reset the current game?",
       "confirm": "Yes",
       "cancel": "No"
-    }
+    },
+    "tSpinAnnouncement": "{{type}} achieved with {{count}} line cleared",
+    "tSpinAnnouncement_other": "{{type}} achieved with {{count}} lines cleared",
+    "linesCleared": "{{count}} line cleared",
+    "linesCleared_other": "{{count}} lines cleared"
   }
 }

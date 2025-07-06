@@ -79,6 +79,16 @@ export interface AnimationController {
 /**
  * Complete game state containing all information needed to render and update the game.
  */
+/**
+ * T-Spin detection and display information
+ */
+export interface TSpinState {
+  type: "none" | "mini" | "normal";
+  show: boolean;
+  linesCleared: number;
+  rotationResult: unknown | null; // RotationResult from the last rotation
+}
+
 export interface GameState {
   board: GameBoard;
   boardBeforeClear: GameBoard | null; // Board state before line clearing for animation
@@ -96,4 +106,5 @@ export interface GameState {
   animationTriggerKey: AnimationTriggerKey;
   ghostPosition: Position | null;
   pieceBag: TetrominoTypeName[]; // 7-Bag system: current bag state (legacy format for compatibility)
+  tSpinState: TSpinState; // T-Spin detection and display state
 }

@@ -21,12 +21,14 @@ import {
   placeTetromino,
 } from "./board";
 import { createPieceBag, getBagContents, getNextPiece, setBagForTesting } from "./pieceBag";
+import { calculateTSpinScore } from "./scoring";
 import {
   createTetromino,
   getTetrominoColorIndex,
   rotateTetromino,
   rotateTetromino180,
 } from "./tetrominos";
+import { detectTSpin } from "./tSpin";
 import { tryRotateWithWallKickUnified } from "./wallKick";
 
 // Backward compatibility functions for existing code
@@ -72,6 +74,12 @@ export function createInitialGameState(): GameState {
     animationTriggerKey: 0,
     ghostPosition: null as Position | null,
     pieceBag: [...getBagContents(finalPieceBag)], // Convert to legacy array format
+    tSpinState: {
+      type: "none" as const,
+      show: false,
+      linesCleared: 0,
+      rotationResult: null,
+    },
   };
 
   // Calculate initial ghost position
@@ -137,10 +145,17 @@ export function rotateTetrominoCW(state: GameState): Result<GameState, GameError
   );
 
   if (rotationResult.success && rotationResult.piece) {
+    // Update T-Spin state with rotation result for potential detection during piece lock
+    const newTSpinState = {
+      ...state.tSpinState,
+      rotationResult,
+    };
+
     return Ok(
       updateGhostPosition({
         ...state,
         currentPiece: rotationResult.piece,
+        tSpinState: newTSpinState,
         animationTriggerKey:
           typeof state.animationTriggerKey === "number" ? state.animationTriggerKey + 1 : 1,
       }),
@@ -177,10 +192,17 @@ export function rotateTetromino180Degrees(state: GameState): Result<GameState, G
   );
 
   if (rotationResult.success && rotationResult.piece) {
+    // Update T-Spin state with rotation result for potential detection during piece lock
+    const newTSpinState = {
+      ...state.tSpinState,
+      rotationResult,
+    };
+
     return Ok(
       updateGhostPosition({
         ...state,
         currentPiece: rotationResult.piece,
+        tSpinState: newTSpinState,
         animationTriggerKey:
           typeof state.animationTriggerKey === "number" ? state.animationTriggerKey + 1 : 1,
       }),
@@ -243,7 +265,29 @@ export function processPlacementAndClearing(state: GameState): PlacementResult {
       level: state.level,
       placedPositions: [],
       clearingLines: [],
+      tSpinType: "none",
+      tSpinLinesCleared: 0,
     };
+  }
+
+  // Detect T-Spin if we have a rotation result from the current piece
+  let tSpinDetectionResult: {
+    type: "none" | "mini" | "normal";
+    cornersFilled: number;
+    usedWallKick: boolean;
+    lastMoveWasRotation: boolean;
+  } = {
+    type: "none",
+    cornersFilled: 0,
+    usedWallKick: false,
+    lastMoveWasRotation: false,
+  };
+  if (state.tSpinState.rotationResult && state.currentPiece) {
+    tSpinDetectionResult = detectTSpin(
+      state.board,
+      state.currentPiece,
+      state.tSpinState.rotationResult as any,
+    );
   }
 
   const colorIndex = getTetrominoColorIndex(state.currentPiece.type);
@@ -270,6 +314,8 @@ export function processPlacementAndClearing(state: GameState): PlacementResult {
       level: state.level,
       placedPositions: [],
       clearingLines: [],
+      tSpinType: "none",
+      tSpinLinesCleared: 0,
     };
   }
 
@@ -278,14 +324,19 @@ export function processPlacementAndClearing(state: GameState): PlacementResult {
   const lines = state.lines + linesCleared;
   const boardBeforeClear = clearedLineIndices.length > 0 ? boardAfterLock : null;
 
+  // Calculate score using T-Spin aware scoring system
+  const scoreToAdd = calculateTSpinScore(linesCleared, state.level, tSpinDetectionResult.type);
+
   return {
     board: boardAfterClear,
     boardBeforeClear,
-    score: state.score + calculateScore(linesCleared, state.level),
+    score: state.score + scoreToAdd,
     lines,
     level: Math.floor(lines / GAME_CONSTANTS.SCORING.LINES_PER_LEVEL) + 1,
     placedPositions,
     clearingLines: clearedLineIndices.length > 0 ? clearedLineIndices : [],
+    tSpinType: tSpinDetectionResult.type,
+    tSpinLinesCleared: linesCleared,
   };
 }
 
@@ -313,6 +364,8 @@ type PlacementResult = {
   level: number;
   placedPositions: Position[];
   clearingLines: number[];
+  tSpinType: "none" | "mini" | "normal";
+  tSpinLinesCleared: number;
 };
 
 type NextPieceResult = {
@@ -355,6 +408,14 @@ function buildFinalGameState(
   placementResult: PlacementResult,
   nextPieceResult: NextPieceResult,
 ): GameState {
+  // Update T-Spin state: show indicator if T-Spin was detected
+  const newTSpinState = {
+    type: placementResult.tSpinType as "none" | "mini" | "normal",
+    show: placementResult.tSpinType !== "none",
+    linesCleared: placementResult.tSpinLinesCleared,
+    rotationResult: null, // Reset rotation result after piece lock
+  };
+
   return updateGhostPosition({
     ...baseState,
     board: placementResult.board,
@@ -369,6 +430,7 @@ function buildFinalGameState(
     clearingLines: placementResult.clearingLines,
     canHold: true,
     pieceBag: nextPieceResult.pieceBag,
+    tSpinState: newTSpinState,
   });
 }
 

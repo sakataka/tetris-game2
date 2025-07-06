@@ -37,13 +37,17 @@
       "language": "言語",
       "current": "現在",
       "ghostPiece": "ゴーストピース",
-      "ghostPieceDescription": "ゴーストピース表示"
+      "ghostPieceDescription": "ゴーストピース表示",
+      "tSpinDetection": "T-Spin検出",
+      "tSpinDetectionDescription": "T-Spin検出とスコアリングを有効にする"
     },
     "resetConfirmation": {
       "title": "ゲームリセット",
       "message": "現在のゲームをリセットしますか？",
       "confirm": "はい",
       "cancel": "いいえ"
-    }
+    },
+    "tSpinAnnouncement": "{{type}}を{{count}}ライン消去で達成しました",
+    "linesCleared": "{{count}}ライン消去"
   }
 }

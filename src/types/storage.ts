@@ -13,4 +13,5 @@ export interface GameSettings {
   language: "ja" | "en";
   volume: number;
   showGhostPiece: boolean;
+  enableTSpinDetection: boolean;
 }
