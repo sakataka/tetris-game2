@@ -26,7 +26,7 @@
 - **Animation System**: Motion 12.23.0 (physics-based animations)
 - **Internationalization**: i18next 25.3.1 + react-i18next 15.6.0
 - **UI Component System**: shadcn/ui (copy-paste component library)
-  - Components: button, card, dialog, badge (located in `/src/components/ui/`)
+  - Components: button, card, dialog, badge, animated-button (located in `/src/components/ui/`)
   - Built on: Radix UI primitives + Tailwind CSS
   - Radix UI: @radix-ui/react-dialog 1.1.14, @radix-ui/react-slot 1.2.3
   - Utilities: class-variance-authority 0.7.1 (variant management)
@@ -61,7 +61,8 @@ src/
 │   ├── layout/    # Application layout and structural components
 │   └── ui/        # Reusable UI primitives (shadcn/ui components)
 ├── game/          # Pure game logic (TEST ALL FUNCTIONS)
-│                  # Core Tetris mechanics, board operations, scoring
+│   ├── ai/        # AI implementation with bitboard optimization
+│   │              # Core Tetris mechanics, board operations, scoring
 ├── hooks/         # Custom React hooks (TEST ONLY EXTRACTED PURE FUNCTIONS)
 │   ├── actions/   # Game action orchestration hooks
 │   ├── common/    # Shared utility hooks
@@ -74,9 +75,10 @@ src/
 ├── store/         # Zustand state management (TEST ALL STORE LOGIC)
 ├── types/         # TypeScript type definitions
 ├── utils/         # Shared utilities and constants (TEST ALL FUNCTIONS)
-├── locales/       # i18n translation files
+├── locales/       # i18n translation files (en.json, ja.json)
 ├── i18n/          # i18n configuration
 ├── lib/           # Shared utility functions
+├── scripts/       # Development and maintenance scripts (i18n checker)
 ├── test/          # Test configuration, setup, and utilities
 └── tests/         # E2E tests and visual testing
 ```
@@ -133,6 +135,7 @@ const b = useStore((state) => state.b);
 - **T-Spin Detection**: 3-corner rule with wall kick integration
 - **Scoring System**: Level-based progression with T-Spin multipliers
 - **Board Engine**: Strategy pattern for optimized performance
+- **AI Implementation**: Advanced bitboard-optimized AI with configurable difficulty levels
 
 ## Development Commands and Execution
 
@@ -149,8 +152,7 @@ bun run typecheck    # Type checking (MUST pass before commits)
 bun run build        # Production build (MUST succeed before commits)
 
 # E2E Testing
-bun run e2e          # Run Playwright E2E tests (headless)
-bun run e2e:headed   # Run Playwright E2E tests (with browser UI)
+bun run e2e          # Run Playwright E2E tests
 
 # i18n Management
 bun run check:i18n   # Check translation key consistency (detect missing/unused keys)
@@ -184,6 +186,7 @@ bun run ci           # Complete CI pipeline (lint + typecheck + test + build)
 - DOM-related: `bun test src/hooks/ src/store/`
 - All tests: `bun test src/`
 - Co-located test files (e.g., `board.test.ts` alongside `board.ts`)
+- Note: Some tests in `src/hooks/controls/` are temporarily disabled (.test.ts.skip) due to parallel execution isolation issues
 
 **MOCKING**: Mock ONLY external dependencies (localStorage, i18n)
 **STORE TESTING**: Test actions and state transitions, NOT selectors
