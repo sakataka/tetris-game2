@@ -8,7 +8,7 @@ describe("parseDebugParams", () => {
   beforeEach(() => {
     const window = new Window({ url: "https://example.com/" });
     originalWindow = global.window;
-    global.window = window as any;
+    global.window = window as unknown as Window & typeof globalThis;
   });
 
   afterEach(() => {
@@ -18,7 +18,7 @@ describe("parseDebugParams", () => {
   describe("basic functionality", () => {
     test("returns disabled state when no debug param", () => {
       const window = new Window({ url: "https://example.com/" });
-      global.window = window as any;
+      global.window = window as unknown as Window & typeof globalThis;
 
       const result = parseDebugParams();
       expect(result).toEqual({ enabled: false });
@@ -26,7 +26,7 @@ describe("parseDebugParams", () => {
 
     test("returns disabled state when debug param is false", () => {
       const window = new Window({ url: "https://example.com/?debug=false" });
-      global.window = window as any;
+      global.window = window as unknown as Window & typeof globalThis;
 
       const result = parseDebugParams();
       expect(result).toEqual({ enabled: false });
@@ -34,7 +34,7 @@ describe("parseDebugParams", () => {
 
     test("returns disabled state when debug param is 0", () => {
       const window = new Window({ url: "https://example.com/?debug=0" });
-      global.window = window as any;
+      global.window = window as unknown as Window & typeof globalThis;
 
       const result = parseDebugParams();
       expect(result).toEqual({ enabled: false });
@@ -42,7 +42,7 @@ describe("parseDebugParams", () => {
 
     test("returns enabled state when debug=true", () => {
       const window = new Window({ url: "https://example.com/?debug=true" });
-      global.window = window as any;
+      global.window = window as unknown as Window & typeof globalThis;
 
       const result = parseDebugParams();
       expect(result).toEqual({ enabled: true });
@@ -50,7 +50,7 @@ describe("parseDebugParams", () => {
 
     test("returns enabled state when debug=1", () => {
       const window = new Window({ url: "https://example.com/?debug=1" });
-      global.window = window as any;
+      global.window = window as unknown as Window & typeof globalThis;
 
       const result = parseDebugParams();
       expect(result).toEqual({ enabled: true });
@@ -58,7 +58,7 @@ describe("parseDebugParams", () => {
 
     test("returns disabled state for invalid debug values", () => {
       const window = new Window({ url: "https://example.com/?debug=yes" });
-      global.window = window as any;
+      global.window = window as unknown as Window & typeof globalThis;
 
       const result = parseDebugParams();
       expect(result).toEqual({ enabled: false });
@@ -68,7 +68,7 @@ describe("parseDebugParams", () => {
   describe("parameter parsing", () => {
     test("parses preset parameter correctly", () => {
       const window = new Window({ url: "https://example.com/?debug=true&preset=tetris" });
-      global.window = window as any;
+      global.window = window as unknown as Window & typeof globalThis;
 
       const result = parseDebugParams();
       expect(result).toEqual({ enabled: true, preset: "tetris" });
@@ -76,7 +76,7 @@ describe("parseDebugParams", () => {
 
     test("parses queue parameter with single character format", () => {
       const window = new Window({ url: "https://example.com/?debug=true&queue=IJLOSTZ" });
-      global.window = window as any;
+      global.window = window as unknown as Window & typeof globalThis;
 
       const result = parseDebugParams();
       expect(result).toEqual({ enabled: true, queue: ["I", "J", "L", "O", "S", "T", "Z"] });
@@ -84,7 +84,7 @@ describe("parseDebugParams", () => {
 
     test("parses queue parameter with comma-separated format", () => {
       const window = new Window({ url: "https://example.com/?debug=true&queue=I,J,L,O,S,T,Z" });
-      global.window = window as any;
+      global.window = window as unknown as Window & typeof globalThis;
 
       const result = parseDebugParams();
       expect(result).toEqual({ enabled: true, queue: ["I", "J", "L", "O", "S", "T", "Z"] });
@@ -92,7 +92,7 @@ describe("parseDebugParams", () => {
 
     test("parses queue parameter with mixed case", () => {
       const window = new Window({ url: "https://example.com/?debug=true&queue=ijl" });
-      global.window = window as any;
+      global.window = window as unknown as Window & typeof globalThis;
 
       const result = parseDebugParams();
       expect(result).toEqual({ enabled: true, queue: ["I", "J", "L"] });
@@ -100,7 +100,7 @@ describe("parseDebugParams", () => {
 
     test("parses seed parameter correctly", () => {
       const window = new Window({ url: "https://example.com/?debug=true&seed=42" });
-      global.window = window as any;
+      global.window = window as unknown as Window & typeof globalThis;
 
       const result = parseDebugParams();
       expect(result).toEqual({ enabled: true, seed: 42 });
@@ -108,7 +108,7 @@ describe("parseDebugParams", () => {
 
     test("parses score parameter correctly", () => {
       const window = new Window({ url: "https://example.com/?debug=true&score=1000" });
-      global.window = window as any;
+      global.window = window as unknown as Window & typeof globalThis;
 
       const result = parseDebugParams();
       expect(result).toEqual({ enabled: true, score: 1000 });
@@ -116,7 +116,7 @@ describe("parseDebugParams", () => {
 
     test("parses level parameter correctly", () => {
       const window = new Window({ url: "https://example.com/?debug=true&level=5" });
-      global.window = window as any;
+      global.window = window as unknown as Window & typeof globalThis;
 
       const result = parseDebugParams();
       expect(result).toEqual({ enabled: true, level: 5 });
@@ -124,7 +124,7 @@ describe("parseDebugParams", () => {
 
     test("parses lines parameter correctly", () => {
       const window = new Window({ url: "https://example.com/?debug=true&lines=10" });
-      global.window = window as any;
+      global.window = window as unknown as Window & typeof globalThis;
 
       const result = parseDebugParams();
       expect(result).toEqual({ enabled: true, lines: 10 });
@@ -134,7 +134,7 @@ describe("parseDebugParams", () => {
       const window = new Window({
         url: "https://example.com/?debug=true&preset=tetris&queue=IJLOSTZ&seed=42&score=1000&level=5&lines=10",
       });
-      global.window = window as any;
+      global.window = window as unknown as Window & typeof globalThis;
 
       const result = parseDebugParams();
       expect(result).toEqual({
@@ -152,7 +152,7 @@ describe("parseDebugParams", () => {
   describe("edge cases and error handling", () => {
     test("handles repeated debug keys (URLSearchParams behavior)", () => {
       const window = new Window({ url: "https://example.com/?debug=false&debug=true" });
-      global.window = window as any;
+      global.window = window as unknown as Window & typeof globalThis;
 
       const result = parseDebugParams();
       expect(result).toEqual({ enabled: false });
@@ -160,7 +160,7 @@ describe("parseDebugParams", () => {
 
     test("handles invalid numeric seed values gracefully", () => {
       const window = new Window({ url: "https://example.com/?debug=true&seed=foo" });
-      global.window = window as any;
+      global.window = window as unknown as Window & typeof globalThis;
 
       const result = parseDebugParams();
       expect(result).toEqual({ enabled: true });
@@ -168,7 +168,7 @@ describe("parseDebugParams", () => {
 
     test("handles invalid numeric score values gracefully", () => {
       const window = new Window({ url: "https://example.com/?debug=true&score=bar" });
-      global.window = window as any;
+      global.window = window as unknown as Window & typeof globalThis;
 
       const result = parseDebugParams();
       expect(result).toEqual({ enabled: true });
@@ -176,7 +176,7 @@ describe("parseDebugParams", () => {
 
     test("handles invalid numeric level values gracefully", () => {
       const window = new Window({ url: "https://example.com/?debug=true&level=baz" });
-      global.window = window as any;
+      global.window = window as unknown as Window & typeof globalThis;
 
       const result = parseDebugParams();
       expect(result).toEqual({ enabled: true });
@@ -184,7 +184,7 @@ describe("parseDebugParams", () => {
 
     test("handles invalid numeric lines values gracefully", () => {
       const window = new Window({ url: "https://example.com/?debug=true&lines=qux" });
-      global.window = window as any;
+      global.window = window as unknown as Window & typeof globalThis;
 
       const result = parseDebugParams();
       expect(result).toEqual({ enabled: true });
@@ -192,7 +192,7 @@ describe("parseDebugParams", () => {
 
     test("ignores out-of-range level values", () => {
       const window = new Window({ url: "https://example.com/?debug=true&level=50" });
-      global.window = window as any;
+      global.window = window as unknown as Window & typeof globalThis;
 
       const result = parseDebugParams();
       expect(result).toEqual({ enabled: true });
@@ -200,7 +200,7 @@ describe("parseDebugParams", () => {
 
     test("ignores level values below minimum", () => {
       const window = new Window({ url: "https://example.com/?debug=true&level=0" });
-      global.window = window as any;
+      global.window = window as unknown as Window & typeof globalThis;
 
       const result = parseDebugParams();
       expect(result).toEqual({ enabled: true });
@@ -208,7 +208,7 @@ describe("parseDebugParams", () => {
 
     test("ignores negative score values", () => {
       const window = new Window({ url: "https://example.com/?debug=true&score=-100" });
-      global.window = window as any;
+      global.window = window as unknown as Window & typeof globalThis;
 
       const result = parseDebugParams();
       expect(result).toEqual({ enabled: true });
@@ -216,7 +216,7 @@ describe("parseDebugParams", () => {
 
     test("ignores negative lines values", () => {
       const window = new Window({ url: "https://example.com/?debug=true&lines=-5" });
-      global.window = window as any;
+      global.window = window as unknown as Window & typeof globalThis;
 
       const result = parseDebugParams();
       expect(result).toEqual({ enabled: true });
@@ -224,7 +224,7 @@ describe("parseDebugParams", () => {
 
     test("filters out invalid tetromino characters", () => {
       const window = new Window({ url: "https://example.com/?debug=true&queue=IXYZ" });
-      global.window = window as any;
+      global.window = window as unknown as Window & typeof globalThis;
 
       const result = parseDebugParams();
       expect(result).toEqual({ enabled: true, queue: ["I", "Z"] });
@@ -232,7 +232,7 @@ describe("parseDebugParams", () => {
 
     test("handles empty queue values gracefully", () => {
       const window = new Window({ url: "https://example.com/?debug=true&queue=" });
-      global.window = window as any;
+      global.window = window as unknown as Window & typeof globalThis;
 
       const result = parseDebugParams();
       expect(result).toEqual({ enabled: true });
@@ -240,7 +240,7 @@ describe("parseDebugParams", () => {
 
     test("handles empty preset values gracefully", () => {
       const window = new Window({ url: "https://example.com/?debug=true&preset=" });
-      global.window = window as any;
+      global.window = window as unknown as Window & typeof globalThis;
 
       const result = parseDebugParams();
       expect(result).toEqual({ enabled: true });
@@ -248,7 +248,7 @@ describe("parseDebugParams", () => {
 
     test("handles queue with spaces", () => {
       const window = new Window({ url: "https://example.com/?debug=true&queue=I J L" });
-      global.window = window as any;
+      global.window = window as unknown as Window & typeof globalThis;
 
       const result = parseDebugParams();
       expect(result).toEqual({ enabled: true, queue: ["I", "J", "L"] });
@@ -256,7 +256,7 @@ describe("parseDebugParams", () => {
 
     test("handles comma-separated queue with spaces", () => {
       const window = new Window({ url: "https://example.com/?debug=true&queue=I, J, L" });
-      global.window = window as any;
+      global.window = window as unknown as Window & typeof globalThis;
 
       const result = parseDebugParams();
       expect(result).toEqual({ enabled: true, queue: ["I", "J", "L"] });
@@ -265,7 +265,7 @@ describe("parseDebugParams", () => {
     test("handles malformed percent encoding gracefully", () => {
       // This test ensures that malformed encoding doesn't crash the parser
       const window = new Window({ url: "https://example.com/?debug=true&queue=%E0%A4" });
-      global.window = window as any;
+      global.window = window as unknown as Window & typeof globalThis;
 
       expect(() => parseDebugParams()).not.toThrow();
     });
@@ -274,7 +274,7 @@ describe("parseDebugParams", () => {
   describe("generateDebugUrl", () => {
     beforeEach(() => {
       const window = new Window({ url: "https://example.com/path?existing=param" });
-      global.window = window as any;
+      global.window = window as unknown as Window & typeof globalThis;
     });
 
     test("generates URL with debug enabled", () => {
@@ -291,7 +291,7 @@ describe("parseDebugParams", () => {
       const window = new Window({
         url: "https://example.com/?debug=true&preset=old&queue=OLD&seed=999&score=9999&level=99&lines=999",
       });
-      global.window = window as any;
+      global.window = window as unknown as Window & typeof globalThis;
 
       const result = generateDebugUrl({ enabled: true, preset: "new", queue: ["I", "J"] });
       expect(result).toBe("https://example.com/?debug=true&preset=new&queue=IJ");
@@ -332,7 +332,7 @@ describe("parseDebugParams", () => {
 
       const url = generateDebugUrl(originalParams);
       const window = new Window({ url });
-      global.window = window as any;
+      global.window = window as unknown as Window & typeof globalThis;
 
       const parsedParams = parseDebugParams();
       expect(parsedParams).toEqual(originalParams);

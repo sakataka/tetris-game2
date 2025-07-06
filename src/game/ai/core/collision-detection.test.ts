@@ -142,13 +142,15 @@ describe("Collision Detection", () => {
       expect(dropY).toBeGreaterThan(15); // Should be near bottom
 
       // Verify the position is actually valid
-      const result = detector.canPlace(bitBoard, "T", 0, 3, dropY!);
-      expect(result.canPlace).toBe(true);
+      if (dropY !== null) {
+        const result = detector.canPlace(bitBoard, "T", 0, 3, dropY);
+        expect(result.canPlace).toBe(true);
 
-      // Verify the position below would not be valid (at the bottom or collision)
-      if (dropY! < 19) {
-        const resultBelow = detector.canPlace(bitBoard, "T", 0, 3, dropY! + 1);
-        expect(resultBelow.canPlace).toBe(false);
+        // Verify the position below would not be valid (at the bottom or collision)
+        if (dropY < 19) {
+          const resultBelow = detector.canPlace(bitBoard, "T", 0, 3, dropY + 1);
+          expect(resultBelow.canPlace).toBe(false);
+        }
       }
     });
 
@@ -191,12 +193,16 @@ describe("Collision Detection", () => {
 
     it("should handle current position at bottom", () => {
       const dropY = detector.findDropPosition(bitBoard, "T", 0, 3);
-      const currentPos = { x: 3, y: dropY! };
-      const ghostPos = detector.calculateGhostPosition(bitBoard, "T", 0, currentPos);
+      if (dropY !== null) {
+        const currentPos = { x: 3, y: dropY };
+        const ghostPos = detector.calculateGhostPosition(bitBoard, "T", 0, currentPos);
 
-      expect(ghostPos).not.toBeNull();
-      expect(ghostPos?.x).toBe(currentPos.x);
-      expect(ghostPos?.y).toBe(currentPos.y); // Should be same as current
+        expect(ghostPos).not.toBeNull();
+        expect(ghostPos?.x).toBe(currentPos.x);
+        expect(ghostPos?.y).toBe(currentPos.y); // Should be same as current
+      } else {
+        expect(dropY).not.toBeNull(); // This test requires a valid drop position
+      }
     });
 
     it("should return null when no drop position exists", () => {

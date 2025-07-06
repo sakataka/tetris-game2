@@ -220,7 +220,7 @@ describe("BitBoard", () => {
 
     it("should handle invalid board dimensions", () => {
       const invalidBoard = [[1, 2, 3]]; // Wrong dimensions
-      expect(() => bitBoard.fromBoardState(invalidBoard as any)).toThrow();
+      expect(() => bitBoard.fromBoardState(invalidBoard as unknown as GameBoard)).toThrow();
     });
 
     it("should preserve occupancy but lose color information", () => {

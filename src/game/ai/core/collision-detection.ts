@@ -213,7 +213,7 @@ export class CollisionDetector {
    */
   private canPlaceOptimized(
     bitBoard: BitBoard,
-    pattern: any, // PieceBitPattern
+    pattern: { rows: number[]; width: number; height: number },
     x: number,
     y: number,
   ): CollisionResult {

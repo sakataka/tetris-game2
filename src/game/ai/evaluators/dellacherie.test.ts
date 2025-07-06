@@ -273,7 +273,7 @@ describe("DellacherieEvaluator", () => {
       const score = evaluator.evaluate(board, move);
 
       expect(typeof score).toBe("number");
-      expect(isFinite(score)).toBe(true);
+      expect(Number.isFinite(score)).toBe(true);
     });
 
     it("should handle moves that clear multiple lines", () => {
@@ -339,7 +339,7 @@ describe("Real Game Scenarios", () => {
     const score = evaluator.evaluate(board, tSpinMove);
 
     expect(typeof score).toBe("number");
-    expect(isFinite(score)).toBe(true);
+    expect(Number.isFinite(score)).toBe(true);
   });
 
   it("should prefer safe placements over risky ones", () => {

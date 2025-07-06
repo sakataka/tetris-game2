@@ -8,6 +8,7 @@
 3. **Output Hardcoding**: NEVER hardcode user-facing text or API responses
 4. **Error Suppression**: NEVER hide or ignore error messages
 5. **Temporary Fixes**: NEVER implement temporary solutions that create technical debt
+6. **Any Type Usage**: NEVER use `any` type - use `unknown` with proper type guards or define explicit types
 
 ### MANDATORY EXECUTION PATTERNS
 - **Path Import Rules**: ALWAYS use `@/` for cross-directory imports, `./` for same-directory imports
@@ -159,7 +160,6 @@ bun run check:i18n   # Check translation key consistency (detect missing/unused 
 
 # Performance Benchmarking
 bun run benchmark    # Run performance benchmarks (collision detection, board operations)
-bun run benchmark:ci # Run benchmarks in CI mode with automated analysis
 
 # Quality Assurance Pipeline
 bun run ci           # Complete CI pipeline (lint + typecheck + test + build)
@@ -308,16 +308,6 @@ const useContinuousOperation = (enabled: boolean) => {
 IF importing from different directory THEN use `@/` alias
   ✅ import { GameStore } from '@/store/gameStore'
   ✅ import { BoardUtils } from '@/utils/boardUtils'
-  ❌ import { GameStore } from '../store/gameStore'
-  ❌ import { BoardUtils } from '../../utils/boardUtils'
-
-IF importing from same directory THEN use `./` relative path
-  ✅ import { helper } from './utils'
-  ✅ import { Component } from './Component'
-  ❌ import { helper } from '@/current-dir/utils'
-
-EXCEPTION: Test mocks may use relative paths when required by testing framework
-  ✅ import mockData from '../__mocks__/data'
 ```
 
 ### CODE QUALITY ENFORCEMENT
@@ -382,12 +372,6 @@ import { useShallow } from "zustand/shallow";
 const { score, level } = useGameStore(
   useShallow((state) => ({ score: state.score, level: state.level }))
 );
-
-// ❌ FORBIDDEN: Object creation in selector (infinite re-renders)
-const gameStats = useGameStore((state) => ({
-  score: state.score,
-  level: state.level
-})); // Creates new object on every render
 
 // ✅ REQUIRED: Functional state transitions
 const moveTetrominoBy = (state: GameState, dx: number, dy: number) => {

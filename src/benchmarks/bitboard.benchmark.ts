@@ -10,12 +10,10 @@ const bench = (name: string, fn: () => void) => {
 };
 
 import { BitBoard } from "@/game/ai/core/bitboard";
-import { BitBoardEngine, getBoardConverter } from "@/game/ai/core/board-adapter";
 import { CollisionDetector } from "@/game/ai/core/collision-detection";
 import { getPieceBitsAtPosition } from "@/game/ai/core/piece-bits";
-import { FastSRSRotation } from "@/game/ai/core/srs-integration";
 import { createEmptyBoard } from "@/game/board";
-import type { CellValue, RotationState, TetrominoTypeName } from "@/types/game";
+import type { RotationState, TetrominoTypeName } from "@/types/game";
 
 /**
  * Comprehensive BitBoard performance benchmarks
@@ -265,111 +263,6 @@ describe("BitBoard Performance Benchmarks", () => {
     });
   });
 
-  describe("SRS Rotation Performance", () => {
-    const srsRotation = new FastSRSRotation(false);
-
-    bench("Single rotation attempt", () => {
-      srsRotation.tryRotate(complexBoard, "T", 0, { x: 3, y: 5 }, 1);
-    });
-
-    bench("All rotation attempts for single piece", () => {
-      srsRotation.tryAllRotations(complexBoard, "T", 0, { x: 3, y: 5 });
-    });
-
-    bench("Find all valid placements - T piece", () => {
-      srsRotation.findAllValidPlacements(complexBoard, "T", 0);
-    });
-
-    bench("T-spin rotation simulation", () => {
-      // Simulate T-spin scenario
-      const tSpinBoard = new BitBoard();
-      tSpinBoard.setRowBits(19, 0b1110111111);
-      tSpinBoard.setRowBits(18, 0b1110111111);
-      tSpinBoard.setRowBits(17, 0b1111011111);
-
-      // Try various T-piece rotations in T-spin position
-      for (const fromRot of rotations) {
-        for (const toRot of rotations) {
-          srsRotation.tryRotate(tSpinBoard, "T", fromRot, { x: 1, y: 17 }, toRot);
-        }
-      }
-    });
-  });
-
-  describe("Board Conversion Performance", () => {
-    const converter = getBoardConverter(false);
-    const gameBoard = createEmptyBoard();
-
-    // Create complex GameBoard
-    for (let y = 15; y < 20; y++) {
-      for (let x = 0; x < 10; x++) {
-        if (Math.random() > 0.3) {
-          gameBoard[y][x] = (Math.floor(Math.random() * 7) + 1) as CellValue;
-        }
-      }
-    }
-
-    bench("GameBoard to BitBoard conversion", () => {
-      converter.toBitBoard(gameBoard);
-    });
-
-    bench("BitBoard to GameBoard conversion", () => {
-      converter.toGameBoard(complexBoard);
-    });
-
-    bench("Roundtrip conversion", () => {
-      const result = converter.toBitBoard(gameBoard);
-      if (result.success && result.result) {
-        converter.toGameBoard(result.result.bitBoard);
-      }
-    });
-
-    bench("Batch conversion (10 boards)", () => {
-      const boards = Array(10).fill(gameBoard);
-      converter.toBitBoardBatch(boards);
-    });
-  });
-
-  describe("BoardEngine Integration Performance", () => {
-    const bitBoardEngine = new BitBoardEngine(false);
-    const gameBoard = createEmptyBoard();
-
-    // Add some complexity
-    gameBoard[19][0] = 1;
-    gameBoard[19][9] = 1;
-    gameBoard[18][4] = 2;
-
-    bench("BitBoardEngine.isValidPosition", () => {
-      bitBoardEngine.isValidPosition(
-        gameBoard,
-        [
-          [1, 1, 1],
-          [0, 1, 0],
-        ],
-        { x: 3, y: 17 },
-      );
-    });
-
-    bench("BitBoardEngine.placePiece", () => {
-      bitBoardEngine.placePiece(
-        gameBoard,
-        [
-          [1, 1, 1],
-          [0, 1, 0],
-        ],
-        { x: 3, y: 17 },
-        3,
-      );
-    });
-
-    bench("BitBoardEngine.clearLines", () => {
-      const fullBoard = createEmptyBoard();
-      fullBoard[19] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]; // Full line
-      fullBoard[18] = [1, 1, 1, 0, 0, 0, 1, 1, 1, 1]; // Partial line
-      bitBoardEngine.clearLines(fullBoard);
-    });
-  });
-
   describe("Memory Efficiency Tests", () => {
     bench("Memory usage - 1000 BitBoards", () => {
       const boards = [];
@@ -403,13 +296,17 @@ describe("BitBoard Performance Benchmarks", () => {
   describe("Real-world AI Simulation", () => {
     bench("Complete AI move evaluation cycle", () => {
       const detector = new CollisionDetector(false);
-      // SRS rotation instance for future enhancements
-      // const srsRotation = new FastSRSRotation(false);
+      // SRS rotation integration removed
 
       // Simulate AI evaluating all possible moves for current piece
       const piece: TetrominoTypeName = "T";
       let bestScore = Number.NEGATIVE_INFINITY;
-      let bestMove: any = null;
+      let bestMove: {
+        piece: TetrominoTypeName;
+        rotation: RotationState;
+        position: { x: number; y: number };
+        score: number;
+      } | null = null;
 
       for (const rotation of rotations) {
         const validPositions = detector.findValidPositions(complexBoard, piece, rotation);
@@ -448,7 +345,14 @@ describe("BitBoard Performance Benchmarks", () => {
       const detector = new CollisionDetector(false);
       const pieces: TetrominoTypeName[] = ["T", "I"];
 
-      let bestSequence: any = null;
+      let bestSequence: {
+        moves: Array<{
+          piece: TetrominoTypeName;
+          rotation: RotationState;
+          position: { x: number; y: number };
+        }>;
+        score: number;
+      } | null = null;
       let bestScore = Number.NEGATIVE_INFINITY;
 
       // First piece
@@ -482,10 +386,13 @@ describe("BitBoard Performance Benchmarks", () => {
 
               if (score > bestScore) {
                 bestScore = score;
-                bestSequence = [
-                  { piece: pieces[0], rotation: rot1, position: pos1 },
-                  { piece: pieces[1], rotation: rot2, position: pos2 },
-                ];
+                bestSequence = {
+                  moves: [
+                    { piece: pieces[0], rotation: rot1, position: pos1 },
+                    { piece: pieces[1], rotation: rot2, position: pos2 },
+                  ],
+                  score: score,
+                };
               }
             }
           }
