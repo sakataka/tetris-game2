@@ -1,6 +1,21 @@
+import type { GameError } from "@/types/errors";
+import { GameErrors } from "@/types/errors";
+import type { Result } from "@/types/result";
+import { Err, Ok, ResultUtils } from "@/types/result";
 import type { CellValue, GameBoard, Position, TetrominoShape } from "../types/game";
 import { isValidBoardPosition } from "../utils/boardUtils";
 import { GAME_CONSTANTS } from "../utils/gameConstants";
+
+// Backward compatibility function for existing code
+export function placeTetrominoLegacy(
+  board: GameBoard,
+  shape: TetrominoShape,
+  position: Position,
+  colorIndex: CellValue,
+): GameBoard {
+  const result = placeTetromino(board, shape, position, colorIndex);
+  return ResultUtils.unwrapOr(result, board);
+}
 
 export function createEmptyBoard(): GameBoard {
   // Defensive checks for CI environment compatibility
@@ -71,16 +86,33 @@ export function placeTetromino(
   shape: TetrominoShape,
   position: Position,
   colorIndex: CellValue,
-): GameBoard {
+): Result<GameBoard, GameError> {
+  // Validate that the piece can be placed at the given position
+  if (!isValidPosition(board, shape, position)) {
+    return Err(GameErrors.boardCollision("Cannot place tetromino at the specified position"));
+  }
+
   const newBoard = board.map((row) => [...row]) as GameBoard;
 
-  forEachPieceCell(shape, position, (boardX, boardY) => {
-    if (isValidBoardPosition({ x: boardX, y: boardY })) {
-      newBoard[boardY][boardX] = colorIndex;
+  // Pre-validate all positions before placing
+  for (let y = 0; y < shape.length; y++) {
+    for (let x = 0; x < shape[y].length; x++) {
+      if (shape[y][x]) {
+        const boardX = position.x + x;
+        const boardY = position.y + y;
+        if (!isValidBoardPosition({ x: boardX, y: boardY })) {
+          return Err(GameErrors.outOfBounds(`Position (${boardX}, ${boardY}) is out of bounds`));
+        }
+      }
     }
+  }
+
+  // Place the piece
+  forEachPieceCell(shape, position, (boardX, boardY) => {
+    newBoard[boardY][boardX] = colorIndex;
   });
 
-  return newBoard;
+  return Ok(newBoard);
 }
 
 export function clearLines(board: GameBoard): {

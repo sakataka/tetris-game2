@@ -64,8 +64,8 @@ class LegacyBoardEngine implements BoardEngine {
     colorIndex: CellValue,
   ): GameBoard {
     // Import here to avoid circular dependencies
-    const { placeTetromino } = require("./board");
-    return placeTetromino(board, shape, position, colorIndex);
+    const { placeTetrominoLegacy } = require("./board");
+    return placeTetrominoLegacy(board, shape, position, colorIndex);
   }
 
   clearLines(board: GameBoard): {

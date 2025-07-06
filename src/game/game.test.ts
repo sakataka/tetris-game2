@@ -7,9 +7,9 @@ import {
   checkGameOver,
   createInitialGameState,
   hardDropTetromino,
-  moveTetrominoBy,
+  moveTetrominoByLegacy,
   processPlacementAndClearing,
-  rotateTetrominoCW,
+  rotateTetrominoCWLegacy,
   spawnNextPiece,
 } from "./game";
 import { createTetromino } from "./tetrominos";
@@ -60,13 +60,13 @@ function _moveTetrominoToPosition(state: GameState, targetX: number, targetY: nu
   // Move in X direction
   const deltaX = targetX - currentX;
   if (deltaX !== 0) {
-    newState = moveTetrominoBy(newState, deltaX, 0);
+    newState = moveTetrominoByLegacy(newState, deltaX, 0);
   }
 
   // Move in Y direction
   const deltaY = targetY - currentY;
   if (deltaY !== 0) {
-    newState = moveTetrominoBy(newState, 0, deltaY);
+    newState = moveTetrominoByLegacy(newState, 0, deltaY);
   }
 
   return newState;
@@ -132,7 +132,7 @@ describe("Game Logic - Junichi Ito Style", () => {
         const initialX = state.currentPiece?.position.x ?? 0;
 
         // When: Move 1 cell to the left
-        const newState = moveTetrominoBy(state, -1, 0);
+        const newState = moveTetrominoByLegacy(state, -1, 0);
 
         // Then: X coordinate decreases by 1
         expect(newState.currentPiece?.position.x).toBe(initialX - 1);
@@ -144,7 +144,7 @@ describe("Game Logic - Junichi Ito Style", () => {
         const initialX = state.currentPiece?.position.x ?? 0;
 
         // When: Move 1 cell to the right
-        const newState = moveTetrominoBy(state, 1, 0);
+        const newState = moveTetrominoByLegacy(state, 1, 0);
 
         // Then: X coordinate increases by 1
         expect(newState.currentPiece?.position.x).toBe(initialX + 1);
@@ -156,7 +156,7 @@ describe("Game Logic - Junichi Ito Style", () => {
         const initialY = state.currentPiece?.position.y ?? 0;
 
         // When: Move 1 cell downward
-        const newState = moveTetrominoBy(state, 0, 1);
+        const newState = moveTetrominoByLegacy(state, 0, 1);
 
         // Then: Y coordinate increases by 1
         expect(newState.currentPiece?.position.y).toBe(initialY + 1);
@@ -169,7 +169,7 @@ describe("Game Logic - Junichi Ito Style", () => {
         const initialY = state.currentPiece?.position.y ?? 0;
 
         // When: Move to bottom-right
-        const newState = moveTetrominoBy(state, 2, 3);
+        const newState = moveTetrominoByLegacy(state, 2, 3);
 
         // Then: Moves correctly in both directions
         expect(newState.currentPiece?.position.x).toBe(initialX + 2);
@@ -182,11 +182,11 @@ describe("Game Logic - Junichi Ito Style", () => {
         // Given: Move piece to left edge
         let state = createInitialGameState();
         for (let i = 0; i < GAME_CONSTANTS.BOARD.WIDTH; i++) {
-          state = moveTetrominoBy(state, -1, 0);
+          state = moveTetrominoByLegacy(state, -1, 0);
         }
 
         // When: Attempt to move further left
-        const finalState = moveTetrominoBy(state, -1, 0);
+        const finalState = moveTetrominoByLegacy(state, -1, 0);
 
         // Then: Stays in original position without moving
         expect(finalState.currentPiece?.position.x).toBe(state.currentPiece?.position.x);
@@ -196,11 +196,11 @@ describe("Game Logic - Junichi Ito Style", () => {
         // Given: Move piece to right edge
         let state = createInitialGameState();
         for (let i = 0; i < GAME_CONSTANTS.BOARD.WIDTH; i++) {
-          state = moveTetrominoBy(state, 1, 0);
+          state = moveTetrominoByLegacy(state, 1, 0);
         }
 
         // When: Attempt to move further right
-        const finalState = moveTetrominoBy(state, 1, 0);
+        const finalState = moveTetrominoByLegacy(state, 1, 0);
 
         // Then: Stays in original position without moving
         expect(finalState.currentPiece?.position.x).toBe(state.currentPiece?.position.x);
@@ -213,7 +213,7 @@ describe("Game Logic - Junichi Ito Style", () => {
 
         // Move piece down until it can't move anymore
         for (let i = 0; i < GAME_CONSTANTS.BOARD.HEIGHT + 5; i++) {
-          const newState = moveTetrominoBy(state, 0, 1);
+          const newState = moveTetrominoByLegacy(state, 0, 1);
           // If the piece didn't move, we've hit the boundary
           if (newState.currentPiece?.position.y === state.currentPiece?.position.y) {
             break;
@@ -223,7 +223,7 @@ describe("Game Logic - Junichi Ito Style", () => {
         }
 
         // When: Try to move further down
-        const finalState = moveTetrominoBy(state, 0, 1);
+        const finalState = moveTetrominoByLegacy(state, 0, 1);
 
         // Then: Position should not change or piece should be placed
         const positionUnchanged =
@@ -242,7 +242,7 @@ describe("Game Logic - Junichi Ito Style", () => {
         };
 
         // When: Move in minimum unit
-        const newState = moveTetrominoBy(state, 1, 1);
+        const newState = moveTetrominoByLegacy(state, 1, 1);
 
         // Then: Moves exactly 1 cell at a time
         expect(newState.currentPiece?.position.x).toBe(initialPosition.x + 1);
@@ -260,7 +260,7 @@ describe("Game Logic - Junichi Ito Style", () => {
         };
 
         // When: Attempt to move
-        const newState = moveTetrominoBy(state, 1, 1);
+        const newState = moveTetrominoByLegacy(state, 1, 1);
 
         // Then: Position does not change
         expect(newState.currentPiece?.position.x).toBe(initialPosition.x);
@@ -276,7 +276,7 @@ describe("Game Logic - Junichi Ito Style", () => {
         };
 
         // When: Attempt to move
-        const newState = moveTetrominoBy(state, 1, 1);
+        const newState = moveTetrominoByLegacy(state, 1, 1);
 
         // Then: Position does not change
         expect(newState.currentPiece?.position.x).toBe(initialPosition.x);
@@ -289,7 +289,7 @@ describe("Game Logic - Junichi Ito Style", () => {
 
         // When: Attempt to move
         // Then: No error occurs
-        expect(() => moveTetrominoBy(state, 1, 1)).not.toThrow();
+        expect(() => moveTetrominoByLegacy(state, 1, 1)).not.toThrow();
       });
 
       test("Movement is restricted by collision with other pieces", () => {
@@ -303,12 +303,12 @@ describe("Game Logic - Junichi Ito Style", () => {
         // Move piece near bottom
         let newState = stateWithObstacle;
         for (let i = 0; i < GAME_CONSTANTS.BOARD.HEIGHT - 2; i++) {
-          newState = moveTetrominoBy(newState, 0, 1);
+          newState = moveTetrominoByLegacy(newState, 0, 1);
         }
 
         // When: Attempt to move toward obstacle
         const beforeX = newState.currentPiece?.position.x ?? 0;
-        const finalState = moveTetrominoBy(newState, -1 * beforeX, 0);
+        const finalState = moveTetrominoByLegacy(newState, -1 * beforeX, 0);
 
         // Then: Movement is restricted by collision
         // (Exact restriction depends on implementation)
@@ -318,13 +318,13 @@ describe("Game Logic - Junichi Ito Style", () => {
       test("Negative movement amounts are processed correctly", () => {
         // Given: State with piece near center
         let state = createInitialGameState();
-        state = moveTetrominoBy(state, 2, 2); // Move toward center
+        state = moveTetrominoByLegacy(state, 2, 2); // Move toward center
 
         const initialX = state.currentPiece?.position.x ?? 0;
         const initialY = state.currentPiece?.position.y ?? 0;
 
         // When: Move with negative amounts
-        const newState = moveTetrominoBy(state, -1, -1);
+        const newState = moveTetrominoByLegacy(state, -1, -1);
 
         // Then: Moves in reverse direction
         expect(newState.currentPiece?.position.x).toBe(initialX - 1);
@@ -333,11 +333,11 @@ describe("Game Logic - Junichi Ito Style", () => {
     });
   });
 
-  describe("rotateTetrominoCW", () => {
+  describe("rotateTetrominoCWLegacy", () => {
     test("should rotate current piece", () => {
       const state = createInitialGameState();
       const initialRotation = state.currentPiece?.rotation ?? 0;
-      const newState = rotateTetrominoCW(state);
+      const newState = rotateTetrominoCWLegacy(state);
       expect(newState.currentPiece?.rotation).toBe((initialRotation + 1) % 4);
     });
 
@@ -347,11 +347,11 @@ describe("Game Logic - Junichi Ito Style", () => {
       // Move piece to left edge where basic rotation might fail
       let edgeState = state;
       for (let i = 0; i < 3; i++) {
-        edgeState = moveTetrominoBy(edgeState, -1, 0);
+        edgeState = moveTetrominoByLegacy(edgeState, -1, 0);
       }
 
       const initialRotation = edgeState.currentPiece?.rotation ?? 0;
-      const newState = rotateTetrominoCW(edgeState);
+      const newState = rotateTetrominoCWLegacy(edgeState);
 
       // Should successfully rotate with wall kick compensation
       expect(newState.currentPiece?.rotation).toBe((initialRotation + 1) % 4);
@@ -359,7 +359,7 @@ describe("Game Logic - Junichi Ito Style", () => {
 
     test("should maintain position when wall kick finds valid spot", () => {
       const state = createInitialGameState();
-      const newState = rotateTetrominoCW(state);
+      const newState = rotateTetrominoCWLegacy(state);
 
       // Should have valid position after rotation
       expect(newState.currentPiece?.position.x).toBeGreaterThanOrEqual(0);
@@ -369,13 +369,13 @@ describe("Game Logic - Junichi Ito Style", () => {
 
     test("should not rotate when game is paused", () => {
       const state = { ...createInitialGameState(), isPaused: true };
-      const newState = rotateTetrominoCW(state);
+      const newState = rotateTetrominoCWLegacy(state);
       expect(newState).toBe(state);
     });
 
     test("should not rotate when game is over", () => {
       const state = { ...createInitialGameState(), isGameOver: true };
-      const newState = rotateTetrominoCW(state);
+      const newState = rotateTetrominoCWLegacy(state);
       expect(newState).toBe(state);
     });
   });

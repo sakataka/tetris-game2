@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { calculateGhostPosition, createInitialGameState, holdCurrentPiece } from "./game";
+import { calculateGhostPosition, createInitialGameState, holdCurrentPieceLegacy } from "./game";
 
 describe("Hold Feature", () => {
-  describe("holdCurrentPiece", () => {
+  describe("holdCurrentPieceLegacy", () => {
     test("should initialize hold state correctly", () => {
       const state = createInitialGameState();
       expect(state.heldPiece).toBe(null);
@@ -14,7 +14,7 @@ describe("Hold Feature", () => {
       const originalCurrentPieceType = state.currentPiece?.type;
       const originalNextPieceType = state.nextPiece;
 
-      const newState = holdCurrentPiece(state);
+      const newState = holdCurrentPieceLegacy(state);
 
       // Current piece should be saved as held piece
       expect(newState.heldPiece).toBe(originalCurrentPieceType);
@@ -33,7 +33,7 @@ describe("Hold Feature", () => {
       // First, do an initial hold
       let state = createInitialGameState();
       const firstPieceType = state.currentPiece?.type;
-      state = holdCurrentPiece(state);
+      state = holdCurrentPieceLegacy(state);
 
       // Reset canHold to simulate a new piece
       state = { ...state, canHold: true };
@@ -42,7 +42,7 @@ describe("Hold Feature", () => {
       const secondPieceType = state.currentPiece?.type;
 
       // Perform exchange hold
-      const newState = holdCurrentPiece(state);
+      const newState = holdCurrentPieceLegacy(state);
 
       // Pieces should be swapped
       expect(newState.heldPiece).toBe(secondPieceType);
@@ -59,7 +59,7 @@ describe("Hold Feature", () => {
       const state = createInitialGameState();
       const stateWithCanHoldFalse = { ...state, canHold: false };
 
-      const newState = holdCurrentPiece(stateWithCanHoldFalse);
+      const newState = holdCurrentPieceLegacy(stateWithCanHoldFalse);
 
       // State should remain unchanged
       expect(newState).toBe(stateWithCanHoldFalse);
@@ -69,7 +69,7 @@ describe("Hold Feature", () => {
       const state = createInitialGameState();
       const stateWithNullPiece = { ...state, currentPiece: null };
 
-      const newState = holdCurrentPiece(stateWithNullPiece);
+      const newState = holdCurrentPieceLegacy(stateWithNullPiece);
 
       // State should remain unchanged
       expect(newState).toBe(stateWithNullPiece);
@@ -79,7 +79,7 @@ describe("Hold Feature", () => {
       const state = createInitialGameState();
       const gameOverState = { ...state, isGameOver: true };
 
-      const newState = holdCurrentPiece(gameOverState);
+      const newState = holdCurrentPieceLegacy(gameOverState);
 
       // State should remain unchanged
       expect(newState).toBe(gameOverState);
@@ -89,7 +89,7 @@ describe("Hold Feature", () => {
       const state = createInitialGameState();
       const pausedState = { ...state, isPaused: true };
 
-      const newState = holdCurrentPiece(pausedState);
+      const newState = holdCurrentPieceLegacy(pausedState);
 
       // State should remain unchanged
       expect(newState).toBe(pausedState);
@@ -97,7 +97,7 @@ describe("Hold Feature", () => {
 
     test("should update ghost position after hold", () => {
       const state = createInitialGameState();
-      const newState = holdCurrentPiece(state);
+      const newState = holdCurrentPieceLegacy(state);
 
       // Ghost position should be calculated for the new current piece
       const expectedGhostPosition = calculateGhostPosition(newState);
@@ -106,7 +106,7 @@ describe("Hold Feature", () => {
 
     test("should create new tetromino instance in correct position", () => {
       const state = createInitialGameState();
-      const newState = holdCurrentPiece(state);
+      const newState = holdCurrentPieceLegacy(state);
 
       // New current piece should be positioned at spawn location
       expect(newState.currentPiece?.position.x).toBeDefined();
@@ -120,17 +120,17 @@ describe("Hold Feature", () => {
       const originalPieceType = state.currentPiece?.type;
 
       // First hold should work
-      state = holdCurrentPiece(state);
+      state = holdCurrentPieceLegacy(state);
       expect(state.canHold).toBe(false);
       expect(state.heldPiece).toBe(originalPieceType);
 
       // Second hold should not work (canHold is false)
-      const attemptedSecondHold = holdCurrentPiece(state);
+      const attemptedSecondHold = holdCurrentPieceLegacy(state);
       expect(attemptedSecondHold).toBe(state); // State unchanged
 
       // After piece is locked (simulated by resetting canHold), hold should work again
       const stateAfterLock = { ...state, canHold: true };
-      const thirdHold = holdCurrentPiece(stateAfterLock);
+      const thirdHold = holdCurrentPieceLegacy(stateAfterLock);
       expect(thirdHold.canHold).toBe(false);
       expect(thirdHold).not.toBe(stateAfterLock); // State should change
     });
@@ -148,7 +148,7 @@ describe("Hold Feature", () => {
         animationTriggerKey: 5,
       };
 
-      const newState = holdCurrentPiece(modifiedState);
+      const newState = holdCurrentPieceLegacy(modifiedState);
 
       // These properties should be preserved
       expect(newState.score).toBe(1000);

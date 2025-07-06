@@ -1,3 +1,5 @@
+import type { GameError } from "@/types/errors";
+import { GameErrors } from "@/types/errors";
 import type {
   GameBoard,
   GameState,
@@ -6,6 +8,8 @@ import type {
   TetrominoShape,
   TetrominoTypeName,
 } from "@/types/game";
+import type { Result } from "@/types/result";
+import { Err, Ok, ResultUtils } from "@/types/result";
 import { GAME_CONSTANTS } from "@/utils/gameConstants";
 import { canPerformHoldAction, isGameOverState, isGamePlayable } from "@/utils/gameValidation";
 import { normalizeRotationState } from "@/utils/typeGuards";
@@ -19,6 +23,22 @@ import {
 import { createPieceBag, getBagContents, getNextPiece, setBagForTesting } from "./pieceBag";
 import { createTetromino, getTetrominoColorIndex, rotateTetromino } from "./tetrominos";
 import { tryRotateWithWallKickUnified } from "./wallKick";
+
+// Backward compatibility functions for existing code
+export function moveTetrominoByLegacy(state: GameState, dx: number, dy: number): GameState {
+  const result = moveTetrominoBy(state, dx, dy);
+  return ResultUtils.unwrapOr(result, state);
+}
+
+export function rotateTetrominoCWLegacy(state: GameState): GameState {
+  const result = rotateTetrominoCW(state);
+  return ResultUtils.unwrapOr(result, state);
+}
+
+export function holdCurrentPieceLegacy(state: GameState): GameState {
+  const result = holdCurrentPiece(state);
+  return ResultUtils.unwrapOr(result, state);
+}
 
 export function createInitialGameState(): GameState {
   const pieceBag = createPieceBag();
@@ -49,8 +69,18 @@ export function createInitialGameState(): GameState {
   return state;
 }
 
-export function moveTetrominoBy(state: GameState, dx: number, dy: number): GameState {
-  if (!isGamePlayable(state) || !state.currentPiece) return state;
+export function moveTetrominoBy(
+  state: GameState,
+  dx: number,
+  dy: number,
+): Result<GameState, GameError> {
+  if (!isGamePlayable(state)) {
+    return Err(GameErrors.invalidState("Game is not in playable state"));
+  }
+
+  if (!state.currentPiece) {
+    return Err(GameErrors.invalidPiece("No current piece to move"));
+  }
 
   const newPosition = {
     x: state.currentPiece.position.x + dx,
@@ -58,18 +88,30 @@ export function moveTetrominoBy(state: GameState, dx: number, dy: number): GameS
   };
 
   if (isValidPosition(state.board, state.currentPiece.shape, newPosition)) {
-    return updateGhostPosition({
-      ...state,
-      currentPiece: { ...state.currentPiece, position: newPosition },
-    });
+    return Ok(
+      updateGhostPosition({
+        ...state,
+        currentPiece: { ...state.currentPiece, position: newPosition },
+      }),
+    );
   }
 
   // If moving down failed, lock the piece
-  return dy > 0 ? lockCurrentTetromino(state) : state;
+  if (dy > 0) {
+    return Ok(lockCurrentTetromino(state));
+  }
+
+  return Err(GameErrors.invalidPosition("Cannot move piece to the specified position"));
 }
 
-export function rotateTetrominoCW(state: GameState): GameState {
-  if (!isGamePlayable(state) || !state.currentPiece) return state;
+export function rotateTetrominoCW(state: GameState): Result<GameState, GameError> {
+  if (!isGamePlayable(state)) {
+    return Err(GameErrors.invalidState("Game is not in playable state"));
+  }
+
+  if (!state.currentPiece) {
+    return Err(GameErrors.invalidPiece("No current piece to rotate"));
+  }
 
   const { currentPiece } = state;
   const rotatedShape = rotateTetromino(currentPiece.shape);
@@ -84,14 +126,22 @@ export function rotateTetrominoCW(state: GameState): GameState {
     isValidPosition,
   );
 
-  return rotationResult.success && rotationResult.piece
-    ? updateGhostPosition({
+  if (rotationResult.success && rotationResult.piece) {
+    return Ok(
+      updateGhostPosition({
         ...state,
         currentPiece: rotationResult.piece,
         animationTriggerKey:
           typeof state.animationTriggerKey === "number" ? state.animationTriggerKey + 1 : 1,
-      })
-    : state;
+      }),
+    );
+  }
+
+  return Err(
+    GameErrors.invalidRotation(
+      rotationResult.failureReason || "Cannot rotate piece to the specified position",
+    ),
+  );
 }
 
 /**
@@ -152,13 +202,28 @@ export function processPlacementAndClearing(state: GameState): PlacementResult {
     placedPositions.push({ x: boardX, y: boardY }),
   );
 
-  const boardAfterLock = placeTetromino(
+  const boardAfterLockResult = placeTetromino(
     state.board,
     state.currentPiece.shape,
     state.currentPiece.position,
     colorIndex,
   );
 
+  // Handle Result type from placeTetromino
+  if (!boardAfterLockResult.ok) {
+    // Return a safe fallback state if placement fails
+    return {
+      board: state.board,
+      boardBeforeClear: null,
+      score: state.score,
+      lines: state.lines,
+      level: state.level,
+      placedPositions: [],
+      clearingLines: [],
+    };
+  }
+
+  const boardAfterLock = boardAfterLockResult.value;
   const { board: boardAfterClear, linesCleared, clearedLineIndices } = clearLines(boardAfterLock);
   const lines = state.lines + linesCleared;
   const boardBeforeClear = clearedLineIndices.length > 0 ? boardAfterLock : null;
@@ -312,8 +377,14 @@ function updateGhostPosition(state: GameState): GameState {
  * Holds current piece (can only be used once per piece drop)
  * Initial hold: save piece and spawn next, Exchange hold: swap with held piece
  */
-export function holdCurrentPiece(state: GameState): GameState {
-  if (!canPerformHoldAction(state) || !state.currentPiece) return state;
+export function holdCurrentPiece(state: GameState): Result<GameState, GameError> {
+  if (!canPerformHoldAction(state)) {
+    return Err(GameErrors.holdNotAllowed("Hold action is not allowed in current state"));
+  }
+
+  if (!state.currentPiece) {
+    return Err(GameErrors.invalidPiece("No current piece to hold"));
+  }
 
   const currentPieceType = state.currentPiece.type;
 
@@ -322,20 +393,24 @@ export function holdCurrentPiece(state: GameState): GameState {
     const currentBag = setBagForTesting(createPieceBag(), state.pieceBag);
     const [newNextPiece, updatedBag] = getNextPiece(currentBag);
 
-    return updateGhostPosition({
-      ...state,
-      currentPiece: createTetromino(state.nextPiece),
-      heldPiece: currentPieceType,
-      nextPiece: newNextPiece,
-      canHold: false,
-      pieceBag: [...getBagContents(updatedBag)],
-    });
+    return Ok(
+      updateGhostPosition({
+        ...state,
+        currentPiece: createTetromino(state.nextPiece),
+        heldPiece: currentPieceType,
+        nextPiece: newNextPiece,
+        canHold: false,
+        pieceBag: [...getBagContents(updatedBag)],
+      }),
+    );
   }
   // Exchange hold: swap held piece with current piece
-  return updateGhostPosition({
-    ...state,
-    currentPiece: createTetromino(state.heldPiece),
-    heldPiece: currentPieceType,
-    canHold: false,
-  });
+  return Ok(
+    updateGhostPosition({
+      ...state,
+      currentPiece: createTetromino(state.heldPiece),
+      heldPiece: currentPieceType,
+      canHold: false,
+    }),
+  );
 }

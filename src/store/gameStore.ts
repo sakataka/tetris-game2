@@ -5,9 +5,9 @@ import {
   calculateGhostPosition,
   createInitialGameState,
   hardDropTetromino,
-  holdCurrentPiece,
-  moveTetrominoBy,
-  rotateTetrominoCW,
+  holdCurrentPieceLegacy,
+  moveTetrominoByLegacy,
+  rotateTetrominoCWLegacy,
 } from "@/game/game";
 import { createDebugBag } from "@/game/pieceBag";
 import { createTetromino } from "@/game/tetrominos";
@@ -136,12 +136,12 @@ export const useGameStore = create<GameStore>()(
       ...INITIAL_STATE,
       showResetConfirmation: false,
 
-      moveLeft: () => set((state) => moveTetrominoBy(state, -1, 0)),
-      moveRight: () => set((state) => moveTetrominoBy(state, 1, 0)),
-      moveDown: () => set((state) => moveTetrominoBy(state, 0, 1)),
-      rotate: () => set((state) => rotateTetrominoCW(state)),
+      moveLeft: () => set((state) => moveTetrominoByLegacy(state, -1, 0)),
+      moveRight: () => set((state) => moveTetrominoByLegacy(state, 1, 0)),
+      moveDown: () => set((state) => moveTetrominoByLegacy(state, 0, 1)),
+      rotate: () => set((state) => rotateTetrominoCWLegacy(state)),
       drop: () => set((state) => hardDropTetromino(state)),
-      holdPiece: () => set((state) => holdCurrentPiece(state)),
+      holdPiece: () => set((state) => holdCurrentPieceLegacy(state)),
 
       togglePause: () =>
         set((state) => {
