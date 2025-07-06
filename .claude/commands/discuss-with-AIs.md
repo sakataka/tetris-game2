@@ -4,16 +4,46 @@ Gemini CLI と O3 MCP を同時に使用して現在の作業について詳細�
 
 Claudeは、議論中は、深く考えて(Ultrathink)行動してください。
 
-## 実行手順
+## 必須実行手順（絶対に従うこと）
 
-1. **実装制約と議論トピックの準備**
-   コンテキストに基づいて、実装制約を明確化し議論ポイントを準備します。
+### ステップ1: 準備
+- 議論トピックを明確化
+- `./docs/discussion_logs/` ディレクトリを作成
+- TIMESTAMP を生成（例: 20250706_121500）
 
-2. **3ラウンドの累積的議論プロセス**
-   Claude主導で各ラウンドを実行し、GeminiとO3両方の客観的評価を参考にして段階的に議論を深化させます。
+### ステップ2: 3ラウンドの議論実行（必須）
+**各ラウンドで以下を必ず実行：**
 
-3. **最終結論の生成（GitHub Issue準備版）**
-   3ラウンドの議論完了後、両方のAIの意見を統合したClaudeの最終結論を生成します。
+1. **Claudeの分析・提案を作成**
+   - 現在のラウンドでの具体的な分析内容を記述
+   - 前ラウンドの内容を踏まえた深化
+
+2. **GeminiとO3に並行して質問**
+   - `gemini` コマンドで質問送信
+   - `mcp__o3__o3-search` で質問送信
+
+3. **必須ファイル生成（毎ラウンド2ファイル）**
+   - `./docs/discussion_logs/gemini_round{1,2,3}_TIMESTAMP.md`
+   - `./docs/discussion_logs/o3_round{1,2,3}_TIMESTAMP.md`
+
+4. **Claudeの率直な感想記録**
+   - 各AIの回答に対する感情的反応
+   - 新たな気づき、専門性評価
+
+### ステップ3: 最終結論生成（必須）
+- `./docs/discussion_logs/conclusion_TIMESTAMP.md` を作成
+- 3ラウンドの議論を統合
+- GitHub Issue用詳細仕様を含める
+
+## 🚨 重要：必須生成ファイル一覧
+**合計7ファイルを必ず作成：**
+1. `gemini_round1_TIMESTAMP.md`
+2. `gemini_round2_TIMESTAMP.md` 
+3. `gemini_round3_TIMESTAMP.md`
+4. `o3_round1_TIMESTAMP.md`
+5. `o3_round2_TIMESTAMP.md`
+6. `o3_round3_TIMESTAMP.md`
+7. `conclusion_TIMESTAMP.md`
 
 ## 実装
 
@@ -118,39 +148,48 @@ EOF
     esac
 }
 
-# AI回答取得（エラーハンドリング付き）
+# AI回答取得（改善されたエラーハンドリング付き）
 get_ai_responses() {
     local prompt="$1"
     local claude_analysis="$2"
     local round="$3"
     local previous_content="$4"
     
-    # Gemini用のプロンプト構築
-    local gemini_prompt="$prompt
-    
-$claude_analysis
-
-$EVALUATION_CRITERIA"
-    
-    # O3用のプロンプト構築（MCPで使用）
-    local o3_prompt="$prompt
-    
-$claude_analysis
-
-$EVALUATION_CRITERIA"
-    
-    # Gemini回答取得
+    # Gemini回答取得（ヒアドキュメント形式で安定化）
     echo "🤖 Gemini に質問中..."
-    if ! GEMINI_RESPONSE=$(timeout 300 gemini <<< "$gemini_prompt" 2>/dev/null); then
-        echo "❌ Gemini への接続に失敗しました。処理を中断します。"
-        exit 1
+    GEMINI_RESPONSE=$(cat << EOF | gemini 2>/dev/null
+$prompt
+
+## Claudeの分析・提案
+$claude_analysis
+
+$EVALUATION_CRITERIA
+EOF
+)
+    
+    # Geminiのレスポンス検証
+    if [ -z "$GEMINI_RESPONSE" ] || echo "$GEMINI_RESPONSE" | grep -q "error\|Error\|ERROR"; then
+        echo "⚠️ Geminiからの有効な回答を取得できませんでした。"
+        GEMINI_RESPONSE="❌ Geminiへの接続でエラーが発生しました。技術的な問題により今回のラウンドは参加できませんでした。"
+    else
+        echo "✅ Geminiから回答を取得しました"
     fi
     
     # O3回答取得
     echo "🤖 O3 に質問中..."
-    if ! O3_RESPONSE=$(timeout 300 mcp__o3__o3-search "$o3_prompt" 2>/dev/null); then
-        echo "❌ O3 への接続に失敗しました。処理を中断します。"
-        exit 1
+    O3_RESPONSE=$(mcp__o3__o3-search "$prompt
+
+## Claudeの分析・提案
+$claude_analysis
+
+$EVALUATION_CRITERIA" 2>/dev/null)
+    
+    # O3のレスポンス検証
+    if [ -z "$O3_RESPONSE" ] || echo "$O3_RESPONSE" | grep -q "error\|Error\|ERROR"; then
+        echo "⚠️ O3からの有効な回答を取得できませんでした。"
+        O3_RESPONSE="❌ O3への接続でエラーが発生しました。技術的な問題により今回のラウンドは参加できませんでした。"
+    else
+        echo "✅ O3から回答を取得しました"
     fi
     
     # 結果をファイルに記録
@@ -169,7 +208,7 @@ $IMPLEMENTATION_CONSTRAINTS
 $claude_analysis
 
 ## Geminiへの評価依頼
-$gemini_prompt
+$prompt
 
 ## Geminiからの回答
 $GEMINI_RESPONSE
@@ -203,7 +242,7 @@ $IMPLEMENTATION_CONSTRAINTS
 $claude_analysis
 
 ## O3への評価依頼
-$o3_prompt
+$prompt
 
 ## O3からの回答
 $O3_RESPONSE
@@ -393,21 +432,14 @@ main() {
     TOPIC="${1:-general}"
     echo "📝 議論トピック: $TOPIC"
     
-    # 関連する過去議論の検索
-    echo "🔍 関連する過去議論を検索中..."
-    if find "${LOG_DIR}" -name "*.md" -exec grep -l "$TOPIC" {} \; 2>/dev/null; then
-        echo "✅ 関連する過去議論を発見しました"
-    else
-        echo "💡 新しい議論トピックです"
-    fi
-    
     # 各ラウンドの実行
     for round in 1 2 3; do
         echo ""
         echo "🔄 ラウンド${round}を開始します..."
         
-        # Claude分析の生成（実際の実装では、ここでClaudeが分析を行う）
-        claude_analysis="[ラウンド${round}でのClaudeの分析内容]"
+        # ⚠️ 重要: この部分は実際にはClaudeが具体的な分析内容を記述する必要がある
+        # プレースホルダーではなく、実際の分析を行うこと
+        claude_analysis="⚠️ この部分はClaudeが実際のラウンド${round}分析を記述すること"
         
         # 前回までの内容（ラウンド2以降）
         previous_content=""
@@ -442,29 +474,50 @@ main "$@"
 ```
 
 
+## 成功の判定基準
+
+### ✅ 実行成功の条件
+1. **7ファイルの完全生成**：
+
+2. **各ファイルの必須内容**：
+   - Claudeの具体的な分析（プレースホルダー不可）
+   - AIからの実際の回答
+   - Claudeの率直な感想
+
+3. **最終結論ファイルの必須要素**：
+   - 3ラウンドの議論総括
+   - GitHub Issue詳細仕様
+   - 3つのAIの評価（星10個 + 100点満点）
+
+### ✅ AI参加エラーへの対応
+- 片方のAIが参加できない場合：代替メッセージで対応し、処理を継続
+- 両方のAIが参加できない場合：エラーメッセージを記録し、Claudeの独自分析で議論を継続
+
 ## 期待される成果
 
-- **議論ログ（各AI・各ラウンドごと）**：
-  - GeminiとO3それぞれの完全な対話履歴
-  - **Claudeの率直な感想**：各AIの回答に対する感情的反応、専門性評価、新たな気づき等
+- **議論ログ**：
+  - 各AI・各ラウンドの完全な対話履歴
+  - **Claudeの率直な感想**：感情的反応、専門性評価、新たな気づき等
   - 累積的な知見の蓄積
 
-- **最終結論ファイル**：
+- **最終結論ファイル（1ファイル）**：
   - 両AIの意見を統合したClaudeの最終判断
   - 採用/却下の理由を明記した透明性のある結論
   - **GitHub Issue登録用の詳細な仕様書**（即座に発行可能なレベル）
-    - タイトル、説明、User Story
-    - 具体的な受け入れ基準
-    - 技術的タスクとコード例
-    - 依存関係と見積もり
-  - Claudeを含む3つのAIについて様々な観点で評価する。
-    評価を星10個でつけて、最終的に100点満点で総合評価を付ける。
+  - **3つのAI評価**：星10個 + 100点満点の総合評価
   - 迷いがある場合はユーザーへの判断要請
 
-## 注意事項
+## 注意事項と改善点
 
-- 各AIが応答できない場合は処理を中断します
-- 各ラウンドで前回までの議論内容を累積的に提供します
+### エラーハンドリングの改善
+- **安定したプロンプト送信**：ヒアドキュメント形式でより確実にプロンプトを送信
+- **レスポンス検証**：空のレスポンスやエラーメッセージを適切に検出し、代替メッセージで対応
+
+### 議論プロセス
+- **各ラウンドで前回までの議論内容を累積的に提供します**
 - 最終的な判断はClaudeが行い、その理由を明確に記載します
 - **最終結論は、記憶を失った場合でもGitHub Issueを作成できる詳細レベルで記載されます**
-- ファイル保存場所：`./docs/discussion_logs/`
+
+### ファイル管理
+- 保存場所：`./docs/discussion_logs/`
+- 必ず7ファイル生成：AI参加状況に関わらず完全なログセットを作成
