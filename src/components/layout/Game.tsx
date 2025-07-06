@@ -1,4 +1,5 @@
 import {
+  AIControls,
   Board,
   Controls,
   DebugIndicator,
@@ -54,6 +55,7 @@ export function Game() {
             <HighScore />
             <HoldPiece />
             <NextPiece />
+            <AIControls />
             <Controls />
           </aside>
 

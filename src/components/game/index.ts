@@ -1,3 +1,4 @@
+export { AIControls } from "./AIControls";
 export { Board } from "./Board";
 export { Controls } from "./Controls";
 export { DebugIndicator } from "./DebugIndicator";
