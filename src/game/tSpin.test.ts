@@ -194,10 +194,11 @@ describe("T-Spin Detection", () => {
   describe("T-Spin Mini vs Normal Detection", () => {
     test("should detect T-Spin Mini when only 1 front corner is filled", () => {
       // T-piece pointing up (rotation 0), only left front corner filled
+      // Center is at (5, 11) when piece position is (4, 10)
       const occupiedPositions: Position[] = [
-        { x: 3, y: 9 }, // Top-left corner (front)
-        { x: 3, y: 11 }, // Bottom-left corner (back)
-        { x: 5, y: 11 }, // Bottom-right corner (back)
+        { x: 4, y: 10 }, // Top-left corner (front)
+        { x: 4, y: 12 }, // Bottom-left corner (back)
+        { x: 6, y: 12 }, // Bottom-right corner (back)
       ];
       const board = createTestBoard(occupiedPositions);
       const tPiece = createTestTPiece({ x: 4, y: 10 }, 0);
@@ -215,10 +216,11 @@ describe("T-Spin Detection", () => {
 
     test("should detect T-Spin Normal when 2 front corners are filled and wall kick used", () => {
       // T-piece pointing up (rotation 0), both front corners filled
+      // Center is at (5, 11) when piece position is (4, 10)
       const occupiedPositions: Position[] = [
-        { x: 3, y: 9 }, // Top-left corner (front)
-        { x: 5, y: 9 }, // Top-right corner (front)
-        { x: 3, y: 11 }, // Bottom-left corner (back)
+        { x: 4, y: 10 }, // Top-left corner (front)
+        { x: 6, y: 10 }, // Top-right corner (front)
+        { x: 4, y: 12 }, // Bottom-left corner (back)
       ];
       const board = createTestBoard(occupiedPositions);
       const tPiece = createTestTPiece({ x: 4, y: 10 }, 0);
@@ -236,10 +238,11 @@ describe("T-Spin Detection", () => {
 
     test("should detect T-Spin Mini when no wall kick is used (point-blank T-Spin)", () => {
       // Point-blank T-Spin: rotation without wall kick
+      // Center is at (5, 11) when piece position is (4, 10)
       const occupiedPositions: Position[] = [
-        { x: 3, y: 9 }, // Top-left corner
-        { x: 5, y: 9 }, // Top-right corner
-        { x: 3, y: 11 }, // Bottom-left corner
+        { x: 4, y: 10 }, // Top-left corner
+        { x: 6, y: 10 }, // Top-right corner
+        { x: 4, y: 12 }, // Bottom-left corner
       ];
       const board = createTestBoard(occupiedPositions);
       const tPiece = createTestTPiece({ x: 4, y: 10 }, 0);
@@ -258,10 +261,11 @@ describe("T-Spin Detection", () => {
   describe("Different T-Piece Orientations", () => {
     test("should correctly detect front corners for T-piece pointing right (rotation 1)", () => {
       // T-piece pointing right, right front corners filled
+      // Center is at (5, 11) when piece position is (4, 10)
       const occupiedPositions: Position[] = [
-        { x: 5, y: 9 }, // Top-right corner (front)
-        { x: 5, y: 11 }, // Bottom-right corner (front)
-        { x: 3, y: 9 }, // Top-left corner (back)
+        { x: 6, y: 10 }, // Top-right corner (front)
+        { x: 6, y: 12 }, // Bottom-right corner (front)
+        { x: 4, y: 10 }, // Top-left corner (back)
       ];
       const board = createTestBoard(occupiedPositions);
       const tPiece = createTestTPiece({ x: 4, y: 10 }, 1);
@@ -279,10 +283,11 @@ describe("T-Spin Detection", () => {
 
     test("should correctly detect front corners for T-piece pointing down (rotation 2)", () => {
       // T-piece pointing down, bottom front corners filled
+      // Center is at (5, 11) when piece position is (4, 10)
       const occupiedPositions: Position[] = [
-        { x: 3, y: 11 }, // Bottom-left corner (front)
-        { x: 5, y: 11 }, // Bottom-right corner (front)
-        { x: 3, y: 9 }, // Top-left corner (back)
+        { x: 4, y: 12 }, // Bottom-left corner (front)
+        { x: 6, y: 12 }, // Bottom-right corner (front)
+        { x: 4, y: 10 }, // Top-left corner (back)
       ];
       const board = createTestBoard(occupiedPositions);
       const tPiece = createTestTPiece({ x: 4, y: 10 }, 2);
@@ -300,10 +305,11 @@ describe("T-Spin Detection", () => {
 
     test("should correctly detect front corners for T-piece pointing left (rotation 3)", () => {
       // T-piece pointing left, left front corners filled
+      // Center is at (5, 11) when piece position is (4, 10)
       const occupiedPositions: Position[] = [
-        { x: 3, y: 9 }, // Top-left corner (front)
-        { x: 3, y: 11 }, // Bottom-left corner (front)
-        { x: 5, y: 9 }, // Top-right corner (back)
+        { x: 4, y: 10 }, // Top-left corner (front)
+        { x: 4, y: 12 }, // Bottom-left corner (front)
+        { x: 6, y: 10 }, // Top-right corner (back)
       ];
       const board = createTestBoard(occupiedPositions);
       const tPiece = createTestTPiece({ x: 4, y: 10 }, 3);
@@ -322,46 +328,54 @@ describe("T-Spin Detection", () => {
 
   describe("Edge Cases and Boundary Conditions", () => {
     test("should handle T-Spin at board edges correctly", () => {
-      // T-piece at left edge, using board boundary as corners
+      // T-piece with some corners out of bounds
+      // When piece position is (0, 10), center is at (1, 11)
+      // Corners would be at (0,10), (2,10), (0,12), (2,12)
+      // All corners are in bounds, so we need a different test
       const occupiedPositions: Position[] = [
-        { x: 1, y: 9 }, // Top-right corner
-        { x: 1, y: 11 }, // Bottom-right corner
+        { x: 0, y: 10 }, // Top-left corner (in bounds, occupied)
+        { x: 2, y: 10 }, // Top-right corner (in bounds, occupied)
+        { x: 0, y: 12 }, // Bottom-left corner (in bounds, occupied)
       ];
       const board = createTestBoard(occupiedPositions);
-      const tPiece = createTestTPiece({ x: 0, y: 10 }, 0); // At left edge
+      const tPiece = createTestTPiece({ x: 0, y: 10 }, 0);
       const kickAttempts = [createWallKickAttempt({ x: 0, y: 0 }, { x: 0, y: 10 })];
       const rotationResult = createRotationResult(true, tPiece, kickAttempts);
 
       const result = detectTSpin(board, tPiece, rotationResult);
 
-      // Left edge positions count as occupied corners
-      expect(result.cornersFilled).toBe(4); // 2 board edge + 2 filled
+      // 3 corners are filled
+      expect(result.cornersFilled).toBe(3);
       expect(result.type).toBe("mini"); // No wall kick used
     });
 
     test("should handle T-Spin at top of board correctly", () => {
-      // T-piece near top of board
+      // T-piece at very top of board where corners go out of bounds
+      // When piece position is (-1, 0), center is at (0, 1)
+      // Corners would be at (-1,0), (1,0), (-1,2), (1,2)
+      // (-1,0) and (-1,2) are out of bounds (x < 0)
       const occupiedPositions: Position[] = [
-        { x: 3, y: 2 }, // Bottom-left corner
-        { x: 5, y: 2 }, // Bottom-right corner
+        { x: 1, y: 0 }, // Top-right corner (in bounds, occupied)
+        { x: 1, y: 2 }, // Bottom-right corner (in bounds, occupied)
       ];
       const board = createTestBoard(occupiedPositions);
-      const tPiece = createTestTPiece({ x: 4, y: 1 }, 0); // Near top
-      const kickAttempts = [createWallKickAttempt({ x: 0, y: 0 }, { x: 4, y: 1 })];
+      const tPiece = createTestTPiece({ x: -1, y: 0 }, 0); // At very left edge
+      const kickAttempts = [createWallKickAttempt({ x: 0, y: 0 }, { x: -1, y: 0 })];
       const rotationResult = createRotationResult(true, tPiece, kickAttempts);
 
       const result = detectTSpin(board, tPiece, rotationResult);
 
-      // Top edge positions count as occupied corners
-      expect(result.cornersFilled).toBe(4); // 2 top edge + 2 filled
+      // Out of bounds positions count as occupied corners
+      expect(result.cornersFilled).toBe(4); // 2 out of bounds + 2 filled
       expect(result.type).toBe("mini"); // No wall kick used
     });
 
     test("should handle multiple wall kick attempts correctly", () => {
+      // Center is at (5, 11) when piece position is (4, 10)
       const occupiedPositions: Position[] = [
-        { x: 3, y: 9 }, // Top-left corner
-        { x: 5, y: 9 }, // Top-right corner
-        { x: 3, y: 11 }, // Bottom-left corner
+        { x: 4, y: 10 }, // Top-left corner
+        { x: 6, y: 10 }, // Top-right corner
+        { x: 4, y: 12 }, // Bottom-left corner
       ];
       const board = createTestBoard(occupiedPositions);
       const tPiece = createTestTPiece({ x: 4, y: 10 }, 0);

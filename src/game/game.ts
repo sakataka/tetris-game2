@@ -10,6 +10,7 @@ import type {
 } from "@/types/game";
 import type { Result } from "@/types/result";
 import { Err, Ok, ResultUtils } from "@/types/result";
+import type { RotationResult } from "@/types/rotation";
 import { GAME_CONSTANTS } from "@/utils/gameConstants";
 import { canPerformHoldAction, isGameOverState, isGamePlayable } from "@/utils/gameValidation";
 import { normalizeRotationState } from "@/utils/typeGuards";
