@@ -336,36 +336,3 @@ export class MoveGenerator {
     return { ...this.options };
   }
 }
-
-/**
- * Utility function to create action sequence for simple direct placement
- * Used for fallback scenarios or testing
- * @param fromPiece - Starting piece state
- * @param toPiece - Target piece state
- * @returns Simple action sequence
- */
-export function createSimpleActionSequence(
-  fromPiece: Tetromino,
-  toPiece: { rotation: RotationState; x: number },
-): GameAction[] {
-  const actions: GameAction[] = [];
-
-  // Rotation actions
-  let rotationDiff = (toPiece.rotation - fromPiece.rotation + 4) % 4;
-  while (rotationDiff > 0) {
-    actions.push({ type: "ROTATE_CW" });
-    rotationDiff--;
-  }
-
-  // Horizontal movement actions
-  const moveDiff = toPiece.x - fromPiece.position.x;
-  const moveAction: GameActionType = moveDiff > 0 ? "MOVE_RIGHT" : "MOVE_LEFT";
-  for (let i = 0; i < Math.abs(moveDiff); i++) {
-    actions.push({ type: moveAction });
-  }
-
-  // Hard drop
-  actions.push({ type: "HARD_DROP" });
-
-  return actions;
-}
