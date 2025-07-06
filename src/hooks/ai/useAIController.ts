@@ -34,6 +34,7 @@ export function useAIController() {
   const isThinkingRef = useRef(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isActiveRef = useRef(false);
+  const aiThinkAndMoveRef = useRef<() => Promise<void>>(() => Promise.resolve());
 
   // AI system instances (stable references)
   const [aiEngine] = useState(
@@ -41,7 +42,7 @@ export function useAIController() {
       new AIEngine({
         thinkingTimeLimit: 200,
         evaluator: "dellacherie",
-        enableLogging: true,
+        enableLogging: false, // Disable verbose logging for production
         fallbackOnTimeout: true,
         useDynamicWeights: true,
       }),
@@ -70,12 +71,9 @@ export function useAIController() {
   // Execute action sequence from AI decision
   const executeActionSequence = useCallback(
     async (actions: GameAction[]) => {
-      console.log("🤖 [AI] Executing action sequence:", actions);
-
       for (const action of actions) {
         // Check if AI is still active before each action
         if (!isActiveRef.current || !aiEnabledRef.current) {
-          console.log("⏹️ [AI] Action sequence aborted - AI disabled");
           return;
         }
 
@@ -105,14 +103,11 @@ export function useAIController() {
             break;
           case "HOLD":
             // Note: Hold not enabled in Phase 1
-            console.warn("[AI] Hold action not supported in Phase 1");
             break;
           default:
-            console.warn("[AI] Unknown action type:", action.type);
+            break;
         }
       }
-
-      console.log("✅ [AI] Action sequence completed!");
     },
     [moveLeft, moveRight, rotate, drop],
   );
@@ -123,14 +118,6 @@ export function useAIController() {
     const gameState = useGameStore.getState();
     const { currentPiece, isGameOver, isPaused, score } = gameState;
 
-    console.log("🔄 [AI] Loop check:", {
-      aiEnabled: aiEnabledRef.current,
-      isGameOver,
-      isPaused,
-      currentPiece: currentPiece?.type,
-      isThinking: isThinkingRef.current,
-    });
-
     if (
       !aiEnabledRef.current ||
       isGameOver ||
@@ -139,7 +126,6 @@ export function useAIController() {
       isThinkingRef.current ||
       !isActiveRef.current
     ) {
-      console.log("❌ [AI] Loop stopped due to condition check");
       return;
     }
 
@@ -148,19 +134,10 @@ export function useAIController() {
     const thinkStartTime = performance.now();
 
     try {
-      console.log("🧠 [AI] Starting to think...", {
-        currentPiece: currentPiece.type,
-        position: currentPiece.position,
-        rotation: currentPiece.rotation,
-      });
-
       // Use comprehensive AI engine for decision making
-      console.log("🔍 [AI] Finding best move with AI engine...");
       const decision = await findBestMoveWithAI(gameState);
-      console.log("🎯 [AI] AI decision:", decision);
 
       if (decision?.bestMove && isActiveRef.current) {
-        console.log("▶️ [AI] Executing best move sequence...");
         await executeActionSequence(decision.bestMove.sequence);
 
         // Update AI stats with detailed metrics
@@ -176,14 +153,6 @@ export function useAIController() {
             decision.bestMove?.evaluationScore || Number.NEGATIVE_INFINITY,
           ),
         }));
-        console.log("📊 [AI] Stats updated:", {
-          thinkTime: `${thinkTime}ms`,
-          timedOut: decision.timedOut,
-          evaluations: decision.evaluationCount,
-          score: decision.bestMove?.evaluationScore?.toFixed(2),
-        });
-      } else {
-        console.log("❌ [AI] No valid move found or AI inactive");
       }
     } catch (error) {
       console.error("💥 [AI] Thinking error:", error);
@@ -193,22 +162,19 @@ export function useAIController() {
         setIsThinking(false);
 
         // Schedule next AI move
-        console.log("⏰ [AI] Scheduling next move in 200ms...");
         timeoutRef.current = setTimeout(() => {
-          console.log("⏰ [AI] Timeout triggered, checking conditions:", {
-            isActive: isActiveRef.current,
-            aiEnabled: aiEnabledRef.current,
-          });
           if (isActiveRef.current && aiEnabledRef.current) {
-            console.log("▶️ [AI] Starting next iteration...");
-            aiThinkAndMove();
-          } else {
-            console.log("⏹️ [AI] Timeout conditions failed, stopping");
+            aiThinkAndMoveRef.current();
           }
         }, 200);
       }
     }
   }, [findBestMoveWithAI, executeActionSequence]);
+
+  // Update ref when aiThinkAndMove changes
+  useEffect(() => {
+    aiThinkAndMoveRef.current = aiThinkAndMove;
+  }, [aiThinkAndMove]);
 
   // Start/stop AI effect - minimal dependencies
   useEffect(() => {
@@ -218,8 +184,8 @@ export function useAIController() {
       const gameState = useGameStore.getState();
       if (!gameState.isGameOver && !gameState.isPaused) {
         isActiveRef.current = true;
-        console.log("🚀 [AI] Starting AI controller...");
-        aiThinkAndMove();
+        // Use ref to call latest version of aiThinkAndMove
+        aiThinkAndMoveRef.current();
       }
     } else {
       isActiveRef.current = false;
@@ -229,7 +195,6 @@ export function useAIController() {
       }
       isThinkingRef.current = false;
       setIsThinking(false);
-      console.log("🛑 [AI] Stopping AI controller...");
     }
 
     return () => {
@@ -239,7 +204,7 @@ export function useAIController() {
         timeoutRef.current = null;
       }
     };
-  }, [aiEnabled, aiThinkAndMove]);
+  }, [aiEnabled]); // Removed aiThinkAndMove from dependencies
 
   const toggleAI = useCallback(() => {
     const gameState = useGameStore.getState();

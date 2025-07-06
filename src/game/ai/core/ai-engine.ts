@@ -1,3 +1,4 @@
+import { getTetrominoShape } from "@/game/tetrominos";
 import type { GameState } from "@/types/game";
 import { DellacherieEvaluator } from "../evaluators/dellacherie";
 import { DynamicWeights } from "../evaluators/weights";
@@ -61,7 +62,7 @@ export interface AIStats {
 export const DEFAULT_AI_CONFIG: AIConfig = {
   thinkingTimeLimit: 200, // 200ms as specified in issue
   evaluator: "dellacherie",
-  enableLogging: false, // Disable for production performance
+  enableLogging: true, // Enable for debugging
   fallbackOnTimeout: true,
   useDynamicWeights: true,
 };
@@ -103,10 +104,12 @@ export class AIEngine {
     try {
       // Validate game state
       if (!gameState.currentPiece) {
+        console.error("[AI] No current piece in game state");
         return this.createDecision(null, [], 0, 0, false, "No current piece");
       }
 
       if (gameState.isGameOver) {
+        console.error("[AI] Game over state detected");
         return this.createDecision(null, [], 0, 0, false, "Game over");
       }
 
@@ -123,11 +126,37 @@ export class AIEngine {
         board,
         gameState.currentPiece,
         gameState.heldPiece
-          ? { type: gameState.heldPiece, position: { x: 4, y: 0 }, rotation: 0, shape: [] }
+          ? {
+              type: gameState.heldPiece,
+              position: { x: 4, y: 0 },
+              rotation: 0,
+              shape: getTetrominoShape(gameState.heldPiece),
+            }
           : null,
       );
 
+      if (this.config.enableLogging) {
+        console.log(`[AI] Generated ${allMoves.length} moves`);
+        if (allMoves.length > 0) {
+          console.log(
+            "[AI] Sample moves:",
+            allMoves.slice(0, 3).map((m) => ({
+              piece: m.piece,
+              rotation: m.rotation,
+              x: m.x,
+              y: m.y,
+              actions: m.sequence.length,
+            })),
+          );
+        }
+      }
+
       if (allMoves.length === 0) {
+        console.error("[AI] No moves generated - Debug info:", {
+          currentPiece: gameState.currentPiece,
+          boardState: board.toBoardState().slice(0, 5), // Top 5 rows
+          boardHeight: board.getDimensions().height,
+        });
         return this.createDecision(
           null,
           [],
@@ -250,9 +279,14 @@ export class AIEngine {
    * @param level - Current level
    */
   private updateDynamicWeights(board: BitBoard, lines: number, level: number): void {
-    const situation = this.dynamicWeights.analyzeSituation(board, lines, level);
-    const adjustedWeights = this.dynamicWeights.adjustWeights(situation);
-    this.evaluator.updateWeights(adjustedWeights);
+    try {
+      const situation = this.dynamicWeights.analyzeSituation(board, lines, level);
+      const adjustedWeights = this.dynamicWeights.adjustWeights(situation);
+      this.evaluator.updateWeights(adjustedWeights);
+    } catch (error) {
+      console.error("[AI] Error in updateDynamicWeights:", error);
+      // Continue without dynamic weights if there's an error
+    }
   }
 
   /**

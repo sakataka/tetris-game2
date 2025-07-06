@@ -135,10 +135,10 @@ describe("AIEngine", () => {
       const decision = await aiEngine.findBestMove(gameState);
 
       expect(decision.bestMove).not.toBeNull();
-      expect(decision.bestMove!.sequence).toBeDefined();
-      expect(decision.bestMove!.sequence.length).toBeGreaterThan(0);
+      expect(decision.bestMove?.sequence).toBeDefined();
+      expect(decision.bestMove?.sequence.length).toBeGreaterThan(0);
       // Should always end with HARD_DROP
-      expect(decision.bestMove!.sequence[decision.bestMove!.sequence.length - 1].type).toBe(
+      expect(decision.bestMove?.sequence[decision.bestMove?.sequence.length - 1].type).toBe(
         "HARD_DROP",
       );
     });
@@ -155,9 +155,9 @@ describe("AIEngine", () => {
 
       expect(decision.bestMove).not.toBeNull();
       // Should have a better score than a random move due to line clearing
-      expect(decision.bestMove!.evaluationScore).toBeDefined();
+      expect(decision.bestMove?.evaluationScore).toBeDefined();
       // I-piece should position to clear multiple lines
-      expect(decision.bestMove!.x).toBe(9); // Rightmost position to fill gaps
+      expect(decision.bestMove?.x).toBe(9); // Rightmost position to fill gaps
 
       // Verify that this move actually clears lines by checking all moves
       const lineClearingMoves = decision.allMoves.filter((move) => move.x === 9);
@@ -174,7 +174,7 @@ describe("AIEngine", () => {
 
       expect(decision.bestMove).not.toBeNull();
       // With dangerous board, AI should be conservative
-      expect(decision.bestMove!.evaluationScore).toBeDefined();
+      expect(decision.bestMove?.evaluationScore).toBeDefined();
     });
 
     it("should prefer low placement on empty board", async () => {
@@ -186,7 +186,7 @@ describe("AIEngine", () => {
 
       expect(decision.bestMove).not.toBeNull();
       // Should place near bottom
-      expect(decision.bestMove!.y).toBeGreaterThan(15);
+      expect(decision.bestMove?.y).toBeGreaterThan(15);
     });
   });
 

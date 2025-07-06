@@ -72,10 +72,17 @@ export class MoveGenerator {
    * @returns Array of all valid moves
    */
   generateAllMoves(board: BitBoard, currentPiece: Tetromino, heldPiece?: Tetromino | null): Move[] {
+    // Check if piece is valid
+    if (!currentPiece.type || !currentPiece.position) {
+      console.error("[MoveGen] Invalid piece structure:", currentPiece);
+      return [];
+    }
+
     const moves: Move[] = [];
 
     // Generate moves for current piece
-    moves.push(...this.generateMovesForPiece(board, currentPiece));
+    const currentPieceMoves = this.generateMovesForPiece(board, currentPiece);
+    moves.push(...currentPieceMoves);
 
     // Generate moves using hold piece if enabled and available
     if (this.options.useHold && heldPiece) {
@@ -87,7 +94,8 @@ export class MoveGenerator {
       moves.push(...holdMoves);
     }
 
-    return this.filterValidMoves(moves, board);
+    const validMoves = this.filterValidMoves(moves, board);
+    return validMoves;
   }
 
   /**
@@ -99,15 +107,19 @@ export class MoveGenerator {
   private generateMovesForPiece(board: BitBoard, piece: Tetromino): Move[] {
     const moves: Move[] = [];
 
+    // Removed verbose debug logging for production
+
     // Test all 4 rotation states
     for (let targetRotation = 0; targetRotation < 4; targetRotation++) {
       const rotState = targetRotation as RotationState;
+      let _rotationMoves = 0;
 
       // Test all horizontal positions (-2 to +11 for off-board exploration)
       for (let targetX = -2; targetX <= 11; targetX++) {
         const move = this.findValidMove(board, piece, rotState, targetX);
         if (move) {
           moves.push(move);
+          _rotationMoves++;
         }
       }
     }
@@ -130,30 +142,40 @@ export class MoveGenerator {
     targetRotation: RotationState,
     targetX: number,
   ): Move | null {
-    // Simulate the path from current position to target
-    const path = this.simulateMovePath(board, piece, targetRotation, targetX);
+    try {
+      // Simulate the path from current position to target
+      const path = this.simulateMovePath(board, piece, targetRotation, targetX);
 
-    if (!path) return null;
+      if (!path) {
+        return null;
+      }
 
-    // Find drop position for final placement
-    const pieceBits = getPieceBitsAtPosition(
-      path.finalPiece.type,
-      path.finalPiece.rotation,
-      path.finalPiece.position.x,
-    );
-    const dropY = this.findDropPosition(board, pieceBits, path.finalPiece.position.x);
+      // Find drop position for final placement
+      const pieceBits = getPieceBitsAtPosition(
+        path.finalPiece.type,
+        path.finalPiece.rotation,
+        path.finalPiece.position.x,
+      );
 
-    if (dropY === -1) return null;
+      const dropY = this.findDropPosition(board, pieceBits, path.finalPiece.position.x);
 
-    // Create move with action sequence
-    return {
-      piece: piece.type,
-      rotation: targetRotation,
-      x: path.finalPiece.position.x,
-      y: dropY,
-      sequence: path.actionSequence,
-      wallKicksUsed: path.wallKicksUsed,
-    };
+      if (dropY === -1) {
+        return null;
+      }
+
+      // Create move with action sequence
+      return {
+        piece: piece.type,
+        rotation: targetRotation,
+        x: path.finalPiece.position.x,
+        y: dropY,
+        sequence: path.actionSequence,
+        wallKicksUsed: path.wallKicksUsed,
+      };
+    } catch (_error) {
+      // Silent error handling in production
+      return null;
+    }
   }
 
   /**
