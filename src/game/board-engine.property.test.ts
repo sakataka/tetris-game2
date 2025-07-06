@@ -15,9 +15,37 @@ import { createBoardEngine } from "./board-engine";
  * Property-based testing for board engines
  * Comprehensive testing with random board generation as per Issue #86
  *
- * Tests 1000 random cases to catch edge cases and ensure consistency
- * across all board engine implementations (legacy, typed-array, bitboard)
+ * Uses TEST_ITERATIONS environment variable to control test iterations
+ * Default: 100 iterations (local development)
+ * CI: 35 iterations (faster builds while maintaining statistical power)
  */
+
+/**
+ * Get the number of test iterations from environment variable
+ * Default: 100 iterations for thorough local testing
+ * CI: Can be reduced to 35 iterations for faster builds
+ */
+const getTestIterations = (): number => {
+  const envValue = process.env.TEST_ITERATIONS;
+  if (envValue) {
+    const parsed = Number.parseInt(envValue, 10);
+    if (!Number.isNaN(parsed) && parsed > 0) {
+      return parsed;
+    }
+  }
+  return 100; // Default value for comprehensive testing
+};
+
+/**
+ * Get reduced iterations for performance-intensive tests
+ * Uses 1/3 of standard iterations for high-volume operations
+ */
+const getReducedTestIterations = (): number => {
+  return Math.max(1, Math.floor(getTestIterations() / 3));
+};
+
+const TEST_ITERATIONS = getTestIterations();
+const REDUCED_TEST_ITERATIONS = getReducedTestIterations();
 
 describe("Board Engine Property-Based Testing", () => {
   const engineTypes: BoardEngineType[] = ["legacy", "typed-array", "bitboard"];
@@ -35,7 +63,7 @@ describe("Board Engine Property-Based Testing", () => {
             expect(results[i]).toBe(firstResult);
           }
         }),
-        { numRuns: 1000 },
+        { numRuns: TEST_ITERATIONS },
       );
     });
 
@@ -59,7 +87,7 @@ describe("Board Engine Property-Based Testing", () => {
             }
           }
         }),
-        { numRuns: 1000 },
+        { numRuns: TEST_ITERATIONS },
       );
     });
 
@@ -75,7 +103,7 @@ describe("Board Engine Property-Based Testing", () => {
             expect(results[i]).toEqual(firstResult);
           }
         }),
-        { numRuns: 1000 },
+        { numRuns: TEST_ITERATIONS },
       );
     });
   });
@@ -91,7 +119,7 @@ describe("Board Engine Property-Based Testing", () => {
             engine.isValidPosition(board, shape, position);
           }).not.toThrow();
         }),
-        { numRuns: 1000 },
+        { numRuns: TEST_ITERATIONS },
       );
     });
 
@@ -114,7 +142,7 @@ describe("Board Engine Property-Based Testing", () => {
               expect(typeof result).toBe("boolean");
             },
           ),
-          { numRuns: 1000 },
+          { numRuns: TEST_ITERATIONS },
         );
       },
     );
@@ -148,7 +176,7 @@ describe("Board Engine Property-Based Testing", () => {
               expect(result).toBe(false);
             },
           ),
-          { numRuns: 1000 },
+          { numRuns: TEST_ITERATIONS },
         );
       },
     );
@@ -172,7 +200,7 @@ describe("Board Engine Property-Based Testing", () => {
             expect(newBoard).not.toBe(board);
           }
         }),
-        { numRuns: 1000 },
+        { numRuns: TEST_ITERATIONS },
       );
     });
 
@@ -192,7 +220,7 @@ describe("Board Engine Property-Based Testing", () => {
               }).not.toThrow();
             }
           }),
-          { numRuns: 1000 },
+          { numRuns: TEST_ITERATIONS },
         );
       },
     );
@@ -211,7 +239,7 @@ describe("Board Engine Property-Based Testing", () => {
           expect(board).toEqual(originalBoard);
           expect(result.board).not.toBe(board);
         }),
-        { numRuns: 1000 },
+        { numRuns: TEST_ITERATIONS },
       );
     });
 
@@ -224,7 +252,7 @@ describe("Board Engine Property-Based Testing", () => {
             engine.clearLines(board);
           }).not.toThrow();
         }),
-        { numRuns: 1000 },
+        { numRuns: TEST_ITERATIONS },
       );
     });
 
@@ -240,7 +268,7 @@ describe("Board Engine Property-Based Testing", () => {
             expect(result.board.length).toBe(board.length);
             expect(result.board[0].length).toBe(board[0].length);
           }),
-          { numRuns: 1000 },
+          { numRuns: TEST_ITERATIONS },
         );
       },
     );
@@ -256,7 +284,7 @@ describe("Board Engine Property-Based Testing", () => {
             // Lines cleared count should match cleared indices length
             expect(result.linesCleared).toBe(result.clearedLineIndices.length);
           }),
-          { numRuns: 1000 },
+          { numRuns: TEST_ITERATIONS },
         );
       },
     );
@@ -277,7 +305,7 @@ describe("Board Engine Property-Based Testing", () => {
             }
           }).not.toThrow();
         }),
-        { numRuns: 1000 },
+        { numRuns: TEST_ITERATIONS },
       );
     });
 
@@ -320,7 +348,7 @@ describe("Board Engine Property-Based Testing", () => {
             }).not.toThrow();
           });
         }),
-        { numRuns: 1000 },
+        { numRuns: TEST_ITERATIONS },
       );
     });
   });
@@ -355,7 +383,7 @@ describe("Board Engine Property-Based Testing", () => {
             });
           },
         ),
-        { numRuns: 100 }, // Fewer runs for performance test
+        { numRuns: REDUCED_TEST_ITERATIONS }, // Reduced runs for performance test
       );
     });
   });

@@ -3,7 +3,6 @@ import type { GameState, TetrominoTypeName } from "@/types/game";
 import { GAME_CONSTANTS } from "@/utils/gameConstants";
 import { createEmptyBoard } from "./board";
 import {
-  calculateScore,
   checkGameOver,
   createInitialGameState,
   hardDropTetromino,
@@ -386,29 +385,6 @@ describe("Game Logic - Junichi Ito Style", () => {
       const newState = hardDropTetromino(state);
       // The piece should be placed on the board
       expect(newState.currentPiece).not.toBe(state.currentPiece);
-    });
-  });
-
-  describe("calculateScore", () => {
-    test("should calculate score for 1 line", () => {
-      expect(calculateScore(1, 1)).toBe(100);
-    });
-
-    test("should calculate score for 2 lines", () => {
-      expect(calculateScore(2, 1)).toBe(300);
-    });
-
-    test("should calculate score for 3 lines", () => {
-      expect(calculateScore(3, 1)).toBe(500);
-    });
-
-    test("should calculate score for 4 lines (tetris)", () => {
-      expect(calculateScore(4, 1)).toBe(800);
-    });
-
-    test("should increase score with level", () => {
-      expect(calculateScore(1, 2)).toBe(200);
-      expect(calculateScore(4, 5)).toBe(4000);
     });
   });
 

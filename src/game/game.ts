@@ -452,14 +452,6 @@ function lockCurrentTetromino(state: GameState): GameState {
   return buildFinalGameState(state, placementResult, nextPieceResult);
 }
 
-/**
- * Calculates score using classic Tetris system: 1=100, 2=300, 3=500, 4=800 points
- * Score is multiplied by current level for progressive difficulty reward
- */
-export function calculateScore(linesCleared: number, level: number): number {
-  return GAME_CONSTANTS.SCORING.BASE_SCORES[linesCleared] * level;
-}
-
 export function getGameSpeed(level: number): number {
   return Math.max(
     GAME_CONSTANTS.TIMING.MIN_DROP_SPEED_MS,

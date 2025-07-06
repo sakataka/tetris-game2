@@ -1,6 +1,5 @@
 import { describe, expect, test } from "bun:test";
 import {
-  calculateScore,
   calculateTSpinScore,
   getTSpinDisplayName,
   isValidTSpinCombination,
@@ -55,24 +54,6 @@ describe("T-Spin Scoring System", () => {
       expect(() => calculateTSpinScore(5, 1, "none")).toThrow("Invalid linesCleared");
       expect(() => calculateTSpinScore(1, 0, "none")).toThrow("Invalid level");
       expect(() => calculateTSpinScore(1, -1, "none")).toThrow("Invalid level");
-    });
-  });
-
-  describe("calculateScore (legacy compatibility)", () => {
-    test("should maintain backward compatibility", () => {
-      expect(calculateScore(1, 1)).toBe(100);
-      expect(calculateScore(2, 1)).toBe(300);
-      expect(calculateScore(3, 1)).toBe(500);
-      expect(calculateScore(4, 1)).toBe(800);
-      expect(calculateScore(1, 5)).toBe(500);
-    });
-
-    test("should be equivalent to calculateTSpinScore with 'none' type", () => {
-      for (let lines = 0; lines <= 4; lines++) {
-        for (let level = 1; level <= 10; level++) {
-          expect(calculateScore(lines, level)).toBe(calculateTSpinScore(lines, level, "none"));
-        }
-      }
     });
   });
 

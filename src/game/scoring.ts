@@ -60,16 +60,6 @@ export function calculateTSpinScore(
 }
 
 /**
- * Legacy scoring function for backward compatibility
- * @param linesCleared Number of lines cleared (0-4)
- * @param level Current game level
- * @returns Score points to award
- */
-export function calculateScore(linesCleared: number, level: number): number {
-  return calculateTSpinScore(linesCleared, level, "none");
-}
-
-/**
  * Gets the T-Spin type name for display purposes
  * @param tSpinType Type of T-Spin
  * @param linesCleared Number of lines cleared

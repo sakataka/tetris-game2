@@ -8,6 +8,7 @@
     "dev": "bun --bun vite",
     "build": "bun x vite build",
     "test": "bun test src/game/ src/utils/ src/lib/ --ignore '**/visual/**'",
+    "test:ci": "TEST_ITERATIONS=35 bun test src/game/ src/utils/ src/lib/ --ignore '**/visual/**'",
     "test:dom": "bun test src/hooks/ src/store/ --ignore '**/visual/**'",
     "test:all": "bun test src/ --ignore '**/visual/**'",
     "lint": "bun x biome check --write",

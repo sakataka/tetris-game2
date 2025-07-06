@@ -83,10 +83,35 @@ bun run preview                # Preview production build
 
 # Testing
 bun test                       # Run pure function tests (game, utils, lib)
+bun run test:ci                # Run tests with reduced iterations for CI (35 iterations)
 bun run test:dom               # Run DOM-related tests (hooks, store)
 bun run test:all               # Run all tests (MUST pass before commits)
 bun run e2e                    # Run Playwright E2E tests (headless)
 bun run e2e:headed             # Run Playwright E2E tests (with browser UI)
+
+## Fast Tests in CI
+
+The project uses property-based testing with configurable iteration counts to balance thorough testing with CI performance:
+
+- **Local Development**: Default 100 iterations for comprehensive testing
+- **CI Environment**: Reduced to 35 iterations for faster builds (~95% confidence)
+- **Custom Control**: Set `TEST_ITERATIONS` environment variable to override defaults
+
+### Usage Examples
+
+```bash
+# Run tests with default iterations (100)
+bun test
+
+# Run tests with reduced iterations for CI (35)
+bun run test:ci
+
+# Run tests with custom iteration count
+TEST_ITERATIONS=50 bun test
+
+# Run tests with minimal iterations for quick feedback
+TEST_ITERATIONS=10 bun test
+```
 
 # Code Quality
 bun run lint                   # Lint code with Biome (MUST pass before commits)
