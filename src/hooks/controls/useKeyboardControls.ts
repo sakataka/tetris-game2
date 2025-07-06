@@ -27,6 +27,7 @@ const DEFAULT_KEY_MAPPING: KeyMapping = {
   Space: { action: "hardDrop", repeat: false, cooldown: 200, preventDefaultAction: true },
   ShiftLeft: { action: "hold", repeat: false, cooldown: 200, preventDefaultAction: true },
   ShiftRight: { action: "hold", repeat: false, cooldown: 200, preventDefaultAction: true },
+  KeyA: { action: "rotate180", repeat: false, cooldown: 100, preventDefaultAction: true },
   KeyP: { action: "pause", repeat: false, cooldown: 200, preventDefaultAction: true },
   KeyR: { action: "reset", repeat: false, cooldown: 300, preventDefaultAction: true },
   Enter: { action: "reset", repeat: false, cooldown: 300, preventDefaultAction: true },

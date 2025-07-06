@@ -9,6 +9,7 @@ export interface GameActions {
   readonly moveRight: () => void;
   readonly moveDown: () => void;
   readonly rotate: () => void;
+  readonly rotate180: () => void;
   readonly drop: () => void;
   readonly holdPiece: () => void;
   readonly togglePause: () => void;

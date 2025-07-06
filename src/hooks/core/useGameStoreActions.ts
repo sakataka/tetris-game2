@@ -8,6 +8,7 @@ export const useGameStoreActions = () =>
       moveRight: state.moveRight,
       moveDown: state.moveDown,
       rotate: state.rotate,
+      rotate180: state.rotate180,
       drop: state.drop,
       holdPiece: state.holdPiece,
       togglePause: state.togglePause,

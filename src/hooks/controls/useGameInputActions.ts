@@ -10,6 +10,7 @@ export interface GameInputActions {
   readonly moveRight: () => void;
   readonly rotateClockwise: () => void;
   readonly rotateCounterClockwise: () => void;
+  readonly rotate180: () => void;
   readonly softDrop: () => void;
   readonly hardDrop: () => void;
   readonly hold: () => void;
@@ -38,6 +39,7 @@ export function useGameInputActions(): GameInputActions {
       moveRight: actions.moveRight,
       rotateClockwise: actions.rotate,
       rotateCounterClockwise: actions.rotate, // In current implementation, both use same rotation
+      rotate180: actions.rotate180,
       softDrop: actions.moveDown,
       hardDrop: actions.drop,
       hold: actions.holdPiece,

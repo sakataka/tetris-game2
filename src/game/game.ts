@@ -21,7 +21,12 @@ import {
   placeTetromino,
 } from "./board";
 import { createPieceBag, getBagContents, getNextPiece, setBagForTesting } from "./pieceBag";
-import { createTetromino, getTetrominoColorIndex, rotateTetromino } from "./tetrominos";
+import {
+  createTetromino,
+  getTetrominoColorIndex,
+  rotateTetromino,
+  rotateTetromino180,
+} from "./tetrominos";
 import { tryRotateWithWallKickUnified } from "./wallKick";
 
 // Backward compatibility functions for existing code
@@ -32,6 +37,11 @@ export function moveTetrominoByLegacy(state: GameState, dx: number, dy: number):
 
 export function rotateTetrominoCWLegacy(state: GameState): GameState {
   const result = rotateTetrominoCW(state);
+  return ResultUtils.unwrapOr(result, state);
+}
+
+export function rotateTetromino180Legacy(state: GameState): GameState {
+  const result = rotateTetromino180Degrees(state);
   return ResultUtils.unwrapOr(result, state);
 }
 
@@ -116,6 +126,46 @@ export function rotateTetrominoCW(state: GameState): Result<GameState, GameError
   const { currentPiece } = state;
   const rotatedShape = rotateTetromino(currentPiece.shape);
   const toRotation = normalizeRotationState(currentPiece.rotation + 1);
+
+  // Try rotation with wall kick compensation using unified result pattern
+  const rotationResult = tryRotateWithWallKickUnified(
+    state.board,
+    currentPiece,
+    rotatedShape,
+    toRotation,
+    isValidPosition,
+  );
+
+  if (rotationResult.success && rotationResult.piece) {
+    return Ok(
+      updateGhostPosition({
+        ...state,
+        currentPiece: rotationResult.piece,
+        animationTriggerKey:
+          typeof state.animationTriggerKey === "number" ? state.animationTriggerKey + 1 : 1,
+      }),
+    );
+  }
+
+  return Err(
+    GameErrors.invalidRotation(
+      rotationResult.failureReason || "Cannot rotate piece to the specified position",
+    ),
+  );
+}
+
+export function rotateTetromino180Degrees(state: GameState): Result<GameState, GameError> {
+  if (!isGamePlayable(state)) {
+    return Err(GameErrors.invalidState("Game is not in playable state"));
+  }
+
+  if (!state.currentPiece) {
+    return Err(GameErrors.invalidPiece("No current piece to rotate"));
+  }
+
+  const { currentPiece } = state;
+  const rotatedShape = rotateTetromino180(currentPiece.shape);
+  const toRotation = normalizeRotationState(currentPiece.rotation + 2);
 
   // Try rotation with wall kick compensation using unified result pattern
   const rotationResult = tryRotateWithWallKickUnified(

@@ -6,9 +6,8 @@ import type {
   TetrominoShape,
   TetrominoTypeName,
 } from "@/types/game";
-import type { RotationResult, WallKickAttempt } from "@/types/rotation";
+import type { RotationResult, RotationTransition, WallKickAttempt } from "@/types/rotation";
 
-type RotationTransition = "0->1" | "1->2" | "2->3" | "3->0" | "1->0" | "2->1" | "3->2" | "0->3";
 type WallKickData = { [K in RotationTransition]: Position[] };
 
 function createRotationTransition(from: RotationState, to: RotationState): RotationTransition {
@@ -53,6 +52,11 @@ const JLSTZ_WALL_KICK_DATA: WallKickData = {
   "2->1": createOffsetPattern("NONE", "LEFT", "LEFT_DOWN", "UP_2", "LEFT_UP_2"),
   "3->2": createOffsetPattern("NONE", "LEFT", "LEFT_UP", "DOWN_2", "LEFT_DOWN_2"),
   "0->3": createOffsetPattern("NONE", "RIGHT", "RIGHT_DOWN", "UP_2", "RIGHT_UP_2"),
+  // 180° rotation wall kick data for JLSTZ pieces
+  "0->2": createOffsetPattern("NONE", "NONE", "LEFT", "RIGHT", "LEFT_UP", "RIGHT_UP"),
+  "1->3": createOffsetPattern("NONE", "NONE", "UP_2", "DOWN_2", "LEFT_UP_2", "RIGHT_DOWN_2"),
+  "2->0": createOffsetPattern("NONE", "NONE", "RIGHT", "LEFT", "RIGHT_UP", "LEFT_UP"),
+  "3->1": createOffsetPattern("NONE", "NONE", "DOWN_2", "UP_2", "RIGHT_DOWN_2", "LEFT_UP_2"),
 };
 
 const I_WALL_KICK_DATA: WallKickData = {
@@ -64,6 +68,11 @@ const I_WALL_KICK_DATA: WallKickData = {
   "2->1": createOffsetPattern("NONE", "RIGHT", "LEFT_2", "RIGHT_DOWN_2", "LEFT_2_UP"),
   "3->2": createOffsetPattern("NONE", "LEFT_2", "RIGHT", "LEFT_2_DOWN", "RIGHT_UP_2"),
   "0->3": createOffsetPattern("NONE", "LEFT", "RIGHT_2", "LEFT_UP_2", "RIGHT_2_DOWN"),
+  // 180° rotation wall kick data for I piece
+  "0->2": createOffsetPattern("NONE", "LEFT_2", "RIGHT_2", "LEFT_2_DOWN", "RIGHT_2_UP"),
+  "1->3": createOffsetPattern("NONE", "UP_2", "DOWN_2", "LEFT_UP_2", "RIGHT_DOWN_2"),
+  "2->0": createOffsetPattern("NONE", "RIGHT_2", "LEFT_2", "RIGHT_2_UP", "LEFT_2_DOWN"),
+  "3->1": createOffsetPattern("NONE", "DOWN_2", "UP_2", "RIGHT_DOWN_2", "LEFT_UP_2"),
 };
 
 /**

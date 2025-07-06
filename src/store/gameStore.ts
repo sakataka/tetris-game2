@@ -7,6 +7,7 @@ import {
   hardDropTetromino,
   holdCurrentPieceLegacy,
   moveTetrominoByLegacy,
+  rotateTetromino180Legacy,
   rotateTetrominoCWLegacy,
 } from "@/game/game";
 import { createDebugBag } from "@/game/pieceBag";
@@ -36,6 +37,7 @@ interface GameStore extends GameState {
   moveRight: () => void;
   moveDown: () => void;
   rotate: () => void;
+  rotate180: () => void;
   drop: () => void;
   holdPiece: () => void;
   togglePause: () => void;
@@ -140,6 +142,7 @@ export const useGameStore = create<GameStore>()(
       moveRight: () => set((state) => moveTetrominoByLegacy(state, 1, 0)),
       moveDown: () => set((state) => moveTetrominoByLegacy(state, 0, 1)),
       rotate: () => set((state) => rotateTetrominoCWLegacy(state)),
+      rotate180: () => set((state) => rotateTetromino180Legacy(state)),
       drop: () => set((state) => hardDropTetromino(state)),
       holdPiece: () => set((state) => holdCurrentPieceLegacy(state)),
 
