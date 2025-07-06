@@ -18,7 +18,7 @@ import {
 } from "./board";
 import { createPieceBag, getBagContents, getNextPiece, setBagForTesting } from "./pieceBag";
 import { createTetromino, getTetrominoColorIndex, rotateTetromino } from "./tetrominos";
-import { tryRotateWithWallKick } from "./wallKick";
+import { tryRotateWithWallKickUnified } from "./wallKick";
 
 export function createInitialGameState(): GameState {
   const pieceBag = createPieceBag();
@@ -73,29 +73,21 @@ export function rotateTetrominoCW(state: GameState): GameState {
 
   const { currentPiece } = state;
   const rotatedShape = rotateTetromino(currentPiece.shape);
-  const fromRotation = currentPiece.rotation;
-  const toRotation = normalizeRotationState(fromRotation + 1);
+  const toRotation = normalizeRotationState(currentPiece.rotation + 1);
 
-  // Try rotation with wall kick compensation
-  const newPosition = tryRotateWithWallKick(
+  // Try rotation with wall kick compensation using unified result pattern
+  const rotationResult = tryRotateWithWallKickUnified(
     state.board,
+    currentPiece,
     rotatedShape,
-    currentPiece.position,
-    currentPiece.type,
-    fromRotation,
     toRotation,
     isValidPosition,
   );
 
-  return newPosition
+  return rotationResult.success && rotationResult.piece
     ? updateGhostPosition({
         ...state,
-        currentPiece: {
-          ...currentPiece,
-          shape: rotatedShape,
-          rotation: toRotation,
-          position: newPosition,
-        },
+        currentPiece: rotationResult.piece,
         animationTriggerKey:
           typeof state.animationTriggerKey === "number" ? state.animationTriggerKey + 1 : 1,
       })

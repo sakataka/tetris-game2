@@ -2,9 +2,11 @@ import type {
   CellValue,
   Position,
   RotationState,
+  Tetromino,
   TetrominoShape,
   TetrominoTypeName,
 } from "@/types/game";
+import type { RotationResult, WallKickAttempt } from "@/types/rotation";
 
 type RotationTransition = "0->1" | "1->2" | "2->3" | "3->0" | "1->0" | "2->1" | "3->2" | "0->3";
 type WallKickData = { [K in RotationTransition]: Position[] };
@@ -106,4 +108,49 @@ export function tryRotateWithWallKick(
     if (isValidPositionFn(board, rotatedShape, testPosition)) return testPosition;
   }
   return null;
+}
+
+/**
+ * Try to rotate piece with wall kick compensation - unified result object pattern
+ * Tests multiple offset positions in SRS order until valid position found
+ */
+export function tryRotateWithWallKickUnified(
+  board: CellValue[][],
+  currentPiece: Tetromino,
+  rotatedShape: TetrominoShape,
+  toRotation: RotationState,
+  isValidPositionFn: (board: CellValue[][], shape: TetrominoShape, position: Position) => boolean,
+): RotationResult {
+  const wallKickOffsets = getWallKickOffsets(currentPiece.type, currentPiece.rotation, toRotation);
+  const kicksAttempted: WallKickAttempt[] = [];
+
+  // Try each wall kick offset in SRS order
+  for (const offset of wallKickOffsets) {
+    const testPosition = applyWallKickOffset(currentPiece.position, offset);
+    const attempt: WallKickAttempt = {
+      offset,
+      tested: true,
+      position: testPosition,
+    };
+    kicksAttempted.push(attempt);
+
+    if (isValidPositionFn(board, rotatedShape, testPosition)) {
+      return {
+        success: true,
+        piece: {
+          ...currentPiece,
+          shape: rotatedShape,
+          position: testPosition,
+          rotation: toRotation,
+        },
+        kicksAttempted,
+      };
+    }
+  }
+
+  return {
+    success: false,
+    kicksAttempted,
+    failureReason: "collision",
+  };
 }

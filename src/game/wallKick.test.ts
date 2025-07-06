@@ -1,8 +1,13 @@
 import { beforeEach, describe, expect, test } from "bun:test";
 import type { TetrominoTypeName } from "@/types/game";
 import { createEmptyBoard, isValidPosition } from "./board";
-import { TETROMINOS } from "./tetrominos";
-import { applyWallKickOffset, getWallKickOffsets, tryRotateWithWallKick } from "./wallKick";
+import { createTetromino, rotateTetromino, TETROMINOS } from "./tetrominos";
+import {
+  applyWallKickOffset,
+  getWallKickOffsets,
+  tryRotateWithWallKick,
+  tryRotateWithWallKickUnified,
+} from "./wallKick";
 
 describe("Wall Kick System", () => {
   describe("getWallKickOffsets", () => {
@@ -255,6 +260,184 @@ describe("Wall Kick System", () => {
       expect(offsets12).not.toEqual(offsets23);
       expect(offsets23).not.toEqual(offsets30);
       expect(offsets30).not.toEqual(offsets01);
+    });
+  });
+
+  describe("tryRotateWithWallKickUnified - Unified Result Pattern", () => {
+    let board: number[][];
+
+    beforeEach(() => {
+      board = createEmptyBoard();
+    });
+
+    test("should return success result when rotation succeeds without wall kick", () => {
+      const currentPiece = createTetromino("T");
+      currentPiece.position = { x: 5, y: 5 };
+      const rotatedShape = rotateTetromino(currentPiece.shape);
+
+      const result = tryRotateWithWallKickUnified(
+        board,
+        currentPiece,
+        rotatedShape,
+        1,
+        isValidPosition,
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.piece).toBeDefined();
+      expect(result.piece?.position).toEqual({ x: 5, y: 5 });
+      expect(result.piece?.rotation).toBe(1);
+      expect(result.piece?.shape).toEqual(rotatedShape);
+      expect(result.kicksAttempted).toHaveLength(1);
+      expect(result.kicksAttempted[0].offset).toEqual({ x: 0, y: 0 });
+      expect(result.kicksAttempted[0].tested).toBe(true);
+      expect(result.failureReason).toBeUndefined();
+    });
+
+    test("should return success result with wall kick when basic rotation fails", () => {
+      const currentPiece = createTetromino("T");
+      currentPiece.position = { x: 0, y: 5 };
+      const rotatedShape = rotateTetromino(currentPiece.shape);
+
+      // Block the basic rotation position
+      board[5][1] = 1;
+
+      const result = tryRotateWithWallKickUnified(
+        board,
+        currentPiece,
+        rotatedShape,
+        1,
+        isValidPosition,
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.piece).toBeDefined();
+      expect(result.piece?.position.x).toBe(-1); // Should use wall kick offset
+      expect(result.piece?.rotation).toBe(1);
+      expect(result.kicksAttempted.length).toBeGreaterThan(1);
+      expect(result.kicksAttempted[0].offset).toEqual({ x: 0, y: 0 });
+      expect(result.kicksAttempted[1].offset).toEqual({ x: -1, y: 0 });
+      expect(result.failureReason).toBeUndefined();
+    });
+
+    test("should return failure result when all wall kicks fail", () => {
+      const currentPiece = createTetromino("T");
+      currentPiece.position = { x: 0, y: 1 };
+      const rotatedShape = rotateTetromino(currentPiece.shape);
+
+      // Fill areas that would block all wall kick attempts
+      for (let x = 0; x < 3; x++) {
+        for (let y = 0; y < 5; y++) {
+          board[y][x] = 1;
+        }
+      }
+
+      const result = tryRotateWithWallKickUnified(
+        board,
+        currentPiece,
+        rotatedShape,
+        1,
+        isValidPosition,
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.piece).toBeUndefined();
+      expect(result.kicksAttempted).toHaveLength(5); // Should try all 5 wall kick offsets
+      expect(result.failureReason).toBe("collision");
+
+      // Verify all offsets were tested
+      for (const attempt of result.kicksAttempted) {
+        expect(attempt.tested).toBe(true);
+      }
+    });
+
+    test("should handle I piece wall kicks correctly", () => {
+      const currentPiece = createTetromino("I");
+      currentPiece.position = { x: 1, y: 5 };
+      const rotatedShape = rotateTetromino(currentPiece.shape);
+
+      const result = tryRotateWithWallKickUnified(
+        board,
+        currentPiece,
+        rotatedShape,
+        1,
+        isValidPosition,
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.piece).toBeDefined();
+      expect(result.piece?.type).toBe("I");
+      expect(result.piece?.rotation).toBe(1);
+      expect(result.kicksAttempted.length).toBeGreaterThan(0);
+    });
+
+    test("should handle O piece (no wall kicks needed)", () => {
+      const currentPiece = createTetromino("O");
+      currentPiece.position = { x: 5, y: 5 };
+      const rotatedShape = currentPiece.shape; // O piece doesn't change when rotated
+
+      const result = tryRotateWithWallKickUnified(
+        board,
+        currentPiece,
+        rotatedShape,
+        1,
+        isValidPosition,
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.piece).toBeDefined();
+      expect(result.piece?.position).toEqual({ x: 5, y: 5 });
+      expect(result.kicksAttempted).toHaveLength(1);
+      expect(result.kicksAttempted[0].offset).toEqual({ x: 0, y: 0 });
+    });
+
+    test("should record all attempted wall kick offsets", () => {
+      const currentPiece = createTetromino("T");
+      currentPiece.position = { x: 5, y: 5 };
+      const rotatedShape = rotateTetromino(currentPiece.shape);
+
+      const result = tryRotateWithWallKickUnified(
+        board,
+        currentPiece,
+        rotatedShape,
+        1,
+        isValidPosition,
+      );
+
+      expect(result.kicksAttempted).toHaveLength(1);
+      const attempt = result.kicksAttempted[0];
+      expect(attempt.offset).toEqual({ x: 0, y: 0 });
+      expect(attempt.tested).toBe(true);
+      expect(attempt.position).toEqual({ x: 5, y: 5 });
+    });
+
+    test("should handle all rotation transitions", () => {
+      const currentPiece = createTetromino("T");
+      currentPiece.position = { x: 5, y: 5 };
+
+      const transitions = [
+        [0, 1],
+        [1, 2],
+        [2, 3],
+        [3, 0],
+      ] as const;
+
+      for (const [from, to] of transitions) {
+        currentPiece.rotation = from;
+        const rotatedShape = rotateTetromino(currentPiece.shape);
+
+        const result = tryRotateWithWallKickUnified(
+          board,
+          currentPiece,
+          rotatedShape,
+          to,
+          isValidPosition,
+        );
+
+        expect(result.success).toBe(true);
+        expect(result.piece?.rotation).toBe(to);
+        expect(result.kicksAttempted.length).toBeGreaterThan(0);
+      }
     });
   });
 });
