@@ -1,15 +1,17 @@
 {
-  "entry": ["src/main.tsx"],
+  "entry": ["src/main.tsx", "**/*.test.{ts,tsx}"],
   "project": ["src/**/*.{ts,tsx}", "*.{ts,js}"],
   "ignore": [
     "dist/**",
     "node_modules/**",
-    "**/*.test.{ts,tsx}",
+    "**/*.benchmark.{ts,tsx}",
     "src/test/__mocks__/**",
-    "src/test/setup.ts"
+    "src/test/setup.ts",
+    "src/test/generators/**"
   ],
   "ignoreExportsUsedInFile": true,
   "includeEntryExports": false,
+  "ignoreBinaries": ["test"],
   "ignoreDependencies": [
     "@biomejs/biome",
     "bun-types",

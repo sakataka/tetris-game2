@@ -298,75 +298,6 @@ class BitboardBoardEngine implements BoardEngine {
   }
 
   /**
-   * Convert bitboard back to 2D board
-   * @param bitboard - Array of integers representing rows
-   * @param originalBoard - Original board for color preservation
-   * @returns 2D board array
-   * @internal Reserved for future bitwise optimization
-   */
-  // @ts-expect-error - Reserved for future bitwise optimization
-  private bitboardToBoard(bitboard: number[], originalBoard: GameBoard): GameBoard {
-    const board: GameBoard = [];
-    for (let y = 0; y < this.height; y++) {
-      const row: CellValue[] = [];
-      const rowBits = bitboard[y];
-      for (let x = 0; x < this.width; x++) {
-        if (rowBits & (1 << x)) {
-          // Preserve original color if available
-          row.push(originalBoard[y] ? originalBoard[y][x] : 1);
-        } else {
-          row.push(0);
-        }
-      }
-      board.push(row);
-    }
-    return board;
-  }
-
-  /**
-   * Convert tetromino shape to bitboard representation
-   * @param shape - Tetromino shape matrix
-   * @param position - Position for the shape
-   * @returns Object with shifted bitboard representation and bounds
-   * @internal Reserved for future bitwise optimization
-   */
-  // @ts-expect-error - Reserved for future bitwise optimization
-  private shapeToBitboard(
-    shape: TetrominoShape,
-    position: Position,
-  ): {
-    shapeBits: number[];
-    startY: number;
-    endY: number;
-  } {
-    const shapeBits: number[] = [];
-    const startY = Math.max(0, position.y);
-    const endY = Math.min(this.height - 1, position.y + shape.length - 1);
-
-    for (let y = startY; y <= endY; y++) {
-      const shapeY = y - position.y;
-      if (shapeY >= 0 && shapeY < shape.length) {
-        let rowBits = 0;
-        const shapeRow = shape[shapeY];
-
-        for (let x = 0; x < shapeRow.length; x++) {
-          if (shapeRow[x]) {
-            const boardX = position.x + x;
-            if (boardX >= 0 && boardX < this.width) {
-              rowBits |= 1 << boardX;
-            }
-          }
-        }
-        shapeBits.push(rowBits);
-      } else {
-        shapeBits.push(0);
-      }
-    }
-
-    return { shapeBits, startY, endY };
-  }
-
-  /**
    * Ultra-fast collision detection using bitwise AND operations
    * Time complexity: O(shape_height) with bitwise operations
    */
@@ -504,24 +435,18 @@ export function createBoardEngine(type: BoardEngineType): BoardEngine {
 }
 
 /**
- * Get the default board engine for the current environment
- * Uses build-time or runtime configuration to select the optimal implementation
- */
-export function getDefaultBoardEngine(): BoardEngine {
-  // For now, use legacy implementation
-  // In the future, this could be determined by:
-  // - Build flags
-  // - Runtime environment detection
-  // - Performance benchmarks
-  // - User preferences
-  return createBoardEngine("legacy");
-}
-
-/**
  * Singleton pattern for board engine instance
  * Ensures only one engine instance is loaded at runtime for performance
  */
 let boardEngineInstance: BoardEngine | null = null;
+
+/**
+ * Get the default board engine for the current environment
+ * Uses build-time or runtime configuration to select the optimal implementation
+ */
+export function getDefaultBoardEngine(): BoardEngine {
+  return createBoardEngine("legacy");
+}
 
 /**
  * Get the current board engine instance

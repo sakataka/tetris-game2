@@ -16,16 +16,6 @@ export type RotationState = 0 | 1 | 2 | 3;
 export type CellValue = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 
 /**
- * Empty cell value (always 0)
- */
-export type EmptyCell = 0;
-
-/**
- * Filled cell values (excluding empty)
- */
-export type FilledCell = Exclude<CellValue, EmptyCell>;
-
-/**
  * Type-safe tetromino shape matrix
  */
 export type TetrominoShape = CellValue[][];
