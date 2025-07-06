@@ -39,7 +39,9 @@ export function MobileHeader() {
       <div className="flex gap-4 text-sm flex-1">
         <div className="text-center">
           <div className="text-xs text-slate-400">Score</div>
-          <div className="font-bold text-cyan-400">{score}</div>
+          <div className="font-bold text-cyan-400" data-testid="score">
+            {score}
+          </div>
         </div>
         <div className="text-center">
           <div className="text-xs text-slate-400">Lines</div>

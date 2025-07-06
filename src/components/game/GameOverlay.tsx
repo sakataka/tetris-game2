@@ -35,7 +35,9 @@ export function GameOverlay() {
           <DialogHeader className="text-center">
             <DialogTitle className="text-3xl font-bold text-white mb-4 text-center">
               {isGameOver ? (
-                <span className="text-red-400">{t("game.gameOver")}</span>
+                <span className="text-red-400" data-testid="game-over">
+                  {t("game.gameOver")}
+                </span>
               ) : (
                 t("game.paused")
               )}

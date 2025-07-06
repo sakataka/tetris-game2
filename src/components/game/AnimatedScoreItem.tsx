@@ -7,6 +7,7 @@ interface AnimatedScoreItemProps {
   animationKey: string | number;
   className?: string;
   animation?: "score" | "lines" | "level";
+  "data-testid"?: string;
 }
 
 /**
@@ -18,6 +19,7 @@ export function AnimatedScoreItem({
   animationKey,
   className = "text-xl font-bold text-tetris-cyan",
   animation = "score",
+  "data-testid": dataTestId,
 }: AnimatedScoreItemProps) {
   const getAnimationPreset = () => {
     switch (animation) {
@@ -43,6 +45,7 @@ export function AnimatedScoreItem({
         animate={animationProps.animate}
         transition={animationProps.transition}
         className={className}
+        data-testid={dataTestId}
       >
         {typeof value === "number" && animation === "score" ? value.toLocaleString() : value}
       </motion.p>

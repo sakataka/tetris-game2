@@ -15,6 +15,10 @@ export default defineConfig({
   // Opt out of parallel tests on CI
   workers: process.env.CI ? 1 : undefined,
 
+  // Shorter timeouts for faster feedback
+  timeout: 30000,
+  expect: { timeout: 5000 },
+
   // Reporter to use
   reporter: "html",
 
@@ -30,17 +34,27 @@ export default defineConfig({
     screenshot: "only-on-failure",
   },
 
-  // Configure projects for major browsers
-  projects: [
-    {
-      name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
-    },
-    {
-      name: "mobile",
-      use: { ...devices["iPhone 12"] },
-    },
-  ],
+  // Configure projects - smoke test in dev, full in CI
+  projects: process.env.CI
+    ? [
+        {
+          name: "chromium",
+          use: { ...devices["Desktop Chrome"] },
+        },
+        {
+          name: "mobile",
+          use: { ...devices["iPhone 12"] },
+        },
+      ]
+    : [
+        {
+          name: "chromium-smoke",
+          use: {
+            ...devices["Desktop Chrome"],
+            viewport: { width: 1280, height: 720 },
+          },
+        },
+      ],
 
   // Run your local dev server before starting the tests
   webServer: {

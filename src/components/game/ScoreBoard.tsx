@@ -32,6 +32,7 @@ export function ScoreBoard() {
           animationKey={`score-${scoreKey}`}
           className="text-xl font-bold text-tetris-cyan"
           animation="score"
+          data-testid="score"
         />
 
         <AnimatedScoreItem

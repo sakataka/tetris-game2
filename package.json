@@ -21,8 +21,9 @@
     "bench": "bun run src/benchmarks/cli.ts",
     "benchmark": "bun run src/benchmarks/cli.ts",
     "benchmark:ci": "bun run src/benchmarks/cli.ts --ci",
-    "e2e": "bun x playwright test --config=playwright.config.ts src/tests/visual/minimal-desktop.spec.ts --project=chromium",
-    "e2e:headed": "bun x playwright test --config=playwright.config.ts src/tests/visual/strategic-line-clear.spec.ts --project=chromium --headed"
+    "e2e": "bun x playwright test --config=playwright.config.ts",
+    "e2e:headed": "bun x playwright test --config=playwright.config.ts --headed",
+    "e2e:debug": "bun x playwright test --config=playwright.config.ts --debug"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.14",
