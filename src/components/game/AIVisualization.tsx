@@ -1,0 +1,255 @@
+import { motion } from "motion/react";
+import { useMemo } from "react";
+import { Card } from "@/components/ui/card";
+import type { AdvancedAIDecision, PerfectClearOpportunity, TSpinOpportunity } from "@/game/ai";
+import type { GameState } from "@/types/game";
+import type { AISettings } from "./AdvancedAIControls";
+
+export interface AIVisualizationProps {
+  decision: AdvancedAIDecision | null;
+  settings: AISettings;
+  gameState: GameState;
+}
+
+export interface SearchTree {
+  maxDepth: number;
+  levels: Array<{
+    nodes: Array<{
+      score: number;
+      isInBestPath: boolean;
+    }>;
+  }>;
+}
+
+export function AIVisualization({ decision, settings }: AIVisualizationProps) {
+  if (!settings.enableVisualization || !decision) return null;
+
+  return (
+    <div className="space-y-4">
+      {/* 候補手ヒートマップ */}
+      <MoveHeatmap decision={decision} />
+
+      {/* 探索ツリー */}
+      {decision.bestPath && (
+        <SearchTreeVisualization
+          tree={{
+            maxDepth: decision.searchDepth || 2,
+            levels: createMockSearchTree(decision),
+          }}
+        />
+      )}
+
+      {/* 評価詳細 */}
+      <EvaluationDetails decision={decision} />
+
+      {/* T-Spin/PC検知 */}
+      {(decision.tSpinOpportunities.length > 0 || decision.perfectClearOpportunity) && (
+        <SpecialOpportunities
+          tSpins={decision.tSpinOpportunities}
+          perfectClear={decision.perfectClearOpportunity}
+        />
+      )}
+    </div>
+  );
+}
+
+function MoveHeatmap({ decision }: { decision: AdvancedAIDecision }) {
+  const heatmapData = useMemo(() => {
+    const data: number[][] = Array(20)
+      .fill(null)
+      .map(() => Array(10).fill(0));
+
+    // 各候補手のスコアを位置にマッピング
+    decision.bestPath?.forEach((move, _index) => {
+      if (move.evaluationScore !== undefined) {
+        const normalizedScore = Math.max(0, Math.min(1, (move.evaluationScore + 100) / 200));
+        const x = Math.max(0, Math.min(9, move.x));
+        const y = Math.max(0, Math.min(19, move.y));
+        data[y][x] = Math.max(data[y][x], normalizedScore);
+      }
+    });
+
+    return data;
+  }, [decision.bestPath]);
+
+  return (
+    <Card className="p-3" data-testid="move-heatmap">
+      <h4 className="text-sm font-medium mb-2">Move Evaluation Heatmap</h4>
+      <div className="grid grid-cols-10 gap-px bg-gray-200 rounded overflow-hidden">
+        {heatmapData.flat().map((intensity, index) => (
+          <div
+            key={`heatmap-${index}`}
+            className="aspect-square"
+            style={{
+              backgroundColor:
+                intensity > 0 ? `hsl(${120 * intensity}, 70%, ${50 + 30 * intensity}%)` : "#f3f4f6",
+            }}
+            title={`Position: (${index % 10}, ${Math.floor(index / 10)}), Score: ${intensity.toFixed(
+              2,
+            )}`}
+          />
+        ))}
+      </div>
+    </Card>
+  );
+}
+
+function SearchTreeVisualization({ tree }: { tree: SearchTree }) {
+  return (
+    <Card className="p-3">
+      <h4 className="text-sm font-medium mb-2">Search Tree (Depth: {tree.maxDepth})</h4>
+      <div className="space-y-2">
+        {tree.levels.map((level, levelIndex) => (
+          <div key={`level-${levelIndex}`} className="flex items-center gap-1">
+            <span className="text-xs text-muted-foreground w-12">D{levelIndex}:</span>
+            <div className="flex gap-1 flex-wrap">
+              {level.nodes.slice(0, 20).map((node, nodeIndex) => (
+                <motion.div
+                  key={`node-${levelIndex}-${nodeIndex}`}
+                  className={`w-3 h-3 rounded-sm ${
+                    node.isInBestPath ? "bg-blue-500" : "bg-gray-300"
+                  }`}
+                  title={`Score: ${node.score.toFixed(1)}`}
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: levelIndex * 0.1 + nodeIndex * 0.01 }}
+                />
+              ))}
+              {level.nodes.length > 20 && (
+                <span className="text-xs text-muted-foreground">
+                  +{level.nodes.length - 20} more
+                </span>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </Card>
+  );
+}
+
+function EvaluationDetails({ decision }: { decision: AdvancedAIDecision }) {
+  const bestMove = decision.bestPath?.[0];
+  if (!bestMove) return null;
+
+  // デモ用の評価特徴量（実際の実装では decision から取得）
+  const features = {
+    landingHeight: decision.terrainEvaluation ? -decision.terrainEvaluation.smoothness * 5 : 0,
+    linesCleared: 0, // 実際のライン消去数が必要
+    holes: Math.floor((1 - decision.terrainEvaluation.accessibility) * 10),
+    rowTransitions: Math.floor(decision.terrainEvaluation.smoothness * 20),
+    columnTransitions: Math.floor(decision.terrainEvaluation.smoothness * 15),
+    wells: decision.terrainEvaluation.tSpinPotential * 3,
+  };
+
+  return (
+    <Card className="p-3" data-testid="evaluation-details">
+      <h4 className="text-sm font-medium mb-2">Evaluation Breakdown</h4>
+      <div className="space-y-1 text-xs">
+        <div className="flex justify-between">
+          <span>Landing Height:</span>
+          <span className={features.landingHeight < 0 ? "text-green-600" : "text-red-600"}>
+            {features.landingHeight.toFixed(2)}
+          </span>
+        </div>
+        <div className="flex justify-between">
+          <span>Lines Cleared:</span>
+          <span className="text-green-600">{features.linesCleared}</span>
+        </div>
+        <div className="flex justify-between">
+          <span>Holes:</span>
+          <span className={features.holes === 0 ? "text-green-600" : "text-red-600"}>
+            {features.holes}
+          </span>
+        </div>
+        <div className="flex justify-between">
+          <span>Row Transitions:</span>
+          <span>{features.rowTransitions}</span>
+        </div>
+        <div className="flex justify-between">
+          <span>Column Transitions:</span>
+          <span>{features.columnTransitions}</span>
+        </div>
+        <div className="flex justify-between">
+          <span>Wells:</span>
+          <span>{features.wells.toFixed(1)}</span>
+        </div>
+        <hr className="my-1" />
+        <div className="flex justify-between font-medium">
+          <span>Total Score:</span>
+          <span
+            className={
+              bestMove.evaluationScore && bestMove.evaluationScore > 0
+                ? "text-green-600"
+                : "text-red-600"
+            }
+          >
+            {bestMove.evaluationScore?.toFixed(2) || "N/A"}
+          </span>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+function SpecialOpportunities({
+  tSpins,
+  perfectClear,
+}: {
+  tSpins: TSpinOpportunity[];
+  perfectClear: PerfectClearOpportunity | null;
+}) {
+  if (tSpins.length === 0 && !perfectClear) return null;
+
+  return (
+    <Card className="p-3">
+      <h4 className="text-sm font-medium mb-2">Special Opportunities</h4>
+
+      {tSpins.length > 0 && (
+        <div className="mb-2">
+          <h5 className="text-xs font-medium text-purple-600 mb-1">T-Spin Detected:</h5>
+          {tSpins.slice(0, 3).map((tSpin, index) => (
+            <div key={index} className="text-xs flex justify-between">
+              <span>
+                {tSpin.type} at ({tSpin.position.x},{tSpin.position.y})
+              </span>
+              <span className="text-purple-600">{tSpin.expectedLines} lines</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {perfectClear && (
+        <div>
+          <h5 className="text-xs font-medium text-blue-600 mb-1">Perfect Clear:</h5>
+          <div className="text-xs flex justify-between">
+            <span>{perfectClear.remainingBlocks} blocks remaining</span>
+            <span className="text-blue-600">~{perfectClear.estimatedMoves} moves</span>
+          </div>
+        </div>
+      )}
+    </Card>
+  );
+}
+
+/**
+ * モック検索ツリーを作成（デモ用）
+ * 実際の実装では decision から検索ツリー情報を取得
+ */
+function createMockSearchTree(decision: AdvancedAIDecision): SearchTree["levels"] {
+  const levels: SearchTree["levels"] = [];
+  const maxDepth = decision.searchDepth || 2;
+  const nodesExplored = decision.nodesExplored;
+
+  for (let depth = 0; depth < maxDepth; depth++) {
+    const nodesAtDepth = Math.max(1, Math.floor(nodesExplored / 2 ** (depth + 1)));
+    const nodes = Array.from({ length: nodesAtDepth }, (_, i) => ({
+      score: Math.random() * 100 - 50,
+      isInBestPath: i === 0 && depth < (decision.bestPath?.length || 0),
+    }));
+
+    levels.push({ nodes });
+  }
+
+  return levels;
+}
