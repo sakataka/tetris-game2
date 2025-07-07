@@ -39,7 +39,9 @@
       "ghostPiece": "ゴーストピース",
       "ghostPieceDescription": "ゴーストピース表示",
       "tSpinDetection": "T-Spin検出",
-      "tSpinDetectionDescription": "T-Spin検出とスコアリングを有効にする"
+      "tSpinDetectionDescription": "T-Spin検出とスコアリングを有効にする",
+      "aiFeatures": "AI機能",
+      "aiFeaturesDescription": "AIプレイヤーと可視化を有効にする"
     },
     "resetConfirmation": {
       "title": "ゲームリセット",

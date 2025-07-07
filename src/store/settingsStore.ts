@@ -9,6 +9,7 @@ interface SettingsStore extends GameSettings {
   toggleShowGhostPiece: () => void;
   setVolume: (volume: number) => void;
   toggleTSpinDetection: () => void;
+  toggleAIFeatures: () => void;
 }
 
 const DEFAULT_SETTINGS: GameSettings = {
@@ -16,6 +17,7 @@ const DEFAULT_SETTINGS: GameSettings = {
   volume: GAME_CONSTANTS.UI.DEFAULT_VOLUME,
   showGhostPiece: true,
   enableTSpinDetection: true,
+  enableAIFeatures: false,
 };
 
 // Log default settings for debugging in development only
@@ -51,6 +53,11 @@ export const useSettingsStore = create<SettingsStore>()(
         toggleTSpinDetection: () =>
           set((state) => {
             state.enableTSpinDetection = !state.enableTSpinDetection;
+          }),
+
+        toggleAIFeatures: () =>
+          set((state) => {
+            state.enableAIFeatures = !state.enableAIFeatures;
           }),
       })),
       {

@@ -45,6 +45,7 @@ export function useAdvancedAIController() {
 
   // Refs to prevent useEffect re-runs
   const aiEnabledRef = useRef(false);
+  const aiPausedRef = useRef(false);
   const isThinkingRef = useRef(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isActiveRef = useRef(false);
@@ -91,11 +92,33 @@ export function useAdvancedAIController() {
   const executeActionSequence = useCallback(
     async (actions: GameAction[]) => {
       for (const action of actions) {
-        if (!isActiveRef.current || !aiEnabledRef.current) {
+        // Check if AI is still active and game is playable before each action
+        const currentState = useGameStore.getState();
+        if (
+          !isActiveRef.current ||
+          !aiEnabledRef.current ||
+          currentState.isGameOver ||
+          currentState.isPaused ||
+          !currentState.currentPiece ||
+          currentState.animationState !== "idle"
+        ) {
           return;
         }
 
         await delay(Math.floor(200 / aiSettings.playbackSpeed));
+
+        // Double-check state after delay
+        const stateAfterDelay = useGameStore.getState();
+        if (
+          !isActiveRef.current ||
+          !aiEnabledRef.current ||
+          stateAfterDelay.isGameOver ||
+          stateAfterDelay.isPaused ||
+          !stateAfterDelay.currentPiece ||
+          stateAfterDelay.animationState !== "idle"
+        ) {
+          return;
+        }
 
         switch (action.type) {
           case "MOVE_LEFT":
@@ -114,6 +137,9 @@ export function useAdvancedAIController() {
             break;
           case "HARD_DROP":
             drop();
+            // After hard drop, the piece locks and new piece spawns
+            // Wait a bit to ensure the new piece is properly spawned
+            await delay(100);
             break;
           case "HOLD":
             // TODO: Implement hold action
@@ -128,18 +154,33 @@ export function useAdvancedAIController() {
 
   // Main AI thinking loop
   const aiThinkAndMove = useCallback(async () => {
+    // Get fresh game state at the start of each iteration
     const gameState = useGameStore.getState();
     const { currentPiece, isGameOver, isPaused } = gameState;
 
     if (
       !aiEnabledRef.current ||
+      aiPausedRef.current ||
       isGameOver ||
       isPaused ||
       !currentPiece ||
       isThinkingRef.current ||
-      !isActiveRef.current ||
-      aiState.isPaused
+      !isActiveRef.current
     ) {
+      return;
+    }
+
+    // Check if animations are running (AI should not act during animations)
+    if (gameState.animationState !== "idle") {
+      // Schedule retry after animation might be complete
+      timeoutRef.current = setTimeout(
+        () => {
+          if (isActiveRef.current && aiEnabledRef.current && !aiPausedRef.current) {
+            aiThinkAndMoveRef.current();
+          }
+        },
+        50, // Short delay to check animation state again
+      );
       return;
     }
 
@@ -149,20 +190,30 @@ export function useAdvancedAIController() {
     try {
       const decision = await findBestMoveWithAI(gameState);
 
-      if (decision?.bestPath && decision.bestPath.length > 0 && isActiveRef.current) {
+      // Re-check game state after AI thinking (state might have changed)
+      const currentGameState = useGameStore.getState();
+      if (
+        !isActiveRef.current ||
+        currentGameState.isGameOver ||
+        currentGameState.isPaused ||
+        !currentGameState.currentPiece ||
+        currentGameState.animationState !== "idle"
+      ) {
+        return;
+      }
+
+      if (decision?.bestPath && decision.bestPath.length > 0) {
         setLastDecision(decision);
 
-        // Record for replay if enabled
-        if (replayData) {
-          setReplayData((prev) => {
-            if (!prev) return prev;
-            return {
-              ...prev,
-              decisions: [...(prev.decisions || []), decision],
-              gameStates: [...(prev.gameStates || []), gameState],
-            };
-          });
-        }
+        // Record for replay if enabled (use callback to avoid dependency issues)
+        setReplayData((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            decisions: [...(prev.decisions || []), decision],
+            gameStates: [...(prev.gameStates || []), gameState],
+          };
+        });
 
         // Execute the first move from the best path
         if (decision.bestPath[0].sequence) {
@@ -176,10 +227,19 @@ export function useAdvancedAIController() {
         isThinkingRef.current = false;
         setAiState((prev) => ({ ...prev, isThinking: false }));
 
-        // Schedule next AI move
+        // Schedule next AI move with fresh state check
         timeoutRef.current = setTimeout(
           () => {
-            if (isActiveRef.current && aiEnabledRef.current && !aiState.isPaused) {
+            const nextGameState = useGameStore.getState();
+            if (
+              isActiveRef.current &&
+              aiEnabledRef.current &&
+              !aiPausedRef.current &&
+              !nextGameState.isGameOver &&
+              !nextGameState.isPaused &&
+              nextGameState.currentPiece &&
+              nextGameState.animationState === "idle"
+            ) {
               aiThinkAndMoveRef.current();
             }
           },
@@ -187,13 +247,7 @@ export function useAdvancedAIController() {
         );
       }
     }
-  }, [
-    findBestMoveWithAI,
-    executeActionSequence,
-    aiState.isPaused,
-    aiSettings.playbackSpeed,
-    replayData,
-  ]);
+  }, [findBestMoveWithAI, executeActionSequence, aiSettings.playbackSpeed]);
 
   // Update ref when aiThinkAndMove changes
   useEffect(() => {
@@ -203,11 +257,24 @@ export function useAdvancedAIController() {
   // Start/stop AI effect
   useEffect(() => {
     aiEnabledRef.current = aiState.isEnabled;
+    aiPausedRef.current = aiState.isPaused;
 
     if (aiState.isEnabled && !aiState.isPaused) {
       const gameState = useGameStore.getState();
-      if (!gameState.isGameOver && !gameState.isPaused) {
+
+      if (!gameState.isGameOver && !gameState.isPaused && gameState.animationState === "idle") {
         isActiveRef.current = true;
+
+        // Clear any existing timeout
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+          timeoutRef.current = null;
+        }
+
+        // Reset thinking state
+        isThinkingRef.current = false;
+        setAiState((prev) => ({ ...prev, isThinking: false }));
+
         // Start recording for replay
         setReplayData({
           moves: [],
@@ -220,7 +287,22 @@ export function useAdvancedAIController() {
             aiSettings,
           },
         });
-        aiThinkAndMoveRef.current();
+
+        // Use setTimeout to ensure aiThinkAndMoveRef is properly set
+        setTimeout(() => {
+          // Double-check state before starting AI loop
+          const currentState = useGameStore.getState();
+          if (
+            aiEnabledRef.current &&
+            !aiPausedRef.current &&
+            !currentState.isGameOver &&
+            !currentState.isPaused &&
+            currentState.animationState === "idle" &&
+            isActiveRef.current
+          ) {
+            aiThinkAndMoveRef.current();
+          }
+        }, 100); // Increased timeout to ensure state is stable
       }
     } else {
       isActiveRef.current = false;
@@ -231,8 +313,8 @@ export function useAdvancedAIController() {
       isThinkingRef.current = false;
       setAiState((prev) => ({ ...prev, isThinking: false }));
 
-      // Finalize replay data
-      if (replayData && aiState.isEnabled === false) {
+      // Finalize replay data when AI is disabled
+      if (aiState.isEnabled === false) {
         const finalGameState = useGameStore.getState();
         setReplayData((prev) => {
           if (!prev) return prev;
@@ -254,8 +336,9 @@ export function useAdvancedAIController() {
         clearTimeout(timeoutRef.current);
         timeoutRef.current = null;
       }
+      isThinkingRef.current = false;
     };
-  }, [aiState.isEnabled, aiState.isPaused, aiSettings, replayData]);
+  }, [aiState.isEnabled, aiState.isPaused, aiSettings]);
 
   // Update AI engine configuration when settings change
   useEffect(() => {

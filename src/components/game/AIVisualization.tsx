@@ -1,5 +1,4 @@
 import { motion } from "motion/react";
-import { useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import type { AdvancedAIDecision, PerfectClearOpportunity, TSpinOpportunity } from "@/game/ai";
 import type { GameState } from "@/types/game";
@@ -26,9 +25,6 @@ export function AIVisualization({ decision, settings }: AIVisualizationProps) {
 
   return (
     <div className="space-y-4">
-      {/* Candidate Move Heatmap */}
-      <MoveHeatmap decision={decision} />
-
       {/* Search Tree */}
       {decision.bestPath && (
         <SearchTreeVisualization
@@ -50,51 +46,6 @@ export function AIVisualization({ decision, settings }: AIVisualizationProps) {
         />
       )}
     </div>
-  );
-}
-
-function MoveHeatmap({ decision }: { decision: AdvancedAIDecision }) {
-  const heatmapData = useMemo(() => {
-    const data: number[][] = Array(20)
-      .fill(null)
-      .map(() => Array(10).fill(0));
-
-    // Map each candidate move's score to position
-    decision.bestPath?.forEach((move, _index) => {
-      if (move.evaluationScore !== undefined) {
-        const normalizedScore = Math.max(0, Math.min(1, (move.evaluationScore + 100) / 200));
-        const x = Math.max(0, Math.min(9, move.x));
-        const y = Math.max(0, Math.min(19, move.y));
-        data[y][x] = Math.max(data[y][x], normalizedScore);
-      }
-    });
-
-    return data;
-  }, [decision.bestPath]);
-
-  return (
-    <Card className="p-3" data-testid="move-heatmap">
-      <h4 className="text-sm font-medium mb-2">Move Evaluation Heatmap</h4>
-      <div className="grid grid-cols-10 gap-px bg-gray-200 rounded overflow-hidden">
-        {heatmapData.flat().map((intensity, index) => {
-          const row = Math.floor(index / 10);
-          const col = index % 10;
-          return (
-            <div
-              key={`heatmap-${row}-${col}`}
-              className="aspect-square"
-              style={{
-                backgroundColor:
-                  intensity > 0
-                    ? `hsl(${120 * intensity}, 70%, ${50 + 30 * intensity}%)`
-                    : "#f3f4f6",
-              }}
-              title={`Position: (${col}, ${row}), Score: ${intensity.toFixed(2)}`}
-            />
-          );
-        })}
-      </div>
-    </Card>
   );
 }
 

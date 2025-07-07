@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import {
   Board,
   Controls,
@@ -30,17 +31,12 @@ export function Game() {
   useHighScoreSideEffect();
   const { handleTouchStart, handleTouchEnd } = useTouchGestures();
 
-  // Advanced AI controller
-  const {
-    aiState,
-    aiSettings,
-    lastDecision,
-    replayData,
-    onToggleAI,
-    onPause,
-    onStep,
-    onSettingsChange,
-  } = useAdvancedAIController();
+  // AI features setting
+  const enableAIFeatures = useSettingsStore((state) => state.enableAIFeatures);
+
+  // Advanced AI controller (always call hook, but conditionally use result)
+  const aiControllerResult = useAdvancedAIController();
+  const aiController = enableAIFeatures ? aiControllerResult : null;
 
   // Replay state
   const [showReplay, setShowReplay] = useState(false);
@@ -65,7 +61,9 @@ export function Game() {
         <GameSettings />
 
         <main
-          className="grid grid-cols-[240px_1fr_300px] gap-6 items-start justify-center min-h-[calc(100vh-2rem)] pt-4"
+          className={`grid gap-6 items-start justify-center min-h-[calc(100vh-2rem)] pt-4 ${
+            enableAIFeatures ? "grid-cols-[240px_1fr_300px]" : "grid-cols-[240px_1fr]"
+          }`}
           aria-label="Tetris Game"
         >
           {/* Left Sidebar - Game Info */}
@@ -103,44 +101,54 @@ export function Game() {
             </section>
           </div>
 
-          {/* Right Sidebar - AI Controls & Visualization */}
-          <aside
-            className="flex flex-col gap-3 sticky top-4 max-h-[calc(100vh-2rem)] overflow-y-auto pl-2"
-            aria-label="AI Controls and Visualization"
-          >
-            {/* Advanced AI Controls */}
-            <AdvancedAIControls
-              aiState={aiState}
-              settings={aiSettings}
-              onSettingsChange={onSettingsChange}
-              onToggleAI={onToggleAI}
-              onPause={onPause}
-              onStep={onStep}
-            />
+          {/* Right Sidebar - AI Controls & Visualization (only when AI features enabled) */}
+          {enableAIFeatures && (
+            <aside
+              className="flex flex-col gap-3 sticky top-4 max-h-[calc(100vh-2rem)] overflow-y-auto pl-2"
+              aria-label="AI Controls and Visualization"
+            >
+              {/* Advanced AI Controls */}
+              {aiController && (
+                <ErrorBoundary>
+                  <AdvancedAIControls
+                    aiState={aiController.aiState}
+                    settings={aiController.aiSettings}
+                    onSettingsChange={aiController.onSettingsChange}
+                    onToggleAI={aiController.onToggleAI}
+                    onPause={aiController.onPause}
+                    onStep={aiController.onStep}
+                  />
+                </ErrorBoundary>
+              )}
 
-            {/* AI Visualization */}
-            {aiSettings.enableVisualization && lastDecision && (
-              <AIVisualization
-                decision={lastDecision}
-                settings={aiSettings}
-                gameState={gameState}
-              />
-            )}
+              {/* AI Visualization */}
+              {aiController?.aiState.isEnabled &&
+                aiController.aiSettings.enableVisualization &&
+                aiController.lastDecision && (
+                  <ErrorBoundary>
+                    <AIVisualization
+                      decision={aiController.lastDecision}
+                      settings={aiController.aiSettings}
+                      gameState={gameState}
+                    />
+                  </ErrorBoundary>
+                )}
 
-            {/* Replay Controls */}
-            {replayData && !aiState.isEnabled && (
-              <div className="space-y-2">
-                <button
-                  type="button"
-                  onClick={() => setShowReplay(true)}
-                  className="w-full text-sm bg-blue-600 hover:bg-blue-700 text-white py-2 px-3 rounded"
-                  data-testid="start-replay"
-                >
-                  View Replay
-                </button>
-              </div>
-            )}
-          </aside>
+              {/* Replay Controls */}
+              {aiController?.replayData && !aiController.aiState.isEnabled && (
+                <div className="space-y-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowReplay(true)}
+                    className="w-full text-sm bg-blue-600 hover:bg-blue-700 text-white py-2 px-3 rounded"
+                    data-testid="start-replay"
+                  >
+                    View Replay
+                  </button>
+                </div>
+              )}
+            </aside>
+          )}
         </main>
       </div>
 
@@ -148,10 +156,13 @@ export function Game() {
       <ResetConfirmationDialog />
 
       {/* Replay Modal */}
-      {showReplay && replayData && (
+      {showReplay && aiController?.replayData && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-slate-800 rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
-            <AIReplay replayData={replayData} onReplayEnd={() => setShowReplay(false)} />
+            <AIReplay
+              replayData={aiController.replayData}
+              onReplayEnd={() => setShowReplay(false)}
+            />
           </div>
         </div>
       )}

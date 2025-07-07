@@ -39,7 +39,9 @@
       "ghostPiece": "Ghost Piece",
       "ghostPieceDescription": "Ghost Piece Display",
       "tSpinDetection": "T-Spin Detection",
-      "tSpinDetectionDescription": "Enable T-Spin detection and scoring"
+      "tSpinDetectionDescription": "Enable T-Spin detection and scoring",
+      "aiFeatures": "AI Features",
+      "aiFeaturesDescription": "Enable AI player and visualization"
     },
     "resetConfirmation": {
       "title": "Reset Game",

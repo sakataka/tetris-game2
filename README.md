@@ -8,6 +8,7 @@ A complete Tetris implementation with authentic gameplay mechanics, featuring al
 
 **Key Features:**
 - Classic Tetris gameplay with modern enhancements
+- **🤖 Advanced AI Player** - Watch AI play with real-time decision visualization
 - Cross-platform support (desktop & mobile with touch controls)
 - Bilingual interface (English/Japanese)
 - Smooth animations and visual effects
@@ -26,6 +27,36 @@ A complete Tetris implementation with authentic gameplay mechanics, featuring al
 **Scoring:** Points awarded for line clears (Tetris = 4 lines = highest points), piece drops, and level progression.
 
 **Strategy:** Use the next piece preview and hold function strategically. Focus on creating Tetris clears for maximum points.
+
+## 🤖 AI Player Mode
+
+Experience advanced AI gameplay with real-time decision visualization! The AI player uses sophisticated algorithms to make strategic decisions.
+
+**How to Use AI Mode:**
+1. Open the game settings (gear icon)
+2. Navigate to "AI Controls" section
+3. Enable "AI Mode" to watch the AI play
+4. Adjust AI settings for different difficulty levels
+
+**AI Features:**
+- **Smart Decision Making**: Advanced evaluation of moves using multiple criteria
+- **Real-time Visualization**: See exactly how the AI thinks about each move
+- **Multiple Difficulty Levels**: From beginner to expert AI performance
+- **Strategic Play**: AI considers T-Spins, Perfect Clears, and advanced techniques
+- **Replay System**: Watch and analyze complete AI games
+- **Performance Metrics**: Track AI performance and decision-making speed
+
+**AI Visualization Options:**
+- **Move Heatmap**: Visual representation of move quality for each position
+- **Decision Tree**: See the AI's search process and considered alternatives
+- **Thinking Process**: Real-time display of AI evaluation criteria
+- **Performance Stats**: Speed, accuracy, and strategic success metrics
+
+**Perfect for:**
+- Learning advanced Tetris techniques
+- Understanding optimal piece placement
+- Enjoying high-level gameplay demonstrations
+- Educational purposes and strategy analysis
 
 ---
 
@@ -193,6 +224,7 @@ bun run ci                     # Full CI pipeline (lint + typecheck + test + bui
 | **C** | Hold Piece | Save current piece for later use (once per piece) |
 | **P** | Pause/Resume | Pause game with overlay (preserves game state) |
 | **Enter** | Reset Game | Start new game (prompts for confirmation) |
+| **A** | Toggle AI Mode | Enable/disable AI player (when available) |
 
 ### Mobile Touch Controls
 | Gesture | Action | Description |
@@ -209,6 +241,7 @@ bun run ci                     # Full CI pipeline (lint + typecheck + test + bui
 - **Paused State**: Press 'P' or click Resume to continue
 - **Settings**: Access via gear icon in top-right corner
 - **Language Toggle**: Switch between English/Japanese in settings
+- **AI Controls**: Access advanced AI settings and visualization options in settings
 
 ## 🐛 Debug Mode (Development Only)
 
@@ -281,6 +314,9 @@ http://localhost:5173/?debug=true&preset=tetris&score=50000
 
 # Random seed for reproducible games
 http://localhost:5173/?debug=true&seed=12345
+
+# AI debug mode with visualization
+http://localhost:5173/?debug=true&ai=advanced&visualization=true
 ```
 
 ### Debug UI Features
@@ -334,10 +370,12 @@ http://localhost:5173/?debug=true&seed=42&level=15
 ## 🌟 Key Highlights
 
 - **🎮 Authentic Experience**: Faithful implementation of classic Tetris mechanics
+- **🤖 Advanced AI**: Sophisticated AI player with real-time decision visualization
 - **📱 Cross-Platform**: Seamless desktop and mobile gameplay
 - **🌍 Bilingual**: Complete English and Japanese localization
 - **⚡ High Performance**: Built with modern web technologies for smooth 60fps gameplay
 - **🎨 Polished UI**: Professional design with satisfying animations and effects
+- **📊 AI Analytics**: Detailed performance metrics and replay analysis
 - **🧪 Well Tested**: Comprehensive test coverage ensuring reliability
 - **🔧 Developer Friendly**: Modern tooling with TypeScript, Bun, and Vite
 - **♿ Accessible**: Keyboard navigation and screen reader friendly

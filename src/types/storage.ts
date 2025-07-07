@@ -14,4 +14,5 @@ export interface GameSettings {
   volume: number;
   showGhostPiece: boolean;
   enableTSpinDetection: boolean;
+  enableAIFeatures: boolean;
 }
