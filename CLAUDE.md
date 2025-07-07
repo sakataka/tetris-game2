@@ -39,9 +39,19 @@
 src/
 ├── benchmarks/    # Performance benchmarks (TEST ALL)
 ├── components/    # React UI components (DO NOT TEST)
+│   ├── game/      # Game UI components with AI visualization
+│   ├── layout/    # Layout components
+│   └── ui/        # shadcn/ui components
 ├── game/          # Pure game logic (TEST ALL)
-│   └── ai/        # AI implementation with BitBoard
+│   └── ai/        # Advanced AI system (21 modules, TEST ALL)
+│       ├── core/      # Core AI engine, BitBoard, collision detection
+│       ├── evaluators/ # Dellacherie and advanced feature evaluators
+│       └── search/    # Beam search and Hold search algorithms
 ├── hooks/         # Custom React hooks (TEST ONLY EXTRACTED PURE FUNCTIONS)
+│   ├── ai/        # AI controller hooks
+│   ├── controls/  # Input and touch control hooks
+│   ├── core/      # Core game hooks
+│   └── ui/        # UI and animation hooks
 ├── store/         # Zustand state management (TEST ALL)
 ├── types/         # TypeScript type definitions
 ├── utils/         # Shared utilities (TEST ALL)
@@ -72,13 +82,30 @@ const b = useStore((state) => state.b);
 **Game Systems**:
 - Board Operations: 20×10 grid with collision detection
 - Tetromino Management: 7 pieces with Super Rotation System (SRS)
-- AI Implementation: Dellacherie algorithm with BitBoard optimization
+- AI Implementation: Multi-level AI system with BitBoard optimization
 
-**AI Architecture**:
-1. **BitBoard**: Ultra-high-performance board representation using Uint32Array
-2. **Dellacherie Evaluator**: 6-feature heuristic system (Landing Height, Lines Cleared, Transitions, Holes, Wells)
-3. **Dynamic Weights**: Adaptive strategy based on game phases (early, mid, late, danger)
-4. **AI Controller**: React hook with isolated refs to prevent useEffect issues
+**AI Architecture** (21 AI modules, 145+ TypeScript files):
+1. **Core AI Engine**:
+   - **BitBoard**: Ultra-high-performance board representation using Uint32Array
+   - **Advanced AI Engine**: Multi-phase decision engine with beam search
+   - **Collision Detection**: Optimized position validation system
+   - **Move Generator**: Comprehensive move analysis with SRS support
+
+2. **AI Evaluators**:
+   - **Dellacherie**: 6-feature heuristic system (Landing Height, Lines Cleared, Transitions, Holes, Wells)
+   - **Advanced Features**: T-Spin detection, Perfect Clear opportunities, danger zone analysis
+   - **Dynamic Weights**: Adaptive strategy based on game phases (early, mid, late, danger)
+
+3. **Search Algorithms**:
+   - **Beam Search**: Multi-depth lookahead with configurable beam width
+   - **Hold Search**: Strategic Hold piece utilization
+   - **Performance Benchmarks**: Optimized search with time limits
+
+4. **AI User Interface**:
+   - **Advanced AI Controls**: Real-time AI parameter adjustment
+   - **AI Visualization**: Move heatmaps, search tree visualization, thinking process
+   - **AI Replay System**: Complete game replay with decision analysis
+   - **Performance Metrics**: Real-time AI performance monitoring
 
 ## Development Commands
 
@@ -91,6 +118,8 @@ bun run lint         # Code linting (MUST pass before commits)
 bun run typecheck    # Type checking (MUST pass before commits)
 bun run build        # Production build (MUST succeed before commits)
 bun run ci           # Complete CI pipeline
+bun run benchmark    # Run AI performance benchmarks
+bun run e2e          # Run Playwright E2E tests
 ```
 
 ### EXECUTION CONDITIONS
@@ -148,25 +177,31 @@ useEffect(() => {
 }, [isRunning]); // ← Causes infinite recreation
 ```
 
-**✅ CORRECT PATTERN**:
+**✅ CORRECT PATTERN (AI Controller Implementation)**:
 ```typescript
-const isRunningRef = useRef(false);
-const enabledRef = useRef(false);
+const aiEnabledRef = useRef(false);
+const isThinkingRef = useRef(false);
+const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
 useEffect(() => {
-  async function continuousLoop() {
-    if (!enabledRef.current || isRunningRef.current) return;
+  async function aiLoop() {
+    if (!aiEnabledRef.current || isThinkingRef.current) return;
     
-    isRunningRef.current = true;
-    // ... do work
-    isRunningRef.current = false;
+    isThinkingRef.current = true;
+    // ... AI decision making
+    isThinkingRef.current = false;
     
-    setTimeout(() => continuousLoop(), 200);
+    timeoutRef.current = setTimeout(() => aiLoop(), aiSpeed);
   }
   
-  if (enabled) continuousLoop();
+  if (enabled) aiLoop();
 }, [enabled]); // ← Only trigger-conditions, not internal state
 ```
+
+**AI-Specific Patterns**:
+- Use `useRef` for AI state that shouldn't trigger re-renders
+- Implement timeout cleanup for AI thinking loops
+- Separate AI decision logic from React state updates
 
 ## CODE QUALITY ENFORCEMENT
 
@@ -191,12 +226,16 @@ http://localhost:5173/?debug=true&preset=tetris
 
 # Custom piece queue
 http://localhost:5173/?debug=true&queue=IJLOSTZ&score=50000
+
+# AI debug mode
+http://localhost:5173/?debug=true&ai=advanced&visualization=true
 ```
 
 **Requirements**:
 - Validate debug parameters for type safety
 - Use immutable state initialization
 - Never allow debug mode in production builds
+- AI debug mode enables advanced visualization and performance metrics
 
 ## STATE MANAGEMENT BEST PRACTICES
 
