@@ -3,6 +3,14 @@ import type { BitBoard } from "../core/bitboard";
 import type { Move, MoveGenerator } from "../core/move-generator";
 import { getPieceBitsAtPosition } from "../core/piece-bits";
 import type { DellacherieEvaluator } from "../evaluators/dellacherie";
+import {
+  applyDepthDiscount,
+  DEFAULT_DIVERSITY_CONFIG,
+  type DiverseSearchNode,
+  type DiversityConfig,
+  selectDiversifiedNodes,
+  shouldTerminateEarly,
+} from "./diversity-beam-search";
 
 /**
  * Represents a search node in the beam search tree
@@ -30,6 +38,10 @@ export interface BeamSearchConfig {
   enablePruning: boolean;
   /** Time limit in milliseconds */
   timeLimit: number;
+  /** Enable diversified beam search */
+  enableDiversity: boolean;
+  /** Diversity configuration */
+  diversityConfig: DiversityConfig;
 }
 
 /**
@@ -57,6 +69,8 @@ export const DEFAULT_BEAM_CONFIG: BeamSearchConfig = {
   useHold: true,
   enablePruning: false, // Disable pruning to find more line clearing opportunities
   timeLimit: 80, // Increased time limit for deeper search
+  enableDiversity: true, // Enable diversified beam search
+  diversityConfig: DEFAULT_DIVERSITY_CONFIG,
 };
 
 /**
@@ -96,15 +110,18 @@ export class BeamSearch {
     let nodesExplored = 0;
 
     // Initialize root node
-    const rootNode: SearchNode = {
+    const rootNode: DiverseSearchNode = {
       board: initialBoard.clone(),
       move: null,
       score: 0,
       depth: 0,
       path: [],
+      diversityScore: undefined,
+      explorationBonus: undefined,
+      surfaceProfile: undefined,
     };
 
-    let currentLevel = [rootNode];
+    let currentLevel: DiverseSearchNode[] = [rootNode];
     let bestPath: Move[] = [];
     let bestScore = Number.NEGATIVE_INFINITY;
     let reachedDepth = 0;
@@ -116,7 +133,7 @@ export class BeamSearch {
         break;
       }
 
-      const nextLevel: SearchNode[] = [];
+      const nextLevel: DiverseSearchNode[] = [];
       reachedDepth = depth;
 
       // Expand each node in current level
@@ -139,18 +156,27 @@ export class BeamSearch {
           for (const move of moves) {
             // Simulate move on board
             const newBoard = this.simulateMove(node.board, move);
-            const moveScore = this.evaluator.evaluate(newBoard, move);
+            let moveScore = this.evaluator.evaluate(newBoard, move);
+
+            // Apply depth discount if diversity is enabled
+            if (this.config.enableDiversity) {
+              moveScore = applyDepthDiscount(moveScore, depth + 1, this.config.diversityConfig);
+            }
 
             // Set evaluation score on move for visualization
             move.evaluationScore = moveScore;
 
-            const childNode: SearchNode = {
+            const childNode: DiverseSearchNode = {
               board: newBoard,
               move,
               score: node.score + moveScore,
               depth: depth + 1,
               path: [...node.path, move],
               parent: node,
+              // Initialize diversity fields
+              diversityScore: undefined,
+              explorationBonus: undefined,
+              surfaceProfile: undefined,
             };
 
             nextLevel.push(childNode);
@@ -171,7 +197,22 @@ export class BeamSearch {
       }
 
       // Apply beam selection (keep top N nodes)
-      currentLevel = this.selectTopNodes(nextLevel, this.config.beamWidth);
+      if (this.config.enableDiversity) {
+        // Use diversified selection
+        currentLevel = selectDiversifiedNodes(
+          nextLevel,
+          this.config.beamWidth,
+          this.config.diversityConfig,
+        );
+
+        // Check for early termination based on convergence
+        if (shouldTerminateEarly(currentLevel, this.config.diversityConfig)) {
+          break;
+        }
+      } else {
+        // Use traditional top-N selection
+        currentLevel = this.selectTopNodes(nextLevel, this.config.beamWidth);
+      }
 
       // Apply pruning if enabled
       if (this.config.enablePruning) {
@@ -261,7 +302,7 @@ export class BeamSearch {
    * @param count - Number of nodes to select
    * @returns Top N nodes sorted by score
    */
-  private selectTopNodes(nodes: SearchNode[], count: number): SearchNode[] {
+  private selectTopNodes(nodes: DiverseSearchNode[], count: number): DiverseSearchNode[] {
     return nodes.sort((a, b) => b.score - a.score).slice(0, count);
   }
 
@@ -271,7 +312,7 @@ export class BeamSearch {
    * @param nodes - Nodes to prune
    * @returns Pruned nodes
    */
-  private pruneNodes(nodes: SearchNode[]): SearchNode[] {
+  private pruneNodes(nodes: DiverseSearchNode[]): DiverseSearchNode[] {
     return nodes.filter((node) => {
       // Very relaxed height pruning - allow building for line clearing
       const maxHeight = this.getMaxHeight(node.board);
