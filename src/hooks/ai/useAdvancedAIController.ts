@@ -17,11 +17,11 @@ import type { GameState } from "@/types/game";
 export function useAdvancedAIController() {
   const [aiSettings, setAiSettings] = useState<AISettings>({
     aiLevel: "advanced",
-    beamWidth: 12,
-    thinkingTimeLimit: 50,
+    beamWidth: 16, // Increased for better line clearing opportunities
+    thinkingTimeLimit: 80, // Increased for deeper search
     useHold: true,
     enableVisualization: true,
-    playbackSpeed: 1.0,
+    playbackSpeed: 1.2, // Slightly faster for more aggressive gameplay
   });
 
   const [aiState, setAiState] = useState<AIState>({
@@ -105,7 +105,7 @@ export function useAdvancedAIController() {
           return;
         }
 
-        await delay(Math.floor(200 / aiSettings.playbackSpeed));
+        await delay(Math.floor(150 / aiSettings.playbackSpeed)); // Faster execution
 
         // Double-check state after delay
         const stateAfterDelay = useGameStore.getState();
@@ -202,7 +202,14 @@ export function useAdvancedAIController() {
         return;
       }
 
-      if (decision?.bestPath && decision.bestPath.length > 0) {
+      if (decision) {
+        console.log("🧠 [AdvancedAI] Decision made:", {
+          bestPath: decision.bestPath?.length || 0,
+          bestScore: decision.bestScore,
+          nodesExplored: decision.nodesExplored,
+          hasSequence: decision.bestPath?.[0]?.sequence?.length || 0,
+        });
+
         setLastDecision(decision);
 
         // Record for replay if enabled (use callback to avoid dependency issues)
@@ -215,10 +222,15 @@ export function useAdvancedAIController() {
           };
         });
 
-        // Execute the first move from the best path
-        if (decision.bestPath[0].sequence) {
+        // Execute the first move from the best path if available
+        if (decision.bestPath && decision.bestPath.length > 0 && decision.bestPath[0].sequence) {
+          console.log("🎯 [AdvancedAI] Executing move:", decision.bestPath[0].sequence);
           await executeActionSequence(decision.bestPath[0].sequence);
+        } else {
+          console.warn("⚠️ [AdvancedAI] No moves to execute");
         }
+      } else {
+        console.warn("⚠️ [AdvancedAI] No decision returned");
       }
     } catch (error) {
       console.error("💥 [AdvancedAI] Thinking error:", error);
@@ -243,7 +255,7 @@ export function useAdvancedAIController() {
               aiThinkAndMoveRef.current();
             }
           },
-          Math.floor(200 / aiSettings.playbackSpeed),
+          Math.floor(120 / aiSettings.playbackSpeed), // Faster AI thinking cycle
         );
       }
     }

@@ -49,14 +49,14 @@ export interface SearchResult {
 }
 
 /**
- * Default beam search configuration optimized for Phase 2
+ * Default beam search configuration optimized for aggressive line clearing
  */
 export const DEFAULT_BEAM_CONFIG: BeamSearchConfig = {
-  beamWidth: 12, // Increased from 10 for better solution quality
-  maxDepth: 2,
+  beamWidth: 16, // Increased for better line clearing opportunities
+  maxDepth: 3, // Increased depth for lookahead line clearing
   useHold: true,
-  enablePruning: true,
-  timeLimit: 45, // 45ms to leave margin for other processing
+  enablePruning: false, // Disable pruning to find more line clearing opportunities
+  timeLimit: 80, // Increased time limit for deeper search
 };
 
 /**
@@ -128,11 +128,21 @@ export class BeamSearch {
         for (const piece of availablePieces) {
           const moves = this.moveGenerator.generateAllMoves(node.board, piece);
 
+          if (moves.length === 0) {
+            console.warn(
+              `⚠️ [BeamSearch] No moves generated for piece ${piece.type} at depth ${depth}`,
+            );
+            continue;
+          }
+
           // Create child nodes for each move
           for (const move of moves) {
             // Simulate move on board
             const newBoard = this.simulateMove(node.board, move);
             const moveScore = this.evaluator.evaluate(newBoard, move);
+
+            // Set evaluation score on move for visualization
+            move.evaluationScore = moveScore;
 
             const childNode: SearchNode = {
               board: newBoard,
@@ -257,18 +267,19 @@ export class BeamSearch {
 
   /**
    * Prune nodes that are unlikely to lead to good solutions
+   * Relaxed pruning to allow more line clearing opportunities
    * @param nodes - Nodes to prune
    * @returns Pruned nodes
    */
   private pruneNodes(nodes: SearchNode[]): SearchNode[] {
     return nodes.filter((node) => {
-      // Prune boards that are too high (dangerous)
+      // Very relaxed height pruning - allow building for line clearing
       const maxHeight = this.getMaxHeight(node.board);
-      if (maxHeight > 18) return false;
+      if (maxHeight > 19) return false;
 
-      // Prune boards with too many holes
+      // Very relaxed hole pruning - holes are acceptable for line clearing
       const holes = this.countHoles(node.board);
-      if (holes > 8) return false;
+      if (holes > 15) return false;
 
       return true;
     });

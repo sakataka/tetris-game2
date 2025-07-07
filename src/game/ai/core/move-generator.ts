@@ -44,13 +44,13 @@ export interface MoveGenerationOptions {
 }
 
 /**
- * Default move generation options optimized for Phase 1
+ * Default move generation options optimized for aggressive line clearing
  */
 export const DEFAULT_MOVE_OPTIONS: MoveGenerationOptions = {
-  useHold: false, // Not used in Phase 1
-  maxSearchDepth: 1,
+  useHold: true, // Use hold for better line clearing opportunities
+  maxSearchDepth: 3, // Increased depth for line clearing
   includeWallKicks: true,
-  enableTSpinDetection: false, // Phase 1 only uses basic evaluation
+  enableTSpinDetection: true, // Enable T-Spin detection for advanced line clearing
 };
 
 /**
@@ -107,8 +107,6 @@ export class MoveGenerator {
   private generateMovesForPiece(board: BitBoard, piece: Tetromino): Move[] {
     const moves: Move[] = [];
 
-    // Removed verbose debug logging for production
-
     // Test all 4 rotation states
     for (let targetRotation = 0; targetRotation < 4; targetRotation++) {
       const rotState = targetRotation as RotationState;
@@ -124,6 +122,7 @@ export class MoveGenerator {
       }
     }
 
+    console.log(`🎯 [MoveGen] Generated ${moves.length} moves for piece ${piece.type}`);
     return moves;
   }
 

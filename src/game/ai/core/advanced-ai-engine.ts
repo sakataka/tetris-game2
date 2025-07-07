@@ -17,7 +17,7 @@ import {
 } from "../search/hold-search";
 import { type AIConfig, type AIDecision, AIEngine } from "./ai-engine";
 import { BitBoard } from "./bitboard";
-import { MoveGenerator } from "./move-generator";
+import { type Move, MoveGenerator } from "./move-generator";
 
 /**
  * Advanced AI configuration extending base AI config
@@ -51,21 +51,21 @@ export interface AdvancedAIDecision extends AIDecision, HoldSearchResult {
 }
 
 /**
- * Default advanced AI configuration for Phase 2
+ * Default advanced AI configuration optimized for aggressive line clearing
  */
 export const DEFAULT_ADVANCED_CONFIG: AdvancedAIConfig = {
-  thinkingTimeLimit: 50, // 50ms as specified in Phase 2 requirements
+  thinkingTimeLimit: 80, // Increased for deeper search
   evaluator: "dellacherie",
   enableLogging: false, // Disable for performance in production
   fallbackOnTimeout: true,
   useDynamicWeights: true,
   beamSearchConfig: {
     ...DEFAULT_BEAM_CONFIG,
-    timeLimit: 40, // Reserve time for advanced features processing
+    timeLimit: 70, // Increased time for deeper search
   },
   holdSearchOptions: {
     ...DEFAULT_HOLD_OPTIONS,
-    holdPenalty: 3, // Reduced penalty for more Hold usage consideration
+    holdPenalty: 2, // Further reduced penalty for more Hold usage
   },
   enableAdvancedFeatures: true,
   enableSearchLogging: false, // Disable for performance unless debugging
@@ -189,6 +189,38 @@ export class AdvancedAIEngine extends AIEngine {
       const bestMove = searchResult.bestPath.length > 0 ? searchResult.bestPath[0] : null;
       const allMoves = searchResult.bestPath;
 
+      // If no best path was found, create a fallback decision with default moves
+      if (!bestMove && this.advancedConfig.fallbackOnTimeout) {
+        // Generate a simple fallback move (straight drop)
+        const fallbackMove = this.generateFallbackMove(currentPiece);
+        if (fallbackMove) {
+          const fallbackPath = [fallbackMove];
+
+          return {
+            // AIDecision properties
+            bestMove: fallbackMove,
+            allMoves: fallbackPath,
+            thinkingTime,
+            evaluationCount: searchResult.nodesExplored,
+            timedOut: searchResult.searchTime >= this.advancedConfig.beamSearchConfig.timeLimit,
+
+            // HoldSearchResult properties
+            ...searchResult,
+            bestPath: fallbackPath,
+            bestScore:
+              searchResult.bestScore !== Number.NEGATIVE_INFINITY ? searchResult.bestScore : 0,
+
+            // AdvancedAIDecision properties
+            tSpinOpportunities,
+            perfectClearOpportunity,
+            terrainEvaluation,
+            searchDepth: searchResult.reachedDepth,
+            searchTimedOut:
+              searchResult.searchTime >= this.advancedConfig.beamSearchConfig.timeLimit,
+          };
+        }
+      }
+
       return {
         // AIDecision properties
         bestMove,
@@ -294,6 +326,28 @@ export class AdvancedAIEngine extends AIEngine {
       rotation: 0,
       shape: getTetrominoShape(type as Tetromino["type"]),
     };
+  }
+
+  /**
+   * Generate a simple fallback move (straight drop)
+   * @param piece - Current piece
+   * @returns Fallback move or null
+   */
+  private generateFallbackMove(piece: Tetromino): Move | null {
+    try {
+      // Create a simple straight drop move
+      return {
+        piece: piece.type,
+        rotation: piece.rotation,
+        x: piece.position.x,
+        y: piece.position.y,
+        sequence: [{ type: "HARD_DROP" }],
+        evaluationScore: 0,
+      };
+    } catch (error) {
+      console.error("[AdvancedAI] Error generating fallback move:", error);
+      return null;
+    }
   }
 
   /**

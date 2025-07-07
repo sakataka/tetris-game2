@@ -132,6 +132,26 @@ describe("DellacherieEvaluator", () => {
       expect(score1).toBeGreaterThan(score2);
     });
 
+    it("should strongly prioritize line clearing over hole avoidance", () => {
+      // Setup board where clearing lines creates minor holes
+      const testBoard: GameBoard = Array(20)
+        .fill(null)
+        .map(() => Array(10).fill(0));
+      testBoard[19] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 0];
+      testBoard[18] = [1, 1, 1, 1, 1, 1, 1, 1, 0, 0];
+
+      board.fromBoardState(testBoard);
+
+      const lineClearMove = createMove("I", 1, 9, 16); // Clears line but creates hole
+      const safeMove = createMove("O", 0, 0, 17); // Safe placement, no clear
+
+      const score1 = evaluator.evaluate(board, lineClearMove);
+      const score2 = evaluator.evaluate(board, safeMove);
+
+      // With new weights, line clearing should be heavily prioritized
+      expect(score1).toBeGreaterThan(score2);
+    });
+
     it("should avoid creating holes", () => {
       const board1 = new BitBoard();
       const board2 = new BitBoard();

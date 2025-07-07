@@ -56,17 +56,17 @@ export interface Move {
 }
 
 /**
- * Survival-focused Dellacherie evaluation weights
- * Optimized for longer game survival and consistent performance
- * Based on SURVIVAL preset with emphasis on avoiding dangerous situations
+ * ULTRA-AGGRESSIVE line-clearing focused Dellacherie evaluation weights
+ * Optimized for maximum line clearing with exponential rewards
+ * Dramatically prioritizes line clearing over ALL other considerations
  */
 export const DEFAULT_WEIGHTS: EvaluationWeights = {
-  landingHeight: -8.0, // Strong penalty for high placement - prioritize staying low
-  linesCleared: 8.0, // High reward for line clearing - essential for survival
-  rowTransitions: -2.5, // Moderate penalty for horizontal roughness
-  columnTransitions: -12.0, // Strong penalty for column inconsistency - keep board smooth
-  holes: -15.0, // Very high penalty for holes - critical to avoid
-  wells: -8.0, // Strong penalty for deep wells - prevent trap situations
+  landingHeight: -3.0, // Minimal penalty for high placement - allow aggressive building
+  linesCleared: 100.0, // MAXIMUM reward for line clearing - absolute priority
+  rowTransitions: -1.0, // Minimal penalty for horizontal roughness
+  columnTransitions: -5.0, // Reduced penalty for column inconsistency
+  holes: -8.0, // Reduced penalty for holes - clearing is more important
+  wells: -3.0, // Minimal penalty for wells - can be useful for I-pieces
 };
 
 /**
@@ -96,6 +96,7 @@ export class DellacherieEvaluator {
   /**
    * Extract all 6 evaluation features for a given move
    * Uses board simulation to accurately compute post-placement features
+   * Enhanced with exponential line clearing rewards
    *
    * @param board - Current board state
    * @param move - Move to analyze
@@ -300,19 +301,26 @@ export class DellacherieEvaluator {
   /**
    * Calculate weighted score from feature values
    * Combines all features using learned weights
+   * Enhanced with exponential line clearing bonuses
    *
    * @param features - Extracted feature values
    * @returns Final heuristic score
    */
   private calculateScore(features: EvaluationFeatures): number {
-    return (
+    // Apply exponential bonus for multiple line clears
+    const lineClearBonus =
+      features.linesCleared > 0 ? features.linesCleared ** 2.5 * this.weights.linesCleared : 0;
+
+    // Base score calculation
+    const baseScore =
       features.landingHeight * this.weights.landingHeight +
-      features.linesCleared * this.weights.linesCleared +
       features.rowTransitions * this.weights.rowTransitions +
       features.columnTransitions * this.weights.columnTransitions +
       features.holes * this.weights.holes +
-      features.wells * this.weights.wells
-    );
+      features.wells * this.weights.wells;
+
+    // Massive bonus for any line clearing
+    return baseScore + lineClearBonus;
   }
 
   /**

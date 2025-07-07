@@ -1,6 +1,11 @@
 import type { BitBoard } from "@/game/ai/core/bitboard";
 import type { EvaluationWeights } from "./dellacherie";
 import { DEFAULT_WEIGHTS } from "./dellacherie";
+import {
+  applyDangerAdjustments,
+  determineGamePhase as newDetermineGamePhase,
+  PHASE_WEIGHTS,
+} from "./new-weights";
 
 /**
  * Game situation analysis for dynamic weight adjustment
@@ -35,9 +40,11 @@ export interface GameSituation {
  */
 export class DynamicWeights {
   private baseWeights: EvaluationWeights;
+  private useNewWeightSystem: boolean;
 
-  constructor(baseWeights: EvaluationWeights = DEFAULT_WEIGHTS) {
+  constructor(baseWeights: EvaluationWeights = PHASE_WEIGHTS.early, useNewWeightSystem = true) {
     this.baseWeights = { ...baseWeights };
+    this.useNewWeightSystem = useNewWeightSystem;
   }
 
   /**
@@ -77,6 +84,20 @@ export class DynamicWeights {
    * @returns Adjusted evaluation weights
    */
   adjustWeights(situation: GameSituation): EvaluationWeights {
+    // Use new balanced weight system if enabled
+    if (this.useNewWeightSystem) {
+      const phase = newDetermineGamePhase(situation.maxHeight);
+      let weights = { ...PHASE_WEIGHTS[phase] };
+
+      // Apply danger adjustments for critical situations
+      if (situation.maxHeight > 15) {
+        weights = applyDangerAdjustments(weights, situation.maxHeight);
+      }
+
+      return weights;
+    }
+
+    // Legacy aggressive weight system
     let weights = { ...this.baseWeights };
 
     // Apply phase-specific adjustments
@@ -110,31 +131,34 @@ export class DynamicWeights {
   ): EvaluationWeights {
     switch (situation.gamePhase) {
       case "early":
-        // Focus on building solid foundation with line clearing priority
+        // Focus on building solid foundation with ULTRA-aggressive line clearing
         return {
           ...weights,
-          landingHeight: weights.landingHeight * 0.9, // Still stay relatively low
-          linesCleared: weights.linesCleared * 1.2, // Encourage early line clears for practice
-          rowTransitions: weights.rowTransitions * 0.9, // Allow some terrain building
-          columnTransitions: weights.columnTransitions * 1.1, // Prefer smoother columns
-          holes: weights.holes * 1.2, // Strongly avoid holes from start
+          landingHeight: weights.landingHeight * 0.5, // Allow much more building
+          linesCleared: weights.linesCleared * 2.0, // EXTREME line clearing priority
+          rowTransitions: weights.rowTransitions * 0.5, // Allow much more terrain building
+          columnTransitions: weights.columnTransitions * 0.7, // Reduced column consistency
+          holes: weights.holes * 0.8, // Reduce hole penalty
         };
 
       case "mid":
-        // Balanced approach with slight emphasis on efficiency
+        // Aggressive approach with MAXIMUM emphasis on line clearing
         return {
           ...weights,
-          linesCleared: weights.linesCleared * 1.1, // Start prioritizing clears
-          holes: weights.holes * 1.1, // Avoid creating problems
+          landingHeight: weights.landingHeight * 0.7, // Allow more building
+          linesCleared: weights.linesCleared * 2.5, // MAXIMUM priority for line clears
+          holes: weights.holes * 0.8, // Reduce hole penalty
+          wells: weights.wells * 0.6, // Reduce well penalty
         };
 
       case "late":
-        // Focus on survival and efficiency
+        // Focus on EXTREME line clearing for survival
         return {
           ...weights,
-          landingHeight: weights.landingHeight * 1.2, // Stay low
-          linesCleared: weights.linesCleared * 1.3, // Clear aggressively
-          holes: weights.holes * 1.2, // Avoid holes
+          landingHeight: weights.landingHeight * 0.8, // Allow building for clearing
+          linesCleared: weights.linesCleared * 3.0, // EXTREME line clearing
+          holes: weights.holes * 0.9, // Reduce hole penalty
+          wells: weights.wells * 0.7, // Reduce well penalty
         };
 
       case "danger":
@@ -154,16 +178,16 @@ export class DynamicWeights {
     weights: EvaluationWeights,
     situation: GameSituation,
   ): EvaluationWeights {
-    const dangerMultiplier = Math.min(2.0, 1.0 + (situation.maxHeight - 15) * 0.2);
+    const dangerMultiplier = Math.min(2.5, 1.0 + (situation.maxHeight - 15) * 0.3);
 
     return {
       ...weights,
       landingHeight: weights.landingHeight * dangerMultiplier, // Desperately stay low
-      linesCleared: weights.linesCleared * 2.0, // Clear anything possible
-      holes: weights.holes * dangerMultiplier, // Absolutely avoid holes
-      wells: weights.wells * dangerMultiplier, // Avoid deep wells
-      rowTransitions: weights.rowTransitions * 0.8, // Less concerned about transitions
-      columnTransitions: weights.columnTransitions * 1.3, // Keep columns smooth for clearing
+      linesCleared: weights.linesCleared * 5.0, // ABSOLUTE MAXIMUM priority for line clearing
+      holes: weights.holes * 0.7, // Reduce hole penalty (clearing is everything)
+      wells: weights.wells * 0.8, // Reduce well penalty
+      rowTransitions: weights.rowTransitions * 0.3, // Minimal concern for transitions
+      columnTransitions: weights.columnTransitions * 0.8, // Allow roughness for clearing
     };
   }
 
@@ -177,12 +201,12 @@ export class DynamicWeights {
   ): EvaluationWeights {
     return {
       ...weights,
-      landingHeight: weights.landingHeight * 0.6, // Allow building height
-      linesCleared: weights.linesCleared * 0.7, // Don't rush single line clears
-      rowTransitions: weights.rowTransitions * 0.8, // Allow terrain for T-spins
-      columnTransitions: weights.columnTransitions * 0.9, // Some variance acceptable
-      holes: weights.holes * 1.3, // Still avoid holes but less critical
-      wells: weights.wells * 0.8, // Wells can be useful for I-pieces
+      landingHeight: weights.landingHeight * 0.3, // Allow maximum building
+      linesCleared: weights.linesCleared * 2.0, // EXTREME line clearing from start
+      rowTransitions: weights.rowTransitions * 0.4, // Allow much more terrain
+      columnTransitions: weights.columnTransitions * 0.5, // Much more variance acceptable
+      holes: weights.holes * 0.6, // Reduce hole penalty
+      wells: weights.wells * 0.4, // Wells very useful for I-pieces
     };
   }
 
@@ -195,16 +219,16 @@ export class DynamicWeights {
     _situation: GameSituation,
   ): EvaluationWeights {
     const problemSeverity = Math.min(
-      1.5,
-      1.0 + (_situation.totalHoles + _situation.roughness) * 0.1,
+      2.0,
+      1.2 + (_situation.totalHoles + _situation.roughness) * 0.1,
     );
 
     return {
       ...weights,
-      linesCleared: weights.linesCleared * problemSeverity, // Clear to fix problems
-      holes: weights.holes * problemSeverity, // Don't make it worse
-      rowTransitions: weights.rowTransitions * 1.2, // Smooth out the board
-      columnTransitions: weights.columnTransitions * 1.2, // Reduce variance
+      linesCleared: weights.linesCleared * (problemSeverity * 2.0), // EXTREME clearing to fix problems
+      holes: weights.holes * 0.8, // Reduce hole penalty (clearing fixes everything)
+      rowTransitions: weights.rowTransitions * 0.8, // Allow roughness for clearing
+      columnTransitions: weights.columnTransitions * 0.9, // Allow variance for clearing
     };
   }
 
@@ -340,5 +364,28 @@ export class DynamicWeights {
    */
   getBaseWeights(): EvaluationWeights {
     return { ...this.baseWeights };
+  }
+
+  /**
+   * Toggle between new balanced and legacy aggressive weight systems
+   * @param useNew - Whether to use the new balanced weight system
+   */
+  setWeightSystem(useNew: boolean): void {
+    this.useNewWeightSystem = useNew;
+    if (useNew) {
+      // Reset to early phase weights when switching to new system
+      this.baseWeights = { ...PHASE_WEIGHTS.early };
+    } else {
+      // Reset to aggressive defaults when switching to legacy
+      this.baseWeights = { ...DEFAULT_WEIGHTS };
+    }
+  }
+
+  /**
+   * Check which weight system is currently active
+   * @returns true if using new balanced system, false for legacy
+   */
+  isUsingNewWeightSystem(): boolean {
+    return this.useNewWeightSystem;
   }
 }
