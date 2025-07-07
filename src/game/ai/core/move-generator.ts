@@ -47,10 +47,10 @@ export interface MoveGenerationOptions {
  * Default move generation options optimized for Phase 1
  */
 export const DEFAULT_MOVE_OPTIONS: MoveGenerationOptions = {
-  useHold: false, // Phase 1では使用しない
+  useHold: false, // Not used in Phase 1
   maxSearchDepth: 1,
   includeWallKicks: true,
-  enableTSpinDetection: false, // Phase 1では基本評価のみ
+  enableTSpinDetection: false, // Phase 1 only uses basic evaluation
 };
 
 /**

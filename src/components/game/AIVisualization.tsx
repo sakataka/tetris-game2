@@ -26,10 +26,10 @@ export function AIVisualization({ decision, settings }: AIVisualizationProps) {
 
   return (
     <div className="space-y-4">
-      {/* 候補手ヒートマップ */}
+      {/* Candidate Move Heatmap */}
       <MoveHeatmap decision={decision} />
 
-      {/* 探索ツリー */}
+      {/* Search Tree */}
       {decision.bestPath && (
         <SearchTreeVisualization
           tree={{
@@ -39,10 +39,10 @@ export function AIVisualization({ decision, settings }: AIVisualizationProps) {
         />
       )}
 
-      {/* 評価詳細 */}
+      {/* Evaluation Details */}
       <EvaluationDetails decision={decision} />
 
-      {/* T-Spin/PC検知 */}
+      {/* T-Spin/PC Detection */}
       {(decision.tSpinOpportunities.length > 0 || decision.perfectClearOpportunity) && (
         <SpecialOpportunities
           tSpins={decision.tSpinOpportunities}
@@ -59,7 +59,7 @@ function MoveHeatmap({ decision }: { decision: AdvancedAIDecision }) {
       .fill(null)
       .map(() => Array(10).fill(0));
 
-    // 各候補手のスコアを位置にマッピング
+    // Map each candidate move's score to position
     decision.bestPath?.forEach((move, _index) => {
       if (move.evaluationScore !== undefined) {
         const normalizedScore = Math.max(0, Math.min(1, (move.evaluationScore + 100) / 200));
@@ -132,10 +132,10 @@ function EvaluationDetails({ decision }: { decision: AdvancedAIDecision }) {
   const bestMove = decision.bestPath?.[0];
   if (!bestMove) return null;
 
-  // デモ用の評価特徴量（実際の実装では decision から取得）
+  // Demo evaluation features (get from decision in actual implementation)
   const features = {
     landingHeight: decision.terrainEvaluation ? -decision.terrainEvaluation.smoothness * 5 : 0,
-    linesCleared: 0, // 実際のライン消去数が必要
+    linesCleared: 0, // Actual line clear count needed
     holes: Math.floor((1 - decision.terrainEvaluation.accessibility) * 10),
     rowTransitions: Math.floor(decision.terrainEvaluation.smoothness * 20),
     columnTransitions: Math.floor(decision.terrainEvaluation.smoothness * 15),
@@ -233,8 +233,8 @@ function SpecialOpportunities({
 }
 
 /**
- * モック検索ツリーを作成（デモ用）
- * 実際の実装では decision から検索ツリー情報を取得
+ * Create mock search tree (for demo)
+ * Get search tree info from decision in actual implementation
  */
 function createMockSearchTree(decision: AdvancedAIDecision): SearchTree["levels"] {
   const levels: SearchTree["levels"] = [];

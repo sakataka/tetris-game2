@@ -82,7 +82,7 @@ export class AIEngine {
   constructor(config: AIConfig = DEFAULT_AI_CONFIG) {
     this.config = { ...config };
     this.moveGenerator = new MoveGenerator({
-      useHold: false, // Phase 1では使用しない
+      useHold: false, // Not used in Phase 1
       maxSearchDepth: 1,
       includeWallKicks: true,
       enableTSpinDetection: false,

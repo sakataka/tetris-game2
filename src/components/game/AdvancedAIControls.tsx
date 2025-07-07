@@ -51,7 +51,7 @@ export function AdvancedAIControls({
 
   return (
     <Card className="p-4 space-y-4" data-testid="ai-controls">
-      {/* 基本制御 */}
+      {/* Basic Control */}
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">AI Control</h3>
         <div className="flex items-center gap-2">
@@ -77,7 +77,7 @@ export function AdvancedAIControls({
         </div>
       </div>
 
-      {/* ステータス表示 */}
+      {/* Status Display */}
       <div className="flex items-center gap-2 text-sm">
         <Badge variant={aiState.isEnabled ? "default" : "secondary"} data-testid="ai-status">
           {aiState.isEnabled ? "Active" : "Inactive"}
@@ -97,7 +97,7 @@ export function AdvancedAIControls({
         )}
       </div>
 
-      {/* AI設定 */}
+      {/* AI Settings */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <label className="text-sm font-medium">AI Level</label>
@@ -143,7 +143,7 @@ export function AdvancedAIControls({
           />
         </div>
 
-        {/* 詳細設定 */}
+        {/* Advanced Settings */}
         <Button
           variant="ghost"
           size="sm"
@@ -221,7 +221,7 @@ export function AdvancedAIControls({
         )}
       </div>
 
-      {/* 統計情報 */}
+      {/* Statistics */}
       {aiState.stats && (
         <div className="text-xs text-muted-foreground space-y-1 pt-2 border-t">
           <div className="flex justify-between">

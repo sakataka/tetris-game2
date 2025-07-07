@@ -39,8 +39,8 @@ export function GameSettings() {
 
   const languages = useMemo(
     () => [
-      { value: "en", label: i18n.language === "ja" ? "英語" : "English", flag: "🇺🇸" },
-      { value: "ja", label: i18n.language === "ja" ? "日本語" : "Japanese", flag: "🇯🇵" },
+      { value: "en", label: "English", flag: "🇺🇸" },
+      { value: "ja", label: "Japanese", flag: "🇯🇵" },
     ],
     [i18n.language],
   );

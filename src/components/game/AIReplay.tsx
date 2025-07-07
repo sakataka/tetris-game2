@@ -30,7 +30,7 @@ export function AIReplay({ replayData, onReplayEnd }: AIReplayProps) {
 
   const maxSteps = replayData.moves.length;
 
-  // 自動再生
+  // Auto-play
   useEffect(() => {
     if (!isPlaying) return;
 
@@ -60,7 +60,7 @@ export function AIReplay({ replayData, onReplayEnd }: AIReplayProps) {
         </Button>
       </div>
 
-      {/* 再生制御 */}
+      {/* Playback Control */}
       <div className="space-y-3">
         <div className="flex items-center gap-2">
           <Button size="sm" onClick={() => setIsPlaying(!isPlaying)} data-testid="replay-play">
@@ -87,7 +87,7 @@ export function AIReplay({ replayData, onReplayEnd }: AIReplayProps) {
           </Button>
         </div>
 
-        {/* 進行バー */}
+        {/* Progress Bar */}
         <div className="space-y-2">
           <div className="flex justify-between text-sm text-muted-foreground">
             <span>
@@ -116,7 +116,7 @@ export function AIReplay({ replayData, onReplayEnd }: AIReplayProps) {
         </div>
       </div>
 
-      {/* 現在の状態表示 */}
+      {/* Current State Display */}
       {currentDecision && (
         <div className="space-y-2">
           <h4 className="text-sm font-medium">Step {currentStep + 1} Analysis</h4>
@@ -148,7 +148,7 @@ export function AIReplay({ replayData, onReplayEnd }: AIReplayProps) {
             <div className="text-xs text-purple-600 font-medium">Used Hold in this move</div>
           )}
 
-          {/* 特殊技の表示 */}
+          {/* Special Techniques Display */}
           {currentDecision.tSpinOpportunities.length > 0 && (
             <div className="text-xs text-purple-600 font-medium">
               T-Spin opportunities: {currentDecision.tSpinOpportunities.length}
@@ -163,7 +163,7 @@ export function AIReplay({ replayData, onReplayEnd }: AIReplayProps) {
         </div>
       )}
 
-      {/* ゲームメタデータ */}
+      {/* Game Metadata */}
       <div className="pt-2 border-t">
         <h4 className="text-sm font-medium mb-2">Game Summary</h4>
         <div className="grid grid-cols-2 gap-2 text-xs">

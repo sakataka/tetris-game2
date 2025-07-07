@@ -90,7 +90,7 @@ export function AIComparison({ humanStats, aiStats, onStartComparison }: AICompa
     <Card className="p-4">
       <h3 className="text-lg font-semibold mb-4">AI vs Human Comparison</h3>
 
-      {/* 総合勝敗 */}
+      {/* Overall Wins/Losses */}
       <div className="mb-4 p-3 bg-muted rounded-lg">
         <div className="text-sm text-center">
           <span className="text-blue-600 font-semibold">Human: {winningMetrics.humanWins}</span>
@@ -168,7 +168,7 @@ export function AIComparison({ humanStats, aiStats, onStartComparison }: AICompa
         </div>
       </div>
 
-      {/* 詳細比較チャート */}
+      {/* Detailed Comparison Chart */}
       <div className="mt-4">
         <h4 className="font-medium mb-2">Performance Comparison</h4>
         <ComparisonChart comparisonData={comparisonData} />
