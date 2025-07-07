@@ -76,19 +76,23 @@ function MoveHeatmap({ decision }: { decision: AdvancedAIDecision }) {
     <Card className="p-3" data-testid="move-heatmap">
       <h4 className="text-sm font-medium mb-2">Move Evaluation Heatmap</h4>
       <div className="grid grid-cols-10 gap-px bg-gray-200 rounded overflow-hidden">
-        {heatmapData.flat().map((intensity, index) => (
-          <div
-            key={`heatmap-${index}`}
-            className="aspect-square"
-            style={{
-              backgroundColor:
-                intensity > 0 ? `hsl(${120 * intensity}, 70%, ${50 + 30 * intensity}%)` : "#f3f4f6",
-            }}
-            title={`Position: (${index % 10}, ${Math.floor(index / 10)}), Score: ${intensity.toFixed(
-              2,
-            )}`}
-          />
-        ))}
+        {heatmapData.flat().map((intensity, index) => {
+          const row = Math.floor(index / 10);
+          const col = index % 10;
+          return (
+            <div
+              key={`heatmap-${row}-${col}`}
+              className="aspect-square"
+              style={{
+                backgroundColor:
+                  intensity > 0
+                    ? `hsl(${120 * intensity}, 70%, ${50 + 30 * intensity}%)`
+                    : "#f3f4f6",
+              }}
+              title={`Position: (${col}, ${row}), Score: ${intensity.toFixed(2)}`}
+            />
+          );
+        })}
       </div>
     </Card>
   );
@@ -100,12 +104,15 @@ function SearchTreeVisualization({ tree }: { tree: SearchTree }) {
       <h4 className="text-sm font-medium mb-2">Search Tree (Depth: {tree.maxDepth})</h4>
       <div className="space-y-2">
         {tree.levels.map((level, levelIndex) => (
-          <div key={`level-${levelIndex}`} className="flex items-center gap-1">
+          <div
+            key={`level-d${levelIndex}-n${level.nodes.length}`}
+            className="flex items-center gap-1"
+          >
             <span className="text-xs text-muted-foreground w-12">D{levelIndex}:</span>
             <div className="flex gap-1 flex-wrap">
               {level.nodes.slice(0, 20).map((node, nodeIndex) => (
                 <motion.div
-                  key={`node-${levelIndex}-${nodeIndex}`}
+                  key={`node-d${levelIndex}-s${node.score.toFixed(3)}-${nodeIndex}`}
                   className={`w-3 h-3 rounded-sm ${
                     node.isInBestPath ? "bg-blue-500" : "bg-gray-300"
                   }`}
@@ -209,7 +216,10 @@ function SpecialOpportunities({
         <div className="mb-2">
           <h5 className="text-xs font-medium text-purple-600 mb-1">T-Spin Detected:</h5>
           {tSpins.slice(0, 3).map((tSpin, index) => (
-            <div key={index} className="text-xs flex justify-between">
+            <div
+              key={`tspin-${tSpin.type}-${tSpin.position.x}-${tSpin.position.y}-${index}`}
+              className="text-xs flex justify-between"
+            >
               <span>
                 {tSpin.type} at ({tSpin.position.x},{tSpin.position.y})
               </span>

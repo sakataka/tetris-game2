@@ -42,7 +42,7 @@ export function GameSettings() {
       { value: "en", label: "English", flag: "🇺🇸" },
       { value: "ja", label: "Japanese", flag: "🇯🇵" },
     ],
-    [i18n.language],
+    [],
   );
 
   const handleLanguageChange = async (value: string) => {

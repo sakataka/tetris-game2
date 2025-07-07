@@ -223,18 +223,6 @@ clearAnimationData: () => set((state) => {
 });
 ```
 
-## PERFORMANCE OPTIMIZATION
-
-### Critical Requirements
-- **React.memo**: Use for expensive components
-- **useCallback/useMemo**: Required for game loop functions
-- **requestAnimationFrame**: ALWAYS use for 60fps animations
-- **GPU-accelerated animations only**: No layout animations
-
-### Performance Targets
-- Bundle: < 500KB total, < 200KB vendor chunk
-- Runtime: 60fps gameplay, < 50MB memory growth/minute
-
 ## MCP TOOLS USAGE
 
 ### PLAYWRIGHT MCP - Browser Testing

@@ -49,7 +49,6 @@ export function AIReplay({ replayData, onReplayEnd }: AIReplayProps) {
   }, [isPlaying, playbackSpeed, maxSteps, onReplayEnd]);
 
   const currentDecision = replayData.decisions[currentStep];
-  const _currentGameState = replayData.gameStates[currentStep];
 
   return (
     <Card className="p-4 space-y-4" data-testid="replay-controls">

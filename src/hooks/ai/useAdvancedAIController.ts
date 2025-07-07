@@ -6,7 +6,7 @@ import {
   type AdvancedAIStats,
   DEFAULT_ADVANCED_CONFIG,
 } from "@/game/ai/core/advanced-ai-engine";
-import type { GameAction } from "@/game/ai/core/move-generator";
+import type { GameAction, Move } from "@/game/ai/core/move-generator";
 import { useGameStore } from "@/store/gameStore";
 import type { GameState } from "@/types/game";
 
@@ -32,7 +32,7 @@ export function useAdvancedAIController() {
 
   const [lastDecision, setLastDecision] = useState<AdvancedAIDecision | null>(null);
   const [replayData, setReplayData] = useState<{
-    moves: unknown[];
+    moves: Move[];
     decisions: AdvancedAIDecision[];
     gameStates: GameState[];
     metadata: {
@@ -154,11 +154,14 @@ export function useAdvancedAIController() {
 
         // Record for replay if enabled
         if (replayData) {
-          setReplayData((prev) => ({
-            ...prev!,
-            decisions: [...prev?.decisions, decision],
-            gameStates: [...prev?.gameStates, gameState],
-          }));
+          setReplayData((prev) => {
+            if (!prev) return prev;
+            return {
+              ...prev,
+              decisions: [...(prev.decisions || []), decision],
+              gameStates: [...(prev.gameStates || []), gameState],
+            };
+          });
         }
 
         // Execute the first move from the best path
@@ -231,14 +234,17 @@ export function useAdvancedAIController() {
       // Finalize replay data
       if (replayData && aiState.isEnabled === false) {
         const finalGameState = useGameStore.getState();
-        setReplayData((prev) => ({
-          ...prev!,
-          metadata: {
-            ...prev?.metadata,
-            endTime: Date.now(),
-            finalScore: finalGameState.score,
-          },
-        }));
+        setReplayData((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            metadata: {
+              ...prev.metadata,
+              endTime: Date.now(),
+              finalScore: finalGameState.score,
+            },
+          };
+        });
       }
     }
 
@@ -277,7 +283,6 @@ export function useAdvancedAIController() {
     }));
 
     if (!aiState.isEnabled) {
-      const _gameState = useGameStore.getState();
       setLastDecision(null);
     } else {
       aiEngine.abortThinking();

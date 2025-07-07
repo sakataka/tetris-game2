@@ -100,14 +100,16 @@ export function AdvancedAIControls({
       {/* AI Settings */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <label className="text-sm font-medium">AI Level</label>
+          <label htmlFor="ai-level-select" className="text-sm font-medium">
+            AI Level
+          </label>
           <Select
             value={settings.aiLevel}
             onValueChange={(value: "basic" | "advanced") =>
               onSettingsChange({ ...settings, aiLevel: value })
             }
           >
-            <SelectTrigger className="w-32" data-testid="ai-level-select">
+            <SelectTrigger id="ai-level-select" className="w-32" data-testid="ai-level-select">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -119,10 +121,13 @@ export function AdvancedAIControls({
 
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <label className="text-sm font-medium">Playback Speed</label>
+            <label htmlFor="playback-speed-slider" className="text-sm font-medium">
+              Playback Speed
+            </label>
             <span className="text-sm text-muted-foreground">{settings.playbackSpeed}x</span>
           </div>
           <Slider
+            id="playback-speed-slider"
             value={[settings.playbackSpeed]}
             onValueChange={([value]) => onSettingsChange({ ...settings, playbackSpeed: value })}
             min={0.1}
@@ -133,8 +138,11 @@ export function AdvancedAIControls({
         </div>
 
         <div className="flex items-center justify-between">
-          <label className="text-sm font-medium">Show Visualization</label>
+          <label htmlFor="show-visualization-switch" className="text-sm font-medium">
+            Show Visualization
+          </label>
           <Switch
+            id="show-visualization-switch"
             checked={settings.enableVisualization}
             onCheckedChange={(checked) =>
               onSettingsChange({ ...settings, enableVisualization: checked })
