@@ -156,8 +156,8 @@ export class BeamSearch {
             nextLevel.push(childNode);
             nodesExplored++;
 
-            // Update best solution if at final depth
-            if (depth === this.config.maxDepth - 1 && childNode.score > bestScore) {
+            // Update best solution at any depth if we find a better score
+            if (childNode.score > bestScore) {
               bestScore = childNode.score;
               bestPath = [...childNode.path];
             }

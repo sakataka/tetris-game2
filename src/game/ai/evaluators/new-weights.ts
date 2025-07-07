@@ -71,44 +71,6 @@ export const PHASE_WEIGHTS: PhaseWeights = {
 };
 
 /**
- * Danger zone adjustments (maxHeight > 15)
- * Emergency modifications applied on top of phase weights
- */
-export interface DangerAdjustments {
-  /** Multiplier for line clearing reward */
-  linesClearedMultiplier: number;
-  /** Additional penalty for maximum height */
-  maxHeightPenalty: number;
-  /** Bonus for moves that immediately reduce height */
-  immediateEscape: number;
-}
-
-export const DANGER_ADJUSTMENTS: DangerAdjustments = {
-  linesClearedMultiplier: 1.5, // 50% bonus for line clearing
-  maxHeightPenalty: -50.0, // Severe penalty for high placement
-  immediateEscape: 15.0, // Reward for height reduction
-};
-
-/**
- * Special situation modifiers
- * Applied based on specific board conditions
- */
-export interface SituationModifiers {
-  /** When T-Spin setup is detected */
-  tSpinPotential: number;
-  /** When perfect clear opportunity exists */
-  perfectClearBonus: number;
-  /** Multiple lines ready to clear */
-  multiLineOpportunity: number;
-}
-
-export const SITUATION_MODIFIERS: SituationModifiers = {
-  tSpinPotential: 5.0, // Bonus for T-Spin setups (mid/late only)
-  perfectClearBonus: 30.0, // Significant bonus for PC opportunity
-  multiLineOpportunity: 10.0, // Bonus when 2+ lines can be cleared
-};
-
-/**
  * Determine game phase based on maximum board height
  * Simple and predictable phase detection
  *

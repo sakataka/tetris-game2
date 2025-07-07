@@ -30,11 +30,11 @@ describe("BeamSearch", () => {
 
   test("should initialize with default configuration", () => {
     const config = beamSearch.getConfig();
-    expect(config.beamWidth).toBe(12); // Updated for Phase 2 optimization
-    expect(config.maxDepth).toBe(2);
+    expect(config.beamWidth).toBe(16); // Updated for Phase 2 optimization
+    expect(config.maxDepth).toBe(3); // Updated for Phase 2 optimization
     expect(config.useHold).toBe(true);
-    expect(config.enablePruning).toBe(true);
-    expect(config.timeLimit).toBe(45); // Updated for Phase 2 optimization
+    expect(config.enablePruning).toBe(false); // Updated for Phase 2 optimization
+    expect(config.timeLimit).toBe(80); // Updated for Phase 2 optimization
   });
 
   test("should update configuration correctly", () => {
