@@ -32,6 +32,9 @@ export const PHASE_WEIGHTS: PhaseWeights = {
     columnTransitions: -9.3, // Strong column consistency
     holes: -10.0, // High penalty for holes
     wells: 2.0, // Small reward for I-piece preparation
+    blocksAboveHoles: -15.0, // Moderate penalty for deep holes
+    wellOpen: 3.0, // Reward for keeping wells accessible
+    escapeRoute: 2.0, // Reward for maintaining escape routes
   },
 
   /**
@@ -45,6 +48,9 @@ export const PHASE_WEIGHTS: PhaseWeights = {
     columnTransitions: -7.0, // Reduced column strictness
     holes: -8.0, // Still significant hole penalty
     wells: 4.0, // Increased well value
+    blocksAboveHoles: -25.0, // Increased penalty for deep holes
+    wellOpen: 5.0, // Higher reward for well accessibility
+    escapeRoute: 4.0, // Increased escape route value
   },
 
   /**
@@ -58,6 +64,9 @@ export const PHASE_WEIGHTS: PhaseWeights = {
     columnTransitions: -4.0, // Accept rougher terrain
     holes: -6.0, // Reduced hole penalty
     wells: 1.0, // Wells less important
+    blocksAboveHoles: -40.0, // Heavy penalty for deep holes in late game
+    wellOpen: 8.0, // Critical for I-piece escape routes
+    escapeRoute: 6.0, // High value for escape potential
   },
 };
 
@@ -149,6 +158,9 @@ export function applyDangerAdjustments(
     linesCleared: weights.linesCleared * (1 + dangerLevel * 0.5),
     landingHeight: weights.landingHeight * (1 + dangerLevel * 0.5),
     holes: weights.holes * 0.8, // Reduce hole penalty in danger
+    blocksAboveHoles: weights.blocksAboveHoles * (1 + dangerLevel * 0.3), // Increase deep hole penalty
+    wellOpen: weights.wellOpen * (1 + dangerLevel * 0.5), // Increase well accessibility value
+    escapeRoute: weights.escapeRoute * (1 + dangerLevel * 0.7), // Significantly increase escape route value
   };
 }
 
