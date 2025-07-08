@@ -7,6 +7,11 @@ import {
   type TSpinOpportunity,
 } from "../evaluators/advanced-features";
 import { DellacherieEvaluator } from "../evaluators/dellacherie";
+import {
+  DEFAULT_PATTERN_CONFIG,
+  PatternEvaluator,
+  type PatternEvaluatorConfig,
+} from "../evaluators/pattern-evaluator";
 import { DynamicWeights } from "../evaluators/weights";
 import { BeamSearch, type BeamSearchConfig, DEFAULT_BEAM_CONFIG } from "../search/beam-search";
 import {
@@ -31,6 +36,10 @@ export interface AdvancedAIConfig extends AIConfig {
   enableAdvancedFeatures: boolean;
   /** Enable debug logging for search process */
   enableSearchLogging: boolean;
+  /** Enable pattern detection (PCO, DT Cannon, ST-Stack) */
+  enablePatternDetection: boolean;
+  /** Pattern evaluator configuration */
+  patternEvaluatorConfig?: PatternEvaluatorConfig;
 }
 
 /**
@@ -69,6 +78,8 @@ export const DEFAULT_ADVANCED_CONFIG: AdvancedAIConfig = {
   },
   enableAdvancedFeatures: true,
   enableSearchLogging: false, // Disable for performance unless debugging
+  enablePatternDetection: true, // Enable advanced pattern detection
+  patternEvaluatorConfig: DEFAULT_PATTERN_CONFIG,
 };
 
 /**
@@ -91,8 +102,11 @@ export class AdvancedAIEngine extends AIEngine {
 
     this.advancedConfig = { ...config };
 
-    // Initialize evaluator and move generator with advanced options
-    const evaluator = new DellacherieEvaluator();
+    // Initialize evaluator based on pattern detection setting
+    const evaluator = config.enablePatternDetection
+      ? new PatternEvaluator(undefined, config.patternEvaluatorConfig)
+      : new DellacherieEvaluator();
+
     const moveGenerator = new MoveGenerator({
       useHold: config.holdSearchOptions.allowHoldUsage,
       maxSearchDepth: config.beamSearchConfig.maxDepth,
@@ -166,6 +180,19 @@ export class AdvancedAIEngine extends AIEngine {
       const heldPiece = gameState.heldPiece
         ? this.createTetrominoFromType(gameState.heldPiece)
         : undefined;
+
+      // Update pattern evaluator with current game state if pattern detection is enabled
+      if (
+        this.advancedConfig.enablePatternDetection &&
+        this.beamSearch.evaluator instanceof PatternEvaluator
+      ) {
+        const pieceTypes = [currentPiece.type, ...nextPieces.map((p) => p.type)];
+        (this.beamSearch.evaluator as PatternEvaluator).updateGameState(
+          pieceTypes,
+          gameState.lines,
+          gameState.level,
+        );
+      }
 
       // Perform Hold-aware beam search
       const searchResult = this.holdSearch.searchWithHold(
