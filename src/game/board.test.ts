@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
+import { ResultUtils } from "@/types/result";
 import { GAME_CONSTANTS } from "@/utils/gameConstants";
-import { clearLines, createEmptyBoard, isValidPosition, placeTetrominoLegacy } from "./board";
+import { clearLines, createEmptyBoard, isValidPosition, placeTetromino } from "./board";
 
 describe("Board", () => {
   describe("createEmptyBoard", () => {
@@ -50,7 +51,9 @@ describe("Board", () => {
         [1, 1],
         [1, 1],
       ];
-      const newBoard = placeTetrominoLegacy(board, shape, { x: 0, y: 0 }, 1);
+      const result = placeTetromino(board, shape, { x: 0, y: 0 }, 1);
+      expect(result.ok).toBe(true);
+      const newBoard = ResultUtils.unwrap(result);
       expect(newBoard[0][0]).toBe(1);
       expect(newBoard[0][1]).toBe(1);
       expect(newBoard[1][0]).toBe(1);

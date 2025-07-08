@@ -1,6 +1,7 @@
 import { getTetrominoShape } from "@/game/tetrominos";
 import type { GameState } from "@/types/game";
 import { DellacherieEvaluator } from "../evaluators/dellacherie";
+import { StackingEvaluator } from "../evaluators/stacking-evaluator";
 import { DynamicWeights } from "../evaluators/weights";
 import type { BitBoard } from "./bitboard";
 import { BitBoard as BitBoardImpl } from "./bitboard";
@@ -13,7 +14,7 @@ export interface AIConfig {
   /** Maximum thinking time in milliseconds */
   thinkingTimeLimit: number;
   /** Evaluator type to use */
-  evaluator: "dellacherie" | "custom";
+  evaluator: "dellacherie" | "stacking" | "custom";
   /** Enable debug logging */
   enableLogging: boolean;
   /** Use fallback move when timeout occurs */
@@ -61,7 +62,7 @@ export interface AIStats {
  */
 export const DEFAULT_AI_CONFIG: AIConfig = {
   thinkingTimeLimit: 200, // 200ms as specified in issue
-  evaluator: "dellacherie",
+  evaluator: "stacking",
   enableLogging: true, // Enable for debugging
   fallbackOnTimeout: true,
   useDynamicWeights: true,
@@ -74,7 +75,7 @@ export const DEFAULT_AI_CONFIG: AIConfig = {
 export class AIEngine {
   private readonly config: AIConfig;
   private readonly moveGenerator: MoveGenerator;
-  private readonly evaluator: DellacherieEvaluator;
+  private readonly evaluator: DellacherieEvaluator | StackingEvaluator;
   private readonly dynamicWeights: DynamicWeights;
   private abortController: AbortController | null = null;
   private stats: AIStats;
@@ -87,9 +88,29 @@ export class AIEngine {
       includeWallKicks: true,
       enableTSpinDetection: false,
     });
-    this.evaluator = new DellacherieEvaluator();
+    this.evaluator = this.createEvaluator(config.evaluator);
     this.dynamicWeights = new DynamicWeights();
     this.stats = this.createInitialStats();
+  }
+
+  /**
+   * Create evaluator based on configuration
+   * @param evaluatorType - Type of evaluator to create
+   * @returns Evaluator instance
+   */
+  private createEvaluator(evaluatorType: string): DellacherieEvaluator | StackingEvaluator {
+    switch (evaluatorType) {
+      case "dellacherie":
+        return new DellacherieEvaluator();
+      case "stacking":
+        return new StackingEvaluator();
+      case "custom":
+        // For now, default to Dellacherie for custom
+        return new DellacherieEvaluator();
+      default:
+        console.warn(`Unknown evaluator type: ${evaluatorType}, defaulting to Dellacherie`);
+        return new DellacherieEvaluator();
+    }
   }
 
   /**
@@ -280,9 +301,13 @@ export class AIEngine {
    */
   private updateDynamicWeights(board: BitBoard, lines: number, level: number): void {
     try {
-      const situation = this.dynamicWeights.analyzeSituation(board, lines, level);
-      const adjustedWeights = this.dynamicWeights.adjustWeights(situation);
-      this.evaluator.updateWeights(adjustedWeights);
+      // Dynamic weights only supported for Dellacherie evaluator
+      if (this.evaluator instanceof DellacherieEvaluator) {
+        const situation = this.dynamicWeights.analyzeSituation(board, lines, level);
+        const adjustedWeights = this.dynamicWeights.adjustWeights(situation);
+        this.evaluator.updateWeights(adjustedWeights);
+      }
+      // Stacking evaluator has its own internal weight tuning
     } catch (error) {
       console.error("[AI] Error in updateDynamicWeights:", error);
       // Continue without dynamic weights if there's an error

@@ -54,7 +54,7 @@ export class CollisionBenchmark {
    * Run performance comparison between board engines
    */
   async runComparison(): Promise<BenchmarkResult> {
-    const engines = ["legacy", "typed-array", "bitboard"] as const;
+    const engines = ["typed-array", "bitboard"] as const;
     const results: Record<string, number> = {};
 
     console.log("🚀 Starting collision benchmark comparison...");
@@ -67,7 +67,7 @@ export class CollisionBenchmark {
 
     const improvement = this.calculateImprovement(results);
     const statisticalSignificance = this.calculateStatisticalSignificance(
-      results.legacy,
+      results["typed-array"],
       results.bitboard,
     );
     const goNoGoDecision = this.evaluateGoNoGo(results, statisticalSignificance);
@@ -222,28 +222,28 @@ export class CollisionBenchmark {
    * Calculate improvement percentage
    */
   private calculateImprovement(results: Record<string, number>): number {
-    const legacyTime = results.legacy;
+    const typedArrayTime = results["typed-array"];
     const bitboardTime = results.bitboard;
 
-    if (!legacyTime || !bitboardTime) {
+    if (!typedArrayTime || !bitboardTime) {
       return 0;
     }
 
     // Improvement = (old - new) / old * 100
-    return ((legacyTime - bitboardTime) / legacyTime) * 100;
+    return ((typedArrayTime - bitboardTime) / typedArrayTime) * 100;
   }
 
   /**
    * Calculate statistical significance using t-test
    */
   private calculateStatisticalSignificance(
-    legacyTime: number,
+    typedArrayTime: number,
     bitboardTime: number,
   ): StatisticalSignificance {
     // For now, simplified t-test calculation
     // In a real implementation, we'd run multiple samples and calculate variance
-    const meanDifference = legacyTime - bitboardTime;
-    const pooledVariance = (legacyTime * 0.1) ** 2; // Simplified variance estimation
+    const meanDifference = typedArrayTime - bitboardTime;
+    const pooledVariance = (typedArrayTime * 0.1) ** 2; // Simplified variance estimation
     const standardError = Math.sqrt(pooledVariance);
     const tStatistic = meanDifference / standardError;
     const degreesOfFreedom = (this.config.runs - 1) * 2; // Simplified calculation
@@ -309,10 +309,9 @@ export class CollisionBenchmark {
       "=".repeat(40),
       "",
       "🏃 Performance Results:",
-      `  Legacy Engine: ${result.results.legacy?.toFixed(2)}ms`,
       `  TypedArray Engine: ${result.results["typed-array"]?.toFixed(2)}ms`,
       `  Bitboard Engine: ${result.results.bitboard?.toFixed(2)}ms`,
-      `  BitBoard vs Legacy Improvement: ${result.improvement.toFixed(1)}%`,
+      `  BitBoard vs TypedArray Improvement: ${result.improvement.toFixed(1)}%`,
       "",
       "📈 Statistical Significance:",
       `  Significant: ${result.statisticalSignificance.isSignificant ? "✅" : "❌"}`,

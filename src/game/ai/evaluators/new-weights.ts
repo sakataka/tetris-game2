@@ -27,12 +27,13 @@ export const PHASE_WEIGHTS: PhaseWeights = {
    */
   early: {
     landingHeight: -3.8, // Moderate penalty for height (El-Tetris scale)
-    linesCleared: 20.0, // Balanced reward for line clearing
+    linesCleared: 100.0, // Very strong reward for line clearing
+    potentialLinesFilled: 80.0, // Strong reward for potential line clearing
     rowTransitions: -2.8, // Moderate penalty for surface roughness
     columnTransitions: -8.0, // Strong penalty for column transitions
-    holes: -30.0, // Strong penalty for holes
+    holes: -15.0, // Reduced penalty for holes (allow some holes for line clearing)
     wells: -2.8, // Moderate penalty for wells
-    blocksAboveHoles: -12.0, // Strong penalty for deep holes
+    blocksAboveHoles: -8.0, // Reduced penalty for deep holes
     wellOpen: 0.0, // Ignore well accessibility
     escapeRoute: 0.0, // Ignore escape routes
     bumpiness: -2.2, // Moderate penalty for surface roughness
@@ -44,12 +45,13 @@ export const PHASE_WEIGHTS: PhaseWeights = {
    */
   mid: {
     landingHeight: -4.2, // Moderate penalty for height
-    linesCleared: 35.0, // Strong reward for line clearing
+    linesCleared: 120.0, // Very strong reward for line clearing
+    potentialLinesFilled: 100.0, // Very strong reward for potential line clearing
     rowTransitions: -3.0, // Moderate penalty for surface roughness
     columnTransitions: -8.8, // Strong penalty for column transitions
-    holes: -35.0, // Strong penalty for holes
+    holes: -18.0, // Reduced penalty for holes (allow some holes for line clearing)
     wells: -3.2, // Moderate penalty for wells
-    blocksAboveHoles: -14.0, // Strong penalty for deep holes
+    blocksAboveHoles: -10.0, // Reduced penalty for deep holes
     wellOpen: 0.0, // Ignore well accessibility
     escapeRoute: 0.0, // Ignore escape routes
     bumpiness: -2.4, // Moderate penalty for surface roughness
@@ -61,12 +63,13 @@ export const PHASE_WEIGHTS: PhaseWeights = {
    */
   late: {
     landingHeight: -5.0, // Higher penalty for height
-    linesCleared: 50.0, // Very strong reward for line clearing
+    linesCleared: 150.0, // Extremely strong reward for line clearing
+    potentialLinesFilled: 120.0, // Extremely strong reward for potential line clearing
     rowTransitions: -3.5, // Higher penalty for surface roughness
     columnTransitions: -10.0, // Higher penalty for column transitions
-    holes: -40.0, // Very strong penalty for holes
+    holes: -20.0, // Reduced penalty for holes (aggressive line clearing mode)
     wells: -3.8, // Moderate penalty for wells
-    blocksAboveHoles: -18.0, // Very strong penalty for deep holes
+    blocksAboveHoles: -12.0, // Reduced penalty for deep holes
     wellOpen: 0.0, // Ignore well accessibility
     escapeRoute: 0.0, // Ignore escape routes
     bumpiness: -2.8, // Higher penalty for surface roughness
@@ -122,6 +125,7 @@ export function applyDangerAdjustments(
   return {
     ...weights,
     linesCleared: weights.linesCleared * (1 + dangerLevel * 0.4), // Max 1.4x
+    potentialLinesFilled: weights.potentialLinesFilled * (1 + dangerLevel * 0.3), // Max 1.3x
     landingHeight: weights.landingHeight * (1 + dangerLevel * 0.3), // Max 1.3x
     holes: weights.holes * (1 - dangerLevel * 0.1), // Slight reduction in danger
     blocksAboveHoles: weights.blocksAboveHoles * (1 + dangerLevel * 0.2), // Max 1.2x

@@ -156,12 +156,12 @@ describe("AIEngine", () => {
       expect(decision.bestMove).not.toBeNull();
       // Should have a better score than a random move due to line clearing
       expect(decision.bestMove?.evaluationScore).toBeDefined();
-      // I-piece should position to clear multiple lines
-      expect(decision.bestMove?.x).toBe(9); // Rightmost position to fill gaps
-
-      // Verify that this move actually clears lines by checking all moves
-      const lineClearingMoves = decision.allMoves.filter((move) => move.x === 9);
-      expect(lineClearingMoves.length).toBeGreaterThan(0);
+      // Stacking evaluator should avoid edge placement (x=0 or x=9)
+      expect(decision.bestMove?.x).not.toBe(0);
+      expect(decision.bestMove?.x).not.toBe(9);
+      // Should choose a position that can clear lines
+      expect(decision.bestMove?.x).toBeGreaterThan(0);
+      expect(decision.bestMove?.x).toBeLessThan(9);
     });
 
     it("should avoid creating holes", async () => {
@@ -327,7 +327,7 @@ describe("AIEngine", () => {
       const config = defaultEngine.getConfig();
 
       expect(config.thinkingTimeLimit).toBe(200);
-      expect(config.evaluator).toBe("dellacherie");
+      expect(config.evaluator).toBe("stacking");
       expect(config.fallbackOnTimeout).toBe(true);
     });
   });

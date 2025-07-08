@@ -94,8 +94,8 @@ const benchmark = (name: string, fn: () => void, iterations = 10000): void => {
 
 describe("Board Engine Performance Benchmarks", () => {
   test("isValidPosition performance comparison", () => {
-    const legacyEngine = createBoardEngine("legacy");
     const typedArrayEngine = createBoardEngine("typed-array");
+    const bitboardEngine = createBoardEngine("bitboard");
 
     const board = createTestBoardWithSomeFilledCells();
     const shapes = createTestShapes();
@@ -117,10 +117,10 @@ describe("Board Engine Performance Benchmarks", () => {
     console.log("\\n=== isValidPosition Performance Test ===");
 
     benchmark(
-      "Legacy Engine",
+      "TypedArray Engine",
       () => {
         const { shape, position } = getNextTest();
-        legacyEngine.isValidPosition(board, shape, position);
+        typedArrayEngine.isValidPosition(board, shape, position);
       },
       50000,
     );
@@ -130,18 +130,18 @@ describe("Board Engine Performance Benchmarks", () => {
     positionIndex = 0;
 
     benchmark(
-      "TypedArray Engine",
+      "Bitboard Engine",
       () => {
         const { shape, position } = getNextTest();
-        typedArrayEngine.isValidPosition(board, shape, position);
+        bitboardEngine.isValidPosition(board, shape, position);
       },
       50000,
     );
   });
 
   test("placePiece performance comparison", () => {
-    const legacyEngine = createBoardEngine("legacy");
     const typedArrayEngine = createBoardEngine("typed-array");
+    const bitboardEngine = createBoardEngine("bitboard");
 
     const board = createTestBoard();
     const shapes = createTestShapes();
@@ -164,10 +164,10 @@ describe("Board Engine Performance Benchmarks", () => {
     console.log("\\n=== placePiece Performance Test ===");
 
     benchmark(
-      "Legacy Engine",
+      "TypedArray Engine",
       () => {
         const { shape, position } = getNextTest();
-        legacyEngine.placePiece(board, shape, position, colorIndex);
+        typedArrayEngine.placePiece(board, shape, position, colorIndex);
       },
       20000,
     );
@@ -177,18 +177,18 @@ describe("Board Engine Performance Benchmarks", () => {
     positionIndex = 0;
 
     benchmark(
-      "TypedArray Engine",
+      "Bitboard Engine",
       () => {
         const { shape, position } = getNextTest();
-        typedArrayEngine.placePiece(board, shape, position, colorIndex);
+        bitboardEngine.placePiece(board, shape, position, colorIndex);
       },
       20000,
     );
   });
 
   test("clearLines performance comparison", () => {
-    const legacyEngine = createBoardEngine("legacy");
     const typedArrayEngine = createBoardEngine("typed-array");
+    const bitboardEngine = createBoardEngine("bitboard");
 
     // Create a board with some completed lines
     const createBoardWithCompletedLines = () => {
@@ -207,15 +207,6 @@ describe("Board Engine Performance Benchmarks", () => {
     console.log("\\n=== clearLines Performance Test ===");
 
     benchmark(
-      "Legacy Engine",
-      () => {
-        const board = createBoardWithCompletedLines();
-        legacyEngine.clearLines(board);
-      },
-      10000,
-    );
-
-    benchmark(
       "TypedArray Engine",
       () => {
         const board = createBoardWithCompletedLines();
@@ -223,11 +214,20 @@ describe("Board Engine Performance Benchmarks", () => {
       },
       10000,
     );
+
+    benchmark(
+      "Bitboard Engine",
+      () => {
+        const board = createBoardWithCompletedLines();
+        bitboardEngine.clearLines(board);
+      },
+      10000,
+    );
   });
 
   test("comprehensive performance comparison", () => {
-    const legacyEngine = createBoardEngine("legacy");
     const typedArrayEngine = createBoardEngine("typed-array");
+    const bitboardEngine = createBoardEngine("bitboard");
 
     const board = createTestBoardWithSomeFilledCells();
     const shapes = createTestShapes();
@@ -250,15 +250,15 @@ describe("Board Engine Performance Benchmarks", () => {
     console.log("\\n=== Comprehensive Performance Test ===");
 
     benchmark(
-      "Legacy Engine (Mixed Operations)",
+      "TypedArray Engine (Mixed Operations)",
       () => {
         const { shape, position } = getNextTest();
 
         // Mix of operations that would happen in a real game
-        const isValid = legacyEngine.isValidPosition(board, shape, position);
+        const isValid = typedArrayEngine.isValidPosition(board, shape, position);
         if (isValid) {
-          const newBoard = legacyEngine.placePiece(board, shape, position, colorIndex);
-          legacyEngine.clearLines(newBoard);
+          const newBoard = typedArrayEngine.placePiece(board, shape, position, colorIndex);
+          typedArrayEngine.clearLines(newBoard);
         }
       },
       5000,
@@ -269,15 +269,15 @@ describe("Board Engine Performance Benchmarks", () => {
     positionIndex = 0;
 
     benchmark(
-      "TypedArray Engine (Mixed Operations)",
+      "Bitboard Engine (Mixed Operations)",
       () => {
         const { shape, position } = getNextTest();
 
         // Mix of operations that would happen in a real game
-        const isValid = typedArrayEngine.isValidPosition(board, shape, position);
+        const isValid = bitboardEngine.isValidPosition(board, shape, position);
         if (isValid) {
-          const newBoard = typedArrayEngine.placePiece(board, shape, position, colorIndex);
-          typedArrayEngine.clearLines(newBoard);
+          const newBoard = bitboardEngine.placePiece(board, shape, position, colorIndex);
+          bitboardEngine.clearLines(newBoard);
         }
       },
       5000,

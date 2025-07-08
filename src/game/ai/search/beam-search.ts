@@ -297,20 +297,33 @@ export class BeamSearch {
     // Place piece on board
     newBoard.place(pieceBits, move.y);
 
-    // Clear completed lines
-    newBoard.clearLines();
+    // Clear completed lines and store count in move
+    const clearedLines = newBoard.clearLines();
+    move.linesCleared = clearedLines.length;
 
     return newBoard;
   }
 
   /**
-   * Select top N nodes based on score
+   * Select top N nodes based on score with line clearing priority
    * @param nodes - All nodes to select from
    * @param count - Number of nodes to select
-   * @returns Top N nodes sorted by score
+   * @returns Top N nodes sorted by line clearing priority then score
    */
   private selectTopNodes(nodes: DiverseSearchNode[], count: number): DiverseSearchNode[] {
-    return nodes.sort((a, b) => b.score - a.score).slice(0, count);
+    return nodes
+      .sort((a, b) => {
+        // 1. Prioritize line clearing (more lines cleared = higher priority)
+        const aLines = a.move?.linesCleared || 0;
+        const bLines = b.move?.linesCleared || 0;
+        if (aLines !== bLines) {
+          return bLines - aLines; // Higher line count first
+        }
+
+        // 2. If line clearing is equal, sort by evaluation score
+        return b.score - a.score;
+      })
+      .slice(0, count);
   }
 
   /**

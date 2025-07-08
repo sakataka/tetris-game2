@@ -198,8 +198,18 @@ export function selectDiversifiedNodes(
   const exploitCount = Math.floor(beamWidth * (1 - diversityRatio));
   const exploreCount = beamWidth - exploitCount;
 
-  // EXPLOITATION: Select top scoring nodes
-  const sortedByScore = [...nodes].sort((a, b) => b.score - a.score);
+  // EXPLOITATION: Select top scoring nodes with line clearing priority
+  const sortedByScore = [...nodes].sort((a, b) => {
+    // 1. Prioritize line clearing (more lines cleared = higher priority)
+    const aLines = a.move?.linesCleared || 0;
+    const bLines = b.move?.linesCleared || 0;
+    if (aLines !== bLines) {
+      return bLines - aLines; // Higher line count first
+    }
+
+    // 2. If line clearing is equal, sort by evaluation score
+    return b.score - a.score;
+  });
   const exploitNodes = sortedByScore.slice(0, exploitCount);
 
   if (exploreCount === 0) {

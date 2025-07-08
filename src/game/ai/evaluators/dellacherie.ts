@@ -16,6 +16,9 @@ export interface EvaluationFeatures {
   /** Lines cleared: number of complete lines removed by this placement */
   linesCleared: number;
 
+  /** Potential lines filled: number of lines that would be completed by this move */
+  potentialLinesFilled: number;
+
   /** Row transitions: number of empty-to-filled and filled-to-empty transitions horizontally */
   rowTransitions: number;
 
@@ -48,6 +51,7 @@ export interface EvaluationFeatures {
 export interface EvaluationWeights {
   landingHeight: number;
   linesCleared: number;
+  potentialLinesFilled: number;
   rowTransitions: number;
   columnTransitions: number;
   holes: number;
@@ -69,6 +73,10 @@ export interface Move {
   y: number;
   /** Cached bit patterns for performance optimization */
   pieceBitRows?: number[];
+  /** Number of lines cleared by this move */
+  linesCleared?: number;
+  /** Evaluation score for this move */
+  evaluationScore?: number;
 }
 
 /**
@@ -78,12 +86,13 @@ export interface Move {
  */
 export const DEFAULT_WEIGHTS: EvaluationWeights = {
   landingHeight: -4.5, // Moderate penalty for height (El-Tetris scale)
-  linesCleared: 30.0, // Strong reward for line clearing (balanced with holes)
+  linesCleared: 120.0, // Very strong reward for line clearing (prioritize over holes)
+  potentialLinesFilled: 100.0, // Very strong reward for potential line clearing
   rowTransitions: -3.2, // Moderate penalty for surface roughness
   columnTransitions: -9.3, // Strong penalty for column transitions
-  holes: -35.0, // Strong penalty for holes (primary constraint)
+  holes: -18.0, // Reduced penalty for holes (allow some holes for line clearing)
   wells: -3.4, // Moderate penalty for wells
-  blocksAboveHoles: -15.0, // Strong penalty for deep holes
+  blocksAboveHoles: -10.0, // Reduced penalty for deep holes
   wellOpen: 0.0, // Ignore well accessibility for simplicity
   escapeRoute: 0.0, // Ignore escape routes for simplicity
   bumpiness: -2.5, // Moderate penalty for surface roughness
@@ -144,9 +153,13 @@ export class DellacherieEvaluator {
       );
     }
 
+    // Calculate potential lines filled by this move
+    const potentialLinesFilled = board.calculatePotentialLinesFilled(move.pieceBitRows, move.y);
+
     return {
       landingHeight: this.calculateLandingHeight(board, move),
       linesCleared: clearedLines.length,
+      potentialLinesFilled,
       rowTransitions: this.calculateRowTransitions(tempBoard),
       columnTransitions: this.calculateColumnTransitions(tempBoard),
       holes: this.calculateHoles(tempBoard),
@@ -507,6 +520,9 @@ export class DellacherieEvaluator {
     // Apply linear bonus for line clears
     const lineClearBonus = features.linesCleared * this.weights.linesCleared;
 
+    // Apply bonus for potential line fills
+    const potentialLinesBonus = features.potentialLinesFilled * this.weights.potentialLinesFilled;
+
     // Base score calculation
     const baseScore =
       features.landingHeight * this.weights.landingHeight +
@@ -519,12 +535,13 @@ export class DellacherieEvaluator {
       features.escapeRoute * this.weights.escapeRoute +
       features.bumpiness * this.weights.bumpiness;
 
-    const totalScore = baseScore + lineClearBonus;
+    const totalScore = baseScore + lineClearBonus + potentialLinesBonus;
 
     // DEBUG: Log scoring details for line clearing moves
-    if (features.linesCleared > 0) {
+    if (features.linesCleared > 0 || features.potentialLinesFilled > 0) {
       console.log(`🔥 [Dellacherie] スコア詳細:
         ライン消去: ${features.linesCleared} × ${this.weights.linesCleared} = ${lineClearBonus}
+        潜在ライン消去: ${features.potentialLinesFilled} × ${this.weights.potentialLinesFilled} = ${potentialLinesBonus}
         ベーススコア: ${baseScore.toFixed(2)}
         合計スコア: ${totalScore.toFixed(2)}
         穴: ${features.holes} (ペナルティ: ${(features.holes * this.weights.holes).toFixed(2)})`);

@@ -220,18 +220,11 @@ const createBoardEngineTestSuite = (engineType: BoardEngineType) => {
 };
 
 // Run test suite for all engine types
-createBoardEngineTestSuite("legacy");
 createBoardEngineTestSuite("typed-array");
 createBoardEngineTestSuite("bitboard");
 
 // Factory function tests
 describe("createBoardEngine", () => {
-  test("should create legacy engine", () => {
-    const engine = createBoardEngine("legacy");
-    expect(engine).toBeDefined();
-    expect(typeof engine.isValidPosition).toBe("function");
-  });
-
   test("should create typed-array engine", () => {
     const engine = createBoardEngine("typed-array");
     expect(engine).toBeDefined();
@@ -288,32 +281,25 @@ describe("Cross-Engine Compatibility", () => {
     const position = createTestPosition();
     const colorIndex = 1 as CellValue;
 
-    const legacyEngine = createBoardEngine("legacy");
     const typedArrayEngine = createBoardEngine("typed-array");
     const bitboardEngine = createBoardEngine("bitboard");
 
     // Test isValidPosition
-    const isValidLegacy = legacyEngine.isValidPosition(board, shape, position);
     const isValidTypedArray = typedArrayEngine.isValidPosition(board, shape, position);
     const isValidBitboard = bitboardEngine.isValidPosition(board, shape, position);
 
-    expect(isValidLegacy).toBe(isValidTypedArray);
     expect(isValidTypedArray).toBe(isValidBitboard);
 
     // Test placePiece
-    const placedLegacy = legacyEngine.placePiece(board, shape, position, colorIndex);
     const placedTypedArray = typedArrayEngine.placePiece(board, shape, position, colorIndex);
     const placedBitboard = bitboardEngine.placePiece(board, shape, position, colorIndex);
 
-    expect(placedLegacy).toEqual(placedTypedArray);
     expect(placedTypedArray).toEqual(placedBitboard);
 
     // Test clearLines
-    const clearedLegacy = legacyEngine.clearLines(board);
     const clearedTypedArray = typedArrayEngine.clearLines(board);
     const clearedBitboard = bitboardEngine.clearLines(board);
 
-    expect(clearedLegacy).toEqual(clearedTypedArray);
     expect(clearedTypedArray).toEqual(clearedBitboard);
   });
 });

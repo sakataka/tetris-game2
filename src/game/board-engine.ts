@@ -44,40 +44,7 @@ export interface BoardEngine {
 /**
  * Available board engine implementations
  */
-export type BoardEngineType = "legacy" | "typed-array" | "bitboard";
-
-/**
- * Legacy board engine implementation using current board.ts functions
- * Maintains backward compatibility while enabling future optimizations
- */
-class LegacyBoardEngine implements BoardEngine {
-  isValidPosition(board: GameBoard, shape: TetrominoShape, position: Position): boolean {
-    // Import here to avoid circular dependencies
-    const { isValidPosition: isValidPos } = require("./board");
-    return isValidPos(board, shape, position);
-  }
-
-  placePiece(
-    board: GameBoard,
-    shape: TetrominoShape,
-    position: Position,
-    colorIndex: CellValue,
-  ): GameBoard {
-    // Import here to avoid circular dependencies
-    const { placeTetrominoLegacy } = require("./board");
-    return placeTetrominoLegacy(board, shape, position, colorIndex);
-  }
-
-  clearLines(board: GameBoard): {
-    board: GameBoard;
-    linesCleared: number;
-    clearedLineIndices: number[];
-  } {
-    // Import here to avoid circular dependencies
-    const { clearLines: clearLinesImpl } = require("./board");
-    return clearLinesImpl(board);
-  }
-}
+export type BoardEngineType = "typed-array" | "bitboard";
 
 /**
  * TypedArray board engine implementation - 1D array optimization
@@ -422,8 +389,6 @@ class BitboardBoardEngine implements BoardEngine {
  */
 export function createBoardEngine(type: BoardEngineType): BoardEngine {
   switch (type) {
-    case "legacy":
-      return new LegacyBoardEngine();
     case "typed-array":
       return new TypedArrayBoardEngine();
     case "bitboard":
@@ -445,7 +410,7 @@ let boardEngineInstance: BoardEngine | null = null;
  * Uses build-time or runtime configuration to select the optimal implementation
  */
 export function getDefaultBoardEngine(): BoardEngine {
-  return createBoardEngine("legacy");
+  return createBoardEngine("bitboard");
 }
 
 /**

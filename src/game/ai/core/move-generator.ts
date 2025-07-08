@@ -31,6 +31,7 @@ export interface Move {
   sequence: GameAction[];
   evaluationScore?: number;
   wallKicksUsed?: number;
+  linesCleared?: number;
 }
 
 /**

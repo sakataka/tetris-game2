@@ -21,15 +21,20 @@ export class BitBoard {
   private readonly width: number;
   private readonly height: number;
   private readonly fullRowMask: number;
+  private readonly vacancyCache: Uint8Array; // Cache for vacancy counts per row
 
   constructor(existingBoard?: GameBoard) {
     this.width = GAME_CONSTANTS.BOARD.WIDTH; // 10
     this.height = GAME_CONSTANTS.BOARD.HEIGHT; // 20
     this.fullRowMask = (1 << this.width) - 1; // 0b1111111111 (10 bits set)
     this.rows = new Uint32Array(this.height);
+    this.vacancyCache = new Uint8Array(this.height);
 
     if (existingBoard) {
       this.fromBoardState(existingBoard);
+    } else {
+      // Initialize vacancy cache with all rows empty (10 vacant cells each)
+      this.vacancyCache.fill(this.width);
     }
   }
 
@@ -98,7 +103,7 @@ export class BitBoard {
       }
     }
 
-    // Place each row using bitwise OR
+    // Place each row using bitwise OR and update vacancy cache
     for (let i = 0; i < pieceBitRows.length; i++) {
       const targetY = startY + i;
       const pieceBits = pieceBitRows[i];
@@ -107,6 +112,7 @@ export class BitBoard {
       if (pieceBits === 0) continue;
 
       this.rows[targetY] |= pieceBits;
+      this.updateVacancyForRow(targetY);
     }
   }
 
@@ -119,6 +125,7 @@ export class BitBoard {
   clearLines(): number[] {
     const clearedLines: number[] = [];
     const tempRows = new Uint32Array(this.height);
+    const tempVacancy = new Uint8Array(this.height);
     let writeIndex = this.height - 1;
 
     // Scan from bottom to top for better cache locality
@@ -131,18 +138,21 @@ export class BitBoard {
       } else {
         // Keep this row - copy to temp buffer
         tempRows[writeIndex] = this.rows[y];
+        tempVacancy[writeIndex] = this.vacancyCache[y];
         writeIndex--;
       }
     }
 
-    // Fill remaining rows with empty (0)
+    // Fill remaining rows with empty (0) and vacancy with full (10)
     while (writeIndex >= 0) {
       tempRows[writeIndex] = 0;
+      tempVacancy[writeIndex] = this.width;
       writeIndex--;
     }
 
-    // Copy temp buffer back to main buffer
+    // Copy temp buffers back to main buffers
     this.rows.set(tempRows);
+    this.vacancyCache.set(tempVacancy);
 
     // Return cleared lines in ascending order (top to bottom)
     return clearedLines.reverse();
@@ -202,6 +212,7 @@ export class BitBoard {
       }
 
       this.rows[y] = rowBits;
+      this.updateVacancyForRow(y);
     }
   }
 
@@ -214,6 +225,7 @@ export class BitBoard {
   clone(): BitBoard {
     const newBitBoard = new BitBoard();
     newBitBoard.rows.set(this.rows);
+    newBitBoard.vacancyCache.set(this.vacancyCache);
     return newBitBoard;
   }
 
@@ -223,6 +235,7 @@ export class BitBoard {
    */
   clear(): void {
     this.rows.fill(0);
+    this.vacancyCache.fill(this.width);
   }
 
   /**
@@ -251,6 +264,7 @@ export class BitBoard {
       throw new Error(`Row index out of bounds: ${y}`);
     }
     this.rows[y] = bits & this.fullRowMask; // Mask to ensure only valid bits
+    this.updateVacancyForRow(y);
   }
 
   /**
@@ -303,5 +317,160 @@ export class BitBoard {
    */
   getDimensions(): { width: number; height: number } {
     return { width: this.width, height: this.height };
+  }
+
+  /**
+   * Update vacancy count for a specific row
+   * Called whenever a row is modified
+   *
+   * @param y - Row index
+   */
+  private updateVacancyForRow(y: number): void {
+    const rowBits = this.rows[y] & this.fullRowMask;
+    // Count empty cells by counting 0 bits in the row
+    this.vacancyCache[y] = this.width - this.popcount(rowBits);
+  }
+
+  /**
+   * Count set bits in a number using Brian Kernighan's algorithm
+   * @param n - Number to count bits in
+   * @returns Number of set bits
+   */
+  private popcount(n: number): number {
+    let count = 0;
+    let num = n;
+    while (num) {
+      count++;
+      num &= num - 1; // Clear the lowest set bit
+    }
+    return count;
+  }
+
+  /**
+   * Get vacancy count for a specific row
+   * @param y - Row index
+   * @returns Number of empty cells in the row
+   */
+  getVacancy(y: number): number {
+    if (y < 0 || y >= this.height) {
+      throw new Error(`Row index out of bounds: ${y}`);
+    }
+    return this.vacancyCache[y];
+  }
+
+  /**
+   * Find rows that are candidates for line clearing
+   * Returns rows with vacancy count <= maxVacancy
+   *
+   * @param maxVacancy - Maximum vacancy count to consider (default: 2)
+   * @returns Array of row indices that are near full
+   */
+  findNearFullRows(maxVacancy = 2): number[] {
+    const nearFullRows: number[] = [];
+
+    for (let y = 0; y < this.height; y++) {
+      const vacancy = this.vacancyCache[y];
+      if (vacancy > 0 && vacancy <= maxVacancy) {
+        nearFullRows.push(y);
+      }
+    }
+
+    return nearFullRows;
+  }
+
+  /**
+   * Find immediate line clearing opportunities
+   * Returns rows that are completely full
+   *
+   * @returns Array of row indices that are full and can be cleared
+   */
+  findFullRows(): number[] {
+    const fullRows: number[] = [];
+
+    for (let y = 0; y < this.height; y++) {
+      if (this.vacancyCache[y] === 0) {
+        fullRows.push(y);
+      }
+    }
+
+    return fullRows;
+  }
+
+  /**
+   * Check if a piece can complete a specific row
+   * @param pieceBits - Bit pattern of the piece
+   * @param targetRow - Row to check
+   * @returns true if the piece can complete the row
+   */
+  canCompleteRow(pieceBits: number, targetRow: number): boolean {
+    if (targetRow < 0 || targetRow >= this.height) {
+      return false;
+    }
+
+    const rowBits = this.rows[targetRow];
+    const vacancy = this.vacancyCache[targetRow];
+
+    // Check if piece bits don't overlap with existing bits
+    if ((rowBits & pieceBits) !== 0) {
+      return false;
+    }
+
+    // Check if piece bits can fill the vacancy
+    const pieceBitCount = this.popcount(pieceBits);
+    return pieceBitCount >= vacancy;
+  }
+
+  /**
+   * Calculate potential lines that could be filled by a piece
+   * @param pieceBitRows - Array of bit patterns for each row of the piece
+   * @param startY - Starting Y position
+   * @returns Number of lines that would be completed
+   */
+  calculatePotentialLinesFilled(pieceBitRows: number[], startY: number): number {
+    let potentialLines = 0;
+
+    for (let i = 0; i < pieceBitRows.length; i++) {
+      const targetY = startY + i;
+      const pieceBits = pieceBitRows[i];
+
+      if (targetY < 0 || targetY >= this.height || pieceBits === 0) {
+        continue;
+      }
+
+      const resultingRowBits = this.rows[targetY] | pieceBits;
+      if ((resultingRowBits & this.fullRowMask) === this.fullRowMask) {
+        potentialLines++;
+      }
+    }
+
+    return potentialLines;
+  }
+
+  /**
+   * Calculate potential near-full rows after placing a piece
+   * @param pieceBitRows - Array of bit patterns for each row of the piece
+   * @param startY - Starting Y position
+   * @returns Number of rows that would become near-full (vacancy = 1)
+   */
+  calculatePotentialNearFullRows(pieceBitRows: number[], startY: number): number {
+    let potentialNearFull = 0;
+
+    for (let i = 0; i < pieceBitRows.length; i++) {
+      const targetY = startY + i;
+      const pieceBits = pieceBitRows[i];
+
+      if (targetY < 0 || targetY >= this.height || pieceBits === 0) {
+        continue;
+      }
+
+      const resultingRowBits = this.rows[targetY] | pieceBits;
+      const resultingVacancy = this.width - this.popcount(resultingRowBits);
+
+      if (resultingVacancy === 1) {
+        potentialNearFull++;
+      }
+    }
+
+    return potentialNearFull;
   }
 }
