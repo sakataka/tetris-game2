@@ -3,8 +3,6 @@ import type { EvaluationWeights } from "./dellacherie";
 import { DEFAULT_WEIGHTS } from "./dellacherie";
 import {
   applyDangerAdjustments,
-  determineGamePhase,
-  getPhaseWeights,
   determineGamePhase as newDetermineGamePhase,
   PHASE_WEIGHTS,
 } from "./new-weights";
@@ -137,7 +135,7 @@ export class DynamicWeights {
         return {
           ...weights,
           landingHeight: weights.landingHeight * 0.5, // Allow much more building
-          linesCleared: weights.linesCleared * 2.0, // EXTREME line clearing priority
+          linesCleared: weights.linesCleared * 3.0, // STRONG line clearing priority
           rowTransitions: weights.rowTransitions * 0.5, // Allow much more terrain building
           columnTransitions: weights.columnTransitions * 0.7, // Reduced column consistency
           holes: weights.holes * 0.8, // Reduce hole penalty
@@ -151,7 +149,7 @@ export class DynamicWeights {
         return {
           ...weights,
           landingHeight: weights.landingHeight * 0.7, // Allow more building
-          linesCleared: weights.linesCleared * 2.5, // MAXIMUM priority for line clears
+          linesCleared: weights.linesCleared * 4.0, // ULTRA priority for line clears
           holes: weights.holes * 0.8, // Reduce hole penalty
           wells: weights.wells * 0.6, // Reduce well penalty
           blocksAboveHoles: weights.blocksAboveHoles * 0.9, // Moderate deep hole penalty
@@ -164,7 +162,7 @@ export class DynamicWeights {
         return {
           ...weights,
           landingHeight: weights.landingHeight * 0.8, // Allow building for clearing
-          linesCleared: weights.linesCleared * 3.0, // EXTREME line clearing
+          linesCleared: weights.linesCleared * 5.0, // MAXIMUM line clearing
           holes: weights.holes * 0.9, // Reduce hole penalty
           wells: weights.wells * 0.7, // Reduce well penalty
           blocksAboveHoles: weights.blocksAboveHoles * 1.2, // Increase deep hole penalty
@@ -194,7 +192,7 @@ export class DynamicWeights {
     return {
       ...weights,
       landingHeight: weights.landingHeight * dangerMultiplier, // Desperately stay low
-      linesCleared: weights.linesCleared * 5.0, // ABSOLUTE MAXIMUM priority for line clearing
+      linesCleared: weights.linesCleared * 100.0, // INSANE priority for line clearing
       holes: weights.holes * 0.7, // Reduce hole penalty (clearing is everything)
       wells: weights.wells * 0.8, // Reduce well penalty
       rowTransitions: weights.rowTransitions * 0.3, // Minimal concern for transitions
@@ -216,7 +214,7 @@ export class DynamicWeights {
     return {
       ...weights,
       landingHeight: weights.landingHeight * 0.3, // Allow maximum building
-      linesCleared: weights.linesCleared * 2.0, // EXTREME line clearing from start
+      linesCleared: weights.linesCleared * 8.0, // EXTREME line clearing from start
       rowTransitions: weights.rowTransitions * 0.4, // Allow much more terrain
       columnTransitions: weights.columnTransitions * 0.5, // Much more variance acceptable
       holes: weights.holes * 0.6, // Reduce hole penalty
@@ -242,7 +240,7 @@ export class DynamicWeights {
 
     return {
       ...weights,
-      linesCleared: weights.linesCleared * (problemSeverity * 2.0), // EXTREME clearing to fix problems
+      linesCleared: weights.linesCleared * (problemSeverity * 1.2), // Enhanced clearing to fix problems
       holes: weights.holes * 0.8, // Reduce hole penalty (clearing fixes everything)
       rowTransitions: weights.rowTransitions * 0.8, // Allow roughness for clearing
       columnTransitions: weights.columnTransitions * 0.9, // Allow variance for clearing

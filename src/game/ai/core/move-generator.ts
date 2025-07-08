@@ -112,12 +112,35 @@ export class MoveGenerator {
       const rotState = targetRotation as RotationState;
       let _rotationMoves = 0;
 
-      // Test all horizontal positions (-2 to +11 for off-board exploration)
-      for (let targetX = -2; targetX <= 11; targetX++) {
-        const move = this.findValidMove(board, piece, rotState, targetX);
-        if (move) {
-          moves.push(move);
-          _rotationMoves++;
+      // Test horizontal positions from center outward (prioritize middle placements)
+      const centerX = 4; // Board center
+      const maxDistance = 6;
+
+      // Start with center position
+      const centerMove = this.findValidMove(board, piece, rotState, centerX);
+      if (centerMove) {
+        moves.push(centerMove);
+        _rotationMoves++;
+      }
+
+      // Then expand outward from center
+      for (let distance = 1; distance <= maxDistance; distance++) {
+        // Try left side
+        if (centerX - distance >= 0) {
+          const leftMove = this.findValidMove(board, piece, rotState, centerX - distance);
+          if (leftMove) {
+            moves.push(leftMove);
+            _rotationMoves++;
+          }
+        }
+
+        // Try right side
+        if (centerX + distance <= 9) {
+          const rightMove = this.findValidMove(board, piece, rotState, centerX + distance);
+          if (rightMove) {
+            moves.push(rightMove);
+            _rotationMoves++;
+          }
         }
       }
     }

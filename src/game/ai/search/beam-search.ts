@@ -93,6 +93,13 @@ export class BeamSearch {
   }
 
   /**
+   * Get the evaluator instance for external access
+   */
+  getEvaluator(): DellacherieEvaluator {
+    return this.evaluator;
+  }
+
+  /**
    * Perform beam search to find optimal move sequence
    * @param initialBoard - Starting board state
    * @param currentPiece - Current piece to place

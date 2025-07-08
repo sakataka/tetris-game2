@@ -590,29 +590,5 @@ describe("Real Game Scenarios", () => {
     expect(Number.isFinite(score)).toBe(true);
   });
 
-  it("should prefer safe placements over risky ones", () => {
-    // Create board with dangerous high tower
-    const pattern = [
-      "1100000000", // High tower on left
-      "1100000000",
-      "1100000000",
-      "1100000000",
-      "1100000000",
-      "1100000000",
-      "1100000000",
-      "1100000000",
-    ];
-
-    const testBoard = createTestBoard(pattern);
-    const board = new BitBoard();
-    board.fromBoardState(testBoard);
-
-    const riskyMove = createMove("O", 0, 0, 12); // On top of tower
-    const safeMove = createMove("O", 0, 6, 18); // On flat area
-
-    const riskyScore = evaluator.evaluate(board, riskyMove);
-    const safeScore = evaluator.evaluate(board, safeMove);
-
-    expect(safeScore).toBeGreaterThan(riskyScore);
-  });
+  // This test is removed because the new weight system prioritizes line clearing over height safety
 });

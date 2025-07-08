@@ -102,15 +102,15 @@ function createPCOEmptyMask(): Uint32Array {
  */
 function createDTLSMask(): Uint32Array {
   const mask = new Uint32Array(GAME_CONSTANTS.BOARD.HEIGHT);
-  // DT Cannon LS-base formation
-  // Row 0: L L O O □ □ □ □ □ □
-  // Row 1: S L J J □ □ □ □ □ □
-  // Row 2: S S J □ □ □ □ □ □ □
-  // Row 3: □ □ □ T T □ □ □ □ □ (T-slot)
-  mask[0] = 0b0000001111; // 4 leftmost blocks
-  mask[1] = 0b0000001111; // 4 leftmost blocks
-  mask[2] = 0b0000000111; // 3 leftmost blocks
-  mask[3] = 0b0000011000; // T-slot position
+  // DT Cannon LS-base formation (bit 0 = rightmost column, bit 9 = leftmost column)
+  // Row 0: L L O O □ □ □ □ □ □  (columns 0-3 occupied)
+  // Row 1: L S J J □ □ □ □ □ □  (columns 0-3 occupied)
+  // Row 2: S S J □ □ □ □ □ □ □  (columns 0-2 occupied)
+  // Row 3: □ S □ □ □ □ □ □ □ □  (column 1 occupied for S continuation)
+  mask[0] = 0b1111000000; // 4 rightmost blocks (columns 0-3)
+  mask[1] = 0b1111000000; // 4 rightmost blocks (columns 0-3)
+  mask[2] = 0b0111000000; // 3 rightmost blocks (columns 0-2)
+  mask[3] = 0b0100000000; // S continuation at column 1
   return mask;
 }
 
@@ -119,10 +119,11 @@ function createDTLSMask(): Uint32Array {
  */
 function createDTLSEmptyMask(): Uint32Array {
   const mask = new Uint32Array(GAME_CONSTANTS.BOARD.HEIGHT);
-  // T-slot area must be empty (columns 2,5,6 in row 3)
-  mask[3] = 0b0001100100; // specific empty positions for T-slot
+  // T-spin slot must be empty - columns 2-4 in rows 3-4 for T-piece placement
+  mask[3] = 0b1000111000; // columns 0,2,3,4 must be empty (T-spin cavity)
+  mask[4] = 0b1110000000; // columns 2,3,4 must be empty for T-piece top
   // Rows above formation must be empty
-  for (let i = 4; i < GAME_CONSTANTS.BOARD.HEIGHT; i++) {
+  for (let i = 5; i < GAME_CONSTANTS.BOARD.HEIGHT; i++) {
     mask[i] = 0b1111111111;
   }
   return mask;
@@ -133,8 +134,12 @@ function createDTLSEmptyMask(): Uint32Array {
  */
 function createSTStackMask(): Uint32Array {
   const mask = new Uint32Array(GAME_CONSTANTS.BOARD.HEIGHT);
-  // ST-Stack notch pattern (relative to current height)
-  // Creates a specific notch shape for S and T placement
+  // ST-Stack notch pattern - minimal structure for S-T stacking
+  // This is a more flexible pattern as ST-Stack adapts to existing stack
+  // Row 0-1: S piece base (2x2 with offset)
+  mask[0] = 0b0110000000; // S piece bottom part (columns 1-2)
+  mask[1] = 0b1100000000; // S piece top part (columns 0-1)
+  // Row 2: T piece will be placed to create 4-line clear potential
   return mask;
 }
 
@@ -319,11 +324,7 @@ export class PatternMatcher {
  * Mid-game pattern detector for continuous patterns like ST-Stack
  */
 export class MidGamePatternDetector {
-  private readonly ST_NOTCH_HEIGHT = 4;
-  private readonly ST_NOTCH_PATTERNS = new Set<number>([
-    // Pre-computed hashes for ST-notch patterns
-    // These would be calculated based on specific board configurations
-  ]);
+  // Pre-computed hashes for ST-notch patterns would be calculated based on specific board configurations
 
   /**
    * Detect ST-Stack opportunity in current board state
@@ -338,9 +339,9 @@ export class MidGamePatternDetector {
       return false;
     }
 
-    // Get top rows for pattern matching
-    const topRows = this.getTopRows(board, this.ST_NOTCH_HEIGHT);
-    const _hash = this.hashBoardSection(topRows);
+    // Future: Get top rows for pattern matching and optimization
+    // const topRows = this.getTopRows(board, this.ST_NOTCH_HEIGHT);
+    // const hash = this.hashBoardSection(topRows);
 
     // Check if pattern matches ST-notch
     if (!this.isSTNotchPattern(board, currentHeight)) {
@@ -353,42 +354,42 @@ export class MidGamePatternDetector {
   }
 
   /**
-   * Extract top rows from board
+   * Extract top rows from board (future implementation)
    */
-  private getTopRows(board: Uint32Array, height: number): Uint32Array {
-    const topRows = new Uint32Array(height);
-    const boardHeight = GAME_CONSTANTS.BOARD.HEIGHT;
-
-    // Find the highest occupied row
-    let highestRow = -1;
-    for (let row = boardHeight - 1; row >= 0; row--) {
-      if (board[row] !== 0) {
-        highestRow = row;
-        break;
-      }
-    }
-
-    // Extract rows from highest occupied row
-    if (highestRow >= 0) {
-      const startRow = Math.max(0, highestRow - height + 1);
-      for (let i = 0; i < height && startRow + i <= highestRow; i++) {
-        topRows[i] = board[startRow + i];
-      }
-    }
-
-    return topRows;
-  }
+  // private getTopRows(board: Uint32Array, height: number): Uint32Array {
+  //   const topRows = new Uint32Array(height);
+  //   const boardHeight = GAME_CONSTANTS.BOARD.HEIGHT;
+  //
+  //   // Find the highest occupied row
+  //   let highestRow = -1;
+  //   for (let row = boardHeight - 1; row >= 0; row--) {
+  //     if (board[row] !== 0) {
+  //       highestRow = row;
+  //       break;
+  //     }
+  //   }
+  //
+  //   // Extract rows from highest occupied row
+  //   if (highestRow >= 0) {
+  //     const startRow = Math.max(0, highestRow - height + 1);
+  //     for (let i = 0; i < height && startRow + i <= highestRow; i++) {
+  //       topRows[i] = board[startRow + i];
+  //     }
+  //   }
+  //
+  //   return topRows;
+  // }
 
   /**
-   * Hash board section for pattern matching
+   * Hash board section for pattern matching (future implementation)
    */
-  private hashBoardSection(rows: Uint32Array): number {
-    let hash = 0;
-    for (let i = 0; i < rows.length; i++) {
-      hash = (hash * 31 + rows[i]) >>> 0;
-    }
-    return hash;
-  }
+  // private hashBoardSection(rows: Uint32Array): number {
+  //   let hash = 0;
+  //   for (let i = 0; i < rows.length; i++) {
+  //     hash = (hash * 31 + rows[i]) >>> 0;
+  //   }
+  //   return hash;
+  // }
 
   /**
    * Check if board has ST-notch pattern

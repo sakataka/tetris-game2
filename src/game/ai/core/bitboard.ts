@@ -123,7 +123,9 @@ export class BitBoard {
 
     // Scan from bottom to top for better cache locality
     for (let y = this.height - 1; y >= 0; y--) {
-      if (this.rows[y] === this.fullRowMask) {
+      // Mask to 10 bits to ignore any garbage in upper bits
+      const maskedRow = this.rows[y] & this.fullRowMask;
+      if (maskedRow === this.fullRowMask) {
         // Full row detected - add to cleared lines
         clearedLines.push(y);
       } else {

@@ -184,10 +184,10 @@ export class AdvancedAIEngine extends AIEngine {
       // Update pattern evaluator with current game state if pattern detection is enabled
       if (
         this.advancedConfig.enablePatternDetection &&
-        this.beamSearch.evaluator instanceof PatternEvaluator
+        this.beamSearch.getEvaluator() instanceof PatternEvaluator
       ) {
         const pieceTypes = [currentPiece.type, ...nextPieces.map((p) => p.type)];
-        (this.beamSearch.evaluator as PatternEvaluator).updateGameState(
+        (this.beamSearch.getEvaluator() as PatternEvaluator).updateGameState(
           pieceTypes,
           gameState.lines,
           gameState.level,

@@ -132,7 +132,7 @@ export class PatternEvaluator extends DellacherieEvaluator {
    */
   private getMaxHeight(board: BitBoard): number {
     for (let row = 19; row >= 0; row--) {
-      if (board.rows[row] !== 0) {
+      if (board.getRowBits(row) !== 0) {
         return row + 1;
       }
     }

@@ -26,15 +26,16 @@ export const PHASE_WEIGHTS: PhaseWeights = {
    * Focus: Build stable foundation, modest line clearing
    */
   early: {
-    landingHeight: -4.5, // Moderate penalty for height
-    linesCleared: 3.0, // Conservative line clearing reward
-    rowTransitions: -3.2, // Maintain clean horizontal structure
-    columnTransitions: -9.3, // Strong column consistency
-    holes: -10.0, // High penalty for holes
-    wells: 2.0, // Small reward for I-piece preparation
-    blocksAboveHoles: -15.0, // Moderate penalty for deep holes
-    wellOpen: 3.0, // Reward for keeping wells accessible
-    escapeRoute: 2.0, // Reward for maintaining escape routes
+    landingHeight: -0.1, // Almost completely ignore height
+    linesCleared: 5000.0, // EXTREME priority for line clearing
+    rowTransitions: -0.1, // Almost completely ignore surface
+    columnTransitions: -0.1, // Almost completely ignore columns
+    holes: -500.0, // MASSIVE hole penalty
+    wells: 0.0, // Completely ignore wells
+    blocksAboveHoles: -500.0, // MASSIVE penalty for deep holes
+    wellOpen: 0.0, // Ignore well accessibility
+    escapeRoute: 0.0, // Ignore escape routes
+    bumpiness: -0.18, // Penalty for surface roughness
   },
 
   /**
@@ -42,15 +43,16 @@ export const PHASE_WEIGHTS: PhaseWeights = {
    * Focus: Balanced play with increasing aggression
    */
   mid: {
-    landingHeight: -3.5, // Reduced height penalty
-    linesCleared: 8.0, // Moderate line clearing priority
-    rowTransitions: -2.0, // More flexibility allowed
-    columnTransitions: -7.0, // Reduced column strictness
-    holes: -8.0, // Still significant hole penalty
-    wells: 4.0, // Increased well value
-    blocksAboveHoles: -25.0, // Increased penalty for deep holes
-    wellOpen: 5.0, // Higher reward for well accessibility
-    escapeRoute: 4.0, // Increased escape route value
+    landingHeight: -0.1, // Almost completely ignore height
+    linesCleared: 8000.0, // ULTRA HIGH line clearing priority
+    rowTransitions: -0.1, // Almost completely ignore surface
+    columnTransitions: -0.1, // Almost completely ignore columns
+    holes: -800.0, // MASSIVE hole penalty
+    wells: 0.0, // Ignore wells
+    blocksAboveHoles: -800.0, // MASSIVE penalty for deep holes
+    wellOpen: 0.0, // Ignore well accessibility
+    escapeRoute: 0.0, // Ignore escape routes
+    bumpiness: -0.18, // Penalty for surface roughness
   },
 
   /**
@@ -58,15 +60,16 @@ export const PHASE_WEIGHTS: PhaseWeights = {
    * Focus: Immediate line clearing for survival
    */
   late: {
-    landingHeight: -2.0, // Minimal height concern
-    linesCleared: 20.0, // High priority for immediate clearing
-    rowTransitions: -1.0, // Minimal transition penalty
-    columnTransitions: -4.0, // Accept rougher terrain
-    holes: -6.0, // Reduced hole penalty
-    wells: 1.0, // Wells less important
-    blocksAboveHoles: -40.0, // Heavy penalty for deep holes in late game
-    wellOpen: 8.0, // Critical for I-piece escape routes
-    escapeRoute: 6.0, // High value for escape potential
+    landingHeight: -0.1, // Almost completely ignore height
+    linesCleared: 15000.0, // ABSOLUTE MAXIMUM line clearing priority
+    rowTransitions: -0.1, // Almost completely ignore surface
+    columnTransitions: -0.1, // Almost completely ignore columns
+    holes: -1500.0, // EXTREME hole penalty
+    wells: 0.0, // Ignore wells
+    blocksAboveHoles: -1500.0, // EXTREME penalty for deep holes
+    wellOpen: 0.0, // Ignore well accessibility
+    escapeRoute: 0.0, // Ignore escape routes
+    bumpiness: -0.18, // Penalty for surface roughness
   },
 };
 

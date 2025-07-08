@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it } from "bun:test";
+import type { TetrominoTypeName } from "@/types/game";
 import { GAME_CONSTANTS } from "@/utils/gameConstants";
 import {
   calculatePatternBonus,
@@ -28,7 +29,7 @@ describe("PatternMatcher", () => {
       // Row 2: O O □ □ □ □ □ □ □ □ (2 blocks)
       board[2] = 0b0000000011;
 
-      const pieceQueue = ["I", "L", "J", "O", "T", "S", "Z"] as any;
+      const pieceQueue: TetrominoTypeName[] = ["I", "L", "J", "O", "T", "S", "Z"];
       const matches = patternMatcher.detectPatterns(board, pieceQueue, 3);
 
       expect(matches.length).toBeGreaterThan(0);
@@ -42,7 +43,7 @@ describe("PatternMatcher", () => {
         board[i] = 0b0011111111;
       }
 
-      const pieceQueue = ["I", "L", "J", "O", "T", "S", "Z"] as any;
+      const pieceQueue: TetrominoTypeName[] = ["I", "L", "J", "O", "T", "S", "Z"];
       const matches = patternMatcher.detectPatterns(board, pieceQueue, 5);
 
       const pcoMatches = matches.filter((m) => m.pattern.name.includes("PCO"));
@@ -51,13 +52,13 @@ describe("PatternMatcher", () => {
 
     it("should detect DT Cannon LS-base pattern", () => {
       const board = new Uint32Array(GAME_CONSTANTS.BOARD.HEIGHT);
-      // DT Cannon LS-base formation
-      board[0] = 0b0000001111; // L L O O
-      board[1] = 0b0000001111; // S L J J
-      board[2] = 0b0000000111; // S S J
-      board[3] = 0b0000011000; // T-slot
+      // DT Cannon LS-base formation (bit 0 = rightmost column, bit 9 = leftmost column)
+      board[0] = 0b1111000000; // 4 rightmost blocks (columns 0-3)
+      board[1] = 0b1111000000; // 4 rightmost blocks (columns 0-3)
+      board[2] = 0b0111000000; // 3 rightmost blocks (columns 0-2)
+      board[3] = 0b0100000000; // S continuation at column 1
 
-      const pieceQueue = ["T", "L", "S", "J", "O"] as any;
+      const pieceQueue: TetrominoTypeName[] = ["T", "L", "S", "J", "O"];
       const matches = patternMatcher.detectPatterns(board, pieceQueue, 4);
 
       const dtMatches = matches.filter((m) => m.pattern.name.includes("DT"));
@@ -66,7 +67,7 @@ describe("PatternMatcher", () => {
 
     it("should handle empty board", () => {
       const board = new Uint32Array(GAME_CONSTANTS.BOARD.HEIGHT);
-      const pieceQueue = ["I", "O", "T"] as any;
+      const pieceQueue: TetrominoTypeName[] = ["I", "O", "T"];
 
       const matches = patternMatcher.detectPatterns(board, pieceQueue, 0);
 
@@ -79,7 +80,7 @@ describe("PatternMatcher", () => {
       board[0] = 0b0000111111;
       board[1] = 0b0000011111;
 
-      const pieceQueue = ["I", "L", "J", "O", "T", "S", "Z"] as any;
+      const pieceQueue: TetrominoTypeName[] = ["I", "L", "J", "O", "T", "S", "Z"];
       const matches = patternMatcher.detectPatterns(board, pieceQueue, 2);
 
       if (matches.length > 1) {
@@ -128,7 +129,7 @@ describe("MidGamePatternDetector", () => {
     board[1] = 0b1111111111;
     board[0] = 0b1111111111;
 
-    const pieceQueue = ["S", "T", "I", "O"] as any;
+    const pieceQueue: TetrominoTypeName[] = ["S", "T", "I", "O"];
     const hasOpportunity = detector.detectSTStackOpportunity(board, pieceQueue, 5);
 
     expect(hasOpportunity).toBe(true);
@@ -138,7 +139,7 @@ describe("MidGamePatternDetector", () => {
     const board = new Uint32Array(GAME_CONSTANTS.BOARD.HEIGHT);
     board[4] = 0b1111010111;
 
-    const pieceQueue = ["I", "O", "L", "J"] as any; // No S or T
+    const pieceQueue: TetrominoTypeName[] = ["I", "O", "L", "J"]; // No S or T
     const hasOpportunity = detector.detectSTStackOpportunity(board, pieceQueue, 5);
 
     expect(hasOpportunity).toBe(false);
@@ -146,7 +147,7 @@ describe("MidGamePatternDetector", () => {
 
   it("should not detect ST-Stack when height too low", () => {
     const board = new Uint32Array(GAME_CONSTANTS.BOARD.HEIGHT);
-    const pieceQueue = ["S", "T"] as any;
+    const pieceQueue: TetrominoTypeName[] = ["S", "T"];
 
     const hasOpportunity = detector.detectSTStackOpportunity(board, pieceQueue, 2);
 
@@ -155,7 +156,7 @@ describe("MidGamePatternDetector", () => {
 
   it("should not detect ST-Stack when height too high", () => {
     const board = new Uint32Array(GAME_CONSTANTS.BOARD.HEIGHT);
-    const pieceQueue = ["S", "T"] as any;
+    const pieceQueue: TetrominoTypeName[] = ["S", "T"];
 
     const hasOpportunity = detector.detectSTStackOpportunity(board, pieceQueue, 17);
 
@@ -168,10 +169,10 @@ describe("Pattern Bonus Calculation", () => {
     const match: PatternMatch = {
       pattern: {
         name: "PCO_standard",
-        requiredPieces: ["I", "L", "J", "O", "T", "S", "Z"] as any,
+        requiredPieces: ["I", "L", "J", "O", "T", "S", "Z"] as TetrominoTypeName[],
         occupiedMask: new Uint32Array(20),
         emptyMask: new Uint32Array(20),
-        holdPiece: "I" as any,
+        holdPiece: "I" as TetrominoTypeName,
         attackValue: 10,
         successRate: 0.846,
       },
@@ -193,10 +194,10 @@ describe("Pattern Bonus Calculation", () => {
     const dtMatch: PatternMatch = {
       pattern: {
         name: "DT_LS_base",
-        requiredPieces: ["L", "S", "J", "O", "T"] as any,
+        requiredPieces: ["L", "S", "J", "O", "T"] as TetrominoTypeName[],
         occupiedMask: new Uint32Array(20),
         emptyMask: new Uint32Array(20),
-        holdPiece: "T" as any,
+        holdPiece: "T" as TetrominoTypeName,
         attackValue: 12,
         successRate: 0.4,
       },
@@ -217,7 +218,7 @@ describe("Pattern Bonus Calculation", () => {
     const match: PatternMatch = {
       pattern: {
         name: "PCO_standard",
-        requiredPieces: [] as any,
+        requiredPieces: [] as TetrominoTypeName[],
         occupiedMask: new Uint32Array(20),
         emptyMask: new Uint32Array(20),
         attackValue: 10,
@@ -249,7 +250,7 @@ describe("Pattern Evaluation Integration", () => {
     board[1] = 0b0000011111;
     board[2] = 0b0000000011;
 
-    const pieceQueue = ["I", "L", "J", "O", "T", "S", "Z"] as any;
+    const pieceQueue: TetrominoTypeName[] = ["I", "L", "J", "O", "T", "S", "Z"];
     const baseScore = 100;
 
     const enhancedScore = evaluateWithPatterns(board, pieceQueue, "early", baseScore, 3);
@@ -264,7 +265,7 @@ describe("Pattern Evaluation Integration", () => {
       board[i] = 0b1010101010;
     }
 
-    const pieceQueue = ["I"] as any;
+    const pieceQueue: TetrominoTypeName[] = ["I"];
     const baseScore = 100;
 
     const score = evaluateWithPatterns(board, pieceQueue, "mid", baseScore, 10);
@@ -278,7 +279,7 @@ describe("Pattern Evaluation Integration", () => {
     board[0] = 0b0000111111; // 6 blocks
     board[1] = 0b0000011111; // 5 blocks
     board[2] = 0b0000000011; // 2 blocks
-    const pieceQueue = ["I", "L", "J", "O", "T", "S", "Z"] as any;
+    const pieceQueue: TetrominoTypeName[] = ["I", "L", "J", "O", "T", "S", "Z"];
     const baseScore = 100;
 
     const phases: GamePhase[] = ["early", "mid", "late", "danger"];

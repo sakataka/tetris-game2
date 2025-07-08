@@ -36,6 +36,9 @@ export interface EvaluationFeatures {
 
   /** Escape route: reachability score for recovery from critical situations */
   escapeRoute: number;
+
+  /** Bumpiness: sum of absolute height differences between adjacent columns */
+  bumpiness: number;
 }
 
 /**
@@ -52,6 +55,7 @@ export interface EvaluationWeights {
   blocksAboveHoles: number;
   wellOpen: number;
   escapeRoute: number;
+  bumpiness: number;
 }
 
 /**
@@ -68,20 +72,20 @@ export interface Move {
 }
 
 /**
- * ULTRA-AGGRESSIVE line-clearing focused Dellacherie evaluation weights
- * Optimized for maximum line clearing with exponential rewards
- * Dramatically prioritizes line clearing over ALL other considerations
+ * SIMPLIFIED weights: Focus ONLY on line clearing and basic stability
+ * All complex features minimized to prioritize basic Tetris gameplay
  */
 export const DEFAULT_WEIGHTS: EvaluationWeights = {
-  landingHeight: -3.0, // Minimal penalty for high placement - allow aggressive building
-  linesCleared: 100.0, // MAXIMUM reward for line clearing - absolute priority
-  rowTransitions: -1.0, // Minimal penalty for horizontal roughness
-  columnTransitions: -5.0, // Reduced penalty for column inconsistency
-  holes: -8.0, // Reduced penalty for holes - clearing is more important
-  wells: -3.0, // Minimal penalty for wells - can be useful for I-pieces
-  blocksAboveHoles: -50.0, // Heavy penalty for blocks above holes - indicates deep holes
-  wellOpen: 5.0, // Reward for keeping wells accessible for I-piece placement
-  escapeRoute: 3.0, // Reward for maintaining escape routes from critical situations
+  landingHeight: -0.1, // Almost ignore height completely
+  linesCleared: 10000.0, // ABSOLUTELY MAXIMUM priority - line clear dominates everything
+  rowTransitions: -0.1, // Almost ignore surface completely
+  columnTransitions: -0.1, // Almost ignore columns completely
+  holes: -1000.0, // MASSIVE penalty for holes
+  wells: 0.0, // Ignore wells completely
+  blocksAboveHoles: -1000.0, // MASSIVE penalty for deep holes
+  wellOpen: 0.0, // Ignore well accessibility
+  escapeRoute: 0.0, // Ignore escape routes
+  bumpiness: -0.18, // Penalty for surface roughness (keep flat for line clearing)
 };
 
 /**
@@ -132,6 +136,13 @@ export class DellacherieEvaluator {
     // Clear lines and get count
     const clearedLines = tempBoard.clearLines();
 
+    // DEBUG: Log line clearing activity
+    if (clearedLines.length > 0) {
+      console.log(
+        `🎯 [Dellacherie] ライン消去! Piece: ${move.piece}, Position: (${move.x}, ${move.y}), Lines: ${clearedLines.length}`,
+      );
+    }
+
     return {
       landingHeight: this.calculateLandingHeight(board, move),
       linesCleared: clearedLines.length,
@@ -142,6 +153,7 @@ export class DellacherieEvaluator {
       blocksAboveHoles: this.calculateBlocksAboveHoles(tempBoard),
       wellOpen: this.calculateWellOpen(tempBoard),
       escapeRoute: this.calculateEscapeRoute(tempBoard),
+      bumpiness: this.calculateBumpiness(tempBoard),
     };
   }
 
@@ -441,6 +453,26 @@ export class DellacherieEvaluator {
   }
 
   /**
+   * Calculate bumpiness feature
+   * Sum of absolute height differences between adjacent columns
+   * Lower values indicate a flatter, more stable surface
+   *
+   * @param board - BitBoard to analyze
+   * @returns Bumpiness value (0 = perfectly flat)
+   */
+  private calculateBumpiness(board: BitBoard): number {
+    const heights = this.getColumnHeights(board);
+    let bumpiness = 0;
+
+    // Sum absolute differences between adjacent columns
+    for (let x = 0; x < heights.length - 1; x++) {
+      bumpiness += Math.abs(heights[x] - heights[x + 1]);
+    }
+
+    return bumpiness;
+  }
+
+  /**
    * Get height of each column on the board
    * @param board - Board state to analyze
    * @returns Array of column heights
@@ -471,9 +503,8 @@ export class DellacherieEvaluator {
    * @returns Final heuristic score
    */
   private calculateScore(features: EvaluationFeatures): number {
-    // Apply exponential bonus for multiple line clears
-    const lineClearBonus =
-      features.linesCleared > 0 ? features.linesCleared ** 2.5 * this.weights.linesCleared : 0;
+    // Apply linear bonus for line clears
+    const lineClearBonus = features.linesCleared * this.weights.linesCleared;
 
     // Base score calculation
     const baseScore =
@@ -484,10 +515,22 @@ export class DellacherieEvaluator {
       features.wells * this.weights.wells +
       features.blocksAboveHoles * this.weights.blocksAboveHoles +
       (features.wellOpen ? 1 : 0) * this.weights.wellOpen +
-      features.escapeRoute * this.weights.escapeRoute;
+      features.escapeRoute * this.weights.escapeRoute +
+      features.bumpiness * this.weights.bumpiness;
+
+    const totalScore = baseScore + lineClearBonus;
+
+    // DEBUG: Log scoring details for line clearing moves
+    if (features.linesCleared > 0) {
+      console.log(`🔥 [Dellacherie] スコア詳細:
+        ライン消去: ${features.linesCleared} × ${this.weights.linesCleared} = ${lineClearBonus}
+        ベーススコア: ${baseScore.toFixed(2)}
+        合計スコア: ${totalScore.toFixed(2)}
+        穴: ${features.holes} (ペナルティ: ${(features.holes * this.weights.holes).toFixed(2)})`);
+    }
 
     // Massive bonus for any line clearing
-    return baseScore + lineClearBonus;
+    return totalScore;
   }
 
   /**
