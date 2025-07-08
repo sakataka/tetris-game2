@@ -3,6 +3,8 @@ import type { EvaluationWeights } from "./dellacherie";
 import { DEFAULT_WEIGHTS } from "./dellacherie";
 import {
   applyDangerAdjustments,
+  determineGamePhase,
+  getPhaseWeights,
   determineGamePhase as newDetermineGamePhase,
   PHASE_WEIGHTS,
 } from "./new-weights";
@@ -407,3 +409,6 @@ export class DynamicWeights {
     return this.useNewWeightSystem;
   }
 }
+
+// Re-export functions from new-weights for external use
+export { determineGamePhase, getPhaseWeights } from "./new-weights";

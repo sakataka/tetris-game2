@@ -29,9 +29,9 @@
 
 #### Development & Build Tools
 - **Runtime**: Bun 1.2.18 (package manager, test runner, dev server)
-- **Build**: Vite 7.0.4 (rolldown-vite)
+- **Build**: Vite 7.0.6 (rolldown-vite)
 - **TypeScript**: 5.8.3 with strict mode
-- **Quality**: Biome 2.0.6, Lefthook 1.11.16
+- **Quality**: Biome 2.1.0, Lefthook 1.11.16
 - **Testing**: Bun Test, Playwright 1.53.2, fast-check 4.2.0
 
 ### Directory Structure
