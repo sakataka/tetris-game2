@@ -72,20 +72,21 @@ export interface Move {
 }
 
 /**
- * SIMPLIFIED weights: Focus ONLY on line clearing and basic stability
- * All complex features minimized to prioritize basic Tetris gameplay
+ * OPTIMIZED weights: Based on El-Tetris research and expert recommendations
+ * Balanced ratios that encourage line clearing while maintaining strategic gameplay
+ * Reference: Line clearing ≈ 0.4~0.8 × |holes penalty| for optimal performance
  */
 export const DEFAULT_WEIGHTS: EvaluationWeights = {
-  landingHeight: -0.1, // Almost ignore height completely
-  linesCleared: 10000.0, // ABSOLUTELY MAXIMUM priority - line clear dominates everything
-  rowTransitions: -0.1, // Almost ignore surface completely
-  columnTransitions: -0.1, // Almost ignore columns completely
-  holes: -1000.0, // MASSIVE penalty for holes
-  wells: 0.0, // Ignore wells completely
-  blocksAboveHoles: -1000.0, // MASSIVE penalty for deep holes
-  wellOpen: 0.0, // Ignore well accessibility
-  escapeRoute: 0.0, // Ignore escape routes
-  bumpiness: -0.18, // Penalty for surface roughness (keep flat for line clearing)
+  landingHeight: -4.5, // Moderate penalty for height (El-Tetris scale)
+  linesCleared: 30.0, // Strong reward for line clearing (balanced with holes)
+  rowTransitions: -3.2, // Moderate penalty for surface roughness
+  columnTransitions: -9.3, // Strong penalty for column transitions
+  holes: -35.0, // Strong penalty for holes (primary constraint)
+  wells: -3.4, // Moderate penalty for wells
+  blocksAboveHoles: -15.0, // Strong penalty for deep holes
+  wellOpen: 0.0, // Ignore well accessibility for simplicity
+  escapeRoute: 0.0, // Ignore escape routes for simplicity
+  bumpiness: -2.5, // Moderate penalty for surface roughness
 };
 
 /**

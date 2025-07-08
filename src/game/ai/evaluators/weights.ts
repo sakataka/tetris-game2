@@ -131,43 +131,43 @@ export class DynamicWeights {
   ): EvaluationWeights {
     switch (situation.gamePhase) {
       case "early":
-        // Focus on building solid foundation with ULTRA-aggressive line clearing
+        // Focus on building solid foundation with balanced line clearing
         return {
           ...weights,
-          landingHeight: weights.landingHeight * 0.5, // Allow much more building
-          linesCleared: weights.linesCleared * 3.0, // STRONG line clearing priority
-          rowTransitions: weights.rowTransitions * 0.5, // Allow much more terrain building
-          columnTransitions: weights.columnTransitions * 0.7, // Reduced column consistency
-          holes: weights.holes * 0.8, // Reduce hole penalty
-          blocksAboveHoles: weights.blocksAboveHoles * 0.7, // Reduce deep hole penalty in early game
-          wellOpen: weights.wellOpen * 1.2, // Increase well accessibility value
+          landingHeight: weights.landingHeight * 0.9, // Allow more building
+          linesCleared: weights.linesCleared * 1.2, // Moderate line clearing priority
+          rowTransitions: weights.rowTransitions * 0.9, // Allow more terrain building
+          columnTransitions: weights.columnTransitions * 0.9, // Allow more column variance
+          holes: weights.holes * 0.9, // Slightly reduce hole penalty
+          blocksAboveHoles: weights.blocksAboveHoles * 0.9, // Reduce deep hole penalty in early game
+          wellOpen: weights.wellOpen * 1.1, // Increase well accessibility value
           escapeRoute: weights.escapeRoute * 1.1, // Slight increase in escape route value
         };
 
       case "mid":
-        // Aggressive approach with MAXIMUM emphasis on line clearing
+        // Balanced approach with increased line clearing focus
         return {
           ...weights,
-          landingHeight: weights.landingHeight * 0.7, // Allow more building
-          linesCleared: weights.linesCleared * 4.0, // ULTRA priority for line clears
-          holes: weights.holes * 0.8, // Reduce hole penalty
-          wells: weights.wells * 0.6, // Reduce well penalty
-          blocksAboveHoles: weights.blocksAboveHoles * 0.9, // Moderate deep hole penalty
-          wellOpen: weights.wellOpen * 1.3, // Increase well accessibility value
-          escapeRoute: weights.escapeRoute * 1.2, // Increase escape route value
+          landingHeight: weights.landingHeight * 0.95, // Allow slightly more building
+          linesCleared: weights.linesCleared * 1.3, // Moderate priority for line clears
+          holes: weights.holes * 0.95, // Slightly reduce hole penalty
+          wells: weights.wells * 0.9, // Slightly reduce well penalty
+          blocksAboveHoles: weights.blocksAboveHoles * 0.95, // Slightly reduce deep hole penalty
+          wellOpen: weights.wellOpen * 1.2, // Increase well accessibility value
+          escapeRoute: weights.escapeRoute * 1.1, // Increase escape route value
         };
 
       case "late":
-        // Focus on EXTREME line clearing for survival
+        // Focus on aggressive line clearing for survival
         return {
           ...weights,
-          landingHeight: weights.landingHeight * 0.8, // Allow building for clearing
-          linesCleared: weights.linesCleared * 5.0, // MAXIMUM line clearing
-          holes: weights.holes * 0.9, // Reduce hole penalty
-          wells: weights.wells * 0.7, // Reduce well penalty
-          blocksAboveHoles: weights.blocksAboveHoles * 1.2, // Increase deep hole penalty
-          wellOpen: weights.wellOpen * 1.5, // High value for well accessibility
-          escapeRoute: weights.escapeRoute * 1.4, // High value for escape routes
+          landingHeight: weights.landingHeight * 1.0, // Normal penalty for height
+          linesCleared: weights.linesCleared * 1.5, // Increased line clearing priority
+          holes: weights.holes * 1.0, // Normal hole penalty
+          wells: weights.wells * 1.0, // Normal well penalty
+          blocksAboveHoles: weights.blocksAboveHoles * 1.1, // Slightly increase deep hole penalty
+          wellOpen: weights.wellOpen * 1.3, // Increase well accessibility value
+          escapeRoute: weights.escapeRoute * 1.2, // Increase escape route value
         };
 
       case "danger":
@@ -182,24 +182,25 @@ export class DynamicWeights {
   /**
    * Apply survival mode adjustments for dangerous situations
    * Prioritizes immediate survival over long-term optimization
+   * Conservative multipliers prevent extreme behavior (≤1.8x total)
    */
   private applySurvivalMode(
     weights: EvaluationWeights,
     situation: GameSituation,
   ): EvaluationWeights {
-    const dangerMultiplier = Math.min(2.5, 1.0 + (situation.maxHeight - 15) * 0.3);
+    const dangerMultiplier = Math.min(1.3, 1.0 + (situation.maxHeight - 15) * 0.08);
 
     return {
       ...weights,
-      landingHeight: weights.landingHeight * dangerMultiplier, // Desperately stay low
-      linesCleared: weights.linesCleared * 100.0, // INSANE priority for line clearing
-      holes: weights.holes * 0.7, // Reduce hole penalty (clearing is everything)
-      wells: weights.wells * 0.8, // Reduce well penalty
-      rowTransitions: weights.rowTransitions * 0.3, // Minimal concern for transitions
-      columnTransitions: weights.columnTransitions * 0.8, // Allow roughness for clearing
-      blocksAboveHoles: weights.blocksAboveHoles * 1.5, // Increase deep hole penalty in danger
-      wellOpen: weights.wellOpen * 2.0, // Critical for survival
-      escapeRoute: weights.escapeRoute * 2.5, // Extremely important for survival
+      landingHeight: weights.landingHeight * dangerMultiplier, // Moderate priority to stay low
+      linesCleared: weights.linesCleared * 1.6, // Moderate increase for line clearing
+      holes: weights.holes * 1.15, // Slightly increase hole penalty
+      wells: weights.wells * 1.1, // Slightly increase well penalty
+      rowTransitions: weights.rowTransitions * 1.15, // Increase surface concern
+      columnTransitions: weights.columnTransitions * 1.1, // Increase column concern
+      blocksAboveHoles: weights.blocksAboveHoles * 1.2, // Increase deep hole penalty
+      wellOpen: weights.wellOpen * 1.4, // Increase well accessibility value
+      escapeRoute: weights.escapeRoute * 1.6, // Increase escape route value
     };
   }
 
@@ -213,14 +214,14 @@ export class DynamicWeights {
   ): EvaluationWeights {
     return {
       ...weights,
-      landingHeight: weights.landingHeight * 0.3, // Allow maximum building
-      linesCleared: weights.linesCleared * 8.0, // EXTREME line clearing from start
-      rowTransitions: weights.rowTransitions * 0.4, // Allow much more terrain
-      columnTransitions: weights.columnTransitions * 0.5, // Much more variance acceptable
-      holes: weights.holes * 0.6, // Reduce hole penalty
-      wells: weights.wells * 0.4, // Wells very useful for I-pieces
-      blocksAboveHoles: weights.blocksAboveHoles * 0.5, // Reduce deep hole penalty early
-      wellOpen: weights.wellOpen * 1.3, // Increase well accessibility importance
+      landingHeight: weights.landingHeight * 0.85, // Allow more building
+      linesCleared: weights.linesCleared * 1.4, // Moderate increase for line clearing
+      rowTransitions: weights.rowTransitions * 0.85, // Allow more terrain variance
+      columnTransitions: weights.columnTransitions * 0.85, // Allow more column variance
+      holes: weights.holes * 0.85, // Reduce hole penalty slightly
+      wells: weights.wells * 0.75, // Wells useful for I-pieces
+      blocksAboveHoles: weights.blocksAboveHoles * 0.85, // Reduce deep hole penalty early
+      wellOpen: weights.wellOpen * 1.15, // Increase well accessibility importance
       escapeRoute: weights.escapeRoute * 1.1, // Slight increase in escape route value
     };
   }
@@ -233,20 +234,15 @@ export class DynamicWeights {
     weights: EvaluationWeights,
     _situation: GameSituation,
   ): EvaluationWeights {
-    const problemSeverity = Math.min(
-      2.0,
-      1.2 + (_situation.totalHoles + _situation.roughness) * 0.1,
-    );
-
     return {
       ...weights,
-      linesCleared: weights.linesCleared * (problemSeverity * 1.2), // Enhanced clearing to fix problems
-      holes: weights.holes * 0.8, // Reduce hole penalty (clearing fixes everything)
-      rowTransitions: weights.rowTransitions * 0.8, // Allow roughness for clearing
-      columnTransitions: weights.columnTransitions * 0.9, // Allow variance for clearing
-      blocksAboveHoles: weights.blocksAboveHoles * 1.3, // Increase deep hole penalty in cleanup
-      wellOpen: weights.wellOpen * 1.4, // Increase well accessibility value
-      escapeRoute: weights.escapeRoute * 1.2, // Increase escape route value
+      linesCleared: weights.linesCleared * 1.2, // Moderate increase for clearing
+      holes: weights.holes * 1.1, // Slightly increase hole penalty
+      rowTransitions: weights.rowTransitions * 1.0, // Normal surface concerns
+      columnTransitions: weights.columnTransitions * 1.0, // Normal column concerns
+      blocksAboveHoles: weights.blocksAboveHoles * 1.2, // Increase deep hole penalty in cleanup
+      wellOpen: weights.wellOpen * 1.2, // Increase well accessibility value
+      escapeRoute: weights.escapeRoute * 1.1, // Slight increase escape route value
     };
   }
 
