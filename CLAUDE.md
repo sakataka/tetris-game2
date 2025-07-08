@@ -31,7 +31,7 @@
 - **Runtime**: Bun 1.2.18 (package manager, test runner, dev server)
 - **Build**: Vite 7.0.6 (rolldown-vite)
 - **TypeScript**: 5.8.3 with strict mode
-- **Quality**: Biome 2.1.0, Lefthook 1.11.16
+- **Quality**: Biome 2.1.1, Lefthook 1.12.0
 - **Testing**: Bun Test, Playwright 1.53.2, fast-check 4.2.0
 
 ### Directory Structure
@@ -43,10 +43,11 @@ src/
 │   ├── layout/    # Layout components
 │   └── ui/        # shadcn/ui components
 ├── game/          # Pure game logic (TEST ALL)
-│   └── ai/        # Advanced AI system (21 modules, TEST ALL)
-│       ├── core/      # Core AI engine, BitBoard, collision detection
-│       ├── evaluators/ # Dellacherie and advanced feature evaluators
-│       └── search/    # Beam search and Hold search algorithms
+│   └── ai/        # Advanced AI system (33 modules, 4,000+ lines, TEST ALL)
+│       ├── core/      # Core AI engine, BitBoard, collision detection, piece bits
+│       ├── evaluators/ # Dellacherie, pattern evaluator, phase-based weights
+│       ├── search/    # Beam search, diversity beam search, Hold search, pattern search
+│       └── tests/     # AI integration tests and strategy validation
 ├── hooks/         # Custom React hooks (TEST ONLY EXTRACTED PURE FUNCTIONS)
 │   ├── ai/        # AI controller hooks
 │   ├── controls/  # Input and touch control hooks
@@ -84,28 +85,39 @@ const b = useStore((state) => state.b);
 - Tetromino Management: 7 pieces with Super Rotation System (SRS)
 - AI Implementation: Multi-level AI system with BitBoard optimization
 
-**AI Architecture** (21 AI modules, 145+ TypeScript files):
+**AI Architecture** (33 AI modules, 4,000+ lines of TypeScript):
 1. **Core AI Engine**:
-   - **BitBoard**: Ultra-high-performance board representation using Uint32Array
-   - **Advanced AI Engine**: Multi-phase decision engine with beam search
-   - **Collision Detection**: Optimized position validation system
+   - **BitBoard**: Ultra-high-performance board representation using Uint32Array (100,000+ evaluations/sec)
+   - **Advanced AI Engine**: Multi-phase decision engine with diversified beam search
+   - **Collision Detection**: Optimized position validation system (< 1ms for 1,000 checks)
    - **Move Generator**: Comprehensive move analysis with SRS support
+   - **Piece Bits**: Optimized piece bit manipulation for collision detection
 
 2. **AI Evaluators**:
    - **Dellacherie**: 6-feature heuristic system (Landing Height, Lines Cleared, Transitions, Holes, Wells)
    - **Advanced Features**: T-Spin detection, Perfect Clear opportunities, danger zone analysis
-   - **Dynamic Weights**: Adaptive strategy based on game phases (early, mid, late, danger)
+   - **Pattern Evaluator**: PCO, DT Cannon, ST-Stack competitive pattern detection
+   - **Phase-Based Weights**: Dynamic strategy adaptation (early/mid/late/danger phases)
+   - **Terrain Analysis**: Surface smoothness, accessibility, and strategic position evaluation
 
 3. **Search Algorithms**:
-   - **Beam Search**: Multi-depth lookahead with configurable beam width
-   - **Hold Search**: Strategic Hold piece utilization
-   - **Performance Benchmarks**: Optimized search with time limits
+   - **Beam Search**: Multi-depth lookahead with configurable beam width (5-20)
+   - **Diversity Beam Search**: Exploration-exploitation balance with surface profile analysis
+   - **Hold Search**: Strategic Hold piece utilization with penalty system
+   - **Pattern Search**: Depth-first search for pattern completion opportunities
+   - **Performance Benchmarks**: Optimized search with 80ms time limits
 
-4. **AI User Interface**:
-   - **Advanced AI Controls**: Real-time AI parameter adjustment
-   - **AI Visualization**: Move heatmaps, search tree visualization, thinking process
-   - **AI Replay System**: Complete game replay with decision analysis
-   - **Performance Metrics**: Real-time AI performance monitoring
+4. **Pattern Recognition System**:
+   - **PCO (Perfect Clear Opener)**: Complete board clearing opening patterns
+   - **DT Cannon**: Double-Triple cannon attack patterns
+   - **ST-Stack**: S-T stacking continuous attack patterns
+   - **Mid-game Pattern Detection**: Advanced pattern recognition for competitive play
+
+5. **AI User Interface**:
+   - **Advanced AI Controls**: Real-time AI parameter adjustment (beam width, thinking time, Hold usage)
+   - **AI Visualization**: Move heatmaps, search tree visualization, thinking process display
+   - **AI Replay System**: Complete game replay with decision analysis and performance metrics
+   - **Performance Monitoring**: Real-time AI performance tracking and optimization insights
 
 ## Development Commands
 
@@ -113,19 +125,24 @@ const b = useStore((state) => state.b);
 ```bash
 bun run dev          # Start development server
 bun test             # Run pure function tests
-bun run test:all     # Run all tests (MUST pass before commits)
+bun run test:full    # Run all tests (MUST pass before commits)
+bun run test:ci      # Run CI tests with verbose output
+bun run test:dom     # Run DOM-related tests (hooks, store)
+bun run test:perf    # Run performance tests
 bun run lint         # Code linting (MUST pass before commits)
 bun run typecheck    # Type checking (MUST pass before commits)
 bun run build        # Production build (MUST succeed before commits)
 bun run ci           # Complete CI pipeline
 bun run benchmark    # Run AI performance benchmarks
 bun run e2e          # Run Playwright E2E tests
+bun run check:i18n   # Check i18n key consistency
 ```
 
 ### EXECUTION CONDITIONS
 - **Before ANY commit**: Run `bun run lint` AND `bun run typecheck`
 - **After code changes**: Run `bun test` to verify no regressions
-- **Git hooks**: Lefthook automatically runs formatting and validation
+- **Before production**: Run `bun run ci` for complete CI pipeline
+- **Git hooks**: Lefthook automatically runs formatting and validation (pre-commit and commit-msg)
 
 ## TESTING STRATEGY
 
@@ -144,8 +161,11 @@ bun run e2e          # Run Playwright E2E tests
 
 1. **Unit/Integration Tests** (Preferred):
 ```bash
-bun test src/                    # All unit tests
-bun test src/game/ai/           # Specific module tests
+bun test src/                    # All unit tests (excludes benchmarks, visual, e2e)
+bun test src/game/ai/           # Specific AI module tests
+bun run test:dom                # DOM-related tests (hooks, store)
+bun run test:perf               # Performance tests
+bun run test:full               # Complete test suite
 ```
 
 2. **Playwright E2E Testing**:
@@ -202,6 +222,9 @@ useEffect(() => {
 - Use `useRef` for AI state that shouldn't trigger re-renders
 - Implement timeout cleanup for AI thinking loops
 - Separate AI decision logic from React state updates
+- Use BitBoard for high-performance board operations
+- Implement 80ms time limits for AI search algorithms
+- Use diversity beam search for exploration-exploitation balance
 
 ## CODE QUALITY ENFORCEMENT
 
