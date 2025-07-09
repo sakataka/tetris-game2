@@ -6,6 +6,7 @@ import { DynamicWeights } from "../evaluators/weights";
 import type { BitBoard } from "./bitboard";
 import { BitBoard as BitBoardImpl } from "./bitboard";
 import { type Move, MoveGenerator } from "./move-generator";
+import { getPieceBitsAtPosition } from "./piece-bits";
 
 /**
  * AI configuration options for decision making
@@ -58,11 +59,12 @@ export interface AIStats {
 }
 
 /**
- * Default AI configuration optimized for Phase 1
+ * Default AI configuration optimized for LINE CLEARING
+ * Based on o3 MCP recommendations: prioritize line clearing above all else
  */
 export const DEFAULT_AI_CONFIG: AIConfig = {
   thinkingTimeLimit: 200, // 200ms as specified in issue
-  evaluator: "stacking",
+  evaluator: "dellacherie", // Changed from "stacking" to prioritize line clearing
   enableLogging: true, // Enable for debugging
   fallbackOnTimeout: true,
   useDynamicWeights: true,
@@ -216,6 +218,7 @@ export class AIEngine {
 
   /**
    * Evaluate all moves with timeout management
+   * Enhanced with LINE-CLEARING PRIORITY FILTER
    * @param board - Board state
    * @param moves - Moves to evaluate
    * @param startTime - Start time for timeout calculation
@@ -231,17 +234,27 @@ export class AIEngine {
     let evaluationCount = 0;
     let timedOut = false;
 
+    // BEAM PRE-FILTER: Prioritize line-clearing moves
+    const lineClearingMoves = this.identifyLineClearingMoves(board, moves);
+    const movesToEvaluate = lineClearingMoves.length > 0 ? lineClearingMoves : moves;
+
+    if (this.config.enableLogging && lineClearingMoves.length > 0) {
+      console.log(
+        `🎯 [AI] LINE-CLEARING FILTER: Found ${lineClearingMoves.length} line-clearing moves out of ${moves.length} total moves`,
+      );
+    }
+
     // Process moves in batches to allow for timeout checking
     const batchSize = 10; // Process 10 moves at a time
 
-    for (let i = 0; i < moves.length; i += batchSize) {
+    for (let i = 0; i < movesToEvaluate.length; i += batchSize) {
       // Check timeout before each batch
       const elapsedTime = performance.now() - startTime;
       if (elapsedTime > this.config.thinkingTimeLimit) {
         timedOut = true;
         if (this.config.enableLogging) {
           console.warn(
-            `[AI] Timeout after ${elapsedTime}ms, ${evaluationCount}/${moves.length} moves evaluated`,
+            `[AI] Timeout after ${elapsedTime}ms, ${evaluationCount}/${movesToEvaluate.length} moves evaluated`,
           );
         }
         break;
@@ -253,9 +266,9 @@ export class AIEngine {
       }
 
       // Process current batch
-      const batchEnd = Math.min(i + batchSize, moves.length);
+      const batchEnd = Math.min(i + batchSize, movesToEvaluate.length);
       for (let j = i; j < batchEnd; j++) {
-        const move = moves[j];
+        const move = movesToEvaluate[j];
         const score = this.evaluator.evaluate(board, move);
         move.evaluationScore = score;
         evaluationCount++;
@@ -279,14 +292,14 @@ export class AIEngine {
 
     // Handle timeout fallback
     if (timedOut && !bestMove && this.config.fallbackOnTimeout) {
-      bestMove = this.createFallbackMove(moves);
+      bestMove = this.createFallbackMove(movesToEvaluate);
     }
 
     const thinkingTime = performance.now() - startTime;
 
     if (this.config.enableLogging) {
       console.log(
-        `[AI] Decision: ${bestMove ? `${bestMove.piece} R${bestMove.rotation} (${bestMove.x},${bestMove.y}) = ${bestMove.evaluationScore?.toFixed(2)}` : "none"}, ${evaluationCount}/${moves.length} evaluated in ${thinkingTime.toFixed(1)}ms`,
+        `[AI] Decision: ${bestMove ? `${bestMove.piece} R${bestMove.rotation} (${bestMove.x},${bestMove.y}) = ${bestMove.evaluationScore?.toFixed(2)}` : "none"}, ${evaluationCount}/${movesToEvaluate.length} evaluated in ${thinkingTime.toFixed(1)}ms`,
       );
     }
 
@@ -448,6 +461,51 @@ export class AIEngine {
    */
   resetStats(): void {
     this.stats = this.createInitialStats();
+  }
+
+  /**
+   * Identify moves that can clear lines (BEAM PRE-FILTER)
+   * This filter ensures line-clearing moves are always prioritized
+   * @param board - Current board state
+   * @param moves - All possible moves
+   * @returns Moves that can clear lines
+   */
+  private identifyLineClearingMoves(board: BitBoard, moves: Move[]): Move[] {
+    const lineClearingMoves: Move[] = [];
+
+    for (const move of moves) {
+      // Create a temporary board to test the move
+      const tempBoard = board.clone();
+
+      // Get piece bit patterns
+      const pieceBitRows = getPieceBitsAtPosition(move.piece, move.rotation, move.x);
+
+      // Skip invalid moves
+      if (!pieceBitRows || pieceBitRows.length === 0) {
+        continue;
+      }
+
+      // Simulate piece placement
+      if (tempBoard.canPlace(pieceBitRows, move.y)) {
+        tempBoard.place(pieceBitRows, move.y);
+
+        // Check if this move clears any lines
+        const clearedLines = tempBoard.clearLines();
+        if (clearedLines.length > 0) {
+          // Store the number of lines cleared in the move
+          move.linesCleared = clearedLines.length;
+          lineClearingMoves.push(move);
+
+          if (this.config.enableLogging) {
+            console.log(
+              `🎯 [AI] Line-clearing move found: ${move.piece} R${move.rotation} (${move.x},${move.y}) clears ${clearedLines.length} lines`,
+            );
+          }
+        }
+      }
+    }
+
+    return lineClearingMoves;
   }
 
   /**

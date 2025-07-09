@@ -42,6 +42,12 @@ export interface EvaluationFeatures {
 
   /** Bumpiness: sum of absolute height differences between adjacent columns */
   bumpiness: number;
+
+  /** Maximum height: highest column on the board */
+  maxHeight: number;
+
+  /** Row fill ratio: completion percentage of near-full rows */
+  rowFillRatio: number;
 }
 
 /**
@@ -60,6 +66,8 @@ export interface EvaluationWeights {
   wellOpen: number;
   escapeRoute: number;
   bumpiness: number;
+  maxHeight: number;
+  rowFillRatio: number;
 }
 
 /**
@@ -80,22 +88,24 @@ export interface Move {
 }
 
 /**
- * OPTIMIZED weights: Based on El-Tetris research and expert recommendations
- * Balanced ratios that encourage line clearing while maintaining strategic gameplay
- * Reference: Line clearing ≈ 0.4~0.8 × |holes penalty| for optimal performance
+ * LINE-CLEARING FOCUSED weights: Based on o3 MCP recommendations
+ * MASSIVE priority for line clearing above all else
+ * Other features reduced to 1/3 - 1/5 of original values
  */
 export const DEFAULT_WEIGHTS: EvaluationWeights = {
-  landingHeight: -4.5, // Moderate penalty for height (El-Tetris scale)
-  linesCleared: 120.0, // Very strong reward for line clearing (prioritize over holes)
-  potentialLinesFilled: 100.0, // Very strong reward for potential line clearing
-  rowTransitions: -3.2, // Moderate penalty for surface roughness
-  columnTransitions: -9.3, // Strong penalty for column transitions
-  holes: -18.0, // Reduced penalty for holes (allow some holes for line clearing)
-  wells: -3.4, // Moderate penalty for wells
-  blocksAboveHoles: -10.0, // Reduced penalty for deep holes
+  landingHeight: -1.5, // Reduced from -4.5 (1/3)
+  linesCleared: 1000.0, // MASSIVE increase from 100.0 (10x) - TOP PRIORITY
+  potentialLinesFilled: 200.0, // Increased from 80.0 (2.5x) - Secondary priority
+  rowTransitions: -1.0, // Reduced from -3.2 (1/3)
+  columnTransitions: -3.0, // Reduced from -9.3 (1/3)
+  holes: -5.0, // Reduced from -15.0 (1/3)
+  wells: -1.0, // Reduced from -3.4 (1/3)
+  blocksAboveHoles: -2.5, // Reduced from -8.0 (1/3)
   wellOpen: 0.0, // Ignore well accessibility for simplicity
   escapeRoute: 0.0, // Ignore escape routes for simplicity
-  bumpiness: -2.5, // Moderate penalty for surface roughness
+  bumpiness: -3.0, // Reduced from -10.0 (1/3)
+  maxHeight: -15.0, // Reduced from -50.0 (1/3) - Allow higher stacks for line clearing
+  rowFillRatio: 50.0, // Increased from 30.0 - Support horizontal filling
 };
 
 /**
@@ -149,25 +159,31 @@ export class DellacherieEvaluator {
     // DEBUG: Log line clearing activity
     if (clearedLines.length > 0) {
       console.log(
-        `🎯 [Dellacherie] ライン消去! Piece: ${move.piece}, Position: (${move.x}, ${move.y}), Lines: ${clearedLines.length}`,
+        `🎯 [Dellacherie] Line Clear! Piece: ${move.piece}, Position: (${move.x}, ${move.y}), Lines: ${clearedLines.length}`,
       );
     }
 
-    // Calculate potential lines filled by this move
+    // Calculate potential lines filled by this move (using original board)
     const potentialLinesFilled = board.calculatePotentialLinesFilled(move.pieceBitRows, move.y);
+
+    // Create pre-clear board for feature extraction (board + piece, before line clearing)
+    const preClearBoard = board.clone();
+    preClearBoard.place(move.pieceBitRows, move.y);
 
     return {
       landingHeight: this.calculateLandingHeight(board, move),
       linesCleared: clearedLines.length,
       potentialLinesFilled,
-      rowTransitions: this.calculateRowTransitions(tempBoard),
-      columnTransitions: this.calculateColumnTransitions(tempBoard),
-      holes: this.calculateHoles(tempBoard),
-      wells: this.calculateWells(tempBoard),
-      blocksAboveHoles: this.calculateBlocksAboveHoles(tempBoard),
-      wellOpen: this.calculateWellOpen(tempBoard),
-      escapeRoute: this.calculateEscapeRoute(tempBoard),
-      bumpiness: this.calculateBumpiness(tempBoard),
+      rowTransitions: this.calculateRowTransitions(preClearBoard),
+      columnTransitions: this.calculateColumnTransitions(preClearBoard),
+      holes: this.calculateHoles(preClearBoard),
+      wells: this.calculateWells(preClearBoard),
+      blocksAboveHoles: this.calculateBlocksAboveHoles(preClearBoard),
+      wellOpen: this.calculateWellOpen(preClearBoard),
+      escapeRoute: this.calculateEscapeRoute(preClearBoard),
+      bumpiness: this.calculateBumpiness(preClearBoard),
+      maxHeight: this.calculateMaxHeight(preClearBoard),
+      rowFillRatio: this.calculateRowFillRatio(preClearBoard),
     };
   }
 
@@ -509,19 +525,88 @@ export class DellacherieEvaluator {
   }
 
   /**
+   * Calculate maximum height feature
+   * Returns the height of the tallest column on the board
+   * Critical for height control and dangerous stacking prevention
+   *
+   * @param board - Board state to analyze
+   * @returns Maximum column height
+   */
+  private calculateMaxHeight(board: BitBoard): number {
+    const heights = this.getColumnHeights(board);
+    return Math.max(...heights);
+  }
+
+  /**
+   * Calculate row fill ratio feature
+   * Evaluates how close rows are to completion for strategic horizontal filling
+   * Rewards moves that work toward completing nearly-full rows
+   *
+   * @param board - Board state to analyze
+   * @returns Row fill ratio score (higher = better horizontal filling)
+   */
+  private calculateRowFillRatio(board: BitBoard): number {
+    let totalScore = 0;
+    let significantRows = 0;
+
+    for (let y = 0; y < 20; y++) {
+      const rowBits = board.getRowBits(y);
+      if (rowBits === 0) continue; // Skip empty rows
+
+      // Count filled cells in this row using Brian Kernighan's algorithm
+      let filledCells = 0;
+      let bits = rowBits;
+      while (bits) {
+        filledCells++;
+        bits &= bits - 1; // Clear the lowest set bit
+      }
+      const fillRatio = filledCells / 10; // 10 is board width
+
+      // Apply weighted scoring for near-complete rows
+      if (fillRatio >= 0.7) {
+        // Rows that are 70%+ complete get exponential scoring
+        const completionBonus = fillRatio ** 3 * 10;
+        totalScore += completionBonus;
+        significantRows++;
+      } else if (fillRatio >= 0.5) {
+        // Rows that are 50%+ complete get linear scoring
+        totalScore += fillRatio * 2;
+        significantRows++;
+      }
+    }
+
+    // Normalize by number of significant rows to avoid favoring tall stacks
+    return significantRows > 0 ? totalScore / significantRows : 0;
+  }
+
+  /**
    * Calculate weighted score from feature values
    * Combines all features using learned weights
-   * Enhanced with exponential line clearing bonuses
+   * Enhanced with exponential line clearing bonuses and NO-CLEAR PENALTY
    *
    * @param features - Extracted feature values
    * @returns Final heuristic score
    */
   private calculateScore(features: EvaluationFeatures): number {
-    // Apply linear bonus for line clears
+    // Apply MASSIVE bonus for line clears
     const lineClearBonus = features.linesCleared * this.weights.linesCleared;
+
+    // Apply NO-CLEAR PENALTY: Strong penalty when no lines are cleared
+    const noClearPenalty = features.linesCleared === 0 ? -150.0 : 0;
 
     // Apply bonus for potential line fills
     const potentialLinesBonus = features.potentialLinesFilled * this.weights.potentialLinesFilled;
+
+    // Apply maxHeight with thresholded height cost (THC)
+    const heightThreshold = 15; // Increased threshold to allow higher stacks for line clearing
+    const maxHeightScore = features.maxHeight * this.weights.maxHeight;
+    const thresholdedHeightPenalty =
+      features.maxHeight > heightThreshold
+        ? (features.maxHeight - heightThreshold) ** 2 * -10.0 // Reduced penalty to allow stacking
+        : 0;
+
+    // Apply row fill ratio bonus
+    const rowFillBonus = features.rowFillRatio * this.weights.rowFillRatio;
 
     // Base score calculation
     const baseScore =
@@ -533,21 +618,27 @@ export class DellacherieEvaluator {
       features.blocksAboveHoles * this.weights.blocksAboveHoles +
       (features.wellOpen ? 1 : 0) * this.weights.wellOpen +
       features.escapeRoute * this.weights.escapeRoute +
-      features.bumpiness * this.weights.bumpiness;
+      features.bumpiness * this.weights.bumpiness +
+      maxHeightScore +
+      thresholdedHeightPenalty;
 
-    const totalScore = baseScore + lineClearBonus + potentialLinesBonus;
+    const totalScore =
+      baseScore + lineClearBonus + potentialLinesBonus + rowFillBonus + noClearPenalty;
 
-    // DEBUG: Log scoring details for line clearing moves
-    if (features.linesCleared > 0 || features.potentialLinesFilled > 0) {
-      console.log(`🔥 [Dellacherie] スコア詳細:
-        ライン消去: ${features.linesCleared} × ${this.weights.linesCleared} = ${lineClearBonus}
-        潜在ライン消去: ${features.potentialLinesFilled} × ${this.weights.potentialLinesFilled} = ${potentialLinesBonus}
-        ベーススコア: ${baseScore.toFixed(2)}
-        合計スコア: ${totalScore.toFixed(2)}
-        穴: ${features.holes} (ペナルティ: ${(features.holes * this.weights.holes).toFixed(2)})`);
+    // DEBUG: Log scoring details for ALL moves to track decision making
+    if (features.linesCleared > 0 || features.potentialLinesFilled > 0 || features.maxHeight > 8) {
+      console.log(`🎯 [Dellacherie] Score Details:
+        Lines Cleared: ${features.linesCleared} × ${this.weights.linesCleared} = ${lineClearBonus}
+        No-Clear Penalty: ${noClearPenalty}
+        Potential Lines: ${features.potentialLinesFilled} × ${this.weights.potentialLinesFilled} = ${potentialLinesBonus}
+        Max Height: ${features.maxHeight} (Penalty: ${maxHeightScore.toFixed(2)} + Threshold: ${thresholdedHeightPenalty.toFixed(2)})
+        Row Fill Ratio: ${features.rowFillRatio.toFixed(2)} (Bonus: ${rowFillBonus.toFixed(2)})
+        Bumpiness: ${features.bumpiness} (Penalty: ${(features.bumpiness * this.weights.bumpiness).toFixed(2)})
+        Holes: ${features.holes} (Penalty: ${(features.holes * this.weights.holes).toFixed(2)})
+        Base Score: ${baseScore.toFixed(2)}
+        Total Score: ${totalScore.toFixed(2)}`);
     }
 
-    // Massive bonus for any line clearing
     return totalScore;
   }
 

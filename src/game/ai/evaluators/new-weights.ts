@@ -16,63 +16,70 @@ export interface PhaseWeights {
 }
 
 /**
- * OPTIMIZED phase-based weight configurations
- * Based on El-Tetris research with realistic ratios for consistent gameplay
- * Line clearing ≈ 0.6~1.4 × |holes penalty| across all phases
+ * LINE-CLEARING PRIORITY phase-based weight configurations
+ * Based on O3 MCP recommendations: MASSIVE line clearing priority above all else
+ * Line clearing weight = 1000 (10x increase) across all phases
+ * Other features reduced to 1/3 - 1/5 of original values
  */
 export const PHASE_WEIGHTS: PhaseWeights = {
   /**
    * Early game phase (maxHeight <= 6)
-   * Focus: Build stable foundation, opportunistic line clearing
+   * Focus: AGGRESSIVE line clearing from the start
    */
   early: {
-    landingHeight: -3.8, // Moderate penalty for height (El-Tetris scale)
-    linesCleared: 100.0, // Very strong reward for line clearing
-    potentialLinesFilled: 80.0, // Strong reward for potential line clearing
-    rowTransitions: -2.8, // Moderate penalty for surface roughness
-    columnTransitions: -8.0, // Strong penalty for column transitions
-    holes: -15.0, // Reduced penalty for holes (allow some holes for line clearing)
-    wells: -2.8, // Moderate penalty for wells
-    blocksAboveHoles: -8.0, // Reduced penalty for deep holes
+    landingHeight: -1.3, // Reduced from -3.8 (1/3)
+    linesCleared: 1000.0, // MASSIVE increase from 100.0 (10x) - TOP PRIORITY
+    potentialLinesFilled: 200.0, // Increased from 80.0 (2.5x) - Secondary priority
+    rowTransitions: -1.0, // Reduced from -2.8 (1/3)
+    columnTransitions: -2.7, // Reduced from -8.0 (1/3)
+    holes: -5.0, // Reduced from -15.0 (1/3)
+    wells: -1.0, // Reduced from -2.8 (1/3)
+    blocksAboveHoles: -2.7, // Reduced from -8.0 (1/3)
     wellOpen: 0.0, // Ignore well accessibility
     escapeRoute: 0.0, // Ignore escape routes
-    bumpiness: -2.2, // Moderate penalty for surface roughness
+    bumpiness: -0.7, // Reduced from -2.2 (1/3)
+    maxHeight: -10.0, // Reduced from -30.0 (1/3) - Allow higher stacks for line clearing
+    rowFillRatio: 50.0, // Increased from 20.0 (2.5x) - Support horizontal filling
   },
 
   /**
    * Mid game phase (6 < maxHeight <= 12)
-   * Focus: Balanced play with increasing line clearing focus
+   * Focus: CONTINUED aggressive line clearing
    */
   mid: {
-    landingHeight: -4.2, // Moderate penalty for height
-    linesCleared: 120.0, // Very strong reward for line clearing
-    potentialLinesFilled: 100.0, // Very strong reward for potential line clearing
-    rowTransitions: -3.0, // Moderate penalty for surface roughness
-    columnTransitions: -8.8, // Strong penalty for column transitions
-    holes: -18.0, // Reduced penalty for holes (allow some holes for line clearing)
-    wells: -3.2, // Moderate penalty for wells
-    blocksAboveHoles: -10.0, // Reduced penalty for deep holes
+    landingHeight: -1.4, // Reduced from -4.2 (1/3)
+    linesCleared: 1000.0, // MASSIVE increase from 120.0 (8.3x) - TOP PRIORITY
+    potentialLinesFilled: 250.0, // Increased from 100.0 (2.5x) - Secondary priority
+    rowTransitions: -1.0, // Reduced from -3.0 (1/3)
+    columnTransitions: -3.0, // Reduced from -8.8 (1/3)
+    holes: -6.0, // Reduced from -18.0 (1/3)
+    wells: -1.1, // Reduced from -3.2 (1/3)
+    blocksAboveHoles: -3.3, // Reduced from -10.0 (1/3)
     wellOpen: 0.0, // Ignore well accessibility
     escapeRoute: 0.0, // Ignore escape routes
-    bumpiness: -2.4, // Moderate penalty for surface roughness
+    bumpiness: -0.8, // Reduced from -2.4 (1/3)
+    maxHeight: -13.3, // Reduced from -40.0 (1/3) - Allow higher stacks for line clearing
+    rowFillRatio: 60.0, // Increased from 25.0 (2.4x) - Support horizontal filling
   },
 
   /**
    * Late game phase (maxHeight > 12)
-   * Focus: Aggressive line clearing for survival
+   * Focus: MAXIMUM line clearing priority for survival
    */
   late: {
-    landingHeight: -5.0, // Higher penalty for height
-    linesCleared: 150.0, // Extremely strong reward for line clearing
-    potentialLinesFilled: 120.0, // Extremely strong reward for potential line clearing
-    rowTransitions: -3.5, // Higher penalty for surface roughness
-    columnTransitions: -10.0, // Higher penalty for column transitions
-    holes: -20.0, // Reduced penalty for holes (aggressive line clearing mode)
-    wells: -3.8, // Moderate penalty for wells
-    blocksAboveHoles: -12.0, // Reduced penalty for deep holes
+    landingHeight: -1.7, // Reduced from -5.0 (1/3)
+    linesCleared: 1000.0, // MASSIVE increase from 150.0 (6.7x) - TOP PRIORITY
+    potentialLinesFilled: 300.0, // Increased from 120.0 (2.5x) - Secondary priority
+    rowTransitions: -1.2, // Reduced from -3.5 (1/3)
+    columnTransitions: -3.3, // Reduced from -10.0 (1/3)
+    holes: -6.7, // Reduced from -20.0 (1/3)
+    wells: -1.3, // Reduced from -3.8 (1/3)
+    blocksAboveHoles: -4.0, // Reduced from -12.0 (1/3)
     wellOpen: 0.0, // Ignore well accessibility
     escapeRoute: 0.0, // Ignore escape routes
-    bumpiness: -2.8, // Higher penalty for surface roughness
+    bumpiness: -0.9, // Reduced from -2.8 (1/3)
+    maxHeight: -20.0, // Reduced from -60.0 (1/3) - Allow higher stacks for line clearing
+    rowFillRatio: 80.0, // Increased from 40.0 (2x) - Support horizontal filling
   },
 };
 

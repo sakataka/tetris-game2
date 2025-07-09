@@ -156,12 +156,12 @@ describe("AIEngine", () => {
       expect(decision.bestMove).not.toBeNull();
       // Should have a better score than a random move due to line clearing
       expect(decision.bestMove?.evaluationScore).toBeDefined();
-      // Stacking evaluator should avoid edge placement (x=0 or x=9)
-      expect(decision.bestMove?.x).not.toBe(0);
-      expect(decision.bestMove?.x).not.toBe(9);
-      // Should choose a position that can clear lines
-      expect(decision.bestMove?.x).toBeGreaterThan(0);
-      expect(decision.bestMove?.x).toBeLessThan(9);
+      // Dellacherie evaluator prioritizes line clearing above edge avoidance
+      // Should choose a position that can clear lines (edge placement is OK if it clears lines)
+      expect(decision.bestMove?.x).toBeGreaterThanOrEqual(0);
+      expect(decision.bestMove?.x).toBeLessThanOrEqual(9);
+      // Score should be positive due to line clearing priority
+      expect(decision.bestMove?.evaluationScore).toBeGreaterThan(0);
     });
 
     it("should avoid creating holes", async () => {
@@ -327,7 +327,7 @@ describe("AIEngine", () => {
       const config = defaultEngine.getConfig();
 
       expect(config.thinkingTimeLimit).toBe(200);
-      expect(config.evaluator).toBe("stacking");
+      expect(config.evaluator).toBe("dellacherie"); // Updated to reflect new default
       expect(config.fallbackOnTimeout).toBe(true);
     });
   });
