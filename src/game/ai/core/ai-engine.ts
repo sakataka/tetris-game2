@@ -269,7 +269,7 @@ export class AIEngine {
       const batchEnd = Math.min(i + batchSize, movesToEvaluate.length);
       for (let j = i; j < batchEnd; j++) {
         const move = movesToEvaluate[j];
-        const score = this.evaluator.evaluate(board, move);
+        const score = this.evaluator.evaluateMove(board, move);
         move.evaluationScore = score;
         evaluationCount++;
 

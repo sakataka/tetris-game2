@@ -52,7 +52,7 @@ export interface EvaluationFeatures {
  * Evaluation weights optimized for general Tetris gameplay
  * These values are derived from extensive machine learning research
  */
-export interface EvaluationWeights {
+export interface EvaluationWeights extends Record<string, number> {
   landingHeight: number;
   linesCleared: number;
   potentialLinesFilled: number;

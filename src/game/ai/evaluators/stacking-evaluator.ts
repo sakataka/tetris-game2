@@ -2,6 +2,13 @@ import type { BitBoard } from "@/game/ai/core/bitboard";
 import type { Move } from "@/game/ai/core/move-generator";
 import { getPieceBitsAtPosition } from "@/game/ai/core/piece-bits";
 import type { RotationState, TetrominoTypeName } from "@/types/game";
+import type {
+  BaseEvaluator,
+  BoardState,
+  FeatureSet,
+  MoveEvaluator,
+  WeightedEvaluator,
+} from "./base-evaluator";
 
 /**
  * Stacking-focused evaluation features for Tetris AI
@@ -55,7 +62,7 @@ export interface StackingFeatures {
  * Stacking-focused evaluation weights
  * Optimized for gradual line building and single well strategy
  */
-export interface StackingWeights {
+export interface StackingWeights extends Record<string, number> {
   landingHeight: number;
   linesCleared: number;
   potentialLinesFilled: number;
@@ -88,7 +95,7 @@ export interface StackingMoveEvaluation {
  * Stacking-focused Tetris AI evaluator
  * Implements gradual line building strategy with single well approach
  */
-export class StackingEvaluator {
+export class StackingEvaluator implements BaseEvaluator, WeightedEvaluator, MoveEvaluator {
   private readonly weights: StackingWeights;
   private readonly wellColumn: number; // Designated well column (usually 9)
 
@@ -117,20 +124,20 @@ export class StackingEvaluator {
   }
 
   /**
-   * Evaluate a move for compatibility with AI engine
+   * Evaluate a move for compatibility with AI engine (MoveEvaluator interface)
    * @param board - Current board state
    * @param move - Move to evaluate
    * @returns Evaluation score
    */
-  evaluate(board: BitBoard, move: Move): number {
-    const result = this.evaluateMove(board, move.piece, move.x, move.y, move.rotation);
+  evaluateMove(board: BitBoard, move: Move): number {
+    const result = this.evaluateMoveDetailed(board, move.piece, move.x, move.y, move.rotation);
     return result.score;
   }
 
   /**
-   * Evaluate a move for stacking-focused play
+   * Evaluate a move for stacking-focused play (detailed version)
    */
-  evaluateMove(
+  evaluateMoveDetailed(
     board: BitBoard,
     piece: TetrominoTypeName,
     x: number,
@@ -510,4 +517,96 @@ export class StackingEvaluator {
   updateWeights(newWeights: Partial<StackingWeights>): void {
     Object.assign(this.weights, newWeights);
   }
+
+  /**
+   * Reset weights to default values
+   */
+  resetWeights(): void {
+    Object.assign(this.weights, {
+      landingHeight: -2.7,
+      linesCleared: 40.0,
+      potentialLinesFilled: 15.0,
+      rowTransitions: -2.4,
+      columnTransitions: -6.3,
+      holes: -8.0,
+      wells: -3.0,
+      bumpiness: -2.0,
+      edgePenalty: -5.0,
+      wellDepth: 1.0,
+      nearFullRows: 8.0,
+      iPieceWaitOpportunity: 12.0,
+      stackHeight: -1.5,
+    });
+  }
+
+  // BaseEvaluator interface implementation
+
+  /**
+   * Evaluate a board state (BaseEvaluator interface)
+   * @param state - The current board state to evaluate
+   * @returns Evaluation score
+   */
+  evaluate(state: BoardState): number;
+  evaluate(board: BitBoard, move: Move): number;
+  evaluate(boardOrState: BitBoard | BoardState, move?: Move): number {
+    // Maintain backward compatibility - if called with BitBoard and Move, use evaluateMove
+    if (move !== undefined) {
+      return this.evaluateMove(boardOrState as BitBoard, move);
+    }
+
+    // New BaseEvaluator interface - evaluate board state
+    const state = boardOrState as BoardState;
+    const features = this.calculateFeatures(state.board);
+    return this.applyWeights(features);
+  }
+
+  /**
+   * Calculate features from the board (BaseEvaluator interface)
+   * @param board - The board to analyze
+   * @returns Set of features extracted from the board
+   */
+  calculateFeatures(board: BitBoard): FeatureSet {
+    // Extract features for current board state without a specific move
+    const features: FeatureSet = {
+      landingHeight: 0, // No landing height in static evaluation
+      linesCleared: 0, // No lines cleared in static evaluation
+      potentialLinesFilled: 0, // No potential lines in static evaluation
+      rowTransitions: this.calculateRowTransitions(board),
+      columnTransitions: this.calculateColumnTransitions(board),
+      holes: this.calculateHoles(board),
+      wells: this.calculateWells(board),
+      bumpiness: this.calculateBumpiness(board),
+      edgePenalty: 0, // No edge penalty in static evaluation
+      wellDepth: this.calculateWellDepth(board),
+      nearFullRows: this.calculateNearFullRows(board),
+      iPieceWaitOpportunity: 0, // No I-piece wait opportunity in static evaluation
+      stackHeight: this.calculateStackHeight(board),
+    };
+
+    return features;
+  }
+
+  /**
+   * Apply weights to features to compute a final score (BaseEvaluator interface)
+   * @param features - The features to score
+   * @returns Weighted evaluation score
+   */
+  applyWeights(features: FeatureSet): number {
+    return this.calculateScore(features as unknown as StackingFeatures);
+  }
+
+  /**
+   * Get the name of this evaluator (BaseEvaluator interface)
+   * @returns Human-readable name of the evaluator
+   */
+  getName(): string {
+    return "StackingEvaluator";
+  }
+
+  // WeightedEvaluator interface implementation is already provided by existing methods:
+  // - getWeights(): StackingWeights
+  // - updateWeights(newWeights: Partial<StackingWeights>): void
+  // - resetWeights(): void
+
+  // MoveEvaluator interface implementation is already provided by existing evaluateMove method
 }

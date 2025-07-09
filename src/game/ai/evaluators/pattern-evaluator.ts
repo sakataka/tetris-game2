@@ -75,14 +75,14 @@ export class PatternEvaluator extends DellacherieEvaluator {
   /**
    * Evaluate board state with pattern detection
    */
-  evaluate(board: BitBoard, move: Move): number {
+  evaluateMove(board: BitBoard, move: Move): number {
     // Skip pattern evaluation if disabled or no piece queue
     if (!this.config.enablePatterns || this.pieceQueue.length === 0) {
-      return super.evaluate(board, move);
+      return super.evaluateMove(board, move);
     }
 
     // Get base Dellacherie evaluation
-    const baseScore = super.evaluate(board, move);
+    const baseScore = super.evaluateMove(board, move);
 
     // Analyze game situation
     const situation = this.dynamicWeights.analyzeSituation(
@@ -195,5 +195,13 @@ export class PatternEvaluator extends DellacherieEvaluator {
    */
   setPatternEnabled(enabled: boolean): void {
     this.config.enablePatterns = enabled;
+  }
+
+  /**
+   * Get the name of this evaluator (BaseEvaluator interface)
+   * @returns Human-readable name of the evaluator
+   */
+  getName(): string {
+    return "PatternEvaluator";
   }
 }
