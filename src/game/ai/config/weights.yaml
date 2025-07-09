@@ -1,0 +1,150 @@
+schemaVersion: "1.0"
+metadata:
+  description: "AI Evaluator Weight Configurations"
+  created: "2025-01-09"
+  lastModified: "2025-01-09"
+  version: "1.0.0"
+
+evaluators:
+  dellacherie:
+    description: "LINE-CLEARING FOCUSED weights: Based on o3 MCP recommendations"
+    landingHeight: -1.5
+    linesCleared: 1000.0
+    potentialLinesFilled: 200.0
+    rowTransitions: -1.0
+    columnTransitions: -3.0
+    holes: -5.0
+    wells: -1.0
+    blocksAboveHoles: -2.5
+    wellOpen: 0.0
+    escapeRoute: 0.0
+    bumpiness: -3.0
+    maxHeight: -15.0
+    rowFillRatio: 50.0
+
+  phaseWeights:
+    description: "Phase-based weight configurations for game progression"
+    early:
+      description: "Early game phase (maxHeight <= 6) - AGGRESSIVE line clearing from the start"
+      landingHeight: -1.3
+      linesCleared: 1000.0
+      potentialLinesFilled: 200.0
+      rowTransitions: -1.0
+      columnTransitions: -2.7
+      holes: -5.0
+      wells: -1.0
+      blocksAboveHoles: -2.7
+      wellOpen: 0.0
+      escapeRoute: 0.0
+      bumpiness: -0.7
+      maxHeight: -10.0
+      rowFillRatio: 50.0
+    
+    mid:
+      description: "Mid game phase (6 < maxHeight <= 12) - CONTINUED aggressive line clearing"
+      landingHeight: -1.4
+      linesCleared: 1000.0
+      potentialLinesFilled: 250.0
+      rowTransitions: -1.0
+      columnTransitions: -3.0
+      holes: -6.0
+      wells: -1.1
+      blocksAboveHoles: -3.3
+      wellOpen: 0.0
+      escapeRoute: 0.0
+      bumpiness: -0.8
+      maxHeight: -13.3
+      rowFillRatio: 60.0
+    
+    late:
+      description: "Late game phase (maxHeight > 12) - MAXIMUM line clearing priority for survival"
+      landingHeight: -1.7
+      linesCleared: 1000.0
+      potentialLinesFilled: 300.0
+      rowTransitions: -1.2
+      columnTransitions: -3.3
+      holes: -6.7
+      wells: -1.3
+      blocksAboveHoles: -4.0
+      wellOpen: 0.0
+      escapeRoute: 0.0
+      bumpiness: -0.9
+      maxHeight: -20.0
+      rowFillRatio: 80.0
+
+adjustments:
+  description: "Dynamic weight adjustment multipliers"
+  dangerZone:
+    description: "Applied when maxHeight > 15"
+    maxMultiplier: 1.4
+    linesCleared: 1.4
+    potentialLinesFilled: 1.3
+    landingHeight: 1.3
+    holes: 0.9
+    blocksAboveHoles: 1.2
+    wellOpen: 1.3
+    escapeRoute: 1.5
+  
+  phaseAdjustments:
+    description: "Phase-specific adjustment multipliers"
+    early:
+      landingHeight: 0.9
+      linesCleared: 1.2
+      rowTransitions: 0.9
+      columnTransitions: 0.9
+      holes: 0.9
+      blocksAboveHoles: 0.9
+      wellOpen: 1.1
+      escapeRoute: 1.1
+    
+    mid:
+      landingHeight: 0.95
+      linesCleared: 1.3
+      holes: 0.95
+      wells: 0.9
+      blocksAboveHoles: 0.95
+      wellOpen: 1.2
+      escapeRoute: 1.1
+    
+    late:
+      landingHeight: 1.0
+      linesCleared: 1.5
+      holes: 1.0
+      wells: 1.0
+      blocksAboveHoles: 1.1
+      wellOpen: 1.3
+      escapeRoute: 1.2
+  
+  survival:
+    description: "Emergency survival mode adjustments"
+    maxMultiplier: 1.3
+    linesCleared: 1.6
+    holes: 1.15
+    wells: 1.1
+    rowTransitions: 1.15
+    columnTransitions: 1.1
+    blocksAboveHoles: 1.2
+    wellOpen: 1.4
+    escapeRoute: 1.6
+  
+  earlyGame:
+    description: "Early game strategy adjustments"
+    landingHeight: 0.85
+    linesCleared: 1.4
+    rowTransitions: 0.85
+    columnTransitions: 0.85
+    holes: 0.85
+    wells: 0.75
+    blocksAboveHoles: 0.85
+    wellOpen: 1.15
+    escapeRoute: 1.1
+  
+  cleanup:
+    description: "Cleanup mode for problematic board states"
+    linesCleared: 1.2
+    holes: 1.1
+    rowTransitions: 1.0
+    columnTransitions: 1.0
+    blocksAboveHoles: 1.2
+    wellOpen: 1.2
+    escapeRoute: 1.1

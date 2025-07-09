@@ -1,3 +1,4 @@
+import { getWeightLoader } from "@/game/ai/config/weight-loader";
 import type { BitBoard } from "@/game/ai/core/bitboard";
 import type { EvaluationWeights } from "./dellacherie";
 import { DEFAULT_WEIGHTS } from "./dellacherie";
@@ -41,10 +42,16 @@ export interface GameSituation {
 export class DynamicWeights {
   private baseWeights: EvaluationWeights;
   private useNewWeightSystem: boolean;
+  private useExternalWeights: boolean;
 
-  constructor(baseWeights: EvaluationWeights = PHASE_WEIGHTS.early, useNewWeightSystem = true) {
+  constructor(
+    baseWeights: EvaluationWeights = PHASE_WEIGHTS.early,
+    useNewWeightSystem = true,
+    useExternalWeights = false,
+  ) {
     this.baseWeights = { ...baseWeights };
     this.useNewWeightSystem = useNewWeightSystem;
+    this.useExternalWeights = useExternalWeights;
   }
 
   /**
@@ -84,6 +91,11 @@ export class DynamicWeights {
    * @returns Adjusted evaluation weights
    */
   adjustWeights(situation: GameSituation): EvaluationWeights {
+    // Use external weight configuration if enabled
+    if (this.useExternalWeights) {
+      return this.adjustWeightsFromExternalConfig(situation);
+    }
+
     // Use new balanced weight system if enabled
     if (this.useNewWeightSystem) {
       const phase = newDetermineGamePhase(situation.maxHeight);
@@ -114,6 +126,204 @@ export class DynamicWeights {
     }
 
     // Handle board quality issues
+    if (situation.totalHoles > 3 || situation.roughness > 5) {
+      weights = this.applyCleanupMode(weights, situation);
+    }
+
+    return weights;
+  }
+
+  /**
+   * Adjust weights using external configuration system
+   * Loads weights from YAML configuration and applies appropriate adjustments
+   *
+   * @param situation - Current game situation analysis
+   * @returns Adjusted evaluation weights from external configuration
+   */
+  private adjustWeightsFromExternalConfig(situation: GameSituation): EvaluationWeights {
+    // For now, fallback to synchronous behavior with cached weights
+    // In a full implementation, this would handle async loading
+    try {
+      const weightLoader = getWeightLoader();
+      const cached = weightLoader.getCachedConfiguration();
+
+      if (cached) {
+        const phase = newDetermineGamePhase(situation.maxHeight);
+        let weights = { ...cached.evaluators.phaseWeights[phase] };
+
+        // Apply danger adjustments for critical situations
+        if (situation.maxHeight > 15) {
+          const dangerAdjustments = cached.adjustments.dangerZone;
+          weights = this.applyExternalDangerAdjustments(
+            weights,
+            dangerAdjustments,
+            situation.maxHeight,
+          );
+        }
+
+        // Apply phase-specific adjustments
+        const phaseAdjustments = cached.adjustments.phaseAdjustments[phase];
+        weights = this.applyExternalPhaseAdjustments(weights, phaseAdjustments);
+
+        // Apply situational adjustments
+        if (situation.gamePhase === "danger" || situation.maxHeight > 15) {
+          const survivalAdjustments = cached.adjustments.survival;
+          weights = this.applyExternalSurvivalAdjustments(weights, survivalAdjustments);
+        }
+
+        if (situation.gamePhase === "early" && situation.maxHeight < 6) {
+          const earlyGameAdjustments = cached.adjustments.earlyGame;
+          weights = this.applyExternalEarlyGameAdjustments(weights, earlyGameAdjustments);
+        }
+
+        if (situation.totalHoles > 3 || situation.roughness > 5) {
+          const cleanupAdjustments = cached.adjustments.cleanup;
+          weights = this.applyExternalCleanupAdjustments(weights, cleanupAdjustments);
+        }
+
+        return weights;
+      }
+    } catch (error) {
+      console.warn("Failed to load external weights, falling back to hardcoded weights:", error);
+    }
+
+    // Fallback to hardcoded weights if external config fails
+    return this.useNewWeightSystem
+      ? this.adjustWeightsFromHardcodedConfig(situation)
+      : this.adjustWeightsFromLegacyConfig(situation);
+  }
+
+  /**
+   * Apply external danger adjustments from configuration
+   */
+  private applyExternalDangerAdjustments(
+    weights: EvaluationWeights,
+    adjustments: Record<string, number>,
+    maxHeight: number,
+  ): EvaluationWeights {
+    if (maxHeight <= 15) {
+      return weights;
+    }
+
+    return {
+      ...weights,
+      linesCleared: weights.linesCleared * (adjustments.linesCleared || 1.0),
+      potentialLinesFilled:
+        weights.potentialLinesFilled * (adjustments.potentialLinesFilled || 1.0),
+      landingHeight: weights.landingHeight * (adjustments.landingHeight || 1.0),
+      holes: weights.holes * (adjustments.holes || 1.0),
+      blocksAboveHoles: weights.blocksAboveHoles * (adjustments.blocksAboveHoles || 1.0),
+      wellOpen: weights.wellOpen * (adjustments.wellOpen || 1.0),
+      escapeRoute: weights.escapeRoute * (adjustments.escapeRoute || 1.0),
+    };
+  }
+
+  /**
+   * Apply external phase adjustments from configuration
+   */
+  private applyExternalPhaseAdjustments(
+    weights: EvaluationWeights,
+    adjustments: Record<string, number>,
+  ): EvaluationWeights {
+    const result = { ...weights };
+
+    for (const [key, multiplier] of Object.entries(adjustments)) {
+      if (key in result) {
+        result[key as keyof EvaluationWeights] =
+          result[key as keyof EvaluationWeights] * multiplier;
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Apply external survival adjustments from configuration
+   */
+  private applyExternalSurvivalAdjustments(
+    weights: EvaluationWeights,
+    adjustments: Record<string, number>,
+  ): EvaluationWeights {
+    const result = { ...weights };
+
+    for (const [key, multiplier] of Object.entries(adjustments)) {
+      if (key in result && key !== "maxMultiplier") {
+        result[key as keyof EvaluationWeights] =
+          result[key as keyof EvaluationWeights] * multiplier;
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Apply external early game adjustments from configuration
+   */
+  private applyExternalEarlyGameAdjustments(
+    weights: EvaluationWeights,
+    adjustments: Record<string, number>,
+  ): EvaluationWeights {
+    const result = { ...weights };
+
+    for (const [key, multiplier] of Object.entries(adjustments)) {
+      if (key in result) {
+        result[key as keyof EvaluationWeights] =
+          result[key as keyof EvaluationWeights] * multiplier;
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Apply external cleanup adjustments from configuration
+   */
+  private applyExternalCleanupAdjustments(
+    weights: EvaluationWeights,
+    adjustments: Record<string, number>,
+  ): EvaluationWeights {
+    const result = { ...weights };
+
+    for (const [key, multiplier] of Object.entries(adjustments)) {
+      if (key in result) {
+        result[key as keyof EvaluationWeights] =
+          result[key as keyof EvaluationWeights] * multiplier;
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Fallback method for hardcoded new weight system
+   */
+  private adjustWeightsFromHardcodedConfig(situation: GameSituation): EvaluationWeights {
+    const phase = newDetermineGamePhase(situation.maxHeight);
+    let weights = { ...PHASE_WEIGHTS[phase] };
+
+    if (situation.maxHeight > 15) {
+      weights = applyDangerAdjustments(weights, situation.maxHeight);
+    }
+
+    return weights;
+  }
+
+  /**
+   * Fallback method for legacy weight system
+   */
+  private adjustWeightsFromLegacyConfig(situation: GameSituation): EvaluationWeights {
+    let weights = { ...this.baseWeights };
+
+    weights = this.applyPhaseAdjustments(weights, situation);
+
+    if (situation.gamePhase === "danger" || situation.maxHeight > 15) {
+      weights = this.applySurvivalMode(weights, situation);
+    }
+
+    if (situation.gamePhase === "early" && situation.maxHeight < 6) {
+      weights = this.applyEarlyGameStrategy(weights, situation);
+    }
+
     if (situation.totalHoles > 3 || situation.roughness > 5) {
       weights = this.applyCleanupMode(weights, situation);
     }
@@ -401,6 +611,39 @@ export class DynamicWeights {
    */
   isUsingNewWeightSystem(): boolean {
     return this.useNewWeightSystem;
+  }
+
+  /**
+   * Enable or disable external weight loading from YAML configuration
+   * @param useExternal - Whether to use external YAML configuration
+   */
+  setExternalWeightSystem(useExternal: boolean): void {
+    this.useExternalWeights = useExternal;
+
+    // Pre-load configuration if enabling external weights
+    if (useExternal) {
+      this.preloadExternalConfiguration();
+    }
+  }
+
+  /**
+   * Check if external weight system is enabled
+   * @returns true if using external YAML configuration
+   */
+  isUsingExternalWeights(): boolean {
+    return this.useExternalWeights;
+  }
+
+  /**
+   * Pre-load external configuration for performance
+   */
+  private async preloadExternalConfiguration(): Promise<void> {
+    try {
+      const weightLoader = getWeightLoader();
+      await weightLoader.loadConfiguration();
+    } catch (error) {
+      console.warn("Failed to preload external weight configuration:", error);
+    }
   }
 }
 

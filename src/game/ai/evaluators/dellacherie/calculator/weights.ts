@@ -1,3 +1,4 @@
+import { getWeightLoader, loadDellacherieWeights } from "@/game/ai/config/weight-loader";
 import type { EvaluationWeights } from "../types";
 
 /**
@@ -26,9 +27,11 @@ export const DEFAULT_WEIGHTS: EvaluationWeights = {
  */
 export class WeightManager {
   private weights: EvaluationWeights;
+  private useExternalWeights: boolean;
 
-  constructor(initialWeights: EvaluationWeights = DEFAULT_WEIGHTS) {
+  constructor(initialWeights: EvaluationWeights = DEFAULT_WEIGHTS, useExternalWeights = false) {
     this.weights = { ...initialWeights };
+    this.useExternalWeights = useExternalWeights;
   }
 
   /**
@@ -46,6 +49,28 @@ export class WeightManager {
    * @returns Current weight configuration
    */
   getWeights(): EvaluationWeights {
+    if (this.useExternalWeights) {
+      return this.getExternalWeights();
+    }
+    return { ...this.weights };
+  }
+
+  /**
+   * Get weights from external configuration
+   * Falls back to internal weights if loading fails
+   */
+  private getExternalWeights(): EvaluationWeights {
+    try {
+      const weightLoader = getWeightLoader();
+      const cached = weightLoader.getCachedConfiguration();
+
+      if (cached) {
+        return { ...cached.evaluators.dellacherie };
+      }
+    } catch (error) {
+      console.warn("Failed to load external weights, falling back to internal weights:", error);
+    }
+
     return { ...this.weights };
   }
 
@@ -54,5 +79,60 @@ export class WeightManager {
    */
   resetWeights(): void {
     Object.assign(this.weights, DEFAULT_WEIGHTS);
+  }
+
+  /**
+   * Enable or disable external weight loading from YAML configuration
+   * @param useExternal - Whether to use external YAML configuration
+   */
+  setExternalWeightSystem(useExternal: boolean): void {
+    this.useExternalWeights = useExternal;
+
+    // Pre-load configuration if enabling external weights
+    if (useExternal) {
+      this.preloadExternalConfiguration();
+    }
+  }
+
+  /**
+   * Check if external weight system is enabled
+   * @returns true if using external YAML configuration
+   */
+  isUsingExternalWeights(): boolean {
+    return this.useExternalWeights;
+  }
+
+  /**
+   * Pre-load external configuration for performance
+   */
+  private async preloadExternalConfiguration(): Promise<void> {
+    try {
+      const weightLoader = getWeightLoader();
+      await weightLoader.loadConfiguration();
+    } catch (error) {
+      console.warn("Failed to preload external weight configuration:", error);
+    }
+  }
+
+  /**
+   * Load weights from external configuration asynchronously
+   * @returns Promise resolving to loaded weights or fallback weights
+   */
+  async loadExternalWeights(): Promise<EvaluationWeights> {
+    if (!this.useExternalWeights) {
+      return this.getWeights();
+    }
+
+    try {
+      const result = await loadDellacherieWeights();
+      if (result.success) {
+        return result.data;
+      }
+      console.warn("Failed to load external weights:", result.error);
+    } catch (error) {
+      console.warn("Failed to load external weights:", error);
+    }
+
+    return this.getWeights();
   }
 }
