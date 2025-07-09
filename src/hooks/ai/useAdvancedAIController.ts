@@ -73,6 +73,7 @@ export function useAdvancedAIController() {
   const moveRight = useGameStore((state) => state.moveRight);
   const rotate = useGameStore((state) => state.rotate);
   const drop = useGameStore((state) => state.drop);
+  const holdPiece = useGameStore((state) => state.holdPiece);
 
   // Find best move using advanced AI
   const findBestMoveWithAI = useCallback(
@@ -142,14 +143,15 @@ export function useAdvancedAIController() {
             await delay(100);
             break;
           case "HOLD":
-            // TODO: Implement hold action
+            holdPiece();
+            await delay(100);
             break;
           default:
             break;
         }
       }
     },
-    [moveLeft, moveRight, rotate, drop, aiSettings.playbackSpeed],
+    [moveLeft, moveRight, rotate, drop, holdPiece, aiSettings.playbackSpeed],
   );
 
   // Main AI thinking loop

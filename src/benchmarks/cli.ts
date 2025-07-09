@@ -1,5 +1,6 @@
 #!/usr/bin/env bun
 
+import { runAIEngineBenchmarkCLI } from "./ai-engine-cli";
 import { runCollisionBenchmarkCLI } from "./collision-benchmark";
 
 /**
@@ -17,22 +18,33 @@ Usage: bun run benchmark [options]
 
 Options:
   --help, -h    Show this help message
-  --collision   Run collision detection benchmark (default)
+  --collision   Run collision detection benchmark
+  --ai          Run AI engine performance benchmark
+  --all         Run all benchmarks
   --ci          Run in CI mode (exit with non-zero code if NO-GO)
 
 Examples:
-  bun run benchmark              # Run collision benchmark
-  bun run benchmark --collision  # Run collision benchmark explicitly
+  bun run benchmark              # Run AI benchmark (default)
+  bun run benchmark --collision  # Run collision benchmark
+  bun run benchmark --ai         # Run AI benchmark
+  bun run benchmark --all        # Run all benchmarks
   bun run benchmark --ci         # Run in CI mode
 `);
     process.exit(0);
   }
 
-  // Default to collision benchmark
-  const benchmarkType = args.includes("--collision") ? "collision" : "collision";
-  const isCIMode = args.includes("--ci");
+  // Determine benchmark type - default to AI benchmark
+  let benchmarkType = "ai"; // Default changed to AI as per Issue #115
 
-  console.log(`🚀 Running ${benchmarkType} benchmark...`);
+  if (args.includes("--collision")) {
+    benchmarkType = "collision";
+  } else if (args.includes("--ai")) {
+    benchmarkType = "ai";
+  } else if (args.includes("--all")) {
+    benchmarkType = "all";
+  }
+
+  const isCIMode = args.includes("--ci");
 
   if (isCIMode) {
     console.log("📊 Running in CI mode - will exit with non-zero code if NO-GO");
@@ -41,7 +53,19 @@ Examples:
   try {
     switch (benchmarkType) {
       case "collision":
+        console.log("🚀 Running collision detection benchmark...");
         await runCollisionBenchmarkCLI();
+        break;
+      case "ai":
+        console.log("🚀 Running AI engine performance benchmark...");
+        await runAIEngineBenchmarkCLI();
+        break;
+      case "all":
+        console.log("🚀 Running all benchmarks...");
+        console.log("\n1️⃣ Starting collision detection benchmark:");
+        await runCollisionBenchmarkCLI();
+        console.log("\n2️⃣ Starting AI engine performance benchmark:");
+        await runAIEngineBenchmarkCLI();
         break;
       default:
         console.error(`❌ Unknown benchmark type: ${benchmarkType}`);
