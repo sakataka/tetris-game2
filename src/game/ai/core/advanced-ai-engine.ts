@@ -14,12 +14,20 @@ import {
 } from "../evaluators/pattern-evaluator";
 import { DynamicWeights } from "../evaluators/weights";
 import { BeamSearch, type BeamSearchConfig, DEFAULT_BEAM_CONFIG } from "../search/beam-search";
+import { BeamSearchAdapter } from "../search/beam-search-adapter";
 import {
   DEFAULT_HOLD_OPTIONS,
   HoldAwareSearch,
   type HoldSearchOptions,
   type HoldSearchResult,
 } from "../search/hold-search";
+import { HoldSearchAdapter } from "../search/hold-search-adapter";
+import {
+  DEFAULT_BEAM_SEARCH_CONFIG,
+  DEFAULT_HOLD_SEARCH_CONFIG,
+  type UnifiedSearchConfig,
+} from "../search/search-config";
+import type { SearchStrategy } from "../search/search-strategy";
 import { type AIConfig, type AIDecision, AIEngine } from "./ai-engine";
 import { BitBoard } from "./bitboard";
 import { type Move, MoveGenerator } from "./move-generator";
@@ -40,6 +48,12 @@ export interface AdvancedAIConfig extends AIConfig {
   enablePatternDetection: boolean;
   /** Pattern evaluator configuration */
   patternEvaluatorConfig?: PatternEvaluatorConfig;
+  /** Search strategy selection (beam, hold, pattern, diversity) */
+  searchStrategy?: string;
+  /** Use unified search strategy interface */
+  useUnifiedSearchStrategy?: boolean;
+  /** Unified search configuration */
+  unifiedSearchConfig?: UnifiedSearchConfig;
 }
 
 /**
@@ -80,6 +94,25 @@ export const DEFAULT_ADVANCED_CONFIG: AdvancedAIConfig = {
   enableSearchLogging: false, // Disable for performance unless debugging
   enablePatternDetection: true, // Enable advanced pattern detection
   patternEvaluatorConfig: DEFAULT_PATTERN_CONFIG,
+  searchStrategy: "hold", // Default to hold search strategy
+  useUnifiedSearchStrategy: false, // Disabled by default for backward compatibility
+  unifiedSearchConfig: {
+    maxDepth: 3,
+    timeLimit: 70,
+    enablePruning: false,
+    beamSearch: {
+      ...DEFAULT_BEAM_SEARCH_CONFIG,
+      timeLimit: 70,
+    },
+    holdSearch: {
+      ...DEFAULT_HOLD_SEARCH_CONFIG,
+      timeLimit: 70,
+      holdOptions: {
+        ...DEFAULT_HOLD_OPTIONS,
+        holdPenalty: 2,
+      },
+    },
+  },
 };
 
 /**
@@ -92,6 +125,10 @@ export class AdvancedAIEngine extends AIEngine {
   private readonly advancedFeatures: AdvancedFeatures;
   private readonly advancedConfig: AdvancedAIConfig;
 
+  // Unified search strategy interface
+  private readonly searchStrategy?: SearchStrategy;
+  private readonly useUnifiedSearch: boolean;
+
   constructor(config: AdvancedAIConfig = DEFAULT_ADVANCED_CONFIG) {
     // Initialize base AI engine with modified config for advanced features
     const baseConfig = {
@@ -101,6 +138,7 @@ export class AdvancedAIEngine extends AIEngine {
     super(baseConfig);
 
     this.advancedConfig = { ...config };
+    this.useUnifiedSearch = config.useUnifiedSearchStrategy ?? false;
 
     // Initialize evaluator based on pattern detection setting
     const evaluator = config.enablePatternDetection
@@ -120,8 +158,67 @@ export class AdvancedAIEngine extends AIEngine {
     // Initialize Hold-aware search
     this.holdSearch = new HoldAwareSearch(this.beamSearch, config.holdSearchOptions);
 
+    // Initialize unified search strategy if enabled
+    if (this.useUnifiedSearch) {
+      const strategy = config.searchStrategy || "hold";
+      this.searchStrategy = this.createSearchStrategy(strategy, evaluator, moveGenerator, config);
+    }
+
     // Initialize advanced features
     this.advancedFeatures = new AdvancedFeatures();
+  }
+
+  /**
+   * Create search strategy based on configuration
+   */
+  private createSearchStrategy(
+    strategy: string,
+    evaluator: DellacherieEvaluator,
+    moveGenerator: MoveGenerator,
+    config: AdvancedAIConfig,
+  ): SearchStrategy {
+    switch (strategy) {
+      case "beam": {
+        const beamConfig = {
+          ...DEFAULT_BEAM_SEARCH_CONFIG,
+          ...config.unifiedSearchConfig?.beamSearch,
+        };
+        return new BeamSearchAdapter(evaluator, moveGenerator, beamConfig);
+      }
+      case "hold": {
+        const holdConfig = {
+          ...DEFAULT_HOLD_SEARCH_CONFIG,
+          ...config.unifiedSearchConfig?.holdSearch,
+        };
+        return new HoldSearchAdapter(this.beamSearch, holdConfig);
+      }
+      default:
+        throw new Error(`Unsupported search strategy: ${strategy}`);
+    }
+  }
+
+  /**
+   * Convert unified search result to legacy HoldSearchResult format
+   */
+  private convertUnifiedResult(
+    unifiedResult: import("../search/search-strategy").SearchResult,
+  ): HoldSearchResult {
+    // If the result is already a HoldSearchResult, return it as is
+    if ("usedHold" in unifiedResult) {
+      return unifiedResult as unknown as HoldSearchResult;
+    }
+
+    // Otherwise, convert basic SearchResult to HoldSearchResult format
+    return {
+      bestPath: unifiedResult.bestPath,
+      bestScore: unifiedResult.bestScore,
+      nodesExplored: unifiedResult.nodesExplored,
+      searchTime: unifiedResult.searchTime,
+      reachedDepth: unifiedResult.reachedDepth,
+      usedHold: false, // Default to false for non-hold strategies
+      alternativeResults: [], // Empty for non-hold strategies
+      holdPenaltyApplied: 0, // No penalty for non-hold strategies
+    };
   }
 
   /**
@@ -194,13 +291,24 @@ export class AdvancedAIEngine extends AIEngine {
         );
       }
 
-      // Perform Hold-aware beam search
-      const searchResult = this.holdSearch.searchWithHold(
-        board,
-        currentPiece,
-        nextPieces,
-        heldPiece,
-      );
+      // Perform search using unified strategy or legacy approach
+      let searchResult: HoldSearchResult;
+      if (this.useUnifiedSearch && this.searchStrategy) {
+        // Use unified search strategy interface
+        const unifiedResult = this.searchStrategy.search(
+          board,
+          currentPiece,
+          nextPieces,
+          heldPiece,
+          this.advancedConfig.unifiedSearchConfig,
+        );
+
+        // Convert unified result to HoldSearchResult format for compatibility
+        searchResult = this.convertUnifiedResult(unifiedResult);
+      } else {
+        // Use legacy Hold-aware beam search
+        searchResult = this.holdSearch.searchWithHold(board, currentPiece, nextPieces, heldPiece);
+      }
 
       const thinkingTime = performance.now() - startTime;
 
@@ -433,6 +541,11 @@ export class AdvancedAIEngine extends AIEngine {
 
     if (newConfig.holdSearchOptions) {
       this.holdSearch.updateOptions(newConfig.holdSearchOptions);
+    }
+
+    // Update unified search strategy configuration
+    if (this.useUnifiedSearch && this.searchStrategy && newConfig.unifiedSearchConfig) {
+      this.searchStrategy.updateConfig(newConfig.unifiedSearchConfig);
     }
   }
 
