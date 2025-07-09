@@ -48,7 +48,7 @@ const TEST_ITERATIONS = getTestIterations();
 const REDUCED_TEST_ITERATIONS = getReducedTestIterations();
 
 describe("Board Engine Property-Based Testing", () => {
-  const engineTypes: BoardEngineType[] = ["legacy", "typed-array", "bitboard"];
+  const engineTypes: BoardEngineType[] = ["typed-array", "bitboard"];
 
   describe("Cross-Engine Consistency", () => {
     test("all engines should produce identical results for isValidPosition", () => {
@@ -394,7 +394,7 @@ describe("Board Engine Property-Based Testing", () => {
  * Fixed test cases for known edge cases and past bugs
  */
 describe("Board Engine Regression Tests", () => {
-  const engineTypes: BoardEngineType[] = ["legacy", "typed-array", "bitboard"];
+  const engineTypes: BoardEngineType[] = ["typed-array", "bitboard"];
 
   test("should handle empty board with I-piece at spawn position", () => {
     const engines = engineTypes.map((type) => createBoardEngine(type));

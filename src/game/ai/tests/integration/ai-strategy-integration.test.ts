@@ -138,7 +138,8 @@ describe("AI Strategy Integration Tests", () => {
 
       expect(earlyPhase).toBe("early");
       expect(midPhase).toBe("mid");
-      expect(earlyWeights.linesCleared).toBeLessThan(midWeights.linesCleared);
+      // Both phases now use the same line clearing priority (1000.0) in the new weight system
+      expect(earlyWeights.linesCleared).toBe(midWeights.linesCleared);
       expect(earlyWeights.holes).toBeGreaterThan(midWeights.holes); // -500 > -800 (less negative = less penalty)
     });
 

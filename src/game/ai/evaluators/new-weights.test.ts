@@ -32,16 +32,16 @@ describe("new-weights", () => {
   describe("getPhaseWeights", () => {
     it("should return correct weights for each phase", () => {
       const earlyWeights = getPhaseWeights("early");
-      expect(earlyWeights.linesCleared).toBe(20.0);
-      expect(earlyWeights.holes).toBe(-30.0);
+      expect(earlyWeights.linesCleared).toBe(1000.0);
+      expect(earlyWeights.holes).toBe(-5.0);
 
       const midWeights = getPhaseWeights("mid");
-      expect(midWeights.linesCleared).toBe(35.0);
-      expect(midWeights.holes).toBe(-35.0);
+      expect(midWeights.linesCleared).toBe(1000.0);
+      expect(midWeights.holes).toBe(-6.0);
 
       const lateWeights = getPhaseWeights("late");
-      expect(lateWeights.linesCleared).toBe(50.0);
-      expect(lateWeights.holes).toBe(-40.0);
+      expect(lateWeights.linesCleared).toBe(1000.0);
+      expect(lateWeights.holes).toBe(-6.7);
     });
 
     it("should return independent weight copies", () => {
@@ -49,8 +49,8 @@ describe("new-weights", () => {
       const weights2 = getPhaseWeights("early");
 
       weights1.linesCleared = 999;
-      expect(weights2.linesCleared).toBe(20.0);
-      expect(PHASE_WEIGHTS.early.linesCleared).toBe(20.0);
+      expect(weights2.linesCleared).toBe(1000.0);
+      expect(PHASE_WEIGHTS.early.linesCleared).toBe(1000.0);
     });
   });
 
@@ -83,8 +83,8 @@ describe("new-weights", () => {
       const baseWeights = getPhaseWeights("late");
       const adjusted = applyDangerAdjustments(baseWeights, 18);
 
-      // Base holes is -40.0, adjusted should be -40.0 * (1 - 0.6 * 0.1) = -40.0 * 0.94 = -37.6
-      expect(adjusted.holes).toBeCloseTo(-37.6, 1);
+      // Base holes is -6.7, adjusted should be -6.7 * (1 - 0.6 * 0.1) = -6.7 * 0.94 = -6.298
+      expect(adjusted.holes).toBeCloseTo(-6.298, 1);
       // Since holes is negative, reducing penalty means making it less negative (closer to 0)
       expect(adjusted.holes).toBeGreaterThan(baseWeights.holes);
     });
@@ -110,7 +110,7 @@ describe("new-weights", () => {
       const weights = dynamicWeights.adjustWeights(situation);
 
       // Should be in early phase with height ~6
-      expect(weights.linesCleared).toBe(20.0);
+      expect(weights.linesCleared).toBe(1000.0);
     });
 
     it("should switch between weight systems", () => {
@@ -138,10 +138,10 @@ describe("new-weights", () => {
       const mid = PHASE_WEIGHTS.mid.linesCleared;
       const late = PHASE_WEIGHTS.late.linesCleared;
 
-      expect(early).toBeLessThan(mid);
-      expect(mid).toBeLessThan(late);
-      expect(early).toBe(20.0);
-      expect(late).toBe(50.0);
+      // All phases now use the same line clearing priority (1000.0)
+      expect(early).toBe(1000.0);
+      expect(mid).toBe(1000.0);
+      expect(late).toBe(1000.0);
     });
 
     it("should progressively increase hole penalties", () => {
