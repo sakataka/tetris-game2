@@ -23,7 +23,7 @@
 #### Application Libraries (Latest Versions)
 - **Frontend**: React 19.1.0, Zustand 5.0.6, Tailwind CSS 4.1.11
 - **Animation**: Motion 12.23.0 (physics-based animations)
-- **i18n**: i18next 25.3.1 + react-i18next 15.6.0
+- **i18n**: i18next 25.3.2 + react-i18next 15.6.0
 - **UI Components**: shadcn/ui with Radix UI primitives
 - **Utilities**: clsx 2.1.1, tailwind-merge 3.3.1, immer 10.1.1
 
@@ -31,7 +31,7 @@
 - **Runtime**: Bun 1.2.18 (package manager, test runner, dev server)
 - **Build**: Vite 7.0.6 (rolldown-vite)
 - **TypeScript**: 5.8.3 with strict mode
-- **Quality**: Biome 2.1.1, Lefthook 1.12.0
+- **Quality**: Biome 2.1.1, Lefthook 1.12.1
 - **Testing**: Bun Test, Playwright 1.53.2, fast-check 4.2.0
 
 ### Directory Structure
@@ -43,20 +43,38 @@ src/
 │   ├── layout/    # Layout components
 │   └── ui/        # shadcn/ui components
 ├── game/          # Pure game logic (TEST ALL)
-│   └── ai/        # Advanced AI system (33 modules, 4,000+ lines, TEST ALL)
+│   └── ai/        # Advanced AI system (18 modules, 12,000+ lines, TEST ALL)
 │       ├── core/      # Core AI engine, BitBoard, collision detection, piece bits
 │       ├── evaluators/ # Dellacherie, pattern evaluator, phase-based weights
 │       ├── search/    # Beam search, diversity beam search, Hold search, pattern search
 │       └── tests/     # AI integration tests and strategy validation
 ├── hooks/         # Custom React hooks (TEST ONLY EXTRACTED PURE FUNCTIONS)
+│   ├── actions/   # Game action hooks
 │   ├── ai/        # AI controller hooks
+│   ├── common/    # Common utility hooks
 │   ├── controls/  # Input and touch control hooks
 │   ├── core/      # Core game hooks
+│   ├── data/      # Data management hooks
+│   ├── effects/   # Side effect hooks
+│   ├── selectors/ # State selector hooks
 │   └── ui/        # UI and animation hooks
 ├── store/         # Zustand state management (TEST ALL)
 ├── types/         # TypeScript type definitions
+│   ├── errors.ts  # Error type definitions
+│   ├── game.ts    # Game type definitions
+│   ├── result.ts  # Result type definitions
+│   ├── rotation.ts # Rotation type definitions
+│   └── storage.ts # Storage type definitions
 ├── utils/         # Shared utilities (TEST ALL)
 ├── locales/       # i18n translation files
+├── i18n/          # i18n configuration
+│   └── config.ts  # i18n setup and configuration
+├── lib/           # Shared library utilities
+│   └── utils.ts   # General utility functions
+├── test/          # Test utilities and mocks
+│   ├── __mocks__/ # Mock implementations
+│   ├── generators/ # Test data generators
+│   └── setup.ts   # Test setup configuration
 └── tests/         # E2E tests
 ```
 
@@ -85,7 +103,7 @@ const b = useStore((state) => state.b);
 - Tetromino Management: 7 pieces with Super Rotation System (SRS)
 - AI Implementation: Multi-level AI system with BitBoard optimization
 
-**AI Architecture** (33 AI modules, 4,000+ lines of TypeScript):
+**AI Architecture** (18 AI modules, 12,000+ lines of TypeScript):
 1. **Core AI Engine**:
    - **BitBoard**: Ultra-high-performance board representation using Uint32Array (100,000+ evaluations/sec)
    - **Advanced AI Engine**: Multi-phase decision engine with diversified beam search
@@ -99,6 +117,7 @@ const b = useStore((state) => state.b);
    - **Pattern Evaluator**: PCO, DT Cannon, ST-Stack competitive pattern detection
    - **Phase-Based Weights**: Dynamic strategy adaptation (early/mid/late/danger phases)
    - **Terrain Analysis**: Surface smoothness, accessibility, and strategic position evaluation
+   - **Stacking Evaluator**: Stacking-focused evaluation with gradual line building strategy (DT-20 system)
 
 3. **Search Algorithms**:
    - **Beam Search**: Multi-depth lookahead with configurable beam width (5-20)
