@@ -3,59 +3,59 @@ allowed-tools: Bash, Read, Edit, MultiEdit
 description: Check i18n consistency and help clean up unused translation keys
 ---
 
-# i18n整合性チェック・クリーンアップ
+# i18n Consistency Check & Cleanup
 
-翻訳キーの整合性をチェックし、未使用キーのクリーンアップを支援します。
+Verify translation key consistency and assist with removing unused translation keys to optimize localization files.
 
-## 実行内容
+## Execution Overview
 
-### 1. i18n整合性チェック
+### 1. i18n Consistency Check
 ```bash
 bun run check:i18n
 ```
 
-このチェックで以下が検出されます：
-- **Missing Keys**: コードで使用されているが翻訳ファイルにないキー
-- **Unused Keys**: 翻訳ファイルにあるがコードで使用されていないキー
+This check detects:
+- **Missing Keys**: Keys used in code but not present in translation files
+- **Unused Keys**: Keys present in translation files but not used in code
 
-### 2. 結果の分析
+### 2. Result Analysis
 
-#### Missing Keys（不足キー）の場合
-- **重要度**: 🔴 高（ビルドエラーの原因）
-- **対応**: 翻訳ファイルに不足キーを追加する必要があります
+#### Missing Keys
+- **Priority**: 🔴 High (causes build errors)
+- **Action**: Add missing keys to translation files
 
-#### Unused Keys（未使用キー）の場合
-- **重要度**: 🟡 中（警告のみ）
-- **対応**: 不要な翻訳キーを削除してファイルサイズを最適化
+#### Unused Keys
+- **Priority**: 🟡 Medium (warnings only)
+- **Action**: Remove unnecessary translation keys to optimize file size
 
-### 3. 自動クリーンアップ
+### 3. Automated Cleanup
 
-未使用キーが検出された場合、以下のファイルから安全に削除できます：
+When unused keys are detected, they can be safely removed from:
 - `src/locales/en.json`
 - `src/locales/ja.json`
 
-削除対象のキーを特定し、両方の言語ファイルから一貫して削除します。
+Identify target keys for removal and consistently delete from both language files.
 
-## 使用方法
+## Usage
 
 ```
 /project:i18n-cleanup
 ```
 
-## 作業フロー
+## Workflow
 
-1. **チェック実行**: まず整合性をチェック
-2. **問題の特定**: Missing/Unusedキーをリストアップ
-3. **修正提案**: 具体的な修正方法を提示
-4. **実行確認**: 修正を適用するかユーザーに確認
-5. **修正適用**: 承認後に翻訳ファイルを更新
-6. **検証**: 修正後に再度チェックを実行
+1. **Execute Check**: Run initial consistency check
+2. **Identify Issues**: List Missing/Unused keys
+3. **Propose Fixes**: Present specific correction methods
+4. **Confirm Execution**: Ask user to approve modifications
+5. **Apply Fixes**: Update translation files after approval
+6. **Verify**: Re-run check after modifications
 
-## 安全対策
+## Safety Measures
 
-- キー削除前に使用状況を再確認
-- 両言語ファイルで一貫した操作を実行
-- 削除後に構文エラーがないかJSONを検証
-- テストとビルドで問題がないか確認
+- Re-verify usage before key deletion
+- Execute consistent operations across both language files
+- Validate JSON syntax after deletion
+- Confirm no issues with tests and build
 
-まず現在の状況をチェックしましょう。
+Let's begin by checking the current status.

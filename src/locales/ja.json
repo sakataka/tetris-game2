@@ -1,7 +1,5 @@
 {
   "game": {
-    "next": "次のピース",
-    "hold": "ホールド",
     "gameOver": "ゲームオーバー",
     "paused": "一時停止中",
     "newGame": "新しいゲーム",
@@ -48,8 +46,6 @@
       "message": "現在のゲームをリセットしますか？",
       "confirm": "はい",
       "cancel": "いいえ"
-    },
-    "tSpinAnnouncement": "{{type}}を{{count}}ライン消去で達成しました",
-    "linesCleared": "{{count}}ライン消去"
+    }
   }
 }

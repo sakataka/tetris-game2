@@ -5,58 +5,58 @@ description: Complete development workflow - validate, commit, and push changes
 
 # Development Workflow: Commit & Push
 
-このコマンドは以下の開発ワークフローを自動実行します：
+This command executes a comprehensive development workflow that ensures code quality before committing and pushing changes:
 
-1. **品質チェック** - lint、typecheck、テスト実行
-2. **Git状態確認** - 変更内容の表示
-3. **コミット作成** - 適切なコミットメッセージ付き
-4. **GitHubプッシュ** - リモートリポジトリへの反映
+1. **Quality Assurance Checks** - Execute type checking and test suites
+2. **Git Status Review** - Display current repository state and changes
+3. **Commit Creation** - Generate appropriate commit message based on changes
+4. **GitHub Push** - Synchronize changes with remote repository
 
-## 実行フロー
+## Execution Flow
 
-### ステップ1: 品質保証チェック
-プロジェクトの品質基準をクリアしているか確認します：
+### Step 1: Quality Assurance Validation
+Verify that all code meets project quality standards:
 
 ```bash
-# typecheckとtestのみ実行（format/lintはlefthookが自動実行）
+# Execute only typecheck and tests (format/lint handled automatically by lefthook)
 bun run typecheck && bun test
 ```
 
-### ステップ2: Git状態の確認
-現在の変更内容を表示して、コミット対象を明確にします：
+### Step 2: Git Status Analysis
+Display current repository state to identify all pending changes:
 
 ```bash
 git status
 git diff --stat
 ```
 
-### ステップ3: 変更内容の詳細分析
-変更された各ファイルの内容を確認し、適切なコミットメッセージを生成します：
+### Step 3: Detailed Change Analysis
+Review specific changes in each modified file to inform commit message generation:
 
 ```bash
 git diff
 ```
 
-### ステップ4: コミット作成とプッシュ
-品質チェックが完了したら、以下の手順でコミット・プッシュを実行してください：
+### Step 4: Commit Creation and Push
+After quality checks pass, proceed with commit and push:
 
-1. **適切なコミットメッセージの作成**:
-   - 変更の種類（feat, fix, refactor, docs, etc.）
-   - 変更内容の簡潔な説明
-   - 必要に応じて詳細説明
+1. **Generate Appropriate Commit Message**:
+   - Identify change type (feat, fix, refactor, docs, etc.)
+   - Write concise summary of changes
+   - Add detailed description if necessary
 
-2. **コミット・プッシュの実行**:
+2. **Execute Commit and Push**:
    ```bash
    git add -A
-   git commit -m "作成されたコミットメッセージ"
+   git commit -m "generated commit message following conventional commits"
    git push
    ```
 
-## 注意事項
+## Important Notes
 
-- 品質チェックが失敗した場合、問題を修正してから再実行してください
-- コミットメッセージは[Conventional Commits](https://www.conventionalcommits.org/)形式を推奨
-- **lefthookが自動実行**: コミット時にformat/lintが自動実行されます
-- プッシュ前にリモートブランチの状態を確認し、競合を避けてください
+- If quality checks fail, fix issues before re-executing the workflow
+- Follow [Conventional Commits](https://www.conventionalcommits.org/) specification for commit messages
+- **Lefthook Integration**: Format and lint checks run automatically during commit via git hooks
+- Verify remote branch state before pushing to avoid merge conflicts
 
-実行する準備ができたら、まず品質チェックから始めましょう。
+Ready to begin? Start with quality assurance checks.

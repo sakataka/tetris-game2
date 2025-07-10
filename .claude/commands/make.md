@@ -1,33 +1,33 @@
 ---
-description: デッドコード検出、フォーマット、リント、型チェック、テスト、ビルドを順番に実行
+description: Execute complete build pipeline with dead code detection, formatting, linting, type checking, testing, and production build
 allowed-tools: Bash(bun:*)
 ---
 
-# プロジェクトビルドパイプライン
+# Project Build Pipeline
 
-このコマンドは以下の処理を順番に実行します：
+This command executes a comprehensive build pipeline with the following steps in sequence:
 
-1. **デッドコード検出** - 未使用コードの検出
-2. **フォーマット** - コードフォーマットを適用
-3. **リント** - コード品質チェック（import順序整理含む）
-4. **タイプチェック** - TypeScript型チェック
-5. **テスト** - 全テストの実行
-6. **ビルド** - プロダクションビルド
+1. **Dead Code Detection** - Identify and report unused code, exports, and dependencies
+2. **Code Formatting** - Apply consistent code style across the entire codebase
+3. **Linting** - Perform code quality checks including import order optimization
+4. **Type Checking** - Validate TypeScript type safety and correctness
+5. **Testing** - Execute all test suites to ensure functionality
+6. **Production Build** - Create optimized production bundle
 
-## 実行
+## Execution
 
 ```bash
-# パイプライン実行（エラー時即座に停止・実行時間計測）
+# Execute full pipeline with fail-fast behavior and execution time measurement
 time (bun run knip && bun run format && bun run lint && bun run typecheck && bun test && bun run build)
 ```
 
-各ステップでエラーが発生した場合は`&&`演算子により即座に処理を停止し、エラー内容を報告します。
+The pipeline uses the `&&` operator to ensure immediate termination upon any step failure, preventing downstream steps from running with invalid code state.
 
-## 処理順序の理由
+## Pipeline Step Rationale
 
-1. **knip**: 最初に実行することで、未使用コードがある場合は早期に検出し、後続の処理時間を削減
-2. **format**: コードスタイルを統一してから品質チェックを実行
-3. **lint**: フォーマット済みのコードに対して品質チェック（`biome check`でimport順序も整理）
-4. **typecheck**: 型の整合性を確認
-5. **test**: コードが正しく動作することを確認（全テスト実行）
-6. **build**: すべてのチェックをパスしたコードをビルド
+1. **knip (first)**: Detect unused code early to reduce processing time for subsequent steps and maintain clean codebase
+2. **format (second)**: Ensure consistent code style before quality checks to avoid style-related linting issues
+3. **lint (third)**: Check code quality on properly formatted code, including automatic import statement organization via `biome check`
+4. **typecheck (fourth)**: Verify type safety after code structure is validated
+5. **test (fifth)**: Confirm functionality only after code passes all static analysis checks
+6. **build (last)**: Generate production bundle only when all quality gates pass successfully

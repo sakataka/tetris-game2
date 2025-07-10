@@ -1,7 +1,5 @@
 {
   "game": {
-    "next": "Next",
-    "hold": "Hold",
     "gameOver": "Game Over",
     "paused": "Paused",
     "newGame": "New Game",
@@ -48,10 +46,6 @@
       "message": "Reset the current game?",
       "confirm": "Yes",
       "cancel": "No"
-    },
-    "tSpinAnnouncement": "{{type}} achieved with {{count}} line cleared",
-    "tSpinAnnouncement_other": "{{type}} achieved with {{count}} lines cleared",
-    "linesCleared": "{{count}} line cleared",
-    "linesCleared_other": "{{count}} lines cleared"
+    }
   }
 }
