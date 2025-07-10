@@ -126,22 +126,3 @@ export interface MoveEvaluator {
    */
   evaluateMove(board: BitBoard, move: Move): number;
 }
-
-/**
- * Helper type to check if an evaluator implements MoveEvaluator
- */
-export function isMoveEvaluator(evaluator: unknown): evaluator is MoveEvaluator {
-  return (
-    typeof evaluator === "object" &&
-    evaluator !== null &&
-    "evaluateMove" in evaluator &&
-    typeof (evaluator as MoveEvaluator).evaluateMove === "function"
-  );
-}
-
-/**
- * Helper type to check if an evaluator implements WeightedEvaluator
- */
-export function isWeightedEvaluator(evaluator: BaseEvaluator): evaluator is WeightedEvaluator {
-  return "getWeights" in evaluator && "updateWeights" in evaluator && "resetWeights" in evaluator;
-}

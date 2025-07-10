@@ -14,20 +14,17 @@ import {
 } from "../evaluators/pattern-evaluator";
 import { DynamicWeights } from "../evaluators/weights";
 import { BeamSearch, type BeamSearchConfig, DEFAULT_BEAM_CONFIG } from "../search/beam-search";
-import { BeamSearchAdapter } from "../search/beam-search-adapter";
 import {
   DEFAULT_HOLD_OPTIONS,
   HoldAwareSearch,
   type HoldSearchOptions,
   type HoldSearchResult,
 } from "../search/hold-search";
-import { HoldSearchAdapter } from "../search/hold-search-adapter";
 import {
   DEFAULT_BEAM_SEARCH_CONFIG,
   DEFAULT_HOLD_SEARCH_CONFIG,
   type UnifiedSearchConfig,
 } from "../search/search-config";
-import type { SearchStrategy } from "../search/search-strategy";
 import { type AIConfig, type AIDecision, AIEngine } from "./ai-engine";
 import { BitBoard } from "./bitboard";
 import { type Move, MoveGenerator } from "./move-generator";
@@ -107,9 +104,31 @@ export const DEFAULT_ADVANCED_CONFIG: AdvancedAIConfig = {
     holdSearch: {
       ...DEFAULT_HOLD_SEARCH_CONFIG,
       timeLimit: 70,
-      holdOptions: {
-        ...DEFAULT_HOLD_OPTIONS,
-        holdPenalty: 2,
+      holdPenalty: 2,
+    },
+    patternSearch: {
+      maxDepth: 2,
+      timeLimit: 80,
+      enablePruning: true,
+      strategyConfig: {},
+      patternDepth: 2,
+      patternTypes: ["PCO", "DT_CANNON", "ST_STACK"],
+      maxPatternAttempts: 10,
+    },
+    diversityBeamSearch: {
+      ...DEFAULT_BEAM_SEARCH_CONFIG,
+      timeLimit: 70,
+      diversityWeight: 0.3,
+      explorationFactor: 0.2,
+      diversityConfig: {
+        surfaceAnalysisWeight: 0.4,
+        heightVariationWeight: 0.3,
+        positionSpreadWeight: 0.3,
+        baseDiversityRatio: 0.5,
+        depthDiscountFactor: 0.95,
+        uncertaintyPenalty: 0.1,
+        complexityBonusWeight: 0.3,
+        dynamicDiversityRatio: true,
       },
     },
   },
@@ -126,7 +145,7 @@ export class AdvancedAIEngine extends AIEngine {
   private readonly advancedConfig: AdvancedAIConfig;
 
   // Unified search strategy interface
-  private readonly searchStrategy?: SearchStrategy;
+  private readonly searchStrategy?: BeamSearch | HoldAwareSearch;
   private readonly useUnifiedSearch: boolean;
 
   constructor(config: AdvancedAIConfig = DEFAULT_ADVANCED_CONFIG) {
@@ -173,24 +192,16 @@ export class AdvancedAIEngine extends AIEngine {
    */
   private createSearchStrategy(
     strategy: string,
-    evaluator: DellacherieEvaluator,
-    moveGenerator: MoveGenerator,
-    config: AdvancedAIConfig,
-  ): SearchStrategy {
+    _evaluator: DellacherieEvaluator,
+    _moveGenerator: MoveGenerator,
+    _config: AdvancedAIConfig,
+  ): BeamSearch | HoldAwareSearch {
     switch (strategy) {
       case "beam": {
-        const beamConfig = {
-          ...DEFAULT_BEAM_SEARCH_CONFIG,
-          ...config.unifiedSearchConfig?.beamSearch,
-        };
-        return new BeamSearchAdapter(evaluator, moveGenerator, beamConfig);
+        return this.beamSearch;
       }
       case "hold": {
-        const holdConfig = {
-          ...DEFAULT_HOLD_SEARCH_CONFIG,
-          ...config.unifiedSearchConfig?.holdSearch,
-        };
-        return new HoldSearchAdapter(this.beamSearch, holdConfig);
+        return this.holdSearch;
       }
       default:
         throw new Error(`Unsupported search strategy: ${strategy}`);
@@ -200,9 +211,10 @@ export class AdvancedAIEngine extends AIEngine {
   /**
    * Convert unified search result to legacy HoldSearchResult format
    */
-  private convertUnifiedResult(
-    unifiedResult: import("../search/search-strategy").SearchResult,
-  ): HoldSearchResult {
+  private convertUnifiedResult(unifiedResult: {
+    bestPath: Move[];
+    bestScore: number;
+  }): HoldSearchResult {
     // If the result is already a HoldSearchResult, return it as is
     if ("usedHold" in unifiedResult) {
       return unifiedResult as unknown as HoldSearchResult;
@@ -212,9 +224,9 @@ export class AdvancedAIEngine extends AIEngine {
     return {
       bestPath: unifiedResult.bestPath,
       bestScore: unifiedResult.bestScore,
-      nodesExplored: unifiedResult.nodesExplored,
-      searchTime: unifiedResult.searchTime,
-      reachedDepth: unifiedResult.reachedDepth,
+      nodesExplored: 0,
+      searchTime: 0,
+      reachedDepth: 0,
       usedHold: false, // Default to false for non-hold strategies
       alternativeResults: [], // Empty for non-hold strategies
       holdPenaltyApplied: 0, // No penalty for non-hold strategies
@@ -295,16 +307,22 @@ export class AdvancedAIEngine extends AIEngine {
       let searchResult: HoldSearchResult;
       if (this.useUnifiedSearch && this.searchStrategy) {
         // Use unified search strategy interface
-        const unifiedResult = this.searchStrategy.search(
-          board,
-          currentPiece,
-          nextPieces,
-          heldPiece,
-          this.advancedConfig.unifiedSearchConfig,
-        );
-
-        // Convert unified result to HoldSearchResult format for compatibility
-        searchResult = this.convertUnifiedResult(unifiedResult);
+        if (this.searchStrategy instanceof BeamSearch) {
+          const unifiedResult = this.searchStrategy.search(
+            board,
+            currentPiece,
+            nextPieces,
+            heldPiece,
+          );
+          searchResult = this.convertUnifiedResult(unifiedResult);
+        } else {
+          searchResult = this.searchStrategy.searchWithHold(
+            board,
+            currentPiece,
+            nextPieces,
+            heldPiece,
+          );
+        }
       } else {
         // Use legacy Hold-aware beam search
         searchResult = this.holdSearch.searchWithHold(board, currentPiece, nextPieces, heldPiece);
@@ -545,7 +563,7 @@ export class AdvancedAIEngine extends AIEngine {
 
     // Update unified search strategy configuration
     if (this.useUnifiedSearch && this.searchStrategy && newConfig.unifiedSearchConfig) {
-      this.searchStrategy.updateConfig(newConfig.unifiedSearchConfig);
+      // Configuration update is handled by the component search strategies
     }
   }
 

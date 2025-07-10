@@ -1,16 +1,4 @@
-// Re-export all functionality from the split modules to maintain API compatibility
-
-// Pattern recognition functionality
-export {
-  analyzePatternDifficulty,
-  checkPatternFeasibility,
-  countEmptySquares,
-  detectDTCannonPattern,
-  detectPCOPattern,
-  detectSTStackPattern,
-  isPatternComplete,
-  scoreMoveFit,
-} from "./pattern-recognition";
+// Pattern recognition functionality removed - pattern search disabled
 // Core search functionality
 // Export for backwards compatibility - these are the main exports that existing code depends on
 export {
