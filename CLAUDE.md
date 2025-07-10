@@ -9,6 +9,7 @@
 4. **Error Suppression**: NEVER hide or ignore error messages
 5. **Temporary Fixes**: NEVER implement temporary solutions that create technical debt
 6. **Any Type Usage**: NEVER use `any` type - use `unknown` with proper type guards or define explicit types
+7. **Class Usage**: NEVER use class-based implementations except when extending interfaces (BaseSearchStrategy)
 
 ### MANDATORY EXECUTION PATTERNS
 - **Path Import Rules**: ALWAYS use `@/` for cross-directory imports, `./` for same-directory imports
@@ -22,17 +23,17 @@
 
 #### Application Libraries (Latest Versions)
 - **Frontend**: React 19.1.0, Zustand 5.0.6, Tailwind CSS 4.1.11
-- **Animation**: Motion 12.23.0 (physics-based animations)
+- **Animation**: Motion 12.23.3 (physics-based animations)
 - **i18n**: i18next 25.3.2 + react-i18next 15.6.0
 - **UI Components**: shadcn/ui with Radix UI primitives
-- **Utilities**: clsx 2.1.1, tailwind-merge 3.3.1, immer 10.1.1
+- **Utilities**: clsx 2.1.1, tailwind-merge 3.3.1, immer 10.1.1, js-yaml 4.1.0, vibelogger 0.1.0
 
 #### Development & Build Tools
 - **Runtime**: Bun 1.2.18 (package manager, test runner, dev server)
-- **Build**: Vite 7.0.6 (rolldown-vite)
+- **Build**: Vite 7.0.7 (rolldown-vite)
 - **TypeScript**: 5.8.3 with strict mode
 - **Quality**: Biome 2.1.1, Lefthook 1.12.1
-- **Testing**: Bun Test, Playwright 1.53.2, fast-check 4.2.0
+- **Testing**: Bun Test, Playwright 1.54.0, fast-check 4.2.0
 
 ### Directory Structure
 ```
@@ -44,9 +45,20 @@ src/
 │   └── ui/        # shadcn/ui components
 ├── game/          # Pure game logic (TEST ALL)
 │   └── ai/        # Advanced AI system (18 modules, 12,000+ lines, TEST ALL)
+│       ├── config/    # YAML-based weight configuration system
+│       │   ├── weight-loader.ts  # Dynamic weight loading from YAML
+│       │   └── weights.yaml      # AI evaluator weight configurations
 │       ├── core/      # Core AI engine, BitBoard, collision detection, piece bits
-│       ├── evaluators/ # Dellacherie, pattern evaluator, phase-based weights
-│       ├── search/    # Beam search, diversity beam search, Hold search, pattern search
+│       ├── evaluators/ # BaseEvaluator interface, unified evaluator architecture
+│       │   ├── dellacherie/     # Modular Dellacherie evaluator
+│       │   │   ├── calculator/  # Score calculation logic
+│       │   │   ├── core/       # Core evaluator implementation
+│       │   │   └── features/   # Individual feature extractors
+│       │   ├── base-evaluator.ts # Unified evaluator interface
+│       │   └── ... # Other evaluators (pattern, stacking, advanced-features)
+│       ├── search/    # Unified SearchStrategy interface and implementations
+│       │   ├── search-strategy.ts # Common search interface
+│       │   └── ... # Search algorithms with adapter pattern
 │       └── tests/     # AI integration tests and strategy validation
 ├── hooks/         # Custom React hooks (TEST ONLY EXTRACTED PURE FUNCTIONS)
 │   ├── actions/   # Game action hooks
@@ -75,7 +87,8 @@ src/
 │   ├── __mocks__/ # Mock implementations
 │   ├── generators/ # Test data generators
 │   └── setup.ts   # Test setup configuration
-└── tests/         # E2E tests
+└── tests/         # Performance tests
+    └── performance/   # Performance benchmarks and tests
 ```
 
 ### State Management Architecture
@@ -103,21 +116,23 @@ const b = useStore((state) => state.b);
 - Tetromino Management: 7 pieces with Super Rotation System (SRS)
 - AI Implementation: Multi-level AI system with BitBoard optimization
 
-**AI Architecture** (18 AI modules, 12,000+ lines of TypeScript):
+**AI Architecture** (20+ AI modules, 15,000+ lines of TypeScript):
 1. **Core AI Engine**:
    - **BitBoard**: Ultra-high-performance board representation using Uint32Array (100,000+ evaluations/sec)
    - **Advanced AI Engine**: Multi-phase decision engine with diversified beam search
    - **Collision Detection**: Optimized position validation system (< 1ms for 1,000 checks)
    - **Move Generator**: Comprehensive move analysis with SRS support
    - **Piece Bits**: Optimized piece bit manipulation for collision detection
+   - **BaseEvaluator Interface**: Unified evaluator interface for consistent AI strategy implementation
 
 2. **AI Evaluators**:
-   - **Dellacherie**: 6-feature heuristic system (Landing Height, Lines Cleared, Transitions, Holes, Wells)
+   - **Dellacherie**: Modularized 6-feature heuristic system with separate feature extractors
    - **Advanced Features**: T-Spin detection, Perfect Clear opportunities, danger zone analysis
    - **Pattern Evaluator**: PCO, DT Cannon, ST-Stack competitive pattern detection
    - **Phase-Based Weights**: Dynamic strategy adaptation (early/mid/late/danger phases)
    - **Terrain Analysis**: Surface smoothness, accessibility, and strategic position evaluation
    - **Stacking Evaluator**: Stacking-focused evaluation with gradual line building strategy (DT-20 system)
+   - **YAML Weight Management**: Dynamic weight configuration system for easy AI tuning (weights.yaml)
 
 3. **Search Algorithms**:
    - **Beam Search**: Multi-depth lookahead with configurable beam width (5-20)
@@ -125,6 +140,7 @@ const b = useStore((state) => state.b);
    - **Hold Search**: Strategic Hold piece utilization with penalty system
    - **Pattern Search**: Depth-first search for pattern completion opportunities
    - **Performance Benchmarks**: Optimized search with 80ms time limits
+   - **Unified SearchStrategy Interface**: Common interface for all search algorithms with adapter pattern
 
 4. **Pattern Recognition System**:
    - **PCO (Perfect Clear Opener)**: Complete board clearing opening patterns
@@ -137,6 +153,32 @@ const b = useStore((state) => state.b);
    - **AI Visualization**: Move heatmaps, search tree visualization, thinking process display
    - **AI Replay System**: Complete game replay with decision analysis and performance metrics
    - **Performance Monitoring**: Real-time AI performance tracking and optimization insights
+
+## AI Architecture Patterns
+
+### BaseEvaluator Interface
+All AI evaluators implement a unified interface for consistency:
+```typescript
+interface BaseEvaluator {
+  evaluate(state: BoardState): number;
+  calculateFeatures(board: BitBoard): FeatureSet;
+  applyWeights(features: FeatureSet): number;
+  getName(): string;
+}
+```
+
+### SearchStrategy Interface
+Unified search algorithm interface with adapter pattern:
+```typescript
+interface SearchStrategy {
+  search(board: BitBoard, piece: Tetromino, next: Tetromino[]): SearchResult;
+  getName(): string;
+  updateConfig(config: Partial<SearchConfig>): void;
+}
+```
+
+### YAML Weight Configuration
+AI weights are now managed through `weights.yaml` for easy tuning without code changes
 
 ## Development Commands
 
@@ -152,7 +194,7 @@ bun run lint         # Code linting (MUST pass before commits)
 bun run typecheck    # Type checking (MUST pass before commits)
 bun run build        # Production build (MUST succeed before commits)
 bun run ci           # Complete CI pipeline
-bun run benchmark    # Run AI performance benchmarks
+bun run benchmark    # Run AI performance benchmarks (CLI mode available)
 bun run e2e          # Run Playwright E2E tests
 bun run check:i18n   # Check i18n key consistency
 ```
@@ -167,7 +209,8 @@ bun run check:i18n   # Check i18n key consistency
 
 ### TESTING RULES
 **TEST TARGETS**: 
-- ✅ Pure functions in `/src/game/`, `/src/utils/`, `/src/store/`
+- ✅ Pure functions in `/src/game/`, `/src/utils/`, `/src/store/`, `/src/benchmarks/`
+- ✅ AI modules in `/src/game/ai/` (all evaluators, search algorithms, core engines)
 - ❌ React components, DOM interactions, UI behavior
 
 ### CRITICAL: Testing with AI Assistants
