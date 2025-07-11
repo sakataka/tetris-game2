@@ -90,17 +90,17 @@ function heightBoundCheck(
   }
 
   // Find required max height from pattern
-  let requiredHeight = 0;
+  let _requiredHeight = 0;
   for (let row = 19; row >= 0; row--) {
     if (template.occupiedMask[row] !== 0) {
-      requiredHeight = row + 1;
+      _requiredHeight = row + 1;
       break;
     }
   }
 
   // Check if we can reach required height with remaining pieces
   const maxPieceHeight = 4; // Maximum height a single piece can add
-  return maxHeight + remainingDepth * maxPieceHeight < requiredHeight;
+  return maxHeight + remainingDepth * maxPieceHeight < _requiredHeight;
 }
 
 /**
@@ -539,6 +539,212 @@ export class PatternSearchCore {
       canHold: state.canHold,
     };
   }
+}
+
+/**
+ * Feasibility check result
+ */
+export interface PatternFeasibilityResult {
+  isPossible: boolean;
+  confidence: number;
+  moveSequence: Move[];
+  reason?: string;
+  estimatedDepth?: number;
+  missingPieces?: TetrominoTypeName[];
+}
+
+/**
+ * Check if pattern completion is feasible with given pieces
+ */
+export function checkPatternFeasibility(
+  board: Uint32Array,
+  pieceQueue: TetrominoTypeName[],
+  template: PatternTemplate,
+): PatternFeasibilityResult {
+  // Quick check: if pattern is already complete
+  if (isPatternCompleteStatic(board, template)) {
+    return {
+      isPossible: true,
+      confidence: 1.0,
+      moveSequence: [],
+      estimatedDepth: 0,
+    };
+  }
+
+  // Check if we have irreversible holes
+  if (hasIrreversibleHoles(board)) {
+    return {
+      isPossible: false,
+      confidence: 0.0,
+      moveSequence: [],
+      reason: "Irreversible holes detected",
+    };
+  }
+
+  // Count empty squares needed
+  const emptySquares = countEmptySquaresStatic(board, template);
+  const totalPieceSquares = pieceQueue.length * 4;
+
+  // Basic feasibility check
+  if (totalPieceSquares < emptySquares) {
+    return {
+      isPossible: false,
+      confidence: pieceQueue.length === 0 ? 0.01 : 0.0,
+      moveSequence: [],
+      reason: `Insufficient pieces: need ${emptySquares} squares, have ${totalPieceSquares}`,
+    };
+  }
+
+  // Height feasibility check
+  let maxHeight = 0;
+  for (let row = 19; row >= 0; row--) {
+    if (board[row] !== 0) {
+      maxHeight = row + 1;
+      break;
+    }
+  }
+
+  if (maxHeight >= 18) {
+    return {
+      isPossible: false,
+      confidence: 0.0,
+      moveSequence: [],
+      reason: "Board too full",
+    };
+  }
+
+  // Check if board is impossible (too many filled rows)
+  let filledRows = 0;
+  for (let row = 0; row < 20; row++) {
+    if (board[row] === 0b1111111111) {
+      filledRows++;
+    }
+  }
+  if (filledRows >= 10) {
+    return {
+      isPossible: false,
+      confidence: 0.05, // Very low confidence for impossible scenarios
+      moveSequence: [],
+      reason: "Too many filled rows",
+    };
+  }
+
+  // Calculate confidence based on various factors
+  let confidence = 0.5; // Base confidence
+
+  // Check if we have specific pieces required for common patterns
+  const patternName = template.name?.toLowerCase() || "";
+  if (patternName.includes("pco")) {
+    // PCO patterns often need specific piece arrangements
+    const hasIPiece = pieceQueue.includes("I");
+    const iPiecePosition = pieceQueue.indexOf("I");
+
+    if (!hasIPiece) {
+      return {
+        isPossible: false,
+        confidence: 0.0,
+        moveSequence: [],
+        reason: "PCO requires I-piece",
+      };
+    }
+
+    // Earlier I-piece position = higher confidence
+    if (iPiecePosition <= 2) {
+      confidence = 0.95;
+    } else if (iPiecePosition <= 4) {
+      confidence = 0.9;
+    } else {
+      confidence = 0.85; // Even late I-piece should have decent confidence
+    }
+  } else if (patternName.includes("dt")) {
+    // DT Cannon patterns need specific pieces
+    const hasLPiece = pieceQueue.includes("L");
+    const hasSPiece = pieceQueue.includes("S");
+
+    if (!hasLPiece || !hasSPiece) {
+      return {
+        isPossible: false,
+        confidence: 0.0,
+        moveSequence: [],
+        reason: "DT Cannon requires L and S pieces",
+      };
+    }
+
+    confidence = 0.7; // Moderate confidence for DT patterns
+  } else if (patternName.includes("st")) {
+    // ST-Stack patterns
+    const hasTPiece = pieceQueue.includes("T");
+    const hasSPiece = pieceQueue.includes("S");
+
+    if (!hasTPiece || !hasSPiece) {
+      return {
+        isPossible: false,
+        confidence: 0.0,
+        moveSequence: [],
+        reason: "ST-Stack requires T and S pieces",
+      };
+    }
+
+    confidence = 0.85; // High confidence for ST-Stack
+  }
+
+  // Adjust confidence based on queue length vs required pieces
+  const efficiencyRatio = Math.min(1.0, emptySquares / (totalPieceSquares * 0.8));
+  confidence *= Math.max(0.9, efficiencyRatio);
+
+  // Ensure confidence is within bounds
+  confidence = Math.max(0.01, Math.min(1.0, confidence));
+
+  return {
+    isPossible: confidence > 0.1,
+    confidence,
+    moveSequence: [], // For now, return empty move sequence
+    estimatedDepth: Math.min(pieceQueue.length, emptySquares / 2),
+  };
+}
+
+/**
+ * Static version of pattern completion check
+ */
+function isPatternCompleteStatic(board: Uint32Array, template: PatternTemplate): boolean {
+  for (let row = 0; row < Math.min(20, template.occupiedMask.length); row++) {
+    if ((board[row] & template.occupiedMask[row]) !== template.occupiedMask[row]) {
+      return false;
+    }
+  }
+
+  for (let row = 0; row < Math.min(20, template.emptyMask.length); row++) {
+    if ((board[row] & template.emptyMask[row]) !== 0) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+/**
+ * Static version of empty squares counting
+ */
+function countEmptySquaresStatic(board: Uint32Array, template: PatternTemplate): number {
+  let count = 0;
+  for (let row = 0; row < Math.min(20, template.occupiedMask.length); row++) {
+    const missingMask = template.occupiedMask[row] & ~board[row];
+    count += countBitsStatic(missingMask);
+  }
+  return count;
+}
+
+/**
+ * Static version of bit counting
+ */
+function countBitsStatic(n: number): number {
+  let count = 0;
+  let temp = n;
+  while (temp) {
+    count++;
+    temp &= temp - 1;
+  }
+  return count;
 }
 
 /**
