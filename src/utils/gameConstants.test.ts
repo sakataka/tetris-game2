@@ -8,7 +8,6 @@ describe("gameConstants", () => {
         "BOARD",
         "TIMING",
         "TETROMINO",
-        "ANIMATION",
         "TOUCH",
         "UI",
         "SCORING",
@@ -104,54 +103,6 @@ describe("gameConstants", () => {
         "GRID_CELL_SIZE",
       ];
       expect(Object.keys(GAME_CONSTANTS.TETROMINO)).toEqual(expectedKeys);
-    });
-  });
-
-  describe("ANIMATION constants", () => {
-    test("should have expected animation sections", () => {
-      const expectedKeys = [
-        "SCORE",
-        "LINES",
-        "LEVEL",
-        "DEFAULT",
-        "CELL",
-        "LINE_CLEAR_DURATION",
-        "PIECE_PLACE_DURATION",
-        "COMPLETION_DELAY",
-      ];
-      expect(Object.keys(GAME_CONSTANTS.ANIMATION)).toEqual(expectedKeys);
-    });
-
-    test("should have expected score animation values", () => {
-      expect(GAME_CONSTANTS.ANIMATION.SCORE.STIFFNESS).toBe(300);
-      expect(GAME_CONSTANTS.ANIMATION.SCORE.DAMPING).toBe(15);
-    });
-
-    test("should have expected lines animation values", () => {
-      expect(GAME_CONSTANTS.ANIMATION.LINES.STIFFNESS).toBe(400);
-      expect(GAME_CONSTANTS.ANIMATION.LINES.DAMPING).toBe(20);
-    });
-
-    test("should have expected level animation values", () => {
-      expect(GAME_CONSTANTS.ANIMATION.LEVEL.STIFFNESS).toBe(250);
-      expect(GAME_CONSTANTS.ANIMATION.LEVEL.DAMPING).toBe(12);
-    });
-
-    test("should have expected default animation values", () => {
-      expect(GAME_CONSTANTS.ANIMATION.DEFAULT.STIFFNESS).toBe(300);
-      expect(GAME_CONSTANTS.ANIMATION.DEFAULT.DAMPING).toBe(15);
-    });
-
-    test("should have expected cell animation values", () => {
-      expect(GAME_CONSTANTS.ANIMATION.CELL.STIFFNESS).toBe(500);
-      expect(GAME_CONSTANTS.ANIMATION.CELL.DAMPING).toBe(30);
-      expect(GAME_CONSTANTS.ANIMATION.CELL.DURATION).toBe(0.25);
-    });
-
-    test("should have expected timing values", () => {
-      expect(GAME_CONSTANTS.ANIMATION.LINE_CLEAR_DURATION).toBe(0.2);
-      expect(GAME_CONSTANTS.ANIMATION.PIECE_PLACE_DURATION).toBe(0.15);
-      expect(GAME_CONSTANTS.ANIMATION.COMPLETION_DELAY).toBe(10);
     });
   });
 
@@ -269,7 +220,6 @@ describe("gameConstants", () => {
         GAME_CONSTANTS.BOARD.HEIGHT,
         GAME_CONSTANTS.TIMING.INITIAL_DROP_SPEED_MS,
         GAME_CONSTANTS.TETROMINO.GRID_SIZE,
-        GAME_CONSTANTS.ANIMATION.SCORE.STIFFNESS,
         GAME_CONSTANTS.TOUCH.MIN_SWIPE_DISTANCE,
         GAME_CONSTANTS.UI.BUTTON_HEIGHT,
         GAME_CONSTANTS.SCORING.LEVEL_MULTIPLIER,
@@ -295,10 +245,6 @@ describe("gameConstants", () => {
       // Timing values should be reasonable (in milliseconds)
       expect(GAME_CONSTANTS.TIMING.INITIAL_DROP_SPEED_MS).toBeLessThan(10000);
       expect(GAME_CONSTANTS.TIMING.MIN_DROP_SPEED_MS).toBeGreaterThan(10);
-
-      // Animation values should be reasonable
-      expect(GAME_CONSTANTS.ANIMATION.SCORE.STIFFNESS).toBeLessThan(1000);
-      expect(GAME_CONSTANTS.ANIMATION.SCORE.DAMPING).toBeLessThan(100);
     });
   });
 });

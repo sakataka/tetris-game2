@@ -34,32 +34,6 @@ export const GAME_CONSTANTS = {
     GRID_ROWS: 3,
     GRID_CELL_SIZE: 16, // For display in UI (w-4 h-4 = 16px)
   },
-  ANIMATION: {
-    SCORE: {
-      STIFFNESS: 300,
-      DAMPING: 15,
-    },
-    LINES: {
-      STIFFNESS: 400,
-      DAMPING: 20,
-    },
-    LEVEL: {
-      STIFFNESS: 250,
-      DAMPING: 12,
-    },
-    DEFAULT: {
-      STIFFNESS: 300,
-      DAMPING: 15,
-    },
-    CELL: {
-      STIFFNESS: 500,
-      DAMPING: 30,
-      DURATION: 0.25,
-    },
-    LINE_CLEAR_DURATION: 0.2,
-    PIECE_PLACE_DURATION: 0.15,
-    COMPLETION_DELAY: 10, // Minimal delay to ensure animation DOM updates complete
-  },
   TOUCH: {
     MIN_SWIPE_DISTANCE: 30,
     MAX_SWIPE_TIME: 500,

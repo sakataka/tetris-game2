@@ -69,14 +69,6 @@ export interface LineClearAnimationData {
 }
 
 /**
- * Animation controller interface (placeholder for future implementation)
- */
-export interface AnimationController {
-  // To be implemented based on specific animation library needs
-  [key: string]: unknown;
-}
-
-/**
  * Complete game state containing all information needed to render and update the game.
  */
 /**

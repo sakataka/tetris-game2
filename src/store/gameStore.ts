@@ -13,7 +13,6 @@ import {
 import { createDebugBag } from "@/game/pieceBag";
 import { createTetromino } from "@/game/tetrominos";
 import type {
-  AnimationController,
   GameAnimationState,
   GameState,
   LineClearAnimationData,
@@ -30,7 +29,6 @@ interface GameStore extends GameState {
   // Animation state fields
   animationState: GameAnimationState;
   lineClearData: LineClearAnimationData | null;
-  animationController: AnimationController | null;
 
   // Movement and game actions
   moveLeft: () => void;
@@ -68,7 +66,6 @@ function createInitialStateWithDebug(): GameState & {
   debugParams: DebugParams | null;
   animationState: GameAnimationState;
   lineClearData: LineClearAnimationData | null;
-  animationController: AnimationController | null;
 } {
   const debugParams = parseDebugParams();
   const initialState = createInitialGameState();
@@ -80,7 +77,6 @@ function createInitialStateWithDebug(): GameState & {
     debugParams: debugParams.enabled ? debugParams : null,
     animationState: "idle" as GameAnimationState,
     lineClearData: null,
-    animationController: null,
   };
 
   if (!debugParams.enabled) {
@@ -148,7 +144,6 @@ const resetGameState = (state: GameStore) => {
   state.showResetConfirmation = false;
   state.animationState = "idle";
   state.lineClearData = null;
-  state.animationController = null;
 };
 
 export const useGameStore = create<GameStore>()(
@@ -272,7 +267,6 @@ export const useGameStore = create<GameStore>()(
           // Error recovery - reset to idle state
           state.animationState = "idle";
           state.lineClearData = null;
-          state.animationController = null;
         }),
 
       // Derived state selectors

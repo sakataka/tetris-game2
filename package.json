@@ -53,11 +53,11 @@
     "fast-check": "^4.2.0",
     "happy-dom": "^18.0.1",
     "knip": "^5.61.3",
-    "lefthook": "1.12.1",
+    "lefthook": "1.12.2",
     "rollup-plugin-visualizer": "^6.0.3",
     "tailwindcss": "4.1.11",
     "typescript": "5.8.3",
-    "vite": "npm:rolldown-vite@^7.0.7"
+    "vite": "npm:rolldown-vite@^7.0.8"
   },
   "trustedDependencies": [
     "@tailwindcss/oxide",

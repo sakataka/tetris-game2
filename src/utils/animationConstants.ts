@@ -16,26 +16,8 @@ export const ANIMATION_PRESETS = {
     damping: 20,
     mass: 0.8,
   },
-  pieceDrop: {
-    type: "spring" as const,
-    stiffness: 600,
-    damping: 30,
-    mass: 0.5,
-  },
-  pieceRotation: {
-    type: "spring" as const,
-    stiffness: 400,
-    damping: 25,
-    mass: 0.6,
-  },
 
-  // Line clear effects
-  lineClear: {
-    type: "spring" as const,
-    stiffness: 500,
-    damping: 25,
-    mass: 0.7,
-  },
+  // Line effects
   lineFall: {
     type: "spring" as const,
     stiffness: 400,
@@ -57,32 +39,12 @@ export const ANIMATION_PRESETS = {
     mass: 0.8,
   },
 
-  // Modal and dialog animations
-  modalEnter: {
-    type: "spring" as const,
-    stiffness: 300,
-    damping: 30,
-    mass: 1.0,
-  },
-  modalExit: {
-    type: "spring" as const,
-    stiffness: 400,
-    damping: 40,
-    mass: 0.8,
-  },
-
   // Button interactions
   buttonHover: {
     type: "spring" as const,
     stiffness: 500,
     damping: 35,
     mass: 0.3,
-  },
-  buttonPress: {
-    type: "spring" as const,
-    stiffness: 800,
-    damping: 40,
-    mass: 0.2,
   },
 
   // Cell animations
@@ -133,40 +95,5 @@ export const COMPLETE_ANIMATIONS = {
     initial: { scale: 1.2, opacity: 0.8, y: -10 },
     animate: { scale: 1, opacity: 1, y: 0 },
     transition: ANIMATION_PRESETS.scoreUpdate,
-  },
-
-  // Piece spawn animation
-  pieceSpawnAnimation: {
-    initial: { y: -8, opacity: 0.9 },
-    animate: { y: 0, opacity: 1 },
-    transition: ANIMATION_PRESETS.pieceSpawn,
-  },
-
-  // Piece placement animation
-  piecePlaceAnimation: {
-    initial: { scale: 0.9 },
-    animate: { scale: 1 },
-    transition: ANIMATION_PRESETS.cellPlace,
-  },
-
-  // Line clearing visual effect
-  lineClearAnimation: {
-    initial: { opacity: 1, scale: 1 },
-    animate: { opacity: [1, 0, 1, 0], scale: [1, 1.1, 1, 0.9] },
-    transition: { duration: ANIMATION_DURATIONS.normal, repeat: 0 },
-  },
-
-  // Line fall gravity animation
-  lineFallAnimation: {
-    initial: { y: 0 },
-    animate: { y: 0 },
-    transition: ANIMATION_PRESETS.lineFall,
-  },
-
-  // Button hover effect
-  buttonHoverAnimation: {
-    whileHover: { scale: 1.05 },
-    whileTap: { scale: 0.95 },
-    transition: ANIMATION_PRESETS.buttonHover,
   },
 } as const;

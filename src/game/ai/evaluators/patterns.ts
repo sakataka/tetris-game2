@@ -354,44 +354,6 @@ export class MidGamePatternDetector {
   }
 
   /**
-   * Extract top rows from board (future implementation)
-   */
-  // private getTopRows(board: Uint32Array, height: number): Uint32Array {
-  //   const topRows = new Uint32Array(height);
-  //   const boardHeight = GAME_CONSTANTS.BOARD.HEIGHT;
-  //
-  //   // Find the highest occupied row
-  //   let highestRow = -1;
-  //   for (let row = boardHeight - 1; row >= 0; row--) {
-  //     if (board[row] !== 0) {
-  //       highestRow = row;
-  //       break;
-  //     }
-  //   }
-  //
-  //   // Extract rows from highest occupied row
-  //   if (highestRow >= 0) {
-  //     const startRow = Math.max(0, highestRow - height + 1);
-  //     for (let i = 0; i < height && startRow + i <= highestRow; i++) {
-  //       topRows[i] = board[startRow + i];
-  //     }
-  //   }
-  //
-  //   return topRows;
-  // }
-
-  /**
-   * Hash board section for pattern matching (future implementation)
-   */
-  // private hashBoardSection(rows: Uint32Array): number {
-  //   let hash = 0;
-  //   for (let i = 0; i < rows.length; i++) {
-  //     hash = (hash * 31 + rows[i]) >>> 0;
-  //   }
-  //   return hash;
-  // }
-
-  /**
    * Check if board has ST-notch pattern
    */
   private isSTNotchPattern(board: Uint32Array, currentHeight: number): boolean {

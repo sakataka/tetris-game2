@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useGameActions } from "@/hooks/actions/useGameActions";
+import { useGameStoreActions } from "@/hooks/core/useGameStoreActions";
 
 /**
  * Game input actions interface
@@ -24,13 +24,13 @@ export interface GameInputActions {
  * Responsibilities:
  * - Maps core game actions to input-specific interface
  * - Provides domain-specific action names for different input types
- * - Leverages useGameActions for DRY principle
+ * - Leverages useGameStoreActions for DRY principle
  *
  * @returns Game input actions object with semantic naming
  */
 export function useGameInputActions(): GameInputActions {
-  // Get core actions from base hook (eliminates duplication)
-  const actions = useGameActions();
+  // Get core actions from game store (eliminates duplication)
+  const actions = useGameStoreActions();
 
   // Transform core actions to input-specific semantic names
   return useMemo(
