@@ -2,14 +2,14 @@
 
 ## EXECUTION PRIORITY: Critical Development Rules
 
-### ABSOLUTE PROHIBITIONS (Never Override)
-1. **Type Error Resolution**: NEVER relax TypeScript checks to resolve issues
-2. **Test Bypassing**: NEVER skip tests or use inappropriate mocks for error avoidance  
-3. **Output Hardcoding**: NEVER hardcode user-facing text or API responses
-4. **Error Suppression**: NEVER hide or ignore error messages
-5. **Temporary Fixes**: NEVER implement temporary solutions that create technical debt
+### ABSOLUTE PROHIBITIONS (No Exceptions)
+1. **Type Error Resolution**: NEVER relax TypeScript checks to resolve issues - always fix the root cause
+2. **Test Bypassing**: NEVER skip tests or use inappropriate mocks for error avoidance - address the underlying problem
+3. **Output Hardcoding**: NEVER hardcode user-facing text or API responses - use i18n and proper data sources
+4. **Error Suppression**: NEVER hide or ignore error messages - errors must be properly handled or resolved
+5. **Temporary Fixes**: NEVER implement temporary solutions that create technical debt - build sustainable solutions
 6. **Any Type Usage**: NEVER use `any` type - use `unknown` with proper type guards or define explicit types
-7. **Class Usage**: NEVER use class-based implementations except when extending interfaces (BaseSearchStrategy)
+7. **Class Usage**: NEVER use class-based implementations except when absolutely necessary for interface compliance
 
 ### MANDATORY EXECUTION PATTERNS
 - **Path Import Rules**: ALWAYS use `@/` for cross-directory imports, `./` for same-directory imports
@@ -21,19 +21,19 @@
 
 ### Core Implementation Stack
 
-#### Application Libraries (Latest Versions)
+#### Application Libraries (Confirmed Versions)
 - **Frontend**: React 19.1.0, Zustand 5.0.6, Tailwind CSS 4.1.11
 - **Animation**: Motion 12.23.3 (physics-based animations)
 - **i18n**: i18next 25.3.2 + react-i18next 15.6.0
-- **UI Components**: shadcn/ui with Radix UI primitives
-- **Utilities**: clsx 2.1.1, tailwind-merge 3.3.1, immer 10.1.1, js-yaml 4.1.0, vibelogger 0.1.0
+- **UI Components**: shadcn/ui with Radix UI primitives (@radix-ui components)
+- **Utilities**: clsx 2.1.1, tailwind-merge 3.3.1, immer 10.1.1
 
 #### Development & Build Tools
 - **Runtime**: Bun 1.2.18 (package manager, test runner, dev server)
-- **Build**: Vite 7.0.7 (rolldown-vite)
+- **Build**: Vite 7.0.8+ (rolldown-vite) 
 - **TypeScript**: 5.8.3 with strict mode
-- **Quality**: Biome 2.1.1, Lefthook 1.12.1
-- **Testing**: Bun Test, Playwright 1.54.0, fast-check 4.2.0
+- **Quality**: Biome 2.1.1, Lefthook 1.12.2
+- **Testing**: Bun Test, Playwright 1.54.1, fast-check 4.2.0
 
 ### Directory Structure
 ```
@@ -116,7 +116,7 @@ const b = useStore((state) => state.b);
 - Tetromino Management: 7 pieces with Super Rotation System (SRS)
 - AI Implementation: Multi-level AI system with BitBoard optimization
 
-**AI Architecture** (20+ AI modules, 15,000+ lines of TypeScript):
+**AI Architecture** (Advanced AI system with modular design):
 1. **Core AI Engine**:
    - **BitBoard**: Ultra-high-performance board representation using Uint32Array (100,000+ evaluations/sec)
    - **Advanced AI Engine**: Multi-phase decision engine with diversified beam search
@@ -140,7 +140,7 @@ const b = useStore((state) => state.b);
    - **Hold Search**: Strategic Hold piece utilization with penalty system
    - **Pattern Search**: Depth-first search for pattern completion opportunities
    - **Performance Benchmarks**: Optimized search with 80ms time limits
-   - **Unified SearchStrategy Interface**: Common interface for all search algorithms with adapter pattern
+   - **Modular Search Strategies**: Multiple search algorithms with shared configuration patterns
 
 4. **Pattern Recognition System**:
    - **PCO (Perfect Clear Opener)**: Complete board clearing opening patterns
@@ -167,13 +167,14 @@ interface BaseEvaluator {
 }
 ```
 
-### SearchStrategy Interface
-Unified search algorithm interface with adapter pattern:
+### Search Configuration Pattern
+Search algorithms use consistent configuration interfaces:
 ```typescript
-interface SearchStrategy {
-  search(board: BitBoard, piece: Tetromino, next: Tetromino[]): SearchResult;
-  getName(): string;
-  updateConfig(config: Partial<SearchConfig>): void;
+interface SearchConfig {
+  maxDepth: number;
+  timeLimit: number;
+  enablePruning: boolean;
+  strategyConfig?: Record<string, unknown>;
 }
 ```
 
@@ -213,13 +214,14 @@ bun run check:i18n   # Check i18n key consistency
 - ✅ AI modules in `/src/game/ai/` (all evaluators, search algorithms, core engines)
 - ❌ React components, DOM interactions, UI behavior
 
-### CRITICAL: Testing with AI Assistants
+### CRITICAL: Testing Guidelines for AI Assistants
 
-**❌ NEVER USE `bun run dev` for testing purposes**:
-- Development server blocks indefinitely
-- AI assistants cannot effectively test interactive applications
+**❌ NEVER USE `bun run dev` for automated testing**:
+- Development server runs indefinitely and blocks terminal
+- AI assistants cannot interact with browser-based applications effectively
+- Use unit tests and build validation instead
 
-**✅ APPROVED TESTING METHODS**:
+**✅ RECOMMENDED TESTING APPROACHES**:
 
 1. **Unit/Integration Tests** (Preferred):
 ```bash
@@ -230,10 +232,12 @@ bun run test:perf               # Performance tests
 bun run test:full               # Complete test suite
 ```
 
-2. **Playwright E2E Testing**:
+2. **Playwright E2E Testing** (When MCP Playwright tools are available):
 ```bash
+# Start dev server in background (for E2E testing only)
 bun run dev > /dev/null 2>&1 &
 sleep 5
+# Use MCP Playwright tools for browser automation
 mcp__playwright__browser_navigate "http://localhost:5173"
 mcp__playwright__browser_snapshot
 ```
@@ -347,16 +351,22 @@ clearAnimationData: () => set((state) => {
 });
 ```
 
-## MCP TOOLS USAGE
+## MCP TOOLS INTEGRATION
 
-### PLAYWRIGHT MCP - Browser Testing
-Use for visual UI validation, user interaction testing, animation behavior analysis
+### PLAYWRIGHT MCP - Browser Automation
+- Visual UI validation and screenshot capture  
+- User interaction testing and gesture simulation
+- Animation behavior analysis and timing validation
+- **Usage Criteria**: Only when E2E testing is required
 
-### CONTEXT7 MCP - Library Documentation  
-Use for researching latest features, checking breaking changes, troubleshooting
+### CONTEXT7 MCP - Documentation Research  
+- Research latest library features and capabilities
+- Check for breaking changes and compatibility issues
+- Troubleshoot technical problems with authoritative documentation
+- **Usage Timing**: When investigating new libraries or unfamiliar functionality
 
-### AIVISSPEECH MCP - Task Completion
-Trigger ONLY when ALL todo items completed (volumeScale=0.1, Japanese messages preferred)
-
-### O3 MCP - Technical Problem Solving
-Use for technical blockers, complex errors, architectural decisions
+### O3 MCP - Advanced Problem Solving
+- Resolve complex technical challenges beyond standard solutions
+- Architectural design consultation and best practices
+- Performance optimization strategies and recommendations
+- **Usage Criteria**: When conventional solutions are insufficient or unclear
