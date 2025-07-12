@@ -1,5 +1,6 @@
 import { describe, expect, it } from "bun:test";
-import { BitBoard } from "@/game/ai/core/bitboard";
+import type { BitBoardData } from "@/game/ai/core/bitboard";
+import { createBitBoard, place } from "@/game/ai/core/bitboard";
 import {
   applyDepthDiscount,
   calculateDiversityScore,
@@ -15,7 +16,7 @@ import {
 } from "./diversity-beam-search";
 
 describe("Diversity Beam Search", () => {
-  const createEmptyBoard = (): BitBoard => new BitBoard();
+  const createEmptyBoard = (): BitBoardData => createBitBoard();
 
   const createMockNode = (boardHeight: number, score: number, _id: string): DiverseSearchNode => ({
     board: createBoardWithHeight(boardHeight),
@@ -28,23 +29,23 @@ describe("Diversity Beam Search", () => {
     surfaceProfile: undefined,
   });
 
-  const createBoardWithHeight = (height: number): BitBoard => {
-    const board = new BitBoard();
+  const createBoardWithHeight = (height: number): BitBoardData => {
+    let board = createBitBoard();
     // Create a simple board with specified height in the first column
     for (let i = 0; i < height; i++) {
       const rowBits = [1]; // Only first column filled
-      board.place(rowBits, 19 - i);
+      board = place(board, rowBits, 19 - i);
     }
     return board;
   };
 
-  const createBoardWithPattern = (heights: number[]): BitBoard => {
-    const board = new BitBoard();
+  const createBoardWithPattern = (heights: number[]): BitBoardData => {
+    let board = createBitBoard();
     for (let col = 0; col < Math.min(heights.length, 10); col++) {
       for (let row = 0; row < heights[col]; row++) {
         // Create a single bit for this column position
         const rowBits = [1 << col];
-        board.place(rowBits, 19 - row);
+        board = place(board, rowBits, 19 - row);
       }
     }
     return board;

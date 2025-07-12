@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { BitBoard } from "@/game/ai/core/bitboard";
+import { createBitBoard } from "@/game/ai/core/bitboard";
 import { MoveGenerator } from "@/game/ai/core/move-generator";
 import { DellacherieEvaluator } from "@/game/ai/evaluators/dellacherie";
 import type { Tetromino, TetrominoTypeName } from "@/types/game";
@@ -69,7 +69,7 @@ describe("BeamSearch with Diversity Integration", () => {
   describe("Search Functionality", () => {
     it("should perform search with diversity enabled", () => {
       const beamSearch = createBeamSearch(DEFAULT_BEAM_CONFIG);
-      const board = new BitBoard();
+      const board = createBitBoard();
       const currentPiece = createMockTetromino("I");
       const nextPieces = [createMockTetromino("O"), createMockTetromino("T")];
 
@@ -88,7 +88,7 @@ describe("BeamSearch with Diversity Integration", () => {
         enableDiversity: false,
       };
       const beamSearch = createBeamSearch(config);
-      const board = new BitBoard();
+      const board = createBitBoard();
       const currentPiece = createMockTetromino("I");
       const nextPieces = [createMockTetromino("O"), createMockTetromino("T")];
 
@@ -103,7 +103,7 @@ describe("BeamSearch with Diversity Integration", () => {
 
     it("should handle empty piece queue", () => {
       const beamSearch = createBeamSearch(DEFAULT_BEAM_CONFIG);
-      const board = new BitBoard();
+      const board = createBitBoard();
       const currentPiece = createMockTetromino("I");
       const nextPieces: Tetromino[] = [];
 
@@ -121,7 +121,7 @@ describe("BeamSearch with Diversity Integration", () => {
         maxDepth: 10, // Deep search that would exceed time limit
       };
       const beamSearch = createBeamSearch(config);
-      const board = new BitBoard();
+      const board = createBitBoard();
       const currentPiece = createMockTetromino("I");
       const nextPieces = Array(10).fill(createMockTetromino("T"));
 
@@ -135,7 +135,7 @@ describe("BeamSearch with Diversity Integration", () => {
 
     it("should handle hold piece", () => {
       const beamSearch = createBeamSearch(DEFAULT_BEAM_CONFIG);
-      const board = new BitBoard();
+      const board = createBitBoard();
       const currentPiece = createMockTetromino("I");
       const nextPieces = [createMockTetromino("O")];
       const heldPiece = createMockTetromino("T");
@@ -167,7 +167,7 @@ describe("BeamSearch with Diversity Integration", () => {
       const diversityBeamSearch = createBeamSearch(diversityConfig);
       const standardBeamSearch = createBeamSearch(standardConfig);
 
-      const board = new BitBoard();
+      const board = createBitBoard();
       const currentPiece = createMockTetromino("I");
       const nextPieces = [createMockTetromino("O"), createMockTetromino("T")];
 
@@ -191,7 +191,7 @@ describe("BeamSearch with Diversity Integration", () => {
       };
 
       const beamSearch = createBeamSearch(config);
-      const board = new BitBoard();
+      const board = createBitBoard();
       const currentPiece = createMockTetromino("I");
       const nextPieces = [createMockTetromino("O")];
 
@@ -207,7 +207,7 @@ describe("BeamSearch with Diversity Integration", () => {
       };
 
       const beamSearch = createBeamSearch(config);
-      const board = new BitBoard();
+      const board = createBitBoard();
       const currentPiece = createMockTetromino("I");
       const nextPieces = [createMockTetromino("O")];
 
