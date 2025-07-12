@@ -8,20 +8,22 @@ const mockGameActions = {
   moveRight: mock(),
   moveDown: mock(),
   rotate: mock(),
+  rotate180: mock(),
   drop: mock(),
   holdPiece: mock(),
   togglePause: mock(),
   resetGame: mock(),
+  showResetDialog: mock(),
+  hideResetDialog: mock(),
+  confirmReset: mock(),
+  clearAnimationData: mock(),
+  applyDebugPreset: mock(),
+  setDebugQueue: mock(),
 };
 
-// Mock useGameStore
-mock.module("../../store/gameStore", () => ({
-  useGameStore: mock().mockImplementation((selector) => {
-    if (typeof selector === "function") {
-      return selector(mockGameActions);
-    }
-    return mockGameActions;
-  }),
+// Mock useGameStoreActions to return our mock actions
+mock.module("../core/useGameStoreActions", () => ({
+  useGameStoreActions: () => mockGameActions,
 }));
 
 describe("useGameInputActions", () => {
