@@ -2,6 +2,24 @@ import { afterEach, beforeEach } from "bun:test";
 import { cleanup } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
+// Type definitions for Zustand store interfaces
+interface ZustandStore {
+  getState: () => unknown;
+  persist?: {
+    clearStorage: () => void;
+  };
+}
+
+interface GameState {
+  resetGame?: () => void;
+}
+
+interface GlobalWithJest {
+  jest?: {
+    clearAllMocks?: () => void;
+  };
+}
+
 // Import stores for cleanup
 let gameStore: unknown;
 let settingsStore: unknown;
@@ -74,8 +92,8 @@ beforeEach(async () => {
 
   // Reset all Zustand stores before each test
   if (gameStore && typeof gameStore === "object" && "getState" in gameStore) {
-    // biome-ignore lint/suspicious/noExplicitAny: Required for dynamic store access
-    const state = (gameStore as any).getState();
+    const store = gameStore as unknown as ZustandStore;
+    const state = store.getState() as GameState;
     if (state?.resetGame) {
       state.resetGame();
     }
@@ -83,16 +101,16 @@ beforeEach(async () => {
 
   // Clear any persisted settings
   if (settingsStore && typeof settingsStore === "object" && "persist" in settingsStore) {
-    // biome-ignore lint/suspicious/noExplicitAny: Required for dynamic store access
-    const persist = (settingsStore as any).persist;
+    const store = settingsStore as unknown as ZustandStore;
+    const persist = store.persist;
     if (persist?.clearStorage) {
       persist.clearStorage();
     }
   }
 
   if (highScoreStore && typeof highScoreStore === "object" && "persist" in highScoreStore) {
-    // biome-ignore lint/suspicious/noExplicitAny: Required for dynamic store access
-    const persist = (highScoreStore as any).persist;
+    const store = highScoreStore as unknown as ZustandStore;
+    const persist = store.persist;
     if (persist?.clearStorage) {
       persist.clearStorage();
     }
@@ -132,8 +150,8 @@ afterEach(() => {
   // Reset Zustand stores after each test as well
   if (gameStore && typeof gameStore === "object" && "getState" in gameStore) {
     try {
-      // biome-ignore lint/suspicious/noExplicitAny: Required for dynamic store access
-      const state = (gameStore as any).getState();
+      const store = gameStore as unknown as ZustandStore;
+      const state = store.getState() as GameState;
       if (state?.resetGame) {
         state.resetGame();
       }
@@ -149,8 +167,8 @@ afterEach(() => {
 
   // Clear any remaining mocks
   if (typeof globalThis !== "undefined" && "jest" in globalThis) {
-    // biome-ignore lint/suspicious/noExplicitAny: Required for dynamic test environment access
-    const jest = (globalThis as any).jest;
+    const globalWithJest = globalThis as unknown as GlobalWithJest;
+    const jest = globalWithJest.jest;
     if (jest?.clearAllMocks) {
       jest.clearAllMocks();
     }

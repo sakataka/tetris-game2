@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useShallow } from "zustand/shallow";
 import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import {
   Board,
@@ -47,7 +48,7 @@ export function Game() {
   const hideTSpinIndicator = useGameStore((state) => state.hideTSpinIndicator);
 
   // Game state for AI visualization
-  const gameState = useGameStore((state) => state);
+  const gameState = useGameStore(useShallow((state) => state));
 
   return (
     <>
