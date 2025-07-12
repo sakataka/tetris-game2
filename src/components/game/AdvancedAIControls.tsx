@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -47,13 +48,14 @@ export function AdvancedAIControls({
   onPause,
   onStep,
 }: AdvancedAIControlsProps) {
+  const { t } = useTranslation();
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   return (
     <Card className="p-4 space-y-4" data-testid="ai-controls">
       {/* Basic Control */}
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">AI Control</h3>
+        <h3 className="text-lg font-semibold">{t("game.ai.controls.title")}</h3>
         <div className="flex items-center gap-2">
           <Button
             onClick={onToggleAI}
@@ -61,16 +63,16 @@ export function AdvancedAIControls({
             size="sm"
             data-testid="toggle-ai"
           >
-            {aiState.isEnabled ? "Stop AI" : "Start AI"}
+            {aiState.isEnabled ? t("game.ai.controls.stop") : t("game.ai.controls.start")}
           </Button>
 
           {aiState.isEnabled && (
             <>
               <Button onClick={onPause} variant="outline" size="sm">
-                {aiState.isPaused ? "Resume" : "Pause"}
+                {aiState.isPaused ? t("game.ai.controls.resume") : t("game.ai.controls.pause")}
               </Button>
               <Button onClick={onStep} variant="outline" size="sm" disabled={!aiState.isPaused}>
-                Step
+                {t("game.ai.controls.step")}
               </Button>
             </>
           )}
@@ -80,19 +82,20 @@ export function AdvancedAIControls({
       {/* Status Display */}
       <div className="flex items-center gap-2 text-sm">
         <Badge variant={aiState.isEnabled ? "default" : "secondary"} data-testid="ai-status">
-          {aiState.isEnabled ? "Active" : "Inactive"}
+          {aiState.isEnabled ? t("game.ai.controls.active") : t("game.ai.controls.inactive")}
         </Badge>
 
         {aiState.isThinking && (
           <Badge variant="outline" data-testid="thinking-indicator">
-            Thinking...
+            {t("game.ai.controls.thinking")}
           </Badge>
         )}
 
         {aiState.lastDecision && (
           <span className="text-muted-foreground">
-            Last: {aiState.lastDecision.thinkingTime.toFixed(1)}ms,{" "}
-            {aiState.lastDecision.nodesExplored} nodes
+            {t("game.ai.controls.last")} {aiState.lastDecision.thinkingTime.toFixed(1)}
+            {t("game.ai.controls.ms")}, {aiState.lastDecision.nodesExplored}{" "}
+            {t("game.ai.controls.nodes")}
           </span>
         )}
       </div>
@@ -101,7 +104,7 @@ export function AdvancedAIControls({
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <label htmlFor="ai-level-select" className="text-sm font-medium">
-            AI Level
+            {t("game.ai.controls.level")}
           </label>
           <Select
             value={settings.aiLevel}
@@ -113,8 +116,8 @@ export function AdvancedAIControls({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="basic">Basic</SelectItem>
-              <SelectItem value="advanced">Advanced</SelectItem>
+              <SelectItem value="basic">{t("game.ai.controls.basic")}</SelectItem>
+              <SelectItem value="advanced">{t("game.ai.controls.advanced")}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -122,7 +125,7 @@ export function AdvancedAIControls({
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <label htmlFor="playback-speed-slider" className="text-sm font-medium">
-              Playback Speed
+              {t("game.ai.controls.playbackSpeed")}
             </label>
             <span className="text-sm text-muted-foreground">{settings.playbackSpeed}x</span>
           </div>
@@ -139,7 +142,7 @@ export function AdvancedAIControls({
 
         <div className="flex items-center justify-between">
           <label htmlFor="show-visualization-switch" className="text-sm font-medium">
-            Show Visualization
+            {t("game.ai.controls.showVisualization")}
           </label>
           <Switch
             id="show-visualization-switch"
@@ -159,7 +162,8 @@ export function AdvancedAIControls({
           className="w-full"
           data-testid="show-advanced"
         >
-          {showAdvanced ? "Hide" : "Show"} Advanced Settings
+          {showAdvanced ? t("game.ai.controls.hideAdvanced") : t("game.ai.controls.showAdvanced")}{" "}
+          {t("game.ai.controls.advancedSettings")}
         </Button>
 
         {showAdvanced && (
@@ -169,7 +173,7 @@ export function AdvancedAIControls({
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <label htmlFor="beam-width" className="text-sm font-medium">
-                      Beam Width
+                      {t("game.ai.controls.beamWidth")}
                     </label>
                     <span
                       className="text-sm text-muted-foreground"
@@ -193,7 +197,7 @@ export function AdvancedAIControls({
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <label htmlFor="time-limit" className="text-sm font-medium">
-                      Time Limit (ms)
+                      {t("game.ai.controls.timeLimit")}
                     </label>
                     <span className="text-sm text-muted-foreground">
                       {settings.thinkingTimeLimit}
@@ -213,7 +217,7 @@ export function AdvancedAIControls({
 
                 <div className="flex items-center justify-between">
                   <label htmlFor="use-hold" className="text-sm font-medium">
-                    Use Hold
+                    {t("game.ai.controls.useHold")}
                   </label>
                   <Switch
                     id="use-hold"
@@ -233,19 +237,22 @@ export function AdvancedAIControls({
       {aiState.stats && (
         <div className="text-xs text-muted-foreground space-y-1 pt-2 border-t">
           <div className="flex justify-between">
-            <span>Decisions:</span>
+            <span>{t("game.ai.controls.decisions")}</span>
             <span>{aiState.stats.totalDecisions}</span>
           </div>
           <div className="flex justify-between">
-            <span>Avg Time:</span>
-            <span>{aiState.stats.averageThinkTime.toFixed(1)}ms</span>
+            <span>{t("game.ai.controls.avgTime")}</span>
+            <span>
+              {aiState.stats.averageThinkTime.toFixed(1)}
+              {t("game.ai.controls.ms")}
+            </span>
           </div>
           <div className="flex justify-between">
-            <span>Timeouts:</span>
+            <span>{t("game.ai.controls.timeouts")}</span>
             <span>{aiState.stats.timeoutCount}</span>
           </div>
           <div className="flex justify-between">
-            <span>Hold Usage:</span>
+            <span>{t("game.ai.controls.holdUsage")}</span>
             <span>{(aiState.stats.holdUsageRate * 100).toFixed(1)}%</span>
           </div>
         </div>

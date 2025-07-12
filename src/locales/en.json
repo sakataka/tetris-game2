@@ -101,7 +101,9 @@
         "decisions": "Decisions:",
         "avgTime": "Avg Time:",
         "timeouts": "Timeouts:",
-        "holdUsage": "Hold Usage:"
+        "holdUsage": "Hold Usage:",
+        "nodes": "nodes",
+        "ms": "ms"
       },
       "visualization": {
         "evaluationBreakdown": "Evaluation Breakdown",
@@ -113,7 +115,16 @@
         "wells": "Wells:",
         "totalScore": "Total Score:",
         "specialOpportunities": "Special Opportunities",
-        "perfectClear": "Perfect Clear:"
+        "perfectClear": "Perfect Clear:",
+        "searchTree": "Search Tree (Depth: {{depth}})",
+        "depthLevel": "D{{level}}:",
+        "moreNodes": "+{{count}} more",
+        "notAvailable": "N/A",
+        "tSpinDetected": "T-Spin Detected:",
+        "tSpinInfo": "{{type}} at ({{x}},{{y}})",
+        "expectedLines": "{{lines}} lines",
+        "blocksRemaining": "{{blocks}} blocks remaining",
+        "estimatedMoves": "~{{moves}} moves"
       }
     },
     "touchControls": {

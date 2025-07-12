@@ -101,7 +101,9 @@
         "decisions": "判断回数:",
         "avgTime": "平均時間:",
         "timeouts": "タイムアウト:",
-        "holdUsage": "ホールド使用率:"
+        "holdUsage": "ホールド使用率:",
+        "nodes": "ノード",
+        "ms": "ミリ秒"
       },
       "visualization": {
         "evaluationBreakdown": "評価内訳",
@@ -113,7 +115,16 @@
         "wells": "井戸:",
         "totalScore": "総合スコア:",
         "specialOpportunities": "特殊機会",
-        "perfectClear": "パーフェクトクリア:"
+        "perfectClear": "パーフェクトクリア:",
+        "searchTree": "探索ツリー (深さ: {{depth}})",
+        "depthLevel": "深さ{{level}}:",
+        "moreNodes": "+{{count}}個",
+        "notAvailable": "N/A",
+        "tSpinDetected": "T-Spin検出:",
+        "tSpinInfo": "{{type}} 位置({{x}},{{y}})",
+        "expectedLines": "{{lines}}ライン",
+        "blocksRemaining": "残り{{blocks}}ブロック",
+        "estimatedMoves": "約{{moves}}手"
       }
     },
     "touchControls": {

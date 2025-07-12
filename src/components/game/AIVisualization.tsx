@@ -1,4 +1,5 @@
 import { motion } from "motion/react";
+import { useTranslation } from "react-i18next";
 import { Card } from "@/components/ui/card";
 import type { AdvancedAIDecision, PerfectClearOpportunity, TSpinOpportunity } from "@/game/ai";
 import type { GameState } from "@/types/game";
@@ -50,16 +51,21 @@ export function AIVisualization({ decision, settings }: AIVisualizationProps) {
 }
 
 function SearchTreeVisualization({ tree }: { tree: SearchTree }) {
+  const { t } = useTranslation();
   return (
     <Card className="p-3">
-      <h4 className="text-sm font-medium mb-2">Search Tree (Depth: {tree.maxDepth})</h4>
+      <h4 className="text-sm font-medium mb-2">
+        {t("game.ai.visualization.searchTree", { depth: tree.maxDepth })}
+      </h4>
       <div className="space-y-2">
         {tree.levels.map((level, levelIndex) => (
           <div
             key={`level-d${levelIndex}-n${level.nodes.length}`}
             className="flex items-center gap-1"
           >
-            <span className="text-xs text-muted-foreground w-12">D{levelIndex}:</span>
+            <span className="text-xs text-muted-foreground w-12">
+              {t("game.ai.visualization.depthLevel", { level: levelIndex })}
+            </span>
             <div className="flex gap-1 flex-wrap">
               {level.nodes.slice(0, 20).map((node, nodeIndex) => (
                 <motion.div
@@ -75,7 +81,7 @@ function SearchTreeVisualization({ tree }: { tree: SearchTree }) {
               ))}
               {level.nodes.length > 20 && (
                 <span className="text-xs text-muted-foreground">
-                  +{level.nodes.length - 20} more
+                  {t("game.ai.visualization.moreNodes", { count: level.nodes.length - 20 })}
                 </span>
               )}
             </div>
@@ -87,6 +93,7 @@ function SearchTreeVisualization({ tree }: { tree: SearchTree }) {
 }
 
 function EvaluationDetails({ decision }: { decision: AdvancedAIDecision }) {
+  const { t } = useTranslation();
   const bestMove = decision.bestPath?.[0];
   if (!bestMove) return null;
 
@@ -102,39 +109,39 @@ function EvaluationDetails({ decision }: { decision: AdvancedAIDecision }) {
 
   return (
     <Card className="p-3" data-testid="evaluation-details">
-      <h4 className="text-sm font-medium mb-2">Evaluation Breakdown</h4>
+      <h4 className="text-sm font-medium mb-2">{t("game.ai.visualization.evaluationBreakdown")}</h4>
       <div className="space-y-1 text-xs">
         <div className="flex justify-between">
-          <span>Landing Height:</span>
+          <span>{t("game.ai.visualization.landingHeight")}</span>
           <span className={features.landingHeight < 0 ? "text-green-600" : "text-red-600"}>
             {features.landingHeight.toFixed(2)}
           </span>
         </div>
         <div className="flex justify-between">
-          <span>Lines Cleared:</span>
+          <span>{t("game.ai.visualization.linesCleared")}</span>
           <span className="text-green-600">{features.linesCleared}</span>
         </div>
         <div className="flex justify-between">
-          <span>Holes:</span>
+          <span>{t("game.ai.visualization.holes")}</span>
           <span className={features.holes === 0 ? "text-green-600" : "text-red-600"}>
             {features.holes}
           </span>
         </div>
         <div className="flex justify-between">
-          <span>Row Transitions:</span>
+          <span>{t("game.ai.visualization.rowTransitions")}</span>
           <span>{features.rowTransitions}</span>
         </div>
         <div className="flex justify-between">
-          <span>Column Transitions:</span>
+          <span>{t("game.ai.visualization.columnTransitions")}</span>
           <span>{features.columnTransitions}</span>
         </div>
         <div className="flex justify-between">
-          <span>Wells:</span>
+          <span>{t("game.ai.visualization.wells")}</span>
           <span>{features.wells.toFixed(1)}</span>
         </div>
         <hr className="my-1" />
         <div className="flex justify-between font-medium">
-          <span>Total Score:</span>
+          <span>{t("game.ai.visualization.totalScore")}</span>
           <span
             className={
               bestMove.evaluationScore && bestMove.evaluationScore > 0
@@ -142,7 +149,7 @@ function EvaluationDetails({ decision }: { decision: AdvancedAIDecision }) {
                 : "text-red-600"
             }
           >
-            {bestMove.evaluationScore?.toFixed(2) || "N/A"}
+            {bestMove.evaluationScore?.toFixed(2) || t("game.ai.visualization.notAvailable")}
           </span>
         </div>
       </div>
@@ -157,24 +164,35 @@ function SpecialOpportunities({
   tSpins: TSpinOpportunity[];
   perfectClear: PerfectClearOpportunity | null;
 }) {
+  const { t } = useTranslation();
   if (tSpins.length === 0 && !perfectClear) return null;
 
   return (
     <Card className="p-3">
-      <h4 className="text-sm font-medium mb-2">Special Opportunities</h4>
+      <h4 className="text-sm font-medium mb-2">
+        {t("game.ai.visualization.specialOpportunities")}
+      </h4>
 
       {tSpins.length > 0 && (
         <div className="mb-2">
-          <h5 className="text-xs font-medium text-purple-600 mb-1">T-Spin Detected:</h5>
+          <h5 className="text-xs font-medium text-purple-600 mb-1">
+            {t("game.ai.visualization.tSpinDetected")}
+          </h5>
           {tSpins.slice(0, 3).map((tSpin, index) => (
             <div
               key={`tspin-${tSpin.type}-${tSpin.position.x}-${tSpin.position.y}-${index}`}
               className="text-xs flex justify-between"
             >
               <span>
-                {tSpin.type} at ({tSpin.position.x},{tSpin.position.y})
+                {t("game.ai.visualization.tSpinInfo", {
+                  type: tSpin.type,
+                  x: tSpin.position.x,
+                  y: tSpin.position.y,
+                })}
               </span>
-              <span className="text-purple-600">{tSpin.expectedLines} lines</span>
+              <span className="text-purple-600">
+                {t("game.ai.visualization.expectedLines", { lines: tSpin.expectedLines })}
+              </span>
             </div>
           ))}
         </div>
@@ -182,10 +200,16 @@ function SpecialOpportunities({
 
       {perfectClear && (
         <div>
-          <h5 className="text-xs font-medium text-blue-600 mb-1">Perfect Clear:</h5>
+          <h5 className="text-xs font-medium text-blue-600 mb-1">
+            {t("game.ai.visualization.perfectClear")}
+          </h5>
           <div className="text-xs flex justify-between">
-            <span>{perfectClear.remainingBlocks} blocks remaining</span>
-            <span className="text-blue-600">~{perfectClear.estimatedMoves} moves</span>
+            <span>
+              {t("game.ai.visualization.blocksRemaining", { blocks: perfectClear.remainingBlocks })}
+            </span>
+            <span className="text-blue-600">
+              {t("game.ai.visualization.estimatedMoves", { moves: perfectClear.estimatedMoves })}
+            </span>
           </div>
         </div>
       )}
