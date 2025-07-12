@@ -325,16 +325,6 @@ export const getDimensions = (board: BitBoardData): { width: number; height: num
 };
 
 /**
- * Get vacancy count for a specific row
- */
-export const getVacancy = (board: BitBoardData, y: number): number => {
-  if (y < 0 || y >= board.height) {
-    throw new Error(`Row index out of bounds: ${y}`);
-  }
-  return board.vacancyCache[y];
-};
-
-/**
  * Find rows that are candidates for line clearing
  * Returns rows with vacancy count <= maxVacancy
  */
@@ -349,47 +339,6 @@ export const findNearFullRows = (board: BitBoardData, maxVacancy = 2): number[] 
   }
 
   return nearFullRows;
-};
-
-/**
- * Find immediate line clearing opportunities
- * Returns rows that are completely full
- */
-export const findFullRows = (board: BitBoardData): number[] => {
-  const fullRows: number[] = [];
-
-  for (let y = 0; y < board.height; y++) {
-    if (board.vacancyCache[y] === 0) {
-      fullRows.push(y);
-    }
-  }
-
-  return fullRows;
-};
-
-/**
- * Check if a piece can complete a specific row
- */
-export const canCompleteRow = (
-  board: BitBoardData,
-  pieceBits: number,
-  targetRow: number,
-): boolean => {
-  if (targetRow < 0 || targetRow >= board.height) {
-    return false;
-  }
-
-  const rowBits = board.rows[targetRow];
-  const vacancy = board.vacancyCache[targetRow];
-
-  // Check if piece bits don't overlap with existing bits
-  if ((rowBits & pieceBits) !== 0) {
-    return false;
-  }
-
-  // Check if piece bits can fill the vacancy
-  const pieceBitCount = popcount(pieceBits);
-  return pieceBitCount >= vacancy;
 };
 
 /**
@@ -417,35 +366,6 @@ export const calculatePotentialLinesFilled = (
   }
 
   return potentialLines;
-};
-
-/**
- * Calculate potential near-full rows after placing a piece
- */
-export const calculatePotentialNearFullRows = (
-  board: BitBoardData,
-  pieceBitRows: number[],
-  startY: number,
-): number => {
-  let potentialNearFull = 0;
-
-  for (let i = 0; i < pieceBitRows.length; i++) {
-    const targetY = startY + i;
-    const pieceBits = pieceBitRows[i];
-
-    if (targetY < 0 || targetY >= board.height || pieceBits === 0) {
-      continue;
-    }
-
-    const resultingRowBits = board.rows[targetY] | pieceBits;
-    const resultingVacancy = board.width - popcount(resultingRowBits);
-
-    if (resultingVacancy === 1) {
-      potentialNearFull++;
-    }
-  }
-
-  return potentialNearFull;
 };
 
 /**

@@ -173,7 +173,7 @@ function generatePossibleKeys(pattern: string): string[] {
   // Handle dynamic type patterns
   const gamePrefix = "game.";
   const dollarSign = "$";
-  const typeVariable = dollarSign + "{type}";
+  const typeVariable = `${dollarSign}{type}`;
   if (pattern.includes(gamePrefix + typeVariable)) {
     const knownTypes = ["hold", "next"];
     for (const type of knownTypes) {
