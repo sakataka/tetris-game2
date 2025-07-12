@@ -1,111 +1,90 @@
-# 🎮 Tetris with AI: The Ultimate Learning Experience
+# 🎮 Tetris with AI
 
-Discover the perfect blend of classic puzzle gaming and cutting-edge artificial intelligence. This isn't just another Tetris clone—it's your personal AI tutor that transforms you from a casual player into a strategic master.
+A modern Tetris implementation with AI features designed to help players learn and improve their game through observation and analysis.
 
-## 🌟 What Makes This Special?
+## 🌟 Features
 
-### 🎯 Authentic Tetris, Elevated
-Every detail matters. We've faithfully recreated the beloved classic with all seven tetrominoes, the Super Rotation System, and that satisfying "click" when lines disappear. But here's where it gets interesting...
+### 🎯 Classic Tetris
+Standard Tetris gameplay with all seven tetrominoes, Super Rotation System (SRS), and proper line clearing mechanics.
 
-### 🤖 Your AI Sensei
-Watch a world-class AI player in action, then dive deep into its mind:
-- **See Every Decision**: Colorful heatmaps show you exactly why the AI chooses each move
-- **Learn Advanced Techniques**: Perfect Clear Openers, T-Spin setups, and tournament-level strategies
-- **Understand the "Why"**: Step through AI games move by move to grasp the underlying logic
-- **Customize the Challenge**: Adjust AI difficulty from "helpful teacher" to "grandmaster level"
+### 🤖 AI Integration
+Watch an AI player demonstrate strategies and learn from its decision-making:
+- **Move Analysis**: Visual indicators show move quality across the board
+- **Strategy Learning**: Observe T-Spin setups and advanced techniques
+- **Step-by-step Analysis**: Review AI games to understand decision patterns
+- **Adjustable Difficulty**: Configure AI behavior for different skill levels
 
-## 🎮 How It Works
+## 🎮 How to Play
 
-### For Newcomers
-1. **Jump Right In**: Arrow keys move pieces, space drops them—you know the drill
-2. **Enable AI Mode**: Hit 'A' or tap the settings gear to watch your AI tutor
-3. **Study the Heatmaps**: Those colored squares? They're showing you the best moves
-4. **Practice with Purpose**: Each game becomes a masterclass in strategic thinking
+### Basic Controls
+- **Arrow Keys**: Move and rotate pieces (desktop)
+- **Touch Gestures**: Swipe to move and tap to rotate (mobile)
+- **Space**: Hard drop
+- **C**: Hold piece
 
-### For Veterans
-Ready to elevate your game? The AI demonstrates techniques that took pros years to master:
-- **T-Spin Mastery**: Learn complex setups that clear multiple lines with devastating effect
-- **Perfect Clear Execution**: Clear the entire board for maximum points and style
-- **Endgame Survival**: Master the art of staying alive when the stack gets dangerous
-- **Pattern Recognition**: Spot setup opportunities that most players miss
+### AI Features
+1. **Enable AI**: Use the settings to activate AI mode
+2. **Visual Feedback**: Colored overlays show move evaluations
+3. **Learn by Watching**: Observe AI strategies and decision patterns
+4. **Practice**: Apply learned techniques in your own games
 
-### Cross-Platform Perfection
-Whether you're on desktop with keyboard precision or mobile with intuitive swipes, the experience adapts flawlessly. English or Japanese? We've got you covered with complete localization.
+### Platform Support
+Available on desktop and mobile devices with keyboard and touch controls. Supports English and Japanese languages.
 
-## 🧠 The Learning Revolution
+## 🧠 Learning Features
 
-### Why This Changes Everything
-Traditional Tetris guides tell you *what* to do. Our AI shows you *why* it works:
+### AI Analysis
+The AI provides insights into Tetris strategy through:
 
-**Real-Time Analysis**: Watch the AI evaluate thousands of positions per second
-**Decision Trees**: See how top-level players think several moves ahead  
-**Performance Metrics**: Track your improvement with detailed statistics
-**Replay System**: Analyze your games (and the AI's) move by move
+- **Position Evaluation**: Real-time analysis of board positions
+- **Move Suggestions**: Visual indicators for optimal piece placement
+- **Performance Tracking**: Basic statistics to monitor improvement
+- **Replay Functionality**: Review games to understand decision patterns
 
-### Learning Paths for Every Player
+### For Different Players
 
-**Casual Gamers**: Enjoy stress-free play while absorbing pro techniques naturally
-**Competitive Players**: Study AI strategies to dominate tournaments and leaderboards
-**Puzzle Enthusiasts**: Discover the mathematical beauty behind optimal play
-**Students & Educators**: Experience AI decision-making in an engaging, visual format
+- **Beginners**: Learn basic strategies through observation
+- **Intermediate Players**: Study advanced techniques like T-Spins
+- **Advanced Players**: Analyze optimal play patterns
+- **Educators**: Demonstrate AI decision-making concepts
 
-## 🎨 Beautiful by Design
+## 🎨 Design
 
-No cluttered interfaces or distracting elements—just pure, focused gameplay enhanced by elegant visualizations. Smooth animations make every line clear satisfying, while the AI overlay provides insights without overwhelming the experience.
+Clean interface focused on gameplay with optional AI visualizations. Smooth animations and responsive controls provide a polished playing experience.
 
 ## 🚀 Getting Started
 
-### Instant Play
-Open your browser, and you're ready to go. No downloads, no setup, no hassle.
+### Quick Start
+1. **Basic Play**: Use arrow keys or touch gestures to control pieces
+2. **Hold Pieces**: Press 'C' to save pieces for strategic use
+3. **AI Mode**: Enable AI visualization in settings
+4. **Learn**: Observe AI strategies and apply them to your play
 
-### Quick Start Guide
-1. **Move & Rotate**: Arrow keys (or swipes on mobile) control everything
-2. **Hold Strategy**: Press 'C' to save pieces for the perfect moment
-3. **AI Insights**: Toggle visualization to see move quality across the board
-4. **Learn & Improve**: Each session reveals new strategic possibilities
+### Tips
+- **Stack Management**: Keep your board balanced and ready for line clears
+- **Pattern Recognition**: Learn common setups and sequences
+- **Timing**: Balance speed with strategic thinking
+- **Practice**: Regular play helps internalize patterns
 
-### Pro Tips from the AI
-- **Opening Patterns**: Learn the setups that pros use to start every game
-- **Stack Management**: Keep your pile balanced and ready for big clears
-- **Timing Mastery**: Know when to play fast and when to think strategically
-- **Pattern Memory**: Recognize and execute complex multi-piece sequences
+## 🎯 Available Features
 
-## 🎯 Game Modes & Features
+### Game Modes
+- **Classic Mode**: Standard Tetris gameplay
+- **AI Mode**: Watch AI demonstration with move analysis
+- **Practice Mode**: Learn specific techniques with AI guidance
 
-### Solo Adventures
-- **Classic Mode**: Traditional gameplay with modern polish
-- **AI Theater**: Watch masterful play while learning advanced concepts  
-- **Training Mode**: Practice specific scenarios with AI guidance
-- **Challenge Runs**: Test your skills against AI benchmarks
+### Analysis Tools
+- **Move Visualization**: Color-coded indicators for move quality
+- **Decision Analysis**: Understand AI reasoning for moves
+- **Performance Metrics**: Track basic gameplay statistics
+- **Replay System**: Review completed games
 
-### Learning Tools
-- **Move Heatmaps**: Visual guides to optimal placement
-- **Strategy Breakdowns**: Detailed explanations of AI decision-making
-- **Progress Tracking**: See your improvement over time
-- **Technique Library**: Catalog of advanced patterns and setups
-
-### Competitive Edge
-- **Performance Analytics**: Pieces per second, efficiency ratings, and more
-- **AI Comparison**: See how your strategies stack up against expert play
-- **Tournament Prep**: Study the techniques used in competitive play
-- **Meta Analysis**: Understand how Tetris strategy continues to evolve
-
-## 🌟 Why You'll Love This
-
-### For the Pure Joy
-Sometimes you just want to play Tetris. Our implementation feels *right*—responsive controls, satisfying effects, and that timeless gameplay that never gets old.
-
-### For the Challenge
-Ready to push your limits? The AI doesn't just play well—it plays *perfectly*, giving you a target that will challenge you for years to come.
-
-### For the Learning
-Every session teaches you something new. Whether it's a subtle positioning trick or a complex multi-move sequence, the AI constantly reveals new depths to explore.
-
-### For the Wonder
-There's something magical about watching an AI solve complex puzzles in real-time. It's entertainment, education, and inspiration rolled into one beautiful experience.
+### Technical Features
+- **Responsive Design**: Works on desktop and mobile
+- **Multiple Languages**: English and Japanese support
+- **Modern Implementation**: Built with React and TypeScript
+- **Performance Optimized**: Smooth gameplay at 60fps
 
 ---
 
-**Ready to transform your Tetris game?** Whether you're picking up the pieces for the first time or you've been playing for decades, our AI-enhanced Tetris reveals secrets that will change how you see the game forever.
-
-**🎮 Play Now** and discover strategies you never knew existed!
+A Tetris implementation designed for both casual play and learning through AI demonstration. Suitable for players of all skill levels who want to improve their strategic understanding of the game.
