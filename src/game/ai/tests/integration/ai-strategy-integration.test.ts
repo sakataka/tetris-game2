@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, test } from "bun:test";
 import { createTetromino } from "@/game/tetrominos";
 import type { Position, TetrominoTypeName } from "@/types/game";
-import { BitBoard } from "../../core/bitboard";
+import { type BitBoardData, createBitBoard, setRowBits } from "../../core/bitboard";
 import { MoveGenerator } from "../../core/move-generator";
 import { AdvancedFeatures } from "../../evaluators/advanced-features";
 import { DellacherieEvaluator } from "../../evaluators/dellacherie";
@@ -12,8 +12,8 @@ import { BeamSearch, type SearchNode } from "../../search/beam-search";
 import { calculateSurfaceProfile } from "../../search/diversity-beam-search";
 
 // Helper functions for test setup
-function createBoardWithHeight(height: number): BitBoard {
-  const board = new BitBoard();
+function createBoardWithHeight(height: number): BitBoardDataData {
+  let board = createBitBoard();
 
   // Fill bottom rows with random patterns
   for (let y = 20 - height; y < 20; y++) {
@@ -24,14 +24,14 @@ function createBoardWithHeight(height: number): BitBoard {
         row |= 1 << x;
       }
     }
-    board.setRowBits(y, row);
+    board = setRowBits(board, y, row);
   }
 
   return board;
 }
 
-function createPCOSetup(): BitBoard {
-  const board = new BitBoard();
+function createPCOSetup(): BitBoardDataData {
+  let board = createBitBoard();
 
   // Create a Perfect Clear Opening setup
   // Example: LST stacking for PCO
@@ -43,14 +43,14 @@ function createPCOSetup(): BitBoard {
   ];
 
   for (let i = 0; i < pattern.length; i++) {
-    board.setRowBits(19 - i, pattern[i]);
+    board = setRowBits(board, 19 - i, pattern[i]);
   }
 
   return board;
 }
 
-function createAmbiguousSetup(): BitBoard {
-  const board = new BitBoard();
+function createAmbiguousSetup(): BitBoardData {
+  let board = createBitBoard();
 
   // Create a setup where both PCO and DT (Donation/T-Spin Triple) are possible
   const pattern = [
@@ -61,13 +61,17 @@ function createAmbiguousSetup(): BitBoard {
   ];
 
   for (let i = 0; i < pattern.length; i++) {
-    board.setRowBits(19 - i, pattern[i]);
+    board = setRowBits(board, 19 - i, pattern[i]);
   }
 
   return board;
 }
 
-function _placePiece(board: BitBoard, _piece: TetrominoTypeName, position: Position): BitBoard {
+function _placePiece(
+  board: BitBoardData,
+  _piece: TetrominoTypeName,
+  position: Position,
+): BitBoardData {
   const newBoard = board.clone();
   // Simplified piece placement for testing
   // In real implementation, this would use the full SRS placement logic

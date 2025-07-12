@@ -1,16 +1,26 @@
 import { beforeEach, describe, expect, test } from "bun:test";
 import { createTetromino } from "@/game/tetrominos";
 import type { GameBoard, Tetromino } from "@/types/game";
-import { BitBoard } from "../core/bitboard";
+import { type BitBoardData, createBitBoard } from "../core/bitboard";
 import { DEFAULT_MOVE_OPTIONS, MoveGenerator } from "../core/move-generator";
 import { DellacherieEvaluator } from "../evaluators/dellacherie";
-import { BeamSearch, DEFAULT_BEAM_CONFIG } from "./beam-search";
+import {
+  BeamSearch,
+  createBeamSearchState,
+  DEFAULT_BEAM_CONFIG,
+  getBeamSearchConfig,
+  performBeamSearch,
+  updateBeamSearchConfig,
+} from "./beam-search";
 
 describe("BeamSearch", () => {
   let beamSearch: BeamSearch;
   let evaluator: DellacherieEvaluator;
   let moveGenerator: MoveGenerator;
-  let emptyBoard: BitBoard;
+  let emptyBoard: BitBoardData;
+
+  // Also test functional API
+  let beamSearchState: ReturnType<typeof createBeamSearchState>;
 
   beforeEach(() => {
     evaluator = new DellacherieEvaluator();
@@ -20,12 +30,13 @@ describe("BeamSearch", () => {
       maxSearchDepth: 2,
     });
     beamSearch = new BeamSearch(evaluator, moveGenerator, DEFAULT_BEAM_CONFIG);
+    beamSearchState = createBeamSearchState(evaluator, moveGenerator, DEFAULT_BEAM_CONFIG);
 
     // Create empty board
     const emptyBoardState: GameBoard = Array(20)
       .fill(null)
       .map(() => Array(10).fill(0));
-    emptyBoard = new BitBoard(emptyBoardState);
+    emptyBoard = createBitBoard(emptyBoardState);
   });
 
   test("should initialize with default configuration", () => {
@@ -35,6 +46,12 @@ describe("BeamSearch", () => {
     expect(config.useHold).toBe(true);
     expect(config.enablePruning).toBe(false); // Updated for Phase 2 optimization
     expect(config.timeLimit).toBe(80); // Updated for Phase 2 optimization
+
+    // Test functional API
+    const functionalConfig = getBeamSearchConfig(beamSearchState);
+    expect(functionalConfig.beamWidth).toBe(16);
+    expect(functionalConfig.maxDepth).toBe(3);
+    expect(functionalConfig.useHold).toBe(true);
   });
 
   test("should update configuration correctly", () => {
@@ -51,6 +68,14 @@ describe("BeamSearch", () => {
     expect(config.maxDepth).toBe(3);
     expect(config.timeLimit).toBe(100);
     expect(config.useHold).toBe(true); // Should preserve unchanged values
+
+    // Test functional API
+    const updatedState = updateBeamSearchConfig(beamSearchState, newConfig);
+    const functionalConfig = getBeamSearchConfig(updatedState);
+    expect(functionalConfig.beamWidth).toBe(15);
+    expect(functionalConfig.maxDepth).toBe(3);
+    expect(functionalConfig.timeLimit).toBe(100);
+    expect(functionalConfig.useHold).toBe(true);
   });
 
   test("should perform basic search on empty board", () => {
@@ -64,6 +89,17 @@ describe("BeamSearch", () => {
     expect(result.nodesExplored).toBeGreaterThan(0);
     expect(result.searchTime).toBeGreaterThanOrEqual(0);
     expect(result.reachedDepth).toBeGreaterThan(0);
+
+    // Test functional API
+    const functionalResult = performBeamSearch(
+      beamSearchState,
+      emptyBoard,
+      currentPiece,
+      nextPieces,
+    );
+    expect(functionalResult.bestPath).toBeDefined();
+    expect(functionalResult.bestScore).toBeGreaterThan(Number.NEGATIVE_INFINITY);
+    expect(functionalResult.nodesExplored).toBeGreaterThan(0);
   });
 
   test("should respect beam width constraint", () => {
@@ -124,7 +160,7 @@ describe("BeamSearch", () => {
     const fullBoardState: GameBoard = Array(20)
       .fill(null)
       .map((_, y) => (y < 5 ? Array(10).fill(1) : Array(10).fill(0)));
-    const fullBoard = new BitBoard(fullBoardState);
+    const fullBoard = createBitBoard(fullBoardState);
 
     const currentPiece = createTetromino("I");
     const nextPieces = [createTetromino("O")];
@@ -158,7 +194,7 @@ describe("BeamSearch", () => {
     const highBoardState: GameBoard = Array(20)
       .fill(null)
       .map((_, y) => (y > 15 ? Array(10).fill(1) : Array(10).fill(0)));
-    const highBoard = new BitBoard(highBoardState);
+    const highBoard = createBitBoard(highBoardState);
 
     const currentPiece = createTetromino("I");
     const nextPieces = [createTetromino("O")];

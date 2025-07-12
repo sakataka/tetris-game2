@@ -1,4 +1,5 @@
-import type { BitBoard } from "@/game/ai/core/bitboard";
+import type { BitBoardData } from "@/game/ai/core/bitboard";
+import { getRowBits } from "@/game/ai/core/bitboard";
 
 /**
  * Calculate holes (empty cells covered by filled cells)
@@ -7,14 +8,14 @@ import type { BitBoard } from "@/game/ai/core/bitboard";
  * @param board - Board state to analyze
  * @returns Number of holes
  */
-export function calculateHoles(board: BitBoard): number {
+export function calculateHoles(board: BitBoardData): number {
   let holes = 0;
 
   for (let x = 0; x < 10; x++) {
     let blockFound = false;
 
     for (let y = 0; y < 20; y++) {
-      const bit = (board.getRowBits(y) >> x) & 1;
+      const bit = (getRowBits(board, y) >> x) & 1;
 
       if (bit === 1) {
         blockFound = true;
@@ -35,7 +36,7 @@ export function calculateHoles(board: BitBoard): number {
  * @param board - Board state to analyze
  * @returns Number of blocks above all holes
  */
-export function calculateBlocksAboveHoles(board: BitBoard): number {
+export function calculateBlocksAboveHoles(board: BitBoardData): number {
   let penalty = 0;
 
   for (let x = 0; x < 10; x++) {
@@ -44,7 +45,7 @@ export function calculateBlocksAboveHoles(board: BitBoard): number {
 
     // First pass: identify all holes in this column
     for (let y = 0; y < 20; y++) {
-      const cellFilled = (board.getRowBits(y) >> x) & 1;
+      const cellFilled = (getRowBits(board, y) >> x) & 1;
 
       if (cellFilled) {
         blockFound = true;
@@ -58,7 +59,7 @@ export function calculateBlocksAboveHoles(board: BitBoard): number {
     for (const holeY of holes) {
       let blocksAbove = 0;
       for (let y = holeY - 1; y >= 0; y--) {
-        const cellFilled = (board.getRowBits(y) >> x) & 1;
+        const cellFilled = (getRowBits(board, y) >> x) & 1;
         if (cellFilled) {
           blocksAbove++;
         }

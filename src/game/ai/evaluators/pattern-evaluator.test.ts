@@ -1,23 +1,39 @@
 import { beforeEach, describe, expect, it } from "bun:test";
-import { BitBoard } from "@/game/ai/core/bitboard";
+import { type BitBoardData, createBitBoard } from "@/game/ai/core/bitboard";
 import type { Move } from "@/game/ai/core/move-generator";
 import type { TetrominoTypeName } from "@/types/game";
 import { DEFAULT_WEIGHTS } from "./dellacherie";
-import { DEFAULT_PATTERN_CONFIG, PatternEvaluator } from "./pattern-evaluator";
+import {
+  createPatternEvaluatorState,
+  DEFAULT_PATTERN_CONFIG,
+  evaluatePatternMove,
+  getPatternInfo,
+  PatternEvaluator,
+  setPatternEnabled,
+  updatePatternEvaluatorGameState,
+} from "./pattern-evaluator";
 
 describe("PatternEvaluator", () => {
   let evaluator: PatternEvaluator;
-  let board: BitBoard;
+  let board: BitBoardData;
+
+  // Also test functional API
+  let evaluatorState: ReturnType<typeof createPatternEvaluatorState>;
 
   beforeEach(() => {
     evaluator = new PatternEvaluator(DEFAULT_WEIGHTS, DEFAULT_PATTERN_CONFIG);
-    board = new BitBoard();
+    evaluatorState = createPatternEvaluatorState(DEFAULT_WEIGHTS, DEFAULT_PATTERN_CONFIG);
+    board = createBitBoard();
   });
 
   describe("Basic Functionality", () => {
     it("should create evaluator with default config", () => {
       expect(evaluator).toBeDefined();
       expect(evaluator.getPatternInfo(board)).toBeDefined();
+
+      // Test functional API
+      expect(evaluatorState).toBeDefined();
+      expect(getPatternInfo(evaluatorState, board)).toBeDefined();
     });
 
     it("should fall back to Dellacherie evaluation when patterns disabled", () => {
@@ -43,11 +59,30 @@ describe("PatternEvaluator", () => {
       // Scores might be different when patterns are enabled
       expect(typeof baseScore).toBe("number");
       expect(typeof patternScore).toBe("number");
+
+      // Test functional API
+      const disabledState = setPatternEnabled(evaluatorState, false);
+      const functionalBaseScore = evaluatePatternMove(disabledState, board, move);
+      expect(typeof functionalBaseScore).toBe("number");
+
+      const enabledState = setPatternEnabled(disabledState, true);
+      const updatedState = updatePatternEvaluatorGameState(enabledState, ["I", "O", "T"], 0, 1);
+      const functionalPatternScore = evaluatePatternMove(updatedState, board, move);
+      expect(typeof functionalPatternScore).toBe("number");
     });
 
     it("should update game state", () => {
       const pieceQueue: TetrominoTypeName[] = ["I", "O", "T", "S", "Z"];
       evaluator.updateGameState(pieceQueue, 10, 2);
+
+      // Test functional API
+      const updatedState = updatePatternEvaluatorGameState(evaluatorState, pieceQueue, 10, 2);
+      expect(updatedState).toBeDefined();
+      expect(updatedState.pieceQueue).toEqual(
+        pieceQueue.slice(0, updatedState.config.queueLookahead),
+      );
+      expect(updatedState.currentLines).toBe(10);
+      expect(updatedState.currentLevel).toBe(2);
 
       const info = evaluator.getPatternInfo(board);
       expect(info.queuePreview).toEqual(pieceQueue);

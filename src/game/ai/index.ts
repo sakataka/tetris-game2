@@ -22,7 +22,7 @@ export {
   type AIStats,
   DEFAULT_AI_CONFIG,
 } from "./core/ai-engine";
-export { BitBoard } from "./core/bitboard";
+export { type BitBoardData, createBitBoard } from "./core/bitboard";
 export {
   DEFAULT_MOVE_OPTIONS,
   type GameAction,

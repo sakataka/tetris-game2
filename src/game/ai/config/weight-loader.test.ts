@@ -3,38 +3,26 @@ import type { GamePhase } from "@/game/ai/evaluators/new-weights";
 import type { WeightConfiguration } from "./weight-loader";
 import {
   CURRENT_SCHEMA_VERSION,
-  getWeightLoader,
+  clearCache,
+  getAdjustmentMultipliers,
+  getAllPhaseWeights,
+  getCachedConfiguration,
+  getDellacherieWeights,
+  getPhaseWeights,
   loadAllPhaseWeights,
+  loadConfiguration,
   loadDellacherieWeights,
   loadPhaseWeights,
-  WeightLoader,
 } from "./weight-loader";
 
 describe("WeightLoader", () => {
-  let weightLoader: WeightLoader;
-
   beforeEach(() => {
-    weightLoader = WeightLoader.getInstance();
-    weightLoader.clearCache();
-  });
-
-  describe("singleton behavior", () => {
-    it("should return the same instance", () => {
-      const instance1 = WeightLoader.getInstance();
-      const instance2 = WeightLoader.getInstance();
-      expect(instance1).toBe(instance2);
-    });
-
-    it("should return the same instance via getWeightLoader", () => {
-      const instance1 = getWeightLoader();
-      const instance2 = getWeightLoader();
-      expect(instance1).toBe(instance2);
-    });
+    clearCache();
   });
 
   describe("loadConfiguration", () => {
     it("should load configuration successfully", async () => {
-      const result = await weightLoader.loadConfiguration();
+      const result = await loadConfiguration();
       expect(result.success).toBe(true);
 
       if (result.success) {
@@ -47,12 +35,12 @@ describe("WeightLoader", () => {
     });
 
     it("should cache configuration after loading", async () => {
-      expect(weightLoader.getCachedConfiguration()).toBeNull();
+      expect(getCachedConfiguration()).toBeNull();
 
-      const result = await weightLoader.loadConfiguration();
+      const result = await loadConfiguration();
       expect(result.success).toBe(true);
 
-      const cached = weightLoader.getCachedConfiguration();
+      const cached = getCachedConfiguration();
       expect(cached).not.toBeNull();
       expect(cached?.schemaVersion).toBe(CURRENT_SCHEMA_VERSION);
     });
@@ -60,7 +48,7 @@ describe("WeightLoader", () => {
 
   describe("getDellacherieWeights", () => {
     it("should load Dellacherie weights successfully", async () => {
-      const result = await weightLoader.getDellacherieWeights();
+      const result = await getDellacherieWeights();
       expect(result.success).toBe(true);
 
       if (result.success) {
@@ -98,7 +86,7 @@ describe("WeightLoader", () => {
     const phases: GamePhase[] = ["early", "mid", "late"];
 
     it.each(phases)("should load %s phase weights successfully", async (phase) => {
-      const result = await weightLoader.getPhaseWeights(phase);
+      const result = await getPhaseWeights(phase);
       expect(result.success).toBe(true);
 
       if (result.success) {
@@ -122,7 +110,7 @@ describe("WeightLoader", () => {
     });
 
     it("should return error for invalid phase", async () => {
-      const result = await weightLoader.getPhaseWeights("invalid" as GamePhase);
+      const result = await getPhaseWeights("invalid" as GamePhase);
       expect(result.success).toBe(false);
 
       if (!result.success) {
@@ -133,7 +121,7 @@ describe("WeightLoader", () => {
 
   describe("getAllPhaseWeights", () => {
     it("should load all phase weights successfully", async () => {
-      const result = await weightLoader.getAllPhaseWeights();
+      const result = await getAllPhaseWeights();
       expect(result.success).toBe(true);
 
       if (result.success) {
@@ -169,7 +157,7 @@ describe("WeightLoader", () => {
 
   describe("getAdjustmentMultipliers", () => {
     it("should load danger zone adjustments", async () => {
-      const result = await weightLoader.getAdjustmentMultipliers("dangerZone");
+      const result = await getAdjustmentMultipliers("dangerZone");
       expect(result.success).toBe(true);
 
       if (result.success) {
@@ -182,7 +170,7 @@ describe("WeightLoader", () => {
     });
 
     it("should load phase adjustments", async () => {
-      const result = await weightLoader.getAdjustmentMultipliers("phaseAdjustments");
+      const result = await getAdjustmentMultipliers("phaseAdjustments");
       expect(result.success).toBe(true);
 
       if (result.success) {
@@ -195,7 +183,7 @@ describe("WeightLoader", () => {
     });
 
     it("should load survival adjustments", async () => {
-      const result = await weightLoader.getAdjustmentMultipliers("survival");
+      const result = await getAdjustmentMultipliers("survival");
       expect(result.success).toBe(true);
 
       if (result.success) {
@@ -207,7 +195,7 @@ describe("WeightLoader", () => {
     });
 
     it("should load early game adjustments", async () => {
-      const result = await weightLoader.getAdjustmentMultipliers("earlyGame");
+      const result = await getAdjustmentMultipliers("earlyGame");
       expect(result.success).toBe(true);
 
       if (result.success) {
@@ -219,7 +207,7 @@ describe("WeightLoader", () => {
     });
 
     it("should load cleanup adjustments", async () => {
-      const result = await weightLoader.getAdjustmentMultipliers("cleanup");
+      const result = await getAdjustmentMultipliers("cleanup");
       expect(result.success).toBe(true);
 
       if (result.success) {
@@ -231,7 +219,7 @@ describe("WeightLoader", () => {
     });
 
     it("should return error for invalid adjustment category", async () => {
-      const result = await weightLoader.getAdjustmentMultipliers(
+      const result = await getAdjustmentMultipliers(
         "invalid" as keyof WeightConfiguration["adjustments"],
       );
       expect(result.success).toBe(false);
@@ -244,29 +232,29 @@ describe("WeightLoader", () => {
 
   describe("cache management", () => {
     it("should clear cache successfully", async () => {
-      await weightLoader.loadConfiguration();
-      expect(weightLoader.getCachedConfiguration()).not.toBeNull();
+      await loadConfiguration();
+      expect(getCachedConfiguration()).not.toBeNull();
 
-      weightLoader.clearCache();
-      expect(weightLoader.getCachedConfiguration()).toBeNull();
+      clearCache();
+      expect(getCachedConfiguration()).toBeNull();
     });
 
     it("should return cached configuration", async () => {
-      const result1 = await weightLoader.loadConfiguration();
-      const result2 = await weightLoader.loadConfiguration();
+      const result1 = await loadConfiguration();
+      const result2 = await loadConfiguration();
 
       expect(result1.success).toBe(true);
       expect(result2.success).toBe(true);
 
       // Should be the same cached instance
-      const cached = weightLoader.getCachedConfiguration();
+      const cached = getCachedConfiguration();
       expect(cached).not.toBeNull();
     });
   });
 
   describe("weight structure validation", () => {
     it("should validate required weight properties", async () => {
-      const result = await weightLoader.getDellacherieWeights();
+      const result = await getDellacherieWeights();
       expect(result.success).toBe(true);
 
       if (result.success) {
@@ -295,7 +283,7 @@ describe("WeightLoader", () => {
     });
 
     it("should validate phase weights structure", async () => {
-      const result = await weightLoader.getAllPhaseWeights();
+      const result = await getAllPhaseWeights();
       expect(result.success).toBe(true);
 
       if (result.success) {

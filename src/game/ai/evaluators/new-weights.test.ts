@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { BitBoard } from "@/game/ai/core/bitboard";
+import { createBitBoard, setRowBits } from "@/game/ai/core/bitboard";
 import {
   applyDangerAdjustments,
   determineGamePhase,
@@ -97,13 +97,13 @@ describe("new-weights", () => {
     });
 
     it("should apply phase-based weights correctly", () => {
-      const board = new BitBoard();
+      let board = createBitBoard();
       const dynamicWeights = new DynamicWeights();
 
       // Simulate different board heights by setting the bottom 6 rows to be filled
       const fullRowMask = (1 << 10) - 1; // 10 bits set (full row)
       for (let y = 19; y >= 14; y--) {
-        board.setRowBits(y, fullRowMask);
+        board = setRowBits(board, y, fullRowMask);
       }
 
       const situation = dynamicWeights.analyzeSituation(board);
@@ -115,7 +115,7 @@ describe("new-weights", () => {
 
     it("should switch between weight systems", () => {
       const dynamicWeights = new DynamicWeights();
-      const board = new BitBoard();
+      const board = createBitBoard();
 
       // New system
       dynamicWeights.setWeightSystem(true);

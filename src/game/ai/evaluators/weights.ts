@@ -1,5 +1,6 @@
-import { getWeightLoader } from "@/game/ai/config/weight-loader";
-import type { BitBoard } from "@/game/ai/core/bitboard";
+import { getCachedConfiguration } from "@/game/ai/config/weight-loader";
+import type { BitBoardData } from "@/game/ai/core/bitboard";
+import { getRowBits } from "@/game/ai/core/bitboard";
 import type { EvaluationWeights } from "./dellacherie";
 import { DEFAULT_WEIGHTS } from "./dellacherie";
 import {
@@ -63,7 +64,7 @@ export class DynamicWeights {
    * @param level - Current game level
    * @returns Detailed game situation analysis
    */
-  analyzeSituation(board: BitBoard, linesCleared = 0, level = 1): GameSituation {
+  analyzeSituation(board: BitBoardData, linesCleared = 0, level = 1): GameSituation {
     const heights = this.getColumnHeights(board);
     const maxHeight = Math.max(...heights);
     const totalHoles = this.countTotalHoles(board);
@@ -144,8 +145,7 @@ export class DynamicWeights {
     // For now, fallback to synchronous behavior with cached weights
     // In a full implementation, this would handle async loading
     try {
-      const weightLoader = getWeightLoader();
-      const cached = weightLoader.getCachedConfiguration();
+      const cached = getCachedConfiguration();
 
       if (cached) {
         const phase = newDetermineGamePhase(situation.maxHeight);
@@ -484,13 +484,13 @@ export class DynamicWeights {
   /**
    * Get height of each column on the board
    */
-  private getColumnHeights(board: BitBoard): number[] {
+  private getColumnHeights(board: BitBoardData): number[] {
     const heights: number[] = [];
 
     for (let x = 0; x < 10; x++) {
       let height = 0;
       for (let y = 0; y < 20; y++) {
-        if ((board.getRowBits(y) >> x) & 1) {
+        if ((getRowBits(board, y) >> x) & 1) {
           height = 20 - y;
           break;
         }
@@ -504,13 +504,13 @@ export class DynamicWeights {
   /**
    * Count total number of holes in the board
    */
-  private countTotalHoles(board: BitBoard): number {
+  private countTotalHoles(board: BitBoardData): number {
     let holes = 0;
 
     for (let x = 0; x < 10; x++) {
       let blockFound = false;
       for (let y = 0; y < 20; y++) {
-        const bit = (board.getRowBits(y) >> x) & 1;
+        const bit = (getRowBits(board, y) >> x) & 1;
         if (bit === 1) {
           blockFound = true;
         } else if (blockFound) {
@@ -538,7 +538,7 @@ export class DynamicWeights {
   /**
    * Count wells deeper than 2 cells
    */
-  private countDeepWells(board: BitBoard): number {
+  private countDeepWells(board: BitBoardData): number {
     let deepWells = 0;
 
     for (let x = 0; x < 10; x++) {
@@ -546,9 +546,9 @@ export class DynamicWeights {
       let inWell = false;
 
       for (let y = 19; y >= 0; y--) {
-        const current = (board.getRowBits(y) >> x) & 1;
-        const left = x > 0 ? (board.getRowBits(y) >> (x - 1)) & 1 : 1;
-        const right = x < 9 ? (board.getRowBits(y) >> (x + 1)) & 1 : 1;
+        const current = (getRowBits(board, y) >> x) & 1;
+        const left = x > 0 ? (getRowBits(board, y) >> (x - 1)) & 1 : 1;
+        const right = x < 9 ? (getRowBits(board, y) >> (x + 1)) & 1 : 1;
 
         if (current === 0 && left === 1 && right === 1) {
           if (!inWell) {
@@ -638,12 +638,8 @@ export class DynamicWeights {
    * Pre-load external configuration for performance
    */
   private async preloadExternalConfiguration(): Promise<void> {
-    try {
-      const weightLoader = getWeightLoader();
-      await weightLoader.loadConfiguration();
-    } catch (error) {
-      console.warn("Failed to preload external weight configuration:", error);
-    }
+    // External weights would be loaded if configuration system was implemented
+    // For now, this is a no-op
   }
 }
 

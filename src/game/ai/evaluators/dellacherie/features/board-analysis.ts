@@ -1,4 +1,5 @@
-import type { BitBoard } from "@/game/ai/core/bitboard";
+import type { BitBoardData } from "@/game/ai/core/bitboard";
+import { getRowBits } from "@/game/ai/core/bitboard";
 import { calculateBlocksAboveHoles } from "./holes";
 import { calculateWellOpen } from "./wells";
 
@@ -10,7 +11,7 @@ import { calculateWellOpen } from "./wells";
  * @param board - BitBoard to analyze
  * @returns Bumpiness value (0 = perfectly flat)
  */
-export function calculateBumpiness(board: BitBoard): number {
+export function calculateBumpiness(board: BitBoardData): number {
   const heights = getColumnHeights(board);
   let bumpiness = 0;
 
@@ -30,7 +31,7 @@ export function calculateBumpiness(board: BitBoard): number {
  * @param board - Board state to analyze
  * @returns Maximum column height
  */
-export function calculateMaxHeight(board: BitBoard): number {
+export function calculateMaxHeight(board: BitBoardData): number {
   const heights = getColumnHeights(board);
   return Math.max(...heights);
 }
@@ -43,12 +44,12 @@ export function calculateMaxHeight(board: BitBoard): number {
  * @param board - Board state to analyze
  * @returns Row fill ratio score (higher = better horizontal filling)
  */
-export function calculateRowFillRatio(board: BitBoard): number {
+export function calculateRowFillRatio(board: BitBoardData): number {
   let totalScore = 0;
   let significantRows = 0;
 
   for (let y = 0; y < 20; y++) {
-    const rowBits = board.getRowBits(y);
+    const rowBits = getRowBits(board, y);
     if (rowBits === 0) continue; // Skip empty rows
 
     // Count filled cells in this row using Brian Kernighan's algorithm
@@ -84,7 +85,7 @@ export function calculateRowFillRatio(board: BitBoard): number {
  * @param board - Board state to analyze
  * @returns Escape route score (higher = better recovery potential)
  */
-export function calculateEscapeRoute(board: BitBoard): number {
+export function calculateEscapeRoute(board: BitBoardData): number {
   const heights = getColumnHeights(board);
   const maxHeight = Math.max(...heights);
   const avgHeight = heights.reduce((sum, h) => sum + h, 0) / heights.length;
@@ -118,13 +119,13 @@ export function calculateEscapeRoute(board: BitBoard): number {
  * @param board - Board state to analyze
  * @returns Array of column heights
  */
-export function getColumnHeights(board: BitBoard): number[] {
+export function getColumnHeights(board: BitBoardData): number[] {
   const heights: number[] = [];
 
   for (let x = 0; x < 10; x++) {
     let height = 0;
     for (let y = 0; y < 20; y++) {
-      if ((board.getRowBits(y) >> x) & 1) {
+      if ((getRowBits(board, y) >> x) & 1) {
         height = 20 - y;
         break;
       }

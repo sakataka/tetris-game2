@@ -1,4 +1,5 @@
-import type { BitBoard } from "@/game/ai/core/bitboard";
+import type { BitBoardData } from "@/game/ai/core/bitboard";
+import { canPlace } from "@/game/ai/core/bitboard";
 import { getPieceBitsAtPosition } from "@/game/ai/core/piece-bits";
 import type { RotationState, TetrominoTypeName } from "@/types/game";
 import type { Move } from "./types";
@@ -39,7 +40,7 @@ export function createMove(
  * @returns Y position where piece would land, or -1 if invalid
  */
 export function findDropPosition(
-  board: BitBoard,
+  board: BitBoardData,
   piece: TetrominoTypeName,
   rotation: RotationState,
   x: number,
@@ -52,10 +53,10 @@ export function findDropPosition(
 
   // Start from top and find first valid position
   for (let y = 0; y <= 20 - pieceBitRows.length; y++) {
-    if (board.canPlace(pieceBitRows, y)) {
+    if (canPlace(board, pieceBitRows, y)) {
       // Check if the piece would be supported (can't fall further)
       const nextY = y + 1;
-      if (nextY + pieceBitRows.length > 20 || !board.canPlace(pieceBitRows, nextY)) {
+      if (nextY + pieceBitRows.length > 20 || !canPlace(board, pieceBitRows, nextY)) {
         return y;
       }
     }

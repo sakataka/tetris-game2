@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, test } from "bun:test";
 import type { GameBoard } from "@/types/game";
-import { BitBoard } from "../core/bitboard";
+import { type BitBoardData, createBitBoard, fromBoardState } from "../core/bitboard";
 import { AdvancedFeatures } from "./advanced-features";
 
 describe("AdvancedFeatures", () => {
   let advancedFeatures: AdvancedFeatures;
-  let emptyBoard: BitBoard;
+  let emptyBoard: BitBoardData;
 
   beforeEach(() => {
     advancedFeatures = new AdvancedFeatures();
@@ -14,7 +14,7 @@ describe("AdvancedFeatures", () => {
     const emptyBoardState: GameBoard = Array(20)
       .fill(null)
       .map(() => Array(10).fill(0));
-    emptyBoard = new BitBoard(emptyBoardState);
+    emptyBoard = fromBoardState(createBitBoard(), emptyBoardState);
   });
 
   describe("T-Spin Detection", () => {
@@ -38,7 +38,7 @@ describe("AdvancedFeatures", () => {
           return Array(10).fill(0);
         });
 
-      const tSpinBoard = new BitBoard(tSpinBoardState);
+      const tSpinBoard = fromBoardState(createBitBoard(), tSpinBoardState);
       const opportunities = advancedFeatures.detectTSpinOpportunity(tSpinBoard);
 
       expect(opportunities).toBeDefined();
@@ -75,7 +75,7 @@ describe("AdvancedFeatures", () => {
           return Array(10).fill(0);
         });
 
-      const multiTSpinBoard = new BitBoard(multiTSpinState);
+      const multiTSpinBoard = fromBoardState(createBitBoard(), multiTSpinState);
       const opportunities = advancedFeatures.detectTSpinOpportunity(multiTSpinBoard);
 
       // Should be sorted by priority (highest first)
@@ -98,7 +98,7 @@ describe("AdvancedFeatures", () => {
           return Array(10).fill(0);
         });
 
-      const pcBoard = new BitBoard(pcBoardState);
+      const pcBoard = fromBoardState(createBitBoard(), pcBoardState);
       const opportunity = advancedFeatures.detectPerfectClear(pcBoard);
 
       expect(opportunity).not.toBeNull();
@@ -121,7 +121,7 @@ describe("AdvancedFeatures", () => {
         .fill(null)
         .map((_, y) => (y > 10 ? Array(10).fill(1) : Array(10).fill(0)));
 
-      const fullBoard = new BitBoard(fullBoardState);
+      const fullBoard = fromBoardState(createBitBoard(), fullBoardState);
       const opportunity = advancedFeatures.detectPerfectClear(fullBoard);
 
       expect(opportunity).toBeNull();
@@ -137,7 +137,7 @@ describe("AdvancedFeatures", () => {
           return Array(10).fill(0);
         });
 
-      const irregularBoard = new BitBoard(irregularBoardState);
+      const irregularBoard = fromBoardState(createBitBoard(), irregularBoardState);
       const opportunity = advancedFeatures.detectPerfectClear(irregularBoard);
 
       if (opportunity) {
@@ -180,7 +180,7 @@ describe("AdvancedFeatures", () => {
           return Array(10).fill(0);
         });
 
-      const smoothBoard = new BitBoard(smoothBoardState);
+      const smoothBoard = fromBoardState(createBitBoard(), smoothBoardState);
       const smoothTerrain = advancedFeatures.evaluateTerrain(smoothBoard);
 
       // Create a rough board (jagged surface)
@@ -192,7 +192,7 @@ describe("AdvancedFeatures", () => {
           return Array(10).fill(0);
         });
 
-      const roughBoard = new BitBoard(roughBoardState);
+      const roughBoard = fromBoardState(createBitBoard(), roughBoardState);
       const roughTerrain = advancedFeatures.evaluateTerrain(roughBoard);
 
       expect(smoothTerrain.smoothness).toBeGreaterThan(roughTerrain.smoothness);
@@ -208,7 +208,7 @@ describe("AdvancedFeatures", () => {
           return Array(10).fill(0);
         });
 
-      const holeyBoard = new BitBoard(holeyBoardState);
+      const holeyBoard = fromBoardState(createBitBoard(), holeyBoardState);
       const holeyTerrain = advancedFeatures.evaluateTerrain(holeyBoard);
 
       // Should have low accessibility due to buried holes
@@ -225,7 +225,7 @@ describe("AdvancedFeatures", () => {
           return Array(10).fill(0);
         });
 
-      const tSpinSetupBoard = new BitBoard(tSpinSetupState);
+      const tSpinSetupBoard = fromBoardState(createBitBoard(), tSpinSetupState);
       const terrain = advancedFeatures.evaluateTerrain(tSpinSetupBoard);
 
       expect(terrain.tSpinPotential).toBeGreaterThan(0);
@@ -240,7 +240,7 @@ describe("AdvancedFeatures", () => {
           return Array(10).fill(0);
         });
 
-      const pcSetupBoard = new BitBoard(pcSetupState);
+      const pcSetupBoard = fromBoardState(createBitBoard(), pcSetupState);
       const terrain = advancedFeatures.evaluateTerrain(pcSetupBoard);
 
       expect(terrain.pcPotential).toBeGreaterThan(0);
@@ -260,7 +260,7 @@ describe("AdvancedFeatures", () => {
           return Array(10).fill(0);
         });
 
-      const edgeBoard = new BitBoard(edgeBoardState);
+      const edgeBoard = fromBoardState(createBitBoard(), edgeBoardState);
       const opportunities = advancedFeatures.detectTSpinOpportunity(edgeBoard);
 
       // Should handle edge cases without throwing errors
@@ -272,7 +272,7 @@ describe("AdvancedFeatures", () => {
       const fullBoardState: GameBoard = Array(20)
         .fill(null)
         .map(() => Array(10).fill(1));
-      const fullBoard = new BitBoard(fullBoardState);
+      const fullBoard = fromBoardState(createBitBoard(), fullBoardState);
 
       const terrain = advancedFeatures.evaluateTerrain(fullBoard);
       const tSpinOps = advancedFeatures.detectTSpinOpportunity(fullBoard);
@@ -293,7 +293,7 @@ describe("AdvancedFeatures", () => {
           return Array(10).fill(0);
         });
 
-      const singleBlockBoard = new BitBoard(singleBlockState);
+      const singleBlockBoard = fromBoardState(createBitBoard(), singleBlockState);
       const terrain = advancedFeatures.evaluateTerrain(singleBlockBoard);
 
       expect(terrain.smoothness).toBeGreaterThanOrEqual(0);

@@ -1,4 +1,4 @@
-import { getWeightLoader, loadDellacherieWeights } from "@/game/ai/config/weight-loader";
+import { getCachedConfiguration, loadDellacherieWeights } from "@/game/ai/config/weight-loader";
 import type { EvaluationWeights } from "../types";
 
 /**
@@ -23,116 +23,133 @@ export const DEFAULT_WEIGHTS: EvaluationWeights = {
 };
 
 /**
- * Weight management class for dynamic evaluation adjustments
+ * Weight manager state interface
  */
-export class WeightManager {
-  private weights: EvaluationWeights;
-  private useExternalWeights: boolean;
+export interface WeightManagerState {
+  weights: EvaluationWeights;
+  useExternalWeights: boolean;
+}
 
-  constructor(initialWeights: EvaluationWeights = DEFAULT_WEIGHTS, useExternalWeights = false) {
-    this.weights = { ...initialWeights };
-    this.useExternalWeights = useExternalWeights;
+/**
+ * Create a new weight manager state
+ * @param initialWeights - Initial weight configuration
+ * @param useExternalWeights - Whether to use external YAML configuration
+ * @returns Weight manager state
+ */
+export function createWeightManager(
+  initialWeights: EvaluationWeights = DEFAULT_WEIGHTS,
+  useExternalWeights = false,
+): WeightManagerState {
+  return {
+    weights: { ...initialWeights },
+    useExternalWeights,
+  };
+}
+
+/**
+ * Update evaluation weights dynamically
+ * Allows for adaptive AI behavior based on game state
+ *
+ * @param state - Current weight manager state
+ * @param newWeights - Updated weight configuration
+ * @returns Updated weight manager state
+ */
+export function updateWeights(
+  state: WeightManagerState,
+  newWeights: Partial<EvaluationWeights>,
+): WeightManagerState {
+  return {
+    ...state,
+    weights: Object.assign({}, state.weights, newWeights),
+  };
+}
+
+/**
+ * Get current evaluation weights
+ * @param state - Weight manager state
+ * @returns Current weight configuration
+ */
+export function getWeights(state: WeightManagerState): EvaluationWeights {
+  if (state.useExternalWeights) {
+    return getExternalWeights(state);
   }
+  return { ...state.weights };
+}
 
-  /**
-   * Update evaluation weights dynamically
-   * Allows for adaptive AI behavior based on game state
-   *
-   * @param newWeights - Updated weight configuration
-   */
-  updateWeights(newWeights: Partial<EvaluationWeights>): void {
-    Object.assign(this.weights, newWeights);
-  }
+/**
+ * Get weights from external configuration
+ * Falls back to internal weights if loading fails
+ */
+function getExternalWeights(state: WeightManagerState): EvaluationWeights {
+  try {
+    const cached = getCachedConfiguration();
 
-  /**
-   * Get current evaluation weights
-   * @returns Current weight configuration
-   */
-  getWeights(): EvaluationWeights {
-    if (this.useExternalWeights) {
-      return this.getExternalWeights();
+    if (cached) {
+      return { ...cached.evaluators.dellacherie };
     }
-    return { ...this.weights };
+  } catch (error) {
+    console.warn("Failed to load external weights, falling back to internal weights:", error);
   }
 
-  /**
-   * Get weights from external configuration
-   * Falls back to internal weights if loading fails
-   */
-  private getExternalWeights(): EvaluationWeights {
-    try {
-      const weightLoader = getWeightLoader();
-      const cached = weightLoader.getCachedConfiguration();
+  return { ...state.weights };
+}
 
-      if (cached) {
-        return { ...cached.evaluators.dellacherie };
-      }
-    } catch (error) {
-      console.warn("Failed to load external weights, falling back to internal weights:", error);
+/**
+ * Reset weights to default values
+ * @param state - Current weight manager state
+ * @returns Weight manager state with default weights
+ */
+export function resetWeights(state: WeightManagerState): WeightManagerState {
+  return {
+    ...state,
+    weights: { ...DEFAULT_WEIGHTS },
+  };
+}
+
+/**
+ * Enable or disable external weight loading from YAML configuration
+ * @param state - Current weight manager state
+ * @param useExternal - Whether to use external YAML configuration
+ * @returns Updated weight manager state
+ */
+export function setExternalWeightSystem(
+  state: WeightManagerState,
+  useExternal: boolean,
+): WeightManagerState {
+  return {
+    ...state,
+    useExternalWeights: useExternal,
+  };
+}
+
+/**
+ * Check if external weight system is enabled
+ * @param state - Weight manager state
+ * @returns true if using external YAML configuration
+ */
+export function isUsingExternalWeights(state: WeightManagerState): boolean {
+  return state.useExternalWeights;
+}
+
+/**
+ * Load weights from external configuration asynchronously
+ * @param state - Weight manager state
+ * @returns Promise resolving to loaded weights or fallback weights
+ */
+export async function loadExternalWeights(state: WeightManagerState): Promise<EvaluationWeights> {
+  if (!state.useExternalWeights) {
+    return getWeights(state);
+  }
+
+  try {
+    const result = await loadDellacherieWeights();
+    if (result.success) {
+      return result.data;
     }
-
-    return { ...this.weights };
+    console.warn("Failed to load external weights:", result.error);
+  } catch (error) {
+    console.warn("Failed to load external weights:", error);
   }
 
-  /**
-   * Reset weights to default values
-   */
-  resetWeights(): void {
-    Object.assign(this.weights, DEFAULT_WEIGHTS);
-  }
-
-  /**
-   * Enable or disable external weight loading from YAML configuration
-   * @param useExternal - Whether to use external YAML configuration
-   */
-  setExternalWeightSystem(useExternal: boolean): void {
-    this.useExternalWeights = useExternal;
-
-    // Pre-load configuration if enabling external weights
-    if (useExternal) {
-      this.preloadExternalConfiguration();
-    }
-  }
-
-  /**
-   * Check if external weight system is enabled
-   * @returns true if using external YAML configuration
-   */
-  isUsingExternalWeights(): boolean {
-    return this.useExternalWeights;
-  }
-
-  /**
-   * Pre-load external configuration for performance
-   */
-  private async preloadExternalConfiguration(): Promise<void> {
-    try {
-      const weightLoader = getWeightLoader();
-      await weightLoader.loadConfiguration();
-    } catch (error) {
-      console.warn("Failed to preload external weight configuration:", error);
-    }
-  }
-
-  /**
-   * Load weights from external configuration asynchronously
-   * @returns Promise resolving to loaded weights or fallback weights
-   */
-  async loadExternalWeights(): Promise<EvaluationWeights> {
-    if (!this.useExternalWeights) {
-      return this.getWeights();
-    }
-
-    try {
-      const result = await loadDellacherieWeights();
-      if (result.success) {
-        return result.data;
-      }
-      console.warn("Failed to load external weights:", result.error);
-    } catch (error) {
-      console.warn("Failed to load external weights:", error);
-    }
-
-    return this.getWeights();
-  }
+  return getWeights(state);
 }

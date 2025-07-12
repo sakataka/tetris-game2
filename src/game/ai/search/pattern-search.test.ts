@@ -4,14 +4,19 @@ import type { TetrominoTypeName } from "@/types/game";
 import { GAME_CONSTANTS } from "@/utils/gameConstants";
 import {
   checkPatternFeasibility,
+  createPatternSearchState,
   DEFAULT_PRUNING_RULES,
   PatternSearch,
   type PatternSearchConfig,
-} from "./pattern-search";
+  performPatternSearch,
+} from "./pattern-search-core";
 
 describe("PatternSearch - Basic Functionality", () => {
   let search: PatternSearch;
   let config: PatternSearchConfig;
+
+  // Also test functional API
+  let searchState: ReturnType<typeof createPatternSearchState>;
 
   beforeEach(() => {
     config = {
@@ -20,6 +25,7 @@ describe("PatternSearch - Basic Functionality", () => {
       timeLimit: 50, // Reduced for faster tests
     };
     search = new PatternSearch(config);
+    searchState = createPatternSearchState(config);
   });
 
   describe("Instance Creation", () => {
@@ -47,6 +53,12 @@ describe("PatternSearch - Basic Functionality", () => {
       expect(Array.isArray(result.path)).toBe(true);
       expect(typeof result.nodesExplored).toBe("number");
       expect(typeof result.timeElapsed).toBe("number");
+
+      // Test functional API
+      const functionalResult = performPatternSearch(searchState, board, pieceQueue, template);
+      expect(functionalResult).toBeDefined();
+      expect(typeof functionalResult.found).toBe("boolean");
+      expect(Array.isArray(functionalResult.path)).toBe(true);
     });
 
     it("should handle nearly full board scenarios", () => {

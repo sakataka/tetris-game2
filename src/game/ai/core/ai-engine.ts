@@ -3,8 +3,16 @@ import type { GameState } from "@/types/game";
 import { DellacherieEvaluator } from "../evaluators/dellacherie";
 import { StackingEvaluator } from "../evaluators/stacking-evaluator";
 import { DynamicWeights } from "../evaluators/weights";
-import type { BitBoard } from "./bitboard";
-import { BitBoard as BitBoardImpl } from "./bitboard";
+import type { BitBoardData } from "./bitboard";
+import {
+  canPlace,
+  clearLines,
+  clone,
+  createBitBoard,
+  getDimensions,
+  place,
+  toBoardState,
+} from "./bitboard";
 import { type Move, MoveGenerator } from "./move-generator";
 import { getPieceBitsAtPosition } from "./piece-bits";
 
@@ -137,7 +145,7 @@ export class AIEngine {
       }
 
       // Convert board to BitBoard for AI processing
-      const board = new BitBoardImpl(gameState.board);
+      const board = createBitBoard(gameState.board);
 
       // Update evaluator weights if dynamic adjustment enabled
       if (this.config.useDynamicWeights) {
@@ -177,8 +185,8 @@ export class AIEngine {
       if (allMoves.length === 0) {
         console.error("[AI] No moves generated - Debug info:", {
           currentPiece: gameState.currentPiece,
-          boardState: board.toBoardState().slice(0, 5), // Top 5 rows
-          boardHeight: board.getDimensions().height,
+          boardState: toBoardState(board).slice(0, 5), // Top 5 rows
+          boardHeight: getDimensions(board).height,
         });
         return this.createDecision(
           null,
@@ -225,7 +233,7 @@ export class AIEngine {
    * @returns AI decision result
    */
   private async evaluateMovesWithTimeout(
-    board: BitBoard,
+    board: BitBoardData,
     moves: Move[],
     startTime: number,
   ): Promise<AIDecision> {
@@ -312,7 +320,7 @@ export class AIEngine {
    * @param lines - Lines cleared
    * @param level - Current level
    */
-  private updateDynamicWeights(board: BitBoard, lines: number, level: number): void {
+  private updateDynamicWeights(board: BitBoardData, lines: number, level: number): void {
     try {
       // Dynamic weights only supported for Dellacherie evaluator
       if (this.evaluator instanceof DellacherieEvaluator) {
@@ -470,12 +478,12 @@ export class AIEngine {
    * @param moves - All possible moves
    * @returns Moves that can clear lines
    */
-  private identifyLineClearingMoves(board: BitBoard, moves: Move[]): Move[] {
+  private identifyLineClearingMoves(board: BitBoardData, moves: Move[]): Move[] {
     const lineClearingMoves: Move[] = [];
 
     for (const move of moves) {
       // Create a temporary board to test the move
-      const tempBoard = board.clone();
+      const tempBoard = clone(board);
 
       // Get piece bit patterns
       const pieceBitRows = getPieceBitsAtPosition(move.piece, move.rotation, move.x);
@@ -486,11 +494,12 @@ export class AIEngine {
       }
 
       // Simulate piece placement
-      if (tempBoard.canPlace(pieceBitRows, move.y)) {
-        tempBoard.place(pieceBitRows, move.y);
+      if (canPlace(tempBoard, pieceBitRows, move.y)) {
+        const placedBoard = place(tempBoard, pieceBitRows, move.y);
 
         // Check if this move clears any lines
-        const clearedLines = tempBoard.clearLines();
+        const clearedLinesResult = clearLines(placedBoard);
+        const clearedLines = clearedLinesResult.clearedLines;
         if (clearedLines.length > 0) {
           // Store the number of lines cleared in the move
           move.linesCleared = clearedLines.length;

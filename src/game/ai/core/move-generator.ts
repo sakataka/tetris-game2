@@ -1,7 +1,8 @@
 import { createTetromino } from "@/game/tetrominos";
 import { applyWallKickOffset, getWallKickOffsets } from "@/game/wallKick";
 import type { RotationState, Tetromino, TetrominoTypeName } from "@/types/game";
-import type { BitBoard } from "./bitboard";
+import type { BitBoardData } from "./bitboard";
+import { canPlace } from "./bitboard";
 import { getPieceBitsAtPosition } from "./piece-bits";
 
 /**
@@ -72,7 +73,11 @@ export class MoveGenerator {
    * @param heldPiece - Currently held piece (optional)
    * @returns Array of all valid moves
    */
-  generateAllMoves(board: BitBoard, currentPiece: Tetromino, heldPiece?: Tetromino | null): Move[] {
+  generateAllMoves(
+    board: BitBoardData,
+    currentPiece: Tetromino,
+    heldPiece?: Tetromino | null,
+  ): Move[] {
     // Check if piece is valid
     if (!currentPiece.type || !currentPiece.position) {
       console.error("[MoveGen] Invalid piece structure:", currentPiece);
@@ -105,7 +110,7 @@ export class MoveGenerator {
    * @param piece - Tetromino to generate moves for
    * @returns Array of moves for this piece
    */
-  private generateMovesForPiece(board: BitBoard, piece: Tetromino): Move[] {
+  private generateMovesForPiece(board: BitBoardData, piece: Tetromino): Move[] {
     const moves: Move[] = [];
 
     // Test all 4 rotation states
@@ -160,7 +165,7 @@ export class MoveGenerator {
    * @returns Valid move or null if impossible
    */
   private findValidMove(
-    board: BitBoard,
+    board: BitBoardData,
     piece: Tetromino,
     targetRotation: RotationState,
     targetX: number,
@@ -210,7 +215,7 @@ export class MoveGenerator {
    * @returns Movement path or null if impossible
    */
   private simulateMovePath(
-    board: BitBoard,
+    board: BitBoardData,
     piece: Tetromino,
     targetRotation: RotationState,
     targetX: number,
@@ -241,7 +246,7 @@ export class MoveGenerator {
 
       // Check if horizontal movement is valid
       const pieceBits = getPieceBitsAtPosition(currentPiece.type, currentPiece.rotation, newX);
-      if (!board.canPlace(pieceBits, currentPiece.position.y)) {
+      if (!canPlace(board, pieceBits, currentPiece.position.y)) {
         return null; // Horizontal movement blocked
       }
 
@@ -269,7 +274,7 @@ export class MoveGenerator {
    * @returns Rotation result or null if impossible
    */
   private attemptRotation(
-    board: BitBoard,
+    board: BitBoardData,
     piece: Tetromino,
     targetRotation: RotationState,
   ): { piece: Tetromino; wallKickUsed: boolean } | null {
@@ -283,7 +288,7 @@ export class MoveGenerator {
 
       // Check if piece can be placed at this position
       const pieceBits = getPieceBitsAtPosition(piece.type, targetRotation, testPosition.x);
-      if (board.canPlace(pieceBits, testPosition.y)) {
+      if (canPlace(board, pieceBits, testPosition.y)) {
         return {
           piece: {
             ...piece,
@@ -306,13 +311,13 @@ export class MoveGenerator {
    * @param x - X position
    * @returns Y position or -1 if invalid
    */
-  private findDropPosition(board: BitBoard, pieceBits: number[], _x: number): number {
+  private findDropPosition(board: BitBoardData, pieceBits: number[], _x: number): number {
     // Start from top and work down
     for (let y = 0; y <= 20 - pieceBits.length; y++) {
-      if (board.canPlace(pieceBits, y)) {
+      if (canPlace(board, pieceBits, y)) {
         // Check if piece would be supported (can't fall further)
         const nextY = y + 1;
-        if (nextY + pieceBits.length > 20 || !board.canPlace(pieceBits, nextY)) {
+        if (nextY + pieceBits.length > 20 || !canPlace(board, pieceBits, nextY)) {
           return y; // This is the final resting position
         }
       }
@@ -336,10 +341,10 @@ export class MoveGenerator {
    * @param board - Board state for validation
    * @returns Filtered valid moves
    */
-  private filterValidMoves(moves: Move[], board: BitBoard): Move[] {
+  private filterValidMoves(moves: Move[], board: BitBoardData): Move[] {
     return moves.filter((move) => {
       const pieceBits = getPieceBitsAtPosition(move.piece, move.rotation, move.x);
-      return board.canPlace(pieceBits, move.y);
+      return canPlace(board, pieceBits, move.y);
     });
   }
 

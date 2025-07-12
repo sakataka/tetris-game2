@@ -9,8 +9,23 @@ const bench = (name: string, fn: () => void) => {
   console.log(`  Time: ${(end - start).toFixed(3)}ms`);
 };
 
-import { BitBoard } from "@/game/ai/core/bitboard";
-import { CollisionDetector } from "@/game/ai/core/collision-detection";
+import {
+  calculateHeight,
+  clear,
+  clearLines,
+  clone,
+  countOccupiedCells,
+  createBitBoard,
+  getRowBits,
+  place,
+  setRowBits,
+} from "@/game/ai/core/bitboard";
+import {
+  canPlacePiece,
+  createCollisionConfig,
+  findDropPosition,
+  findValidPositions,
+} from "@/game/ai/core/collision-detection";
 import { getPieceBitsAtPosition } from "@/game/ai/core/piece-bits";
 import { createEmptyBoard } from "@/game/board";
 import type { RotationState, TetrominoTypeName } from "@/types/game";
@@ -31,70 +46,70 @@ describe("BitBoard Performance Benchmarks", () => {
   const rotations: RotationState[] = [0, 1, 2, 3];
 
   // Create test boards with varying complexity
-  const emptyBoard = new BitBoard();
+  const emptyBoard = createBitBoard();
 
-  const sparseBoard = new BitBoard();
-  sparseBoard.setRowBits(19, 0b1100001100); // Bottom row with gaps
-  sparseBoard.setRowBits(18, 0b0110110000); // Second row
-  sparseBoard.setRowBits(15, 0b1000000001); // Higher row
+  let sparseBoard = createBitBoard();
+  sparseBoard = setRowBits(sparseBoard, 19, 0b1100001100); // Bottom row with gaps
+  sparseBoard = setRowBits(sparseBoard, 18, 0b0110110000); // Second row
+  sparseBoard = setRowBits(sparseBoard, 15, 0b1000000001); // Higher row
 
-  const denseBoard = new BitBoard();
+  let denseBoard = createBitBoard();
   for (let y = 15; y < 20; y++) {
-    denseBoard.setRowBits(y, 0b1111111110); // Almost full bottom rows
+    denseBoard = setRowBits(denseBoard, y, 0b1111111110); // Almost full bottom rows
   }
 
-  const complexBoard = new BitBoard();
+  let complexBoard = createBitBoard();
   // Create a realistic mid-game board state
-  complexBoard.setRowBits(19, 0b1111011111);
-  complexBoard.setRowBits(18, 0b1111101111);
-  complexBoard.setRowBits(17, 0b1110111111);
-  complexBoard.setRowBits(16, 0b1101111111);
-  complexBoard.setRowBits(15, 0b1011111111);
-  complexBoard.setRowBits(14, 0b0111111111);
-  complexBoard.setRowBits(13, 0b1111111011);
-  complexBoard.setRowBits(12, 0b1111110111);
-  complexBoard.setRowBits(10, 0b1100000011);
-  complexBoard.setRowBits(8, 0b0110000110);
+  complexBoard = setRowBits(complexBoard, 19, 0b1111011111);
+  complexBoard = setRowBits(complexBoard, 18, 0b1111101111);
+  complexBoard = setRowBits(complexBoard, 17, 0b1110111111);
+  complexBoard = setRowBits(complexBoard, 16, 0b1101111111);
+  complexBoard = setRowBits(complexBoard, 15, 0b1011111111);
+  complexBoard = setRowBits(complexBoard, 14, 0b0111111111);
+  complexBoard = setRowBits(complexBoard, 13, 0b1111111011);
+  complexBoard = setRowBits(complexBoard, 12, 0b1111110111);
+  complexBoard = setRowBits(complexBoard, 10, 0b1100000011);
+  complexBoard = setRowBits(complexBoard, 8, 0b0110000110);
 
   describe("Core BitBoard Operations", () => {
     bench("BitBoard creation from empty", () => {
-      new BitBoard();
+      createBitBoard();
     });
 
     bench("BitBoard creation from GameBoard", () => {
       const gameBoard = createEmptyBoard();
       gameBoard[19][0] = 1;
       gameBoard[19][9] = 1;
-      new BitBoard(gameBoard);
+      createBitBoard(gameBoard);
     });
 
     bench("Row bit operations (1000x)", () => {
-      const board = new BitBoard();
+      let board = createBitBoard();
       for (let i = 0; i < 1000; i++) {
-        board.setRowBits(i % 20, 0b1010101010);
-        board.getRowBits(i % 20);
+        board = setRowBits(board, i % 20, 0b1010101010);
+        getRowBits(board, i % 20);
       }
     });
 
     bench("Board cloning", () => {
-      complexBoard.clone();
+      clone(complexBoard);
     });
 
     bench("Board clearing", () => {
-      const board = complexBoard.clone();
-      board.clear();
+      const board = clone(complexBoard);
+      clear(board);
     });
   });
 
   describe("Collision Detection Performance", () => {
-    const detector = new CollisionDetector(false);
+    const collisionConfig = createCollisionConfig();
 
     bench("Single collision check - empty board", () => {
-      detector.canPlace(emptyBoard, "T", 0, 3, 10);
+      canPlacePiece(emptyBoard, "T", 0, 3, 10);
     });
 
     bench("Single collision check - complex board", () => {
-      detector.canPlace(complexBoard, "T", 0, 3, 5);
+      canPlacePiece(complexBoard, "T", 0, 3, 5);
     });
 
     bench("1000 collision checks - TARGET: <1ms", () => {
@@ -103,7 +118,7 @@ describe("BitBoard Performance Benchmarks", () => {
         const rotation = rotations[i % rotations.length];
         const x = i % 8;
         const y = i % 18;
-        detector.canPlace(complexBoard, piece, rotation, x, y);
+        canPlacePiece(complexBoard, piece, rotation, x, y);
       }
     });
 
@@ -114,32 +129,35 @@ describe("BitBoard Performance Benchmarks", () => {
           positions.push({ x, y });
         }
       }
-      detector.canPlaceBatch(complexBoard, "T", 0, positions);
+      // Batch operation using individual calls
+      for (const pos of positions) {
+        canPlacePiece(complexBoard, "T", 0, pos.x, pos.y);
+      }
     });
 
     bench("Find all valid positions - T piece", () => {
-      detector.findValidPositions(complexBoard, "T", 0);
+      findValidPositions(collisionConfig, complexBoard, "T", 0);
     });
 
     bench("Find all valid positions - I piece", () => {
-      detector.findValidPositions(complexBoard, "I", 0);
+      findValidPositions(collisionConfig, complexBoard, "I", 0);
     });
 
     bench("Drop position finding (all columns)", () => {
       for (let x = 0; x < 8; x++) {
-        detector.findDropPosition(complexBoard, "T", 0, x);
+        findDropPosition(collisionConfig, complexBoard, "T", 0, x);
       }
     });
   });
 
   describe("AI Board Evaluation Performance", () => {
-    const detector = new CollisionDetector(false);
+    const collisionConfig = createCollisionConfig();
 
     bench("Complete move generation - single piece", () => {
       const validMoves = [];
       for (const piece of ["T"] as const) {
         for (const rotation of rotations) {
-          const positions = detector.findValidPositions(complexBoard, piece, rotation);
+          const positions = findValidPositions(collisionConfig, complexBoard, piece, rotation);
           for (const pos of positions) {
             validMoves.push({ piece, rotation, position: pos });
           }
@@ -158,14 +176,14 @@ describe("BitBoard Performance Benchmarks", () => {
         const y = evaluationCount % 18;
 
         // Simulate AI evaluation: collision check + basic scoring
-        const canPlace = detector.canPlace(complexBoard, piece, rotation, x, y);
-        if (canPlace.canPlace) {
+        const canPlaceResult = canPlacePiece(complexBoard, piece, rotation, x, y);
+        if (canPlaceResult) {
           // Simulate placing piece and evaluating
-          const board = complexBoard.clone();
+          let board = clone(complexBoard);
           const pieceBits = getPieceBitsAtPosition(piece, rotation, x);
-          board.place(pieceBits, y);
-          const height = board.calculateHeight();
-          const occupied = board.countOccupiedCells();
+          board = place(board, pieceBits, y);
+          const height = calculateHeight(board);
+          const occupied = countOccupiedCells(board);
           // Simple evaluation score
           const score = height * 10 + occupied;
           // Use score to prevent unused variable warning
@@ -188,33 +206,35 @@ describe("BitBoard Performance Benchmarks", () => {
 
       for (const piece1 of [pieceQueue[0]]) {
         for (const rot1 of [0, 1] as const) {
-          const positions1 = detector.findValidPositions(complexBoard, piece1, rot1);
+          const positions1 = findValidPositions(collisionConfig, complexBoard, piece1, rot1);
 
           for (let i = 0; i < Math.min(positions1.length, 5); i++) {
             const pos1 = positions1[i];
 
             // Place first piece
-            const board1 = complexBoard.clone();
+            let board1 = clone(complexBoard);
             const bits1 = getPieceBitsAtPosition(piece1, rot1, pos1.x);
-            board1.place(bits1, pos1.y);
-            board1.clearLines();
+            board1 = place(board1, bits1, pos1.y);
+            const result1 = clearLines(board1);
+            board1 = result1.board;
 
             for (const piece2 of [pieceQueue[1]]) {
               for (const rot2 of [0, 1] as const) {
-                const positions2 = detector.findValidPositions(board1, piece2, rot2);
+                const positions2 = findValidPositions(collisionConfig, board1, piece2, rot2);
 
                 for (let j = 0; j < Math.min(positions2.length, 3); j++) {
                   const pos2 = positions2[j];
 
                   // Place second piece
-                  const board2 = board1.clone();
+                  let board2 = clone(board1);
                   const bits2 = getPieceBitsAtPosition(piece2, rot2, pos2.x);
-                  board2.place(bits2, pos2.y);
-                  board2.clearLines();
+                  board2 = place(board2, bits2, pos2.y);
+                  const result2 = clearLines(board2);
+                  board2 = result2.board;
 
                   for (const piece3 of [pieceQueue[2]]) {
                     for (const rot3 of [0] as const) {
-                      const positions3 = detector.findValidPositions(board2, piece3, rot3);
+                      const positions3 = findValidPositions(collisionConfig, board2, piece3, rot3);
                       simulations += positions3.length;
                     }
                   }
@@ -231,35 +251,35 @@ describe("BitBoard Performance Benchmarks", () => {
 
   describe("Line Clearing Performance", () => {
     bench("Line clearing - no lines", () => {
-      sparseBoard.clone().clearLines();
+      clearLines(clone(sparseBoard));
     });
 
     bench("Line clearing - single line", () => {
-      const board = sparseBoard.clone();
-      board.setRowBits(19, 0b1111111111); // Full line
-      board.clearLines();
+      let board = clone(sparseBoard);
+      board = setRowBits(board, 19, 0b1111111111); // Full line
+      clearLines(board);
     });
 
     bench("Line clearing - tetris (4 lines)", () => {
-      const board = sparseBoard.clone();
-      board.setRowBits(19, 0b1111111111);
-      board.setRowBits(18, 0b1111111111);
-      board.setRowBits(17, 0b1111111111);
-      board.setRowBits(16, 0b1111111111);
-      board.clearLines();
+      let board = clone(sparseBoard);
+      board = setRowBits(board, 19, 0b1111111111);
+      board = setRowBits(board, 18, 0b1111111111);
+      board = setRowBits(board, 17, 0b1111111111);
+      board = setRowBits(board, 16, 0b1111111111);
+      clearLines(board);
     });
 
     bench("Line clearing - complex pattern", () => {
-      const board = new BitBoard();
+      let board = createBitBoard();
       // Alternate full and partial lines
       for (let y = 10; y < 20; y++) {
         if (y % 2 === 0) {
-          board.setRowBits(y, 0b1111111111); // Full
+          board = setRowBits(board, y, 0b1111111111); // Full
         } else {
-          board.setRowBits(y, 0b1111111110); // Partial
+          board = setRowBits(board, y, 0b1111111110); // Partial
         }
       }
-      board.clearLines();
+      clearLines(board);
     });
   });
 
@@ -267,7 +287,7 @@ describe("BitBoard Performance Benchmarks", () => {
     bench("Memory usage - 1000 BitBoards", () => {
       const boards = [];
       for (let i = 0; i < 1000; i++) {
-        boards.push(new BitBoard());
+        boards.push(createBitBoard());
       }
       // Force garbage collection to see actual memory usage
       if (global.gc) {
@@ -288,14 +308,14 @@ describe("BitBoard Performance Benchmarks", () => {
     bench("Clone performance - large scale", () => {
       const boards = [];
       for (let i = 0; i < 100; i++) {
-        boards.push(complexBoard.clone());
+        boards.push(clone(complexBoard));
       }
     });
   });
 
   describe("Real-world AI Simulation", () => {
     bench("Complete AI move evaluation cycle", () => {
-      const detector = new CollisionDetector(false);
+      const collisionConfig = createCollisionConfig();
       // SRS rotation integration removed
 
       // Simulate AI evaluating all possible moves for current piece
@@ -309,22 +329,23 @@ describe("BitBoard Performance Benchmarks", () => {
       } | null = null;
 
       for (const rotation of rotations) {
-        const validPositions = detector.findValidPositions(complexBoard, piece, rotation);
+        const validPositions = findValidPositions(collisionConfig, complexBoard, piece, rotation);
 
         for (const position of validPositions) {
           // Simulate placing piece
-          const board = complexBoard.clone();
+          let board = clone(complexBoard);
           const pieceBits = getPieceBitsAtPosition(piece, rotation, position.x);
-          board.place(pieceBits, position.y);
+          board = place(board, pieceBits, position.y);
 
           // Clear lines
-          const clearedLines = board.clearLines();
+          const clearResult = clearLines(board);
+          board = clearResult.board;
 
           // Simple evaluation function
-          const height = board.calculateHeight();
+          const height = calculateHeight(board);
           const holes = 0; // Would count holes in real AI
           const bumpiness = 0; // Would calculate bumpiness in real AI
-          const linesCleared = clearedLines.length;
+          const linesCleared = clearResult.clearedLines.length;
 
           const score = linesCleared * 1000 - height * 10 - holes * 50 - bumpiness * 5;
 
@@ -342,7 +363,7 @@ describe("BitBoard Performance Benchmarks", () => {
     });
 
     bench("Multi-piece lookahead (2 pieces)", () => {
-      const detector = new CollisionDetector(false);
+      const collisionConfig = createCollisionConfig();
       const pieces: TetrominoTypeName[] = ["T", "I"];
 
       let bestSequence: {
@@ -357,31 +378,35 @@ describe("BitBoard Performance Benchmarks", () => {
 
       // First piece
       for (const rot1 of [0, 1] as const) {
-        const positions1 = detector.findValidPositions(complexBoard, pieces[0], rot1);
+        const positions1 = findValidPositions(collisionConfig, complexBoard, pieces[0], rot1);
 
         for (let i = 0; i < Math.min(positions1.length, 10); i++) {
           const pos1 = positions1[i];
 
           // Place first piece
-          const board1 = complexBoard.clone();
+          let board1 = clone(complexBoard);
           const bits1 = getPieceBitsAtPosition(pieces[0], rot1, pos1.x);
-          board1.place(bits1, pos1.y);
-          const lines1 = board1.clearLines();
+          board1 = place(board1, bits1, pos1.y);
+          const result1 = clearLines(board1);
+          board1 = result1.board;
+          const lines1 = result1.clearedLines;
 
           // Second piece
           for (const rot2 of [0, 1] as const) {
-            const positions2 = detector.findValidPositions(board1, pieces[1], rot2);
+            const positions2 = findValidPositions(collisionConfig, board1, pieces[1], rot2);
 
             for (let j = 0; j < Math.min(positions2.length, 5); j++) {
               const pos2 = positions2[j];
 
-              const board2 = board1.clone();
+              let board2 = clone(board1);
               const bits2 = getPieceBitsAtPosition(pieces[1], rot2, pos2.x);
-              board2.place(bits2, pos2.y);
-              const lines2 = board2.clearLines();
+              board2 = place(board2, bits2, pos2.y);
+              const result2 = clearLines(board2);
+              board2 = result2.board;
+              const lines2 = result2.clearedLines;
 
               const totalLines = lines1.length + lines2.length;
-              const finalHeight = board2.calculateHeight();
+              const finalHeight = calculateHeight(board2);
               const score = totalLines * 1000 - finalHeight * 10;
 
               if (score > bestScore) {
@@ -413,12 +438,11 @@ describe("BitBoard Performance Benchmarks", () => {
  */
 describe("Performance Validation", () => {
   bench("Validate 1000 collision checks <1ms", () => {
-    const detector = new CollisionDetector(false);
-    const board = new BitBoard();
+    const board = createBitBoard();
 
     const start = performance.now();
     for (let i = 0; i < 1000; i++) {
-      detector.canPlace(board, "T", 0, i % 8, i % 18);
+      canPlacePiece(board, "T", 0, i % 8, i % 18);
     }
     const end = performance.now();
 
@@ -433,10 +457,9 @@ describe("Performance Validation", () => {
   });
 
   bench("Validate 100k evaluations per second", () => {
-    const detector = new CollisionDetector(false);
-    const board = new BitBoard();
-    board.setRowBits(19, 0b1111000000);
-    board.setRowBits(18, 0b1100000000);
+    let board = createBitBoard();
+    board = setRowBits(board, 19, 0b1111000000);
+    board = setRowBits(board, 18, 0b1100000000);
 
     const start = performance.now();
     let evaluations = 0;
@@ -448,7 +471,7 @@ describe("Performance Validation", () => {
       const x = evaluations % 8;
       const y = evaluations % 18;
 
-      detector.canPlace(board, piece, rotation, x, y);
+      canPlacePiece(board, piece, rotation, x, y);
       evaluations++;
 
       // Break if we've spent more than 1 second

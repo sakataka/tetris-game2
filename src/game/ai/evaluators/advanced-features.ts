@@ -1,4 +1,5 @@
-import type { BitBoard } from "../core/bitboard";
+import type { BitBoardData } from "../core/bitboard";
+import { calculateHeight, countOccupiedCells, getRowBits } from "../core/bitboard";
 
 /**
  * T-Spin opportunity detection result
@@ -50,7 +51,7 @@ export class AdvancedFeatures {
    * @param board - Current board state
    * @returns Array of T-Spin opportunities sorted by priority
    */
-  detectTSpinOpportunity(board: BitBoard): TSpinOpportunity[] {
+  detectTSpinOpportunity(board: BitBoardData): TSpinOpportunity[] {
     const opportunities: TSpinOpportunity[] = [];
 
     // Scan board for T-Spin slot patterns
@@ -82,8 +83,8 @@ export class AdvancedFeatures {
    * @param board - Current board state
    * @returns Perfect Clear opportunity or null if not possible
    */
-  detectPerfectClear(board: BitBoard): PerfectClearOpportunity | null {
-    const totalBlocks = board.countOccupiedCells();
+  detectPerfectClear(board: BitBoardData): PerfectClearOpportunity | null {
+    const totalBlocks = countOccupiedCells(board);
 
     // Perfect Clear only feasible with some blocks present (1-40) and divisible by 4
     if (totalBlocks > 0 && totalBlocks <= 40 && totalBlocks % 4 === 0) {
@@ -105,7 +106,7 @@ export class AdvancedFeatures {
    * @param board - Current board state
    * @returns Comprehensive terrain evaluation
    */
-  evaluateTerrain(board: BitBoard): TerrainEvaluation {
+  evaluateTerrain(board: BitBoardData): TerrainEvaluation {
     return {
       smoothness: this.calculateSmoothness(board),
       accessibility: this.calculateAccessibility(board),
@@ -124,7 +125,7 @@ export class AdvancedFeatures {
    * @returns 2D pattern array (1 = occupied, 0 = empty)
    */
   private extractPattern(
-    board: BitBoard,
+    board: BitBoardData,
     x: number,
     y: number,
     width: number,
@@ -142,7 +143,7 @@ export class AdvancedFeatures {
           // Out of bounds treated as solid wall
           pattern[dy][dx] = 1;
         } else {
-          const rowBits = board.getRowBits(row);
+          const rowBits = getRowBits(board, row);
           pattern[dy][dx] = (rowBits >> col) & 1;
         }
       }
@@ -247,9 +248,9 @@ export class AdvancedFeatures {
    * @param board - Board state
    * @returns Difficulty score (0-10, lower is easier)
    */
-  private calculatePCDifficulty(board: BitBoard): number {
-    const height = board.calculateHeight();
-    const blocks = board.countOccupiedCells();
+  private calculatePCDifficulty(board: BitBoardData): number {
+    const height = calculateHeight(board);
+    const blocks = countOccupiedCells(board);
 
     // Base difficulty from height and block count
     let difficulty = height * 0.3 + blocks * 0.1;
@@ -266,7 +267,7 @@ export class AdvancedFeatures {
    * @param board - Board state
    * @returns Smoothness score (0-1, higher is smoother)
    */
-  private calculateSmoothness(board: BitBoard): number {
+  private calculateSmoothness(board: BitBoardData): number {
     const heights = this.getColumnHeights(board);
     let heightDifferences = 0;
 
@@ -283,13 +284,13 @@ export class AdvancedFeatures {
    * @param board - Board state
    * @returns Accessibility score (0-1, higher is better)
    */
-  private calculateAccessibility(board: BitBoard): number {
+  private calculateAccessibility(board: BitBoardData): number {
     let accessibleCells = 0;
     let totalEmptyCells = 0;
 
     for (let x = 0; x < 10; x++) {
       for (let y = 0; y < 20; y++) {
-        const rowBits = board.getRowBits(y);
+        const rowBits = getRowBits(board, y);
         const cell = (rowBits >> x) & 1;
 
         if (cell === 0) {
@@ -298,7 +299,7 @@ export class AdvancedFeatures {
           // Check if cell is accessible from top
           let accessible = true;
           for (let checkY = 0; checkY < y; checkY++) {
-            const checkRowBits = board.getRowBits(checkY);
+            const checkRowBits = getRowBits(board, checkY);
             if ((checkRowBits >> x) & 1) {
               accessible = false;
               break;
@@ -318,7 +319,7 @@ export class AdvancedFeatures {
    * @param board - Board state
    * @returns T-Spin potential score (0-1, higher is better)
    */
-  private calculateTSpinPotential(board: BitBoard): number {
+  private calculateTSpinPotential(board: BitBoardData): number {
     const opportunities = this.detectTSpinOpportunity(board);
 
     if (opportunities.length === 0) return 0;
@@ -333,7 +334,7 @@ export class AdvancedFeatures {
    * @param board - Board state
    * @returns PC potential score (0-1, higher is better)
    */
-  private calculatePCPotential(board: BitBoard): number {
+  private calculatePCPotential(board: BitBoardData): number {
     const pcOp = this.detectPerfectClear(board);
 
     if (!pcOp) return 0;
@@ -350,14 +351,14 @@ export class AdvancedFeatures {
    * @param board - Board state
    * @returns Array of column heights
    */
-  private getColumnHeights(board: BitBoard): number[] {
+  private getColumnHeights(board: BitBoardData): number[] {
     const heights: number[] = [];
 
     for (let x = 0; x < 10; x++) {
       heights[x] = 0;
 
       for (let y = 0; y < 20; y++) {
-        const rowBits = board.getRowBits(y);
+        const rowBits = getRowBits(board, y);
         if ((rowBits >> x) & 1) {
           heights[x] = 20 - y;
           break;

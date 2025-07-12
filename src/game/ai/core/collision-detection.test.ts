@@ -2,57 +2,60 @@ import { beforeEach, describe, expect, it } from "bun:test";
 import fc from "fast-check";
 import { createEmptyBoard } from "@/game/board";
 import type { Position, RotationState, TetrominoTypeName } from "@/types/game";
-import { BitBoard } from "./bitboard";
+import { type BitBoardData, createBitBoard } from "./bitboard";
 import {
-  CollisionDetector,
+  type CollisionConfig,
+  calculateGhostPosition,
+  canPlace,
+  canPlaceBatch,
   canPlacePiece,
+  createCollisionConfig,
+  findDropPosition,
   findPieceDropPosition,
+  findValidPositions,
   getAllValidPositions,
-  getCollisionDetector,
-  resetCollisionDetector,
 } from "./collision-detection";
 
 describe("Collision Detection", () => {
-  let detector: CollisionDetector;
-  let bitBoard: BitBoard;
+  let config: CollisionConfig;
+  let bitBoard: BitBoardData;
 
   beforeEach(() => {
-    detector = new CollisionDetector(false); // Disable metrics for faster tests
-    bitBoard = new BitBoard();
-    resetCollisionDetector(); // Ensure clean state
+    config = createCollisionConfig(false); // Disable metrics for faster tests
+    bitBoard = createBitBoard();
   });
 
   describe("Basic Collision Detection", () => {
     it("should detect valid placement on empty board", () => {
-      const result = detector.canPlace(bitBoard, "T", 0, 3, 0);
+      const result = canPlace(config, bitBoard, "T", 0, 3, 0);
       expect(result.canPlace).toBe(true);
       expect(result.reason).toBeUndefined();
     });
 
     it("should detect collision with existing pieces", () => {
       // Place some pieces on the board
-      bitBoard.setRowBits(19, 0b0000001111); // Bottom row, left 4 cells occupied (bits 0-3)
+      bitBoard.rows[19] = 0b0000001111; // Bottom row, left 4 cells occupied (bits 0-3)
 
-      const result = detector.canPlace(bitBoard, "I", 0, 0, 19); // I-piece horizontal at bottom-left
+      const result = canPlace(config, bitBoard, "I", 0, 0, 19); // I-piece horizontal at bottom-left
       expect(result.canPlace).toBe(false);
       expect(result.reason).toBe("collision");
     });
 
     it("should detect bounds violations", () => {
       // Test X bounds
-      expect(detector.canPlace(bitBoard, "I", 0, 7, 0).canPlace).toBe(false); // I-piece (width 4) at X=7
-      expect(detector.canPlace(bitBoard, "I", 0, -1, 0).canPlace).toBe(false); // Negative X
+      expect(canPlace(config, bitBoard, "I", 0, 7, 0).canPlace).toBe(false); // I-piece (width 4) at X=7
+      expect(canPlace(config, bitBoard, "I", 0, -1, 0).canPlace).toBe(false); // Negative X
 
       // Test Y bounds
-      expect(detector.canPlace(bitBoard, "I", 1, 0, 17).canPlace).toBe(false); // I-piece vertical (height 4) at Y=17
-      expect(detector.canPlace(bitBoard, "I", 1, 0, -1).canPlace).toBe(false); // Negative Y
+      expect(canPlace(config, bitBoard, "I", 1, 0, 17).canPlace).toBe(false); // I-piece vertical (height 4) at Y=17
+      expect(canPlace(config, bitBoard, "I", 1, 0, -1).canPlace).toBe(false); // Negative Y
     });
 
     it("should handle different piece types correctly", () => {
       const pieces: TetrominoTypeName[] = ["I", "O", "T", "S", "Z", "J", "L"];
 
       for (const piece of pieces) {
-        const result = detector.canPlace(bitBoard, piece, 0, 3, 0);
+        const result = canPlace(config, bitBoard, piece, 0, 3, 0);
         expect(result.canPlace).toBe(true);
       }
     });
@@ -61,7 +64,7 @@ describe("Collision Detection", () => {
       const rotations: RotationState[] = [0, 1, 2, 3];
 
       for (const rotation of rotations) {
-        const result = detector.canPlace(bitBoard, "T", rotation, 3, 0);
+        const result = canPlace(config, bitBoard, "T", rotation, 3, 0);
         expect(result.canPlace).toBe(true);
       }
     });
@@ -76,14 +79,14 @@ describe("Collision Detection", () => {
         { x: 0, y: 10 },
       ];
 
-      const results = detector.canPlaceBatch(bitBoard, "T", 0, positions);
+      const results = canPlaceBatch(config, bitBoard, "T", 0, positions);
       expect(results).toHaveLength(4);
       expect(results.every((r) => r.canPlace)).toBe(true);
     });
 
     it("should handle mixed valid/invalid positions", () => {
       // Add obstacles
-      bitBoard.setRowBits(0, 0b0000000111); // Top row, left 3 cells occupied (bits 0-2)
+      bitBoard.rows[0] = 0b0000000111; // Top row, left 3 cells occupied (bits 0-2)
 
       const positions: Position[] = [
         { x: 0, y: 0 }, // Should collide
@@ -91,7 +94,7 @@ describe("Collision Detection", () => {
         { x: 8, y: 0 }, // Should be out of bounds for T-piece
       ];
 
-      const results = detector.canPlaceBatch(bitBoard, "T", 0, positions);
+      const results = canPlaceBatch(config, bitBoard, "T", 0, positions);
       expect(results[0].canPlace).toBe(false);
       expect(results[1].canPlace).toBe(true);
       expect(results[2].canPlace).toBe(false);
@@ -100,55 +103,55 @@ describe("Collision Detection", () => {
 
   describe("Valid Position Finding", () => {
     it("should find all valid positions on empty board", () => {
-      const validPositions = detector.findValidPositions(bitBoard, "T", 0);
+      const validPositions = findValidPositions(config, bitBoard, "T", 0);
 
       // T-piece in rotation 0 should fit in many positions
       expect(validPositions.length).toBeGreaterThan(0);
 
       // All returned positions should be valid
       for (const pos of validPositions) {
-        const result = detector.canPlace(bitBoard, "T", 0, pos.x, pos.y);
+        const result = canPlace(config, bitBoard, "T", 0, pos.x, pos.y);
         expect(result.canPlace).toBe(true);
       }
     });
 
     it("should find fewer positions with obstacles", () => {
-      const emptyPositions = detector.findValidPositions(bitBoard, "T", 0);
+      const emptyPositions = findValidPositions(config, bitBoard, "T", 0);
 
       // Add obstacles
       for (let y = 15; y < 20; y++) {
-        bitBoard.setRowBits(y, 0b1111111110); // Almost full bottom rows
+        bitBoard.rows[y] = 0b1111111110; // Almost full bottom rows
       }
 
-      const blockedPositions = detector.findValidPositions(bitBoard, "T", 0);
+      const blockedPositions = findValidPositions(config, bitBoard, "T", 0);
       expect(blockedPositions.length).toBeLessThan(emptyPositions.length);
     });
 
     it("should return empty array when no valid positions exist", () => {
       // Fill the entire board
       for (let y = 0; y < 20; y++) {
-        bitBoard.setRowBits(y, 0b1111111111);
+        bitBoard.rows[y] = 0b1111111111;
       }
 
-      const validPositions = detector.findValidPositions(bitBoard, "T", 0);
+      const validPositions = findValidPositions(config, bitBoard, "T", 0);
       expect(validPositions).toEqual([]);
     });
   });
 
   describe("Drop Position Finding", () => {
     it("should find bottom position on empty board", () => {
-      const dropY = detector.findDropPosition(bitBoard, "T", 0, 3);
+      const dropY = findDropPosition(config, bitBoard, "T", 0, 3);
       expect(dropY).not.toBeNull();
       expect(dropY).toBeGreaterThan(15); // Should be near bottom
 
       // Verify the position is actually valid
       if (dropY !== null) {
-        const result = detector.canPlace(bitBoard, "T", 0, 3, dropY);
+        const result = canPlace(config, bitBoard, "T", 0, 3, dropY);
         expect(result.canPlace).toBe(true);
 
         // Verify the position below would not be valid (at the bottom or collision)
         if (dropY < 19) {
-          const resultBelow = detector.canPlace(bitBoard, "T", 0, 3, dropY + 1);
+          const resultBelow = canPlace(config, bitBoard, "T", 0, 3, dropY + 1);
           expect(resultBelow.canPlace).toBe(false);
         }
       }
@@ -156,27 +159,27 @@ describe("Collision Detection", () => {
 
     it("should find correct position with obstacles", () => {
       // Place obstacle at bottom
-      bitBoard.setRowBits(19, 0b0001111000); // Obstacle in middle
-      bitBoard.setRowBits(18, 0b0001111000); // Two rows high
+      bitBoard.rows[19] = 0b0001111000; // Obstacle in middle
+      bitBoard.rows[18] = 0b0001111000; // Two rows high
 
-      const dropY = detector.findDropPosition(bitBoard, "T", 0, 3);
+      const dropY = findDropPosition(config, bitBoard, "T", 0, 3);
       expect(dropY).not.toBeNull();
       expect(dropY).toBeLessThan(18); // Should be above the obstacle
     });
 
     it("should return null for invalid X positions", () => {
-      expect(detector.findDropPosition(bitBoard, "I", 0, 7)).toBeNull(); // I-piece too wide
-      expect(detector.findDropPosition(bitBoard, "T", 0, -1)).toBeNull(); // Negative X
-      expect(detector.findDropPosition(bitBoard, "T", 0, 10)).toBeNull(); // Beyond board
+      expect(findDropPosition(config, bitBoard, "I", 0, 7)).toBeNull(); // I-piece too wide
+      expect(findDropPosition(config, bitBoard, "T", 0, -1)).toBeNull(); // Negative X
+      expect(findDropPosition(config, bitBoard, "T", 0, 10)).toBeNull(); // Beyond board
     });
 
     it("should return null when column is completely blocked", () => {
       // Fill column 3 completely (where I-piece vertical would be placed)
       for (let y = 0; y < 20; y++) {
-        bitBoard.setRowBits(y, 0b0000001000); // Column 3 occupied (bit 3)
+        bitBoard.rows[y] = 0b0000001000; // Column 3 occupied (bit 3)
       }
 
-      const dropY = detector.findDropPosition(bitBoard, "I", 1, 3); // I-piece vertical in blocked column
+      const dropY = findDropPosition(config, bitBoard, "I", 1, 3); // I-piece vertical in blocked column
       expect(dropY).toBeNull();
     });
   });
@@ -184,7 +187,7 @@ describe("Collision Detection", () => {
   describe("Ghost Position Calculation", () => {
     it("should calculate ghost position correctly", () => {
       const currentPos = { x: 3, y: 5 };
-      const ghostPos = detector.calculateGhostPosition(bitBoard, "T", 0, currentPos);
+      const ghostPos = calculateGhostPosition(config, bitBoard, "T", 0, currentPos);
 
       expect(ghostPos).not.toBeNull();
       expect(ghostPos?.x).toBe(currentPos.x);
@@ -192,10 +195,10 @@ describe("Collision Detection", () => {
     });
 
     it("should handle current position at bottom", () => {
-      const dropY = detector.findDropPosition(bitBoard, "T", 0, 3);
+      const dropY = findDropPosition(config, bitBoard, "T", 0, 3);
       if (dropY !== null) {
         const currentPos = { x: 3, y: dropY };
-        const ghostPos = detector.calculateGhostPosition(bitBoard, "T", 0, currentPos);
+        const ghostPos = calculateGhostPosition(config, bitBoard, "T", 0, currentPos);
 
         expect(ghostPos).not.toBeNull();
         expect(ghostPos?.x).toBe(currentPos.x);
@@ -208,11 +211,11 @@ describe("Collision Detection", () => {
     it("should return null when no drop position exists", () => {
       // Block the column
       for (let y = 0; y < 20; y++) {
-        bitBoard.setRowBits(y, 0b0001111000); // Block where T-piece would go
+        bitBoard.rows[y] = 0b0001111000; // Block where T-piece would go
       }
 
       const currentPos = { x: 3, y: 0 };
-      const ghostPos = detector.calculateGhostPosition(bitBoard, "T", 0, currentPos);
+      const ghostPos = calculateGhostPosition(config, bitBoard, "T", 0, currentPos);
       expect(ghostPos).toBeNull();
     });
   });
@@ -230,7 +233,7 @@ describe("Collision Detection", () => {
     });
 
     it("should work with BitBoard input", () => {
-      bitBoard.setRowBits(19, 0b0001000000);
+      bitBoard.rows[19] = 0b0001000000;
 
       const canPlace = canPlacePiece(bitBoard, "T", 0, 3, 19);
       expect(canPlace).toBe(false);
@@ -257,8 +260,8 @@ describe("Collision Detection", () => {
 
   describe("Metrics Mode", () => {
     it("should provide metrics when enabled", () => {
-      const metricsDetector = new CollisionDetector(true);
-      const result = metricsDetector.canPlace(bitBoard, "T", 0, 3, 0);
+      const metricsConfig = createCollisionConfig(true);
+      const result = canPlace(metricsConfig, bitBoard, "T", 0, 3, 0);
 
       expect(result.metrics).toBeDefined();
       expect(result.metrics?.timeUs).toBeGreaterThanOrEqual(0);
@@ -266,7 +269,7 @@ describe("Collision Detection", () => {
     });
 
     it("should not provide metrics when disabled", () => {
-      const result = detector.canPlace(bitBoard, "T", 0, 3, 0);
+      const result = canPlace(config, bitBoard, "T", 0, 3, 0);
       expect(result.metrics).toBeUndefined();
     });
   });
@@ -280,13 +283,13 @@ describe("Collision Detection", () => {
           fc.integer({ min: 0, max: 9 }),
           fc.integer({ min: 0, max: 19 }),
           (piece, rotation, x, y) => {
-            const board = new BitBoard();
-            const result = detector.canPlace(board, piece, rotation, x, y);
+            const board = createBitBoard();
+            const result = canPlace(config, board, piece, rotation, x, y);
 
             if (result.canPlace) {
               // If placement is valid, placing the piece should make the same position invalid
               // This requires generating the actual piece bits and placing them
-              const validPositions = detector.findValidPositions(board, piece, rotation);
+              const validPositions = findValidPositions(config, board, piece, rotation);
               const hasPosition = validPositions.some((pos) => pos.x === x && pos.y === y);
               expect(hasPosition).toBe(true);
             }
@@ -303,17 +306,17 @@ describe("Collision Detection", () => {
           fc.constantFrom(0, 1, 2, 3 as const),
           fc.integer({ min: 0, max: 9 }),
           (piece, rotation, x) => {
-            const board = new BitBoard();
-            const dropY = detector.findDropPosition(board, piece, rotation, x);
+            const board = createBitBoard();
+            const dropY = findDropPosition(config, board, piece, rotation, x);
 
             if (dropY !== null) {
               // Drop position should be valid
-              const result = detector.canPlace(board, piece, rotation, x, dropY);
+              const result = canPlace(config, board, piece, rotation, x, dropY);
               expect(result.canPlace).toBe(true);
 
               // Position below should be invalid (if not at bottom)
               if (dropY < 19) {
-                const resultBelow = detector.canPlace(board, piece, rotation, x, dropY + 1);
+                const resultBelow = canPlace(config, board, piece, rotation, x, dropY + 1);
                 expect(resultBelow.canPlace).toBe(false);
               }
             }
@@ -331,8 +334,8 @@ describe("Collision Detection", () => {
           fc.integer({ min: -5, max: 15 }),
           fc.integer({ min: -5, max: 25 }),
           (piece, rotation, x, y) => {
-            const board = new BitBoard();
-            const result = detector.canPlace(board, piece, rotation, x, y);
+            const board = createBitBoard();
+            const result = canPlace(config, board, piece, rotation, x, y);
 
             // If position is clearly out of bounds, should return bounds error
             if (x < 0 || y < 0 || x >= 10 || y >= 20) {
@@ -353,7 +356,7 @@ describe("Collision Detection", () => {
 
       // Perform many collision checks
       for (let i = 0; i < 1000; i++) {
-        detector.canPlace(bitBoard, "T", 0, i % 8, i % 18);
+        canPlace(config, bitBoard, "T", 0, i % 8, i % 18);
       }
 
       const end = performance.now();
@@ -372,7 +375,7 @@ describe("Collision Detection", () => {
       }
 
       const start = performance.now();
-      const results = detector.canPlaceBatch(bitBoard, "T", 0, positions);
+      const results = canPlaceBatch(config, bitBoard, "T", 0, positions);
       const end = performance.now();
 
       expect(results).toHaveLength(positions.length);
@@ -383,7 +386,7 @@ describe("Collision Detection", () => {
       const start = performance.now();
 
       for (let i = 0; i < 100; i++) {
-        detector.findValidPositions(bitBoard, "T", 0);
+        findValidPositions(config, bitBoard, "T", 0);
       }
 
       const end = performance.now();
@@ -398,11 +401,11 @@ describe("Collision Detection", () => {
     it("should handle completely filled board", () => {
       // Fill entire board
       for (let y = 0; y < 20; y++) {
-        bitBoard.setRowBits(y, 0b1111111111);
+        bitBoard.rows[y] = 0b1111111111;
       }
 
       for (const piece of ["I", "O", "T", "S", "Z", "J", "L"] as const) {
-        const result = detector.canPlace(bitBoard, piece, 0, 0, 0);
+        const result = canPlace(config, bitBoard, piece, 0, 0, 0);
         expect(result.canPlace).toBe(false);
         expect(result.reason).toBe("collision");
       }
@@ -411,50 +414,46 @@ describe("Collision Detection", () => {
     it("should handle minimal space scenarios", () => {
       // Leave only small gaps - rightmost bit (position 0) is clear
       for (let y = 10; y < 20; y++) {
-        bitBoard.setRowBits(y, 0b1111111110); // Missing rightmost bit (bit 0)
+        bitBoard.rows[y] = 0b1111111110; // Missing rightmost bit (bit 0)
       }
 
       // I-piece vertical should fit in the gap at position 0
-      const result = detector.canPlace(bitBoard, "I", 1, 0, 16);
+      const result = canPlace(config, bitBoard, "I", 1, 0, 16);
       expect(result.canPlace).toBe(true);
 
       // But not horizontally (would need 4 consecutive cells)
-      const resultHorizontal = detector.canPlace(bitBoard, "I", 0, 0, 19);
+      const resultHorizontal = canPlace(config, bitBoard, "I", 0, 0, 19);
       expect(resultHorizontal.canPlace).toBe(false);
     });
 
     it("should handle single-cell gaps", () => {
       // Create single cell gaps
-      bitBoard.setRowBits(19, 0b1111111101); // Gap at position 1
+      bitBoard.rows[19] = 0b1111111101; // Gap at position 1
 
       // No standard tetromino should fit in a single cell
       for (const piece of ["I", "O", "T", "S", "Z", "J", "L"] as const) {
         for (const rotation of [0, 1, 2, 3] as const) {
-          const result = detector.canPlace(bitBoard, piece, rotation, 1, 19);
+          const result = canPlace(config, bitBoard, piece, rotation, 1, 19);
           expect(result.canPlace).toBe(false);
         }
       }
     });
   });
 
-  describe("Singleton Management", () => {
-    it("should return same instance from getCollisionDetector", () => {
-      const detector1 = getCollisionDetector();
-      const detector2 = getCollisionDetector();
-      expect(detector1).toBe(detector2);
+  describe("Configuration Management", () => {
+    it("should create config with default metrics disabled", () => {
+      const defaultConfig = createCollisionConfig();
+      expect(defaultConfig.enableMetrics).toBe(false);
     });
 
-    it("should create new instance when metrics setting changes", () => {
-      const detector1 = getCollisionDetector(false);
-      const detector2 = getCollisionDetector(true);
-      expect(detector1).not.toBe(detector2);
+    it("should create config with metrics enabled when requested", () => {
+      const metricsConfig = createCollisionConfig(true);
+      expect(metricsConfig.enableMetrics).toBe(true);
     });
 
-    it("should reset properly", () => {
-      const detector1 = getCollisionDetector();
-      resetCollisionDetector();
-      const detector2 = getCollisionDetector();
-      expect(detector1).not.toBe(detector2);
+    it("should create config with metrics disabled when explicitly disabled", () => {
+      const noMetricsConfig = createCollisionConfig(false);
+      expect(noMetricsConfig.enableMetrics).toBe(false);
     });
   });
 });

@@ -1,4 +1,13 @@
-import type { BitBoard } from "@/game/ai/core/bitboard";
+import type { BitBoardData } from "@/game/ai/core/bitboard";
+import {
+  calculatePotentialLinesFilled,
+  clearLines,
+  clone,
+  findNearFullRows,
+  getDimensions,
+  getRowBits,
+  place,
+} from "@/game/ai/core/bitboard";
 import type { Move } from "@/game/ai/core/move-generator";
 import { getPieceBitsAtPosition } from "@/game/ai/core/piece-bits";
 import type { RotationState, TetrominoTypeName } from "@/types/game";
@@ -129,7 +138,7 @@ export class StackingEvaluator implements BaseEvaluator, WeightedEvaluator, Move
    * @param move - Move to evaluate
    * @returns Evaluation score
    */
-  evaluateMove(board: BitBoard, move: Move): number {
+  evaluateMove(board: BitBoardData, move: Move): number {
     const result = this.evaluateMoveDetailed(board, move.piece, move.x, move.y, move.rotation);
     return result.score;
   }
@@ -138,7 +147,7 @@ export class StackingEvaluator implements BaseEvaluator, WeightedEvaluator, Move
    * Evaluate a move for stacking-focused play (detailed version)
    */
   evaluateMoveDetailed(
-    board: BitBoard,
+    board: BitBoardData,
     piece: TetrominoTypeName,
     x: number,
     y: number,
@@ -147,20 +156,22 @@ export class StackingEvaluator implements BaseEvaluator, WeightedEvaluator, Move
     const pieceBitRows = getPieceBitsAtPosition(piece, rotation, x);
 
     // Create a copy of the board and place the piece
-    const tempBoard = board.clone();
-    tempBoard.place(pieceBitRows, y);
+    const tempBoard = clone(board);
+    const placedBoard = place(tempBoard, pieceBitRows, y);
 
     // Clear lines and get information about cleared lines
-    const clearedLines = tempBoard.clearLines();
+    const clearResult = clearLines(placedBoard);
+    const finalBoard = clearResult.board;
+    const clearedLineNumbers = clearResult.clearedLines;
 
     // Extract features
-    const features = this.extractFeatures(tempBoard, {
+    const features = this.extractFeatures(finalBoard, {
       piece,
       x,
       y,
       rotation,
       pieceBitRows,
-      clearedLines,
+      clearedLines: clearedLineNumbers,
     });
 
     // Calculate score
@@ -181,7 +192,7 @@ export class StackingEvaluator implements BaseEvaluator, WeightedEvaluator, Move
    * Extract all stacking-focused features from the board state
    */
   private extractFeatures(
-    board: BitBoard,
+    board: BitBoardData,
     move: {
       piece: TetrominoTypeName;
       x: number;
@@ -194,7 +205,7 @@ export class StackingEvaluator implements BaseEvaluator, WeightedEvaluator, Move
     const features: StackingFeatures = {
       landingHeight: this.calculateLandingHeight(board, move),
       linesCleared: move.clearedLines.length,
-      potentialLinesFilled: board.calculatePotentialLinesFilled(move.pieceBitRows, move.y),
+      potentialLinesFilled: calculatePotentialLinesFilled(board, move.pieceBitRows, move.y),
       rowTransitions: this.calculateRowTransitions(board),
       columnTransitions: this.calculateColumnTransitions(board),
       holes: this.calculateHoles(board),
@@ -202,7 +213,7 @@ export class StackingEvaluator implements BaseEvaluator, WeightedEvaluator, Move
       bumpiness: this.calculateBumpiness(board),
       edgePenalty: this.calculateEdgePenalty(move.x),
       wellDepth: this.calculateWellDepth(board),
-      nearFullRows: this.calculateNearFullRows(board),
+      nearFullRows: findNearFullRows(board, 2).length,
       iPieceWaitOpportunity: this.calculateIPieceWaitOpportunity(board, move.piece),
       stackHeight: this.calculateStackHeight(board),
     };
@@ -214,7 +225,7 @@ export class StackingEvaluator implements BaseEvaluator, WeightedEvaluator, Move
    * Calculate landing height (center of mass of placed piece)
    */
   private calculateLandingHeight(
-    board: BitBoard,
+    board: BitBoardData,
     move: {
       piece: TetrominoTypeName;
       x: number;
@@ -230,7 +241,7 @@ export class StackingEvaluator implements BaseEvaluator, WeightedEvaluator, Move
       if (row === 0) continue;
 
       const y = move.y + i;
-      const pieceRowHeight = board.getDimensions().height - y;
+      const pieceRowHeight = getDimensions(board).height - y;
 
       // Count bits in this row
       const bits = row;
@@ -250,12 +261,12 @@ export class StackingEvaluator implements BaseEvaluator, WeightedEvaluator, Move
   /**
    * Calculate row transitions (horizontal empty-to-filled transitions)
    */
-  private calculateRowTransitions(board: BitBoard): number {
+  private calculateRowTransitions(board: BitBoardData): number {
     let transitions = 0;
-    const { height, width } = board.getDimensions();
+    const { height, width } = getDimensions(board);
 
     for (let y = 0; y < height; y++) {
-      const row = board.getRowBits(y);
+      const row = getRowBits(board, y);
       let prevFilled = true; // Assume left wall is filled
 
       for (let x = 0; x < width; x++) {
@@ -278,15 +289,15 @@ export class StackingEvaluator implements BaseEvaluator, WeightedEvaluator, Move
   /**
    * Calculate column transitions (vertical empty-to-filled transitions)
    */
-  private calculateColumnTransitions(board: BitBoard): number {
+  private calculateColumnTransitions(board: BitBoardData): number {
     let transitions = 0;
-    const { height, width } = board.getDimensions();
+    const { height, width } = getDimensions(board);
 
     for (let x = 0; x < width; x++) {
       let prevFilled = true; // Assume top wall is filled
 
       for (let y = 0; y < height; y++) {
-        const currentFilled = (board.getRowBits(y) & (1 << x)) !== 0;
+        const currentFilled = (getRowBits(board, y) & (1 << x)) !== 0;
         if (prevFilled !== currentFilled) {
           transitions++;
         }
@@ -305,15 +316,15 @@ export class StackingEvaluator implements BaseEvaluator, WeightedEvaluator, Move
   /**
    * Calculate holes (empty cells with filled cells above them)
    */
-  private calculateHoles(board: BitBoard): number {
+  private calculateHoles(board: BitBoardData): number {
     let holes = 0;
-    const { height, width } = board.getDimensions();
+    const { height, width } = getDimensions(board);
 
     for (let x = 0; x < width; x++) {
       let foundFilled = false;
 
       for (let y = 0; y < height; y++) {
-        const filled = (board.getRowBits(y) & (1 << x)) !== 0;
+        const filled = (getRowBits(board, y) & (1 << x)) !== 0;
         if (filled) {
           foundFilled = true;
         } else if (foundFilled) {
@@ -328,18 +339,18 @@ export class StackingEvaluator implements BaseEvaluator, WeightedEvaluator, Move
   /**
    * Calculate wells (sum of well depths)
    */
-  private calculateWells(board: BitBoard): number {
+  private calculateWells(board: BitBoardData): number {
     let wellSum = 0;
-    const { height, width } = board.getDimensions();
+    const { height, width } = getDimensions(board);
 
     for (let x = 0; x < width; x++) {
       let wellDepth = 0;
       let wellStarted = false;
 
       for (let y = 0; y < height; y++) {
-        const filled = (board.getRowBits(y) & (1 << x)) !== 0;
-        const leftFilled = x > 0 ? (board.getRowBits(y) & (1 << (x - 1))) !== 0 : true;
-        const rightFilled = x < width - 1 ? (board.getRowBits(y) & (1 << (x + 1))) !== 0 : true;
+        const filled = (getRowBits(board, y) & (1 << x)) !== 0;
+        const leftFilled = x > 0 ? (getRowBits(board, y) & (1 << (x - 1))) !== 0 : true;
+        const rightFilled = x < width - 1 ? (getRowBits(board, y) & (1 << (x + 1))) !== 0 : true;
 
         if (!filled && (leftFilled || rightFilled)) {
           wellDepth++;
@@ -362,7 +373,7 @@ export class StackingEvaluator implements BaseEvaluator, WeightedEvaluator, Move
   /**
    * Calculate surface bumpiness (sum of absolute height differences)
    */
-  private calculateBumpiness(board: BitBoard): number {
+  private calculateBumpiness(board: BitBoardData): number {
     const columnHeights = this.getColumnHeights(board);
     let bumpiness = 0;
 
@@ -399,14 +410,14 @@ export class StackingEvaluator implements BaseEvaluator, WeightedEvaluator, Move
   /**
    * Calculate well depth in the designated well column
    */
-  private calculateWellDepth(board: BitBoard): number {
-    const { height } = board.getDimensions();
+  private calculateWellDepth(board: BitBoardData): number {
+    const { height } = getDimensions(board);
     let wellDepth = 0;
     let foundFilled = false;
 
     // Check from top to bottom in the well column
     for (let y = 0; y < height; y++) {
-      const filled = (board.getRowBits(y) & (1 << this.wellColumn)) !== 0;
+      const filled = (getRowBits(board, y) & (1 << this.wellColumn)) !== 0;
       if (filled) {
         foundFilled = true;
         break;
@@ -426,14 +437,14 @@ export class StackingEvaluator implements BaseEvaluator, WeightedEvaluator, Move
   /**
    * Calculate near full rows (rows with 1-2 empty cells)
    */
-  private calculateNearFullRows(board: BitBoard): number {
-    return board.findNearFullRows(2).length;
+  private calculateNearFullRows(board: BitBoardData): number {
+    return findNearFullRows(board, 2).length;
   }
 
   /**
    * Calculate I-piece wait opportunity
    */
-  private calculateIPieceWaitOpportunity(board: BitBoard, piece: TetrominoTypeName): number {
+  private calculateIPieceWaitOpportunity(board: BitBoardData, piece: TetrominoTypeName): number {
     // If current piece is I-piece, no wait opportunity
     if (piece === "I") {
       return 0;
@@ -456,7 +467,7 @@ export class StackingEvaluator implements BaseEvaluator, WeightedEvaluator, Move
   /**
    * Calculate stack height (maximum height of the board)
    */
-  private calculateStackHeight(board: BitBoard): number {
+  private calculateStackHeight(board: BitBoardData): number {
     const columnHeights = this.getColumnHeights(board);
     return Math.max(...columnHeights);
   }
@@ -464,14 +475,14 @@ export class StackingEvaluator implements BaseEvaluator, WeightedEvaluator, Move
   /**
    * Get column heights for the board
    */
-  private getColumnHeights(board: BitBoard): number[] {
+  private getColumnHeights(board: BitBoardData): number[] {
     const heights: number[] = [];
-    const { height, width } = board.getDimensions();
+    const { height, width } = getDimensions(board);
 
     for (let x = 0; x < width; x++) {
       let columnHeight = 0;
       for (let y = 0; y < height; y++) {
-        if ((board.getRowBits(y) & (1 << x)) !== 0) {
+        if ((getRowBits(board, y) & (1 << x)) !== 0) {
           columnHeight = height - y;
           break;
         }
@@ -547,11 +558,11 @@ export class StackingEvaluator implements BaseEvaluator, WeightedEvaluator, Move
    * @returns Evaluation score
    */
   evaluate(state: BoardState): number;
-  evaluate(board: BitBoard, move: Move): number;
-  evaluate(boardOrState: BitBoard | BoardState, move?: Move): number {
+  evaluate(board: BitBoardData, move: Move): number;
+  evaluate(boardOrState: BitBoardData | BoardState, move?: Move): number {
     // Maintain backward compatibility - if called with BitBoard and Move, use evaluateMove
     if (move !== undefined) {
-      return this.evaluateMove(boardOrState as BitBoard, move);
+      return this.evaluateMove(boardOrState as BitBoardData, move);
     }
 
     // New BaseEvaluator interface - evaluate board state
@@ -565,7 +576,7 @@ export class StackingEvaluator implements BaseEvaluator, WeightedEvaluator, Move
    * @param board - The board to analyze
    * @returns Set of features extracted from the board
    */
-  calculateFeatures(board: BitBoard): FeatureSet {
+  calculateFeatures(board: BitBoardData): FeatureSet {
     // Extract features for current board state without a specific move
     const features: FeatureSet = {
       landingHeight: 0, // No landing height in static evaluation

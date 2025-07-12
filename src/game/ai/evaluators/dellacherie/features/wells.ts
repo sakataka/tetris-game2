@@ -1,4 +1,5 @@
-import type { BitBoard } from "@/game/ai/core/bitboard";
+import type { BitBoardData } from "@/game/ai/core/bitboard";
+import { getRowBits } from "@/game/ai/core/bitboard";
 
 /**
  * Calculate wells (empty columns surrounded by filled cells)
@@ -7,7 +8,7 @@ import type { BitBoard } from "@/game/ai/core/bitboard";
  * @param board - Board state to analyze
  * @returns Sum of weighted well depths
  */
-export function calculateWells(board: BitBoard): number {
+export function calculateWells(board: BitBoardData): number {
   let wells = 0;
 
   for (let x = 0; x < 10; x++) {
@@ -16,9 +17,9 @@ export function calculateWells(board: BitBoard): number {
     let inWell = false;
 
     for (let y = 19; y >= 0; y--) {
-      const current = (board.getRowBits(y) >> x) & 1;
-      const left = x > 0 ? (board.getRowBits(y) >> (x - 1)) & 1 : 1;
-      const right = x < 9 ? (board.getRowBits(y) >> (x + 1)) & 1 : 1;
+      const current = (getRowBits(board, y) >> x) & 1;
+      const left = x > 0 ? (getRowBits(board, y) >> (x - 1)) & 1 : 1;
+      const right = x < 9 ? (getRowBits(board, y) >> (x + 1)) & 1 : 1;
 
       if (current === 0 && left === 1 && right === 1) {
         // Empty cell surrounded by filled cells (well)
@@ -55,7 +56,7 @@ export function calculateWells(board: BitBoard): number {
  * @param board - Board state to analyze
  * @returns true if well is accessible, false otherwise
  */
-export function calculateWellOpen(board: BitBoard): boolean {
+export function calculateWellOpen(board: BitBoardData): boolean {
   const heights = getColumnHeights(board);
   const maxHeight = Math.max(...heights);
 
@@ -98,13 +99,13 @@ export function calculateWellOpen(board: BitBoard): boolean {
  * @param board - Board state to analyze
  * @returns Array of column heights
  */
-function getColumnHeights(board: BitBoard): number[] {
+function getColumnHeights(board: BitBoardData): number[] {
   const heights: number[] = [];
 
   for (let x = 0; x < 10; x++) {
     let height = 0;
     for (let y = 0; y < 20; y++) {
-      if ((board.getRowBits(y) >> x) & 1) {
+      if ((getRowBits(board, y) >> x) & 1) {
         height = 20 - y;
         break;
       }

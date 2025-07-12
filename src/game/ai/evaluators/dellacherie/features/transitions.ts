@@ -1,4 +1,5 @@
-import type { BitBoard } from "@/game/ai/core/bitboard";
+import type { BitBoardData } from "@/game/ai/core/bitboard";
+import { getRowBits } from "@/game/ai/core/bitboard";
 
 /**
  * Calculate row transitions (horizontal discontinuities)
@@ -7,11 +8,11 @@ import type { BitBoard } from "@/game/ai/core/bitboard";
  * @param board - Board state to analyze
  * @returns Number of row transitions
  */
-export function calculateRowTransitions(board: BitBoard): number {
+export function calculateRowTransitions(board: BitBoardData): number {
   let transitions = 0;
 
   for (let y = 0; y < 20; y++) {
-    const rowBits = board.getRowBits(y);
+    const rowBits = getRowBits(board, y);
 
     // Only count transitions for non-empty rows
     if (rowBits === 0) continue;
@@ -42,14 +43,14 @@ export function calculateRowTransitions(board: BitBoard): number {
  * @param board - Board state to analyze
  * @returns Number of column transitions
  */
-export function calculateColumnTransitions(board: BitBoard): number {
+export function calculateColumnTransitions(board: BitBoardData): number {
   let transitions = 0;
 
   for (let x = 0; x < 10; x++) {
     let lastBit = 1; // Bottom floor considered filled
 
     for (let y = 19; y >= 0; y--) {
-      const currentBit = (board.getRowBits(y) >> x) & 1;
+      const currentBit = (getRowBits(board, y) >> x) & 1;
       if (currentBit !== lastBit) {
         transitions++;
       }

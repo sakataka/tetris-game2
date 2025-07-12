@@ -1,4 +1,4 @@
-import type { BitBoard } from "@/game/ai/core/bitboard";
+import type { BitBoardData } from "@/game/ai/core/bitboard";
 import type { Move } from "@/game/ai/core/move-generator";
 
 /**
@@ -13,7 +13,7 @@ export type FeatureSet = Record<string, number | boolean>;
  */
 export interface BoardState {
   /** The current board state */
-  board: BitBoard;
+  board: BitBoardData;
   /** Current lines cleared in the game */
   lines?: number;
   /** Current level */
@@ -36,7 +36,7 @@ export interface BoardState {
  *     return this.applyWeights(features);
  *   }
  *
- *   calculateFeatures(board: BitBoard): FeatureSet {
+ *   calculateFeatures(board: BitBoardData): FeatureSet {
  *     return {
  *       holes: this.countHoles(board),
  *       height: this.getMaxHeight(board),
@@ -71,7 +71,7 @@ export interface BaseEvaluator {
    * @param board - The board to analyze
    * @returns Set of features extracted from the board
    */
-  calculateFeatures(board: BitBoard): FeatureSet;
+  calculateFeatures(board: BitBoardData): FeatureSet;
 
   /**
    * Apply weights to features to compute a final score
@@ -124,5 +124,5 @@ export interface MoveEvaluator {
    * @param move - Move to evaluate
    * @returns Evaluation score for the move
    */
-  evaluateMove(board: BitBoard, move: Move): number;
+  evaluateMove(board: BitBoardData, move: Move): number;
 }

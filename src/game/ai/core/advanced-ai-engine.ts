@@ -26,7 +26,8 @@ import {
   type UnifiedSearchConfig,
 } from "../search/search-config";
 import { type AIConfig, type AIDecision, AIEngine } from "./ai-engine";
-import { BitBoard } from "./bitboard";
+import type { BitBoardData } from "./bitboard";
+import { createBitBoard } from "./bitboard";
 import { type Move, MoveGenerator } from "./move-generator";
 
 /**
@@ -252,7 +253,7 @@ export class AdvancedAIEngine extends AIEngine {
       }
 
       // Convert board to BitBoard for AI processing
-      const board = new BitBoard(gameState.board);
+      const board = createBitBoard(gameState.board);
 
       // Update dynamic weights if enabled
       if (this.advancedConfig.useDynamicWeights) {
@@ -405,7 +406,7 @@ export class AdvancedAIEngine extends AIEngine {
    * @param level - Current level
    */
   private async updateAdvancedDynamicWeights(
-    board: BitBoard,
+    board: BitBoardData,
     lines: number,
     level: number,
   ): Promise<void> {

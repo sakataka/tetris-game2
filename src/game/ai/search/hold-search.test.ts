@@ -1,18 +1,29 @@
 import { beforeEach, describe, expect, test } from "bun:test";
 import { createTetromino } from "@/game/tetrominos";
 import type { GameBoard, Tetromino } from "@/types/game";
-import { BitBoard } from "../core/bitboard";
+import { type BitBoardData, createBitBoard } from "../core/bitboard";
 import { DEFAULT_MOVE_OPTIONS, MoveGenerator } from "../core/move-generator";
 import { DellacherieEvaluator } from "../evaluators/dellacherie";
 import { BeamSearch, DEFAULT_BEAM_CONFIG } from "./beam-search";
-import { DEFAULT_HOLD_OPTIONS, HoldAwareSearch } from "./hold-search";
+import {
+  createHoldSearchState,
+  DEFAULT_HOLD_OPTIONS,
+  evaluateHoldStrategy,
+  getHoldSearchOptions,
+  HoldAwareSearch,
+  performHoldSearch,
+  updateHoldSearchOptions,
+} from "./hold-search";
 
 describe("HoldAwareSearch", () => {
   let holdSearch: HoldAwareSearch;
   let beamSearch: BeamSearch;
   let evaluator: DellacherieEvaluator;
   let moveGenerator: MoveGenerator;
-  let emptyBoard: BitBoard;
+  let emptyBoard: BitBoardData;
+
+  // Also test functional API
+  let holdSearchState: ReturnType<typeof createHoldSearchState>;
 
   beforeEach(() => {
     evaluator = new DellacherieEvaluator();
@@ -23,12 +34,13 @@ describe("HoldAwareSearch", () => {
     });
     beamSearch = new BeamSearch(evaluator, moveGenerator, DEFAULT_BEAM_CONFIG);
     holdSearch = new HoldAwareSearch(beamSearch, DEFAULT_HOLD_OPTIONS);
+    holdSearchState = createHoldSearchState(beamSearch, DEFAULT_HOLD_OPTIONS);
 
     // Create empty board
     const emptyBoardState: GameBoard = Array(20)
       .fill(null)
       .map(() => Array(10).fill(0));
-    emptyBoard = new BitBoard(emptyBoardState);
+    emptyBoard = createBitBoard(emptyBoardState);
   });
 
   test("should initialize with default configuration", () => {
@@ -36,6 +48,12 @@ describe("HoldAwareSearch", () => {
     expect(options.allowHoldUsage).toBe(true);
     expect(options.holdPenalty).toBe(5);
     expect(options.maxHoldUsage).toBe(3);
+
+    // Test functional API
+    const functionalOptions = getHoldSearchOptions(holdSearchState);
+    expect(functionalOptions.allowHoldUsage).toBe(true);
+    expect(functionalOptions.holdPenalty).toBe(5);
+    expect(functionalOptions.maxHoldUsage).toBe(3);
   });
 
   test("should update options correctly", () => {
@@ -50,6 +68,13 @@ describe("HoldAwareSearch", () => {
     expect(options.allowHoldUsage).toBe(false);
     expect(options.holdPenalty).toBe(10);
     expect(options.maxHoldUsage).toBe(3); // Should preserve unchanged values
+
+    // Test functional API
+    const updatedState = updateHoldSearchOptions(holdSearchState, newOptions);
+    const functionalOptions = getHoldSearchOptions(updatedState);
+    expect(functionalOptions.allowHoldUsage).toBe(false);
+    expect(functionalOptions.holdPenalty).toBe(10);
+    expect(functionalOptions.maxHoldUsage).toBe(3);
   });
 
   test("should perform search without Hold when disabled", () => {
@@ -80,6 +105,17 @@ describe("HoldAwareSearch", () => {
     expect(result.alternativeResults).toHaveLength(2); // Normal and Hold paths
     expect(result.usedHold).toBeDefined();
     expect(result.holdPenaltyApplied).toBeGreaterThanOrEqual(0);
+
+    // Test functional API
+    const functionalResult = performHoldSearch(
+      holdSearchState,
+      emptyBoard,
+      currentPiece,
+      nextPieces,
+      heldPiece,
+    );
+    expect(functionalResult.alternativeResults).toHaveLength(2);
+    expect(functionalResult.usedHold).toBeDefined();
   });
 
   test("should apply Hold penalty when Hold is used", () => {
@@ -139,6 +175,17 @@ describe("HoldAwareSearch", () => {
     expect(evaluation.shouldUseHold).toBeDefined();
     expect(evaluation.confidence).toBeGreaterThanOrEqual(0);
     expect(evaluation.confidence).toBeLessThanOrEqual(1);
+
+    // Test functional API
+    const functionalEvaluation = evaluateHoldStrategy(
+      holdSearchState,
+      emptyBoard,
+      currentPiece,
+      nextPieces,
+      heldPiece,
+    );
+    expect(functionalEvaluation.currentPieceScore).toBeGreaterThan(0);
+    expect(functionalEvaluation.shouldUseHold).toBeDefined();
   });
 
   test("should prefer I-piece when board is high", () => {
@@ -152,7 +199,7 @@ describe("HoldAwareSearch", () => {
               .map((_, x) => (x === 9 ? 0 : 1))
           : Array(10).fill(0),
       );
-    const highBoard = new BitBoard(highBoardState);
+    const highBoard = createBitBoard(highBoardState);
 
     const currentPiece = createTetromino("O");
     const nextPieces = [createTetromino("T")];

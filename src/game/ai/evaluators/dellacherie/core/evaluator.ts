@@ -1,4 +1,5 @@
-import type { BitBoard } from "@/game/ai/core/bitboard";
+import type { BitBoardData } from "@/game/ai/core/bitboard";
+import { calculatePotentialLinesFilled, clearLines, clone, place } from "@/game/ai/core/bitboard";
 import { getPieceBitsAtPosition } from "@/game/ai/core/piece-bits";
 import type {
   BaseEvaluator,
@@ -8,7 +9,14 @@ import type {
   WeightedEvaluator,
 } from "../../base-evaluator";
 import { calculateScore } from "../calculator/scorer";
-import { DEFAULT_WEIGHTS, WeightManager } from "../calculator/weights";
+import {
+  createWeightManager,
+  DEFAULT_WEIGHTS,
+  getWeights,
+  resetWeights,
+  updateWeights,
+  type WeightManagerState,
+} from "../calculator/weights";
 import {
   calculateBumpiness,
   calculateEscapeRoute,
@@ -26,10 +34,10 @@ import type { EvaluationFeatures, EvaluationWeights, Move } from "../types";
  * Implements the 6-feature evaluation system with optimized algorithms
  */
 export class DellacherieEvaluator implements BaseEvaluator, WeightedEvaluator, MoveEvaluator {
-  private readonly weightManager: WeightManager;
+  private weightManagerState: WeightManagerState;
 
   constructor(weights: EvaluationWeights = DEFAULT_WEIGHTS) {
-    this.weightManager = new WeightManager(weights);
+    this.weightManagerState = createWeightManager(weights);
   }
 
   /**
@@ -40,9 +48,9 @@ export class DellacherieEvaluator implements BaseEvaluator, WeightedEvaluator, M
    * @param move - Move to evaluate
    * @returns Heuristic score for the move
    */
-  evaluateMove(board: BitBoard, move: Move): number {
+  evaluateMove(board: BitBoardData, move: Move): number {
     const features = this.extractFeatures(board, move);
-    return calculateScore(features, this.weightManager.getWeights());
+    return calculateScore(features, getWeights(this.weightManagerState));
   }
 
   /**
@@ -54,9 +62,9 @@ export class DellacherieEvaluator implements BaseEvaluator, WeightedEvaluator, M
    * @param move - Move to analyze
    * @returns Complete feature set for evaluation
    */
-  extractFeatures(board: BitBoard, move: Move): EvaluationFeatures {
+  extractFeatures(board: BitBoardData, move: Move): EvaluationFeatures {
     // Create a simulation board to test the move
-    const tempBoard = board.clone();
+    const tempBoard = clone(board);
 
     // Get piece bit patterns if not cached
     if (!move.pieceBitRows) {
@@ -64,10 +72,11 @@ export class DellacherieEvaluator implements BaseEvaluator, WeightedEvaluator, M
     }
 
     // Simulate piece placement
-    tempBoard.place(move.pieceBitRows, move.y);
+    const placedBoard = place(tempBoard, move.pieceBitRows, move.y);
 
     // Clear lines and get count
-    const clearedLines = tempBoard.clearLines();
+    const clearResult = clearLines(placedBoard);
+    const clearedLines = clearResult.clearedLines;
 
     // DEBUG: Log line clearing activity
     if (clearedLines.length > 0) {
@@ -77,26 +86,26 @@ export class DellacherieEvaluator implements BaseEvaluator, WeightedEvaluator, M
     }
 
     // Calculate potential lines filled by this move (using original board)
-    const potentialLinesFilled = board.calculatePotentialLinesFilled(move.pieceBitRows, move.y);
+    const potentialLinesFilled = calculatePotentialLinesFilled(board, move.pieceBitRows, move.y);
 
     // Create pre-clear board for feature extraction (board + piece, before line clearing)
-    const preClearBoard = board.clone();
-    preClearBoard.place(move.pieceBitRows, move.y);
+    const preClearBoard = clone(board);
+    const preClearBoardWithPiece = place(preClearBoard, move.pieceBitRows, move.y);
 
     return {
       landingHeight: calculateLandingHeight(board, move),
       linesCleared: clearedLines.length,
       potentialLinesFilled,
-      rowTransitions: calculateRowTransitions(preClearBoard),
-      columnTransitions: calculateColumnTransitions(preClearBoard),
-      holes: calculateHoles(preClearBoard),
-      wells: calculateWells(preClearBoard),
-      blocksAboveHoles: calculateBlocksAboveHoles(preClearBoard),
-      wellOpen: calculateWellOpen(preClearBoard),
-      escapeRoute: calculateEscapeRoute(preClearBoard),
-      bumpiness: calculateBumpiness(preClearBoard),
-      maxHeight: calculateMaxHeight(preClearBoard),
-      rowFillRatio: calculateRowFillRatio(preClearBoard),
+      rowTransitions: calculateRowTransitions(preClearBoardWithPiece),
+      columnTransitions: calculateColumnTransitions(preClearBoardWithPiece),
+      holes: calculateHoles(preClearBoardWithPiece),
+      wells: calculateWells(preClearBoardWithPiece),
+      blocksAboveHoles: calculateBlocksAboveHoles(preClearBoardWithPiece),
+      wellOpen: calculateWellOpen(preClearBoardWithPiece),
+      escapeRoute: calculateEscapeRoute(preClearBoardWithPiece),
+      bumpiness: calculateBumpiness(preClearBoardWithPiece),
+      maxHeight: calculateMaxHeight(preClearBoardWithPiece),
+      rowFillRatio: calculateRowFillRatio(preClearBoardWithPiece),
     };
   }
 
@@ -107,7 +116,7 @@ export class DellacherieEvaluator implements BaseEvaluator, WeightedEvaluator, M
    * @param newWeights - Updated weight configuration
    */
   updateWeights(newWeights: Partial<EvaluationWeights>): void {
-    this.weightManager.updateWeights(newWeights);
+    this.weightManagerState = updateWeights(this.weightManagerState, newWeights);
   }
 
   /**
@@ -115,14 +124,14 @@ export class DellacherieEvaluator implements BaseEvaluator, WeightedEvaluator, M
    * @returns Current weight configuration
    */
   getWeights(): EvaluationWeights {
-    return this.weightManager.getWeights();
+    return getWeights(this.weightManagerState);
   }
 
   /**
    * Reset weights to default values
    */
   resetWeights(): void {
-    this.weightManager.resetWeights();
+    this.weightManagerState = resetWeights(this.weightManagerState);
   }
 
   // BaseEvaluator interface implementation
@@ -133,11 +142,11 @@ export class DellacherieEvaluator implements BaseEvaluator, WeightedEvaluator, M
    * @returns Evaluation score
    */
   evaluate(state: BoardState): number;
-  evaluate(board: BitBoard, move: Move): number;
-  evaluate(boardOrState: BitBoard | BoardState, move?: Move): number {
+  evaluate(board: BitBoardData, move: Move): number;
+  evaluate(boardOrState: BitBoardData | BoardState, move?: Move): number {
     // Maintain backward compatibility - if called with BitBoard and Move, use evaluateMove
     if (move !== undefined) {
-      return this.evaluateMove(boardOrState as BitBoard, move);
+      return this.evaluateMove(boardOrState as BitBoardData, move);
     }
 
     // New BaseEvaluator interface - evaluate board state
@@ -151,7 +160,7 @@ export class DellacherieEvaluator implements BaseEvaluator, WeightedEvaluator, M
    * @param board - The board to analyze
    * @returns Set of features extracted from the board
    */
-  calculateFeatures(board: BitBoard): FeatureSet {
+  calculateFeatures(board: BitBoardData): FeatureSet {
     // Calculate features for the current board state without a specific move
     // This provides a baseline evaluation of the board
     return {
@@ -179,7 +188,7 @@ export class DellacherieEvaluator implements BaseEvaluator, WeightedEvaluator, M
   applyWeights(features: FeatureSet): number {
     return calculateScore(
       features as unknown as EvaluationFeatures,
-      this.weightManager.getWeights(),
+      getWeights(this.weightManagerState),
     );
   }
 

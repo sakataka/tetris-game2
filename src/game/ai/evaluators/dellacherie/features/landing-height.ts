@@ -1,4 +1,4 @@
-import type { BitBoard } from "@/game/ai/core/bitboard";
+import type { BitBoardData } from "@/game/ai/core/bitboard";
 import { getPieceBitPattern } from "@/game/ai/core/piece-bits";
 import type { Move } from "../types";
 
@@ -10,7 +10,7 @@ import type { Move } from "../types";
  * @param move - Move being evaluated
  * @returns Landing height value
  */
-export function calculateLandingHeight(_board: BitBoard, move: Move): number {
+export function calculateLandingHeight(_board: BitBoardData, move: Move): number {
   const pattern = getPieceBitPattern(move.piece, move.rotation);
 
   // Calculate piece center of mass Y coordinate

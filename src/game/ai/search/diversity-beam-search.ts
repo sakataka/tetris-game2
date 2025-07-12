@@ -1,4 +1,5 @@
-import type { BitBoard } from "@/game/ai/core/bitboard";
+import type { BitBoardData } from "@/game/ai/core/bitboard";
+import { calculateHeight, getRowBits } from "@/game/ai/core/bitboard";
 import { determineGamePhase } from "@/game/ai/evaluators/new-weights";
 import type { SearchNode } from "./beam-search";
 
@@ -46,13 +47,13 @@ export const DEFAULT_DIVERSITY_CONFIG: DiversityConfig = {
  * @param board - BitBoard to analyze
  * @returns Array of column heights (0-20)
  */
-export function calculateSurfaceProfile(board: BitBoard): number[] {
+export function calculateSurfaceProfile(board: BitBoardData): number[] {
   const profile = new Array(10).fill(0);
 
   for (let col = 0; col < 10; col++) {
     // Find the highest occupied cell in this column
     for (let row = 0; row < 20; row++) {
-      const rowBits = board.getRowBits(row);
+      const rowBits = getRowBits(board, row);
       if ((rowBits >> col) & 1) {
         profile[col] = 20 - row;
         break;
@@ -190,7 +191,7 @@ export function selectDiversifiedNodes(
   if (nodes.length <= beamWidth) return nodes;
 
   // Calculate board statistics for diversity ratio
-  const maxHeight = Math.max(...nodes.map((n) => n.board.calculateHeight()));
+  const maxHeight = Math.max(...nodes.map((n) => calculateHeight(n.board)));
   const holes = Math.max(...nodes.map((n) => countHoles(n.board)));
   const diversityRatio = getDiversityRatio(maxHeight, holes, config);
 
@@ -241,13 +242,13 @@ export function selectDiversifiedNodes(
  * @param board - BitBoard to analyze
  * @returns Number of holes
  */
-function countHoles(board: BitBoard): number {
+function countHoles(board: BitBoardData): number {
   let holes = 0;
 
   for (let col = 0; col < 10; col++) {
     let blockFound = false;
     for (let row = 0; row < 20; row++) {
-      const rowBits = board.getRowBits(row);
+      const rowBits = getRowBits(board, row);
       const bit = (rowBits >> col) & 1;
 
       if (bit === 1) {
