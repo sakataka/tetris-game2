@@ -134,7 +134,7 @@ function extractDynamicPatterns(sourceFiles: string[]): DynamicPattern[] {
   for (const filePath of sourceFiles) {
     try {
       const content = readFileSync(filePath, "utf-8");
-      const lines = content.split("\n");
+      const _lines = content.split("\n");
 
       let match: RegExpExecArray | null;
       // biome-ignore lint/suspicious/noAssignInExpressions: necessary for regex iteration
@@ -170,11 +170,14 @@ function extractDynamicPatterns(sourceFiles: string[]): DynamicPattern[] {
 function generatePossibleKeys(pattern: string): string[] {
   const keys: string[] = [];
 
-  // Handle game.${type} pattern with known types
-  if (pattern.includes("game.${type}")) {
+  // Handle dynamic type patterns
+  const gamePrefix = "game.";
+  const dollarSign = "$";
+  const typeVariable = dollarSign + "{type}";
+  if (pattern.includes(gamePrefix + typeVariable)) {
     const knownTypes = ["hold", "next"];
     for (const type of knownTypes) {
-      keys.push(pattern.replace("${type}", type));
+      keys.push(pattern.replace(/\$\{type\}/g, type));
     }
   }
 
