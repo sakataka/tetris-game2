@@ -3,15 +3,18 @@
 /**
  * i18n Key Consistency Checker
  *
- * This script validates the consistency between translation keys used in the codebase
- * and the keys defined in translation files. It helps prevent issues like missing
- * translations or outdated key references.
+ * Comprehensive i18n analysis tool that checks for:
+ * 1. Missing translation keys (used but not defined)
+ * 2. Unused translation keys (defined but not used)
+ * 3. Dynamic key patterns like t(`game.${type}`)
+ * 4. Hardcoded strings that should use i18n
+ * 5. Potential translation candidates
  *
  * Features:
- * - Extracts all translation keys from JSON files
- * - Finds all t() function calls in TypeScript/TSX files
- * - Reports missing keys and unused translations
- * - Supports nested key structures (dot notation)
+ * - Detects dynamic key construction patterns
+ * - Finds hardcoded user-facing strings
+ * - Validates actual key existence in translation files
+ * - Suggests improvements for i18n compliance
  *
  * Usage:
  *   bun run scripts/check-i18n-keys.ts
@@ -30,6 +33,23 @@ interface CheckResult {
   unusedKeys: string[];
   usedKeys: string[];
   translationKeys: string[];
+  dynamicPatterns: DynamicPattern[];
+  hardcodedStrings: HardcodedString[];
+  potentialKeys: string[];
+}
+
+interface DynamicPattern {
+  pattern: string;
+  file: string;
+  line: number;
+  possibleKeys: string[];
+}
+
+interface HardcodedString {
+  text: string;
+  file: string;
+  line: number;
+  context: string;
 }
 
 /**
@@ -103,20 +123,135 @@ function findSourceFiles(dir: string): string[] {
 }
 
 /**
- * Extracts translation keys from t() function calls in source code
- * Supports various patterns:
- * - t("key")
- * - t('key')
- * - t(`key`)
- * - t("nested.key.path")
+ * Extract dynamic patterns like t(`game.${type}`)
+ */
+function extractDynamicPatterns(sourceFiles: string[]): DynamicPattern[] {
+  const patterns: DynamicPattern[] = [];
+
+  // Pattern for template literals in t() calls
+  const dynamicPattern = /\bt\s*\(\s*`([^`]*\$\{[^}]+\}[^`]*)`\s*\)/g;
+
+  for (const filePath of sourceFiles) {
+    try {
+      const content = readFileSync(filePath, "utf-8");
+      const lines = content.split("\n");
+
+      let match: RegExpExecArray | null;
+      // biome-ignore lint/suspicious/noAssignInExpressions: necessary for regex iteration
+      while ((match = dynamicPattern.exec(content)) !== null) {
+        const pattern = match[1];
+        const matchIndex = match.index;
+
+        // Find line number
+        const beforeMatch = content.substring(0, matchIndex);
+        const lineNumber = beforeMatch.split("\n").length;
+
+        // Try to generate possible keys based on common patterns
+        const possibleKeys = generatePossibleKeys(pattern);
+
+        patterns.push({
+          pattern,
+          file: filePath,
+          line: lineNumber,
+          possibleKeys,
+        });
+      }
+    } catch (error) {
+      console.warn(`Warning: Could not read file ${filePath}: ${error}`);
+    }
+  }
+
+  return patterns;
+}
+
+/**
+ * Generate possible keys from dynamic patterns
+ */
+function generatePossibleKeys(pattern: string): string[] {
+  const keys: string[] = [];
+
+  // Handle game.${type} pattern with known types
+  if (pattern.includes("game.${type}")) {
+    const knownTypes = ["hold", "next"];
+    for (const type of knownTypes) {
+      keys.push(pattern.replace("${type}", type));
+    }
+  }
+
+  // Add more pattern recognition as needed
+
+  return keys;
+}
+
+/**
+ * Find hardcoded strings that should potentially use i18n
+ */
+function findHardcodedStrings(sourceFiles: string[]): HardcodedString[] {
+  const hardcodedStrings: HardcodedString[] = [];
+
+  // Patterns for likely user-facing strings
+  const stringPatterns = [
+    /"([A-Z][a-zA-Z\s:]{2,}[a-z])"/g, // "Title Case Strings"
+    /'([A-Z][a-zA-Z\s:]{2,}[a-z])'/g, // 'Title Case Strings'
+  ];
+
+  // Exclude patterns (technical strings, file paths, etc.)
+  const excludePatterns = [
+    /\.(ts|tsx|js|jsx|css|json|md)$/,
+    /^https?:\/\//,
+    /^\/[a-z]/,
+    /^[a-z]+[A-Z]/, // camelCase
+    /\d+/, // Contains numbers
+    /^[A-Z_]+$/, // CONSTANTS
+  ];
+
+  for (const filePath of sourceFiles) {
+    try {
+      const content = readFileSync(filePath, "utf-8");
+      const lines = content.split("\n");
+
+      for (const pattern of stringPatterns) {
+        let match: RegExpExecArray | null;
+        // biome-ignore lint/suspicious/noAssignInExpressions: necessary for regex iteration
+        while ((match = pattern.exec(content)) !== null) {
+          const text = match[1];
+          const matchIndex = match.index;
+
+          // Skip if matches exclude patterns
+          if (excludePatterns.some((exclude) => exclude.test(text))) {
+            continue;
+          }
+
+          // Find line number and context
+          const beforeMatch = content.substring(0, matchIndex);
+          const lineNumber = beforeMatch.split("\n").length;
+          const contextLine = lines[lineNumber - 1] || "";
+
+          hardcodedStrings.push({
+            text,
+            file: filePath,
+            line: lineNumber,
+            context: contextLine.trim(),
+          });
+        }
+      }
+    } catch (error) {
+      console.warn(`Warning: Could not read file ${filePath}: ${error}`);
+    }
+  }
+
+  return hardcodedStrings;
+}
+
+/**
+ * Extract regular translation keys from t() function calls
  */
 function extractUsedKeys(sourceFiles: string[]): string[] {
   const usedKeys = new Set<string>();
 
   // Regular expressions for different t() call patterns
   const patterns = [
-    /\bt\s*\(\s*["']([^"']+)["']\s*\)/g, // t("key") or t('key')
-    /\bt\s*\(\s*`([^`]+)`\s*\)/g, // t(`key`)
+    /\bt\s*\(\s*["']([^"'${]+)["']\s*\)/g, // t("key") or t('key') - excluding template vars
   ];
 
   for (const filePath of sourceFiles) {
@@ -128,10 +263,7 @@ function extractUsedKeys(sourceFiles: string[]): string[] {
         // biome-ignore lint/suspicious/noAssignInExpressions: necessary for regex iteration
         while ((match = pattern.exec(content)) !== null) {
           const key = match[1];
-          // Skip template literal variables and complex expressions
-          if (!key.includes("${") && !key.includes("`")) {
-            usedKeys.add(key);
-          }
+          usedKeys.add(key);
         }
       }
     } catch (error) {
@@ -143,54 +275,7 @@ function extractUsedKeys(sourceFiles: string[]): string[] {
 }
 
 /**
- * Formats results for console output with colors
- */
-function formatResults(result: CheckResult): string {
-  const { missingKeys, unusedKeys, usedKeys, translationKeys } = result;
-
-  let output = "";
-
-  // Header
-  output += "🔍 i18n Key Consistency Check Results\n";
-  output += "=====================================\n\n";
-
-  // Statistics
-  output += "📊 Statistics:\n";
-  output += `   Translation keys: ${translationKeys.length}\n`;
-  output += `   Used keys: ${usedKeys.length}\n`;
-  output += `   Missing keys: ${missingKeys.length}\n`;
-  output += `   Unused keys: ${unusedKeys.length}\n\n`;
-
-  // Missing keys (used but not defined)
-  if (missingKeys.length > 0) {
-    output += `❌ Missing Keys (${missingKeys.length}):\n`;
-    output += "   These keys are used in code but not defined in translation files:\n";
-    for (const key of missingKeys) {
-      output += `   - ${key}\n`;
-    }
-    output += "\n";
-  }
-
-  // Unused keys (defined but not used)
-  if (unusedKeys.length > 0) {
-    output += `⚠️  Unused Keys (${unusedKeys.length}):\n`;
-    output += "   These keys are defined in translation files but not used in code:\n";
-    for (const key of unusedKeys) {
-      output += `   - ${key}\n`;
-    }
-    output += "\n";
-  }
-
-  // Success message
-  if (missingKeys.length === 0 && unusedKeys.length === 0) {
-    output += "✅ All translation keys are consistent!\n";
-  }
-
-  return output;
-}
-
-/**
- * Main function to check i18n key consistency
+ * Enhanced check function
  */
 function checkI18nKeys(): CheckResult {
   const projectRoot = process.cwd();
@@ -212,23 +297,124 @@ function checkI18nKeys(): CheckResult {
   // Extract used keys
   console.log("🔎 Extracting used keys from source code...");
   const usedKeys = extractUsedKeys(sourceFiles);
-  console.log(`   Found ${usedKeys.length} used keys\n`);
+  console.log(`   Found ${usedKeys.length} static keys\n`);
+
+  // Extract dynamic patterns
+  console.log("🔄 Analyzing dynamic key patterns...");
+  const dynamicPatterns = extractDynamicPatterns(sourceFiles);
+  console.log(`   Found ${dynamicPatterns.length} dynamic patterns\n`);
+
+  // Find hardcoded strings
+  console.log("📝 Detecting hardcoded strings...");
+  const hardcodedStrings = findHardcodedStrings(sourceFiles);
+  console.log(`   Found ${hardcodedStrings.length} potential hardcoded strings\n`);
+
+  // Generate potential keys from dynamic patterns
+  const potentialKeys = dynamicPatterns.flatMap((dp) => dp.possibleKeys);
 
   // Compare keys
   console.log("⚖️  Comparing keys...\n");
 
   const translationKeySet = new Set(translationKeys);
-  const usedKeySet = new Set(usedKeys);
+  const allUsedKeys = [...usedKeys, ...potentialKeys];
+  const usedKeySet = new Set(allUsedKeys);
 
-  const missingKeys = usedKeys.filter((key) => !translationKeySet.has(key));
+  const missingKeys = allUsedKeys.filter((key) => !translationKeySet.has(key));
   const unusedKeys = translationKeys.filter((key) => !usedKeySet.has(key));
 
   return {
     missingKeys,
     unusedKeys,
-    usedKeys,
+    usedKeys: allUsedKeys,
     translationKeys,
+    dynamicPatterns,
+    hardcodedStrings,
+    potentialKeys,
   };
+}
+
+/**
+ * Format enhanced results
+ */
+function formatResults(result: CheckResult): string {
+  const { missingKeys, unusedKeys, usedKeys, translationKeys, dynamicPatterns, hardcodedStrings } =
+    result;
+
+  let output = "";
+
+  // Header
+  output += "🔍 i18n Key Consistency Check Results\n";
+  output += "=====================================\n\n";
+
+  // Statistics
+  output += "📊 Statistics:\n";
+  output += `   Translation keys: ${translationKeys.length}\n`;
+  output += `   Used keys: ${usedKeys.length}\n`;
+  output += `   Missing keys: ${missingKeys.length}\n`;
+  output += `   Unused keys: ${unusedKeys.length}\n`;
+  output += `   Dynamic patterns: ${dynamicPatterns.length}\n`;
+  output += `   Hardcoded strings: ${hardcodedStrings.length}\n\n`;
+
+  // Missing keys
+  if (missingKeys.length > 0) {
+    output += `❌ Missing Keys (${missingKeys.length}):\n`;
+    output += "   These keys are used in code but not defined in translation files:\n";
+    for (const key of missingKeys) {
+      output += `   - ${key}\n`;
+    }
+    output += "\n";
+  }
+
+  // Dynamic patterns
+  if (dynamicPatterns.length > 0) {
+    output += `🔄 Dynamic Key Patterns (${dynamicPatterns.length}):\n`;
+    output += "   These dynamic patterns need verification:\n";
+    for (const dp of dynamicPatterns) {
+      output += `   - Pattern: t(\`${dp.pattern}\`) in ${dp.file}:${dp.line}\n`;
+      output += `     Possible keys: ${dp.possibleKeys.join(", ")}\n`;
+    }
+    output += "\n";
+  }
+
+  // Hardcoded strings
+  if (hardcodedStrings.length > 0) {
+    output += `📝 Hardcoded Strings (${hardcodedStrings.length}):\n`;
+    output += "   These strings should potentially use i18n:\n";
+    const uniqueStrings = [...new Set(hardcodedStrings.map((hs) => hs.text))];
+    for (const text of uniqueStrings.slice(0, 10)) {
+      // Limit output
+      const examples = hardcodedStrings.filter((hs) => hs.text === text).slice(0, 2);
+      output += `   - "${text}"\n`;
+      for (const ex of examples) {
+        output += `     Found in: ${ex.file}:${ex.line}\n`;
+      }
+    }
+    if (uniqueStrings.length > 10) {
+      output += `     ... and ${uniqueStrings.length - 10} more\n`;
+    }
+    output += "\n";
+  }
+
+  // Unused keys
+  if (unusedKeys.length > 0) {
+    output += `⚠️  Unused Keys (${unusedKeys.length}):\n`;
+    output += "   These keys are defined in translation files but not used in code:\n";
+    for (const key of unusedKeys.slice(0, 10)) {
+      // Limit output
+      output += `   - ${key}\n`;
+    }
+    if (unusedKeys.length > 10) {
+      output += `     ... and ${unusedKeys.length - 10} more\n`;
+    }
+    output += "\n";
+  }
+
+  // Success message
+  if (missingKeys.length === 0 && hardcodedStrings.length === 0) {
+    output += "✅ All translation keys are consistent!\n";
+  }
+
+  return output;
 }
 
 // Main execution
@@ -237,15 +423,18 @@ if (import.meta.main) {
     const result = checkI18nKeys();
     console.log(formatResults(result));
 
-    // Exit with error code if there are issues
+    // Exit with error code if there are critical issues
     if (result.missingKeys.length > 0) {
-      console.error("💥 Build failed: Missing translation keys detected!");
+      console.error("💥 Critical: Missing translation keys detected!");
       process.exit(1);
+    }
+
+    if (result.hardcodedStrings.length > 0) {
+      console.warn("⚠️  Warning: Hardcoded strings detected that should use i18n!");
     }
 
     if (result.unusedKeys.length > 0) {
       console.warn("⚠️  Warning: Unused translation keys detected!");
-      // Don't exit with error for unused keys, just warn
     }
 
     console.log("✨ i18n key consistency check completed successfully!");

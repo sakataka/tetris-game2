@@ -1,5 +1,8 @@
 {
   "game": {
+    "hold": "ホールド",
+    "next": "ネクスト",
+    "viewReplay": "リプレイ表示",
     "gameOver": "ゲームオーバー",
     "paused": "一時停止中",
     "newGame": "新しいゲーム",
@@ -46,6 +49,84 @@
       "message": "現在のゲームをリセットしますか？",
       "confirm": "はい",
       "cancel": "いいえ"
+    },
+    "ai": {
+      "replay": {
+        "title": "AIリプレイ",
+        "close": "閉じる",
+        "play": "再生",
+        "pause": "一時停止",
+        "previous": "前へ",
+        "next": "次へ",
+        "step": "ステップ",
+        "speed": "速度",
+        "stepAnalysis": "ステップ {{step}} 分析",
+        "move": "手番:",
+        "position": "位置:",
+        "performance": "パフォーマンス:",
+        "thinkTime": "思考時間:",
+        "nodes": "ノード数:",
+        "score": "スコア:",
+        "usedHold": "この手でホールドを使用",
+        "tSpinOpportunities": "T-Spin機会:",
+        "perfectClearDetected": "パーフェクトクリア機会を検出!",
+        "gameSummary": "ゲーム要約",
+        "finalScore": "最終スコア:",
+        "duration": "時間:",
+        "aiLevel": "AIレベル:",
+        "totalMoves": "総手数:"
+      },
+      "controls": {
+        "title": "AI制御",
+        "start": "AI開始",
+        "stop": "AI停止",
+        "resume": "再開",
+        "pause": "一時停止",
+        "step": "ステップ",
+        "active": "アクティブ",
+        "inactive": "非アクティブ",
+        "thinking": "思考中...",
+        "last": "最新:",
+        "level": "AIレベル",
+        "basic": "基本",
+        "advanced": "上級",
+        "playbackSpeed": "再生速度",
+        "showVisualization": "可視化表示",
+        "hideAdvanced": "隠す",
+        "showAdvanced": "表示",
+        "advancedSettings": "詳細設定",
+        "beamWidth": "ビーム幅",
+        "timeLimit": "制限時間 (ms)",
+        "useHold": "ホールド使用",
+        "decisions": "判断回数:",
+        "avgTime": "平均時間:",
+        "timeouts": "タイムアウト:",
+        "holdUsage": "ホールド使用率:"
+      },
+      "visualization": {
+        "evaluationBreakdown": "評価内訳",
+        "landingHeight": "着地高度:",
+        "linesCleared": "消去ライン:",
+        "holes": "穴数:",
+        "rowTransitions": "横遷移:",
+        "columnTransitions": "縦遷移:",
+        "wells": "井戸:",
+        "totalScore": "総合スコア:",
+        "specialOpportunities": "特殊機会",
+        "perfectClear": "パーフェクトクリア:"
+      }
+    },
+    "touchControls": {
+      "moveLeft": "左移動",
+      "moveRight": "右移動",
+      "rotatePiece": "回転",
+      "hardDrop": "ハードドロップ",
+      "softDrop": "ソフトドロップ"
+    },
+    "debug": {
+      "quickPresets": "クイックプリセット",
+      "customQueue": "カスタムキュー",
+      "pressEnterToApply": "Enterで適用"
     }
   }
 }

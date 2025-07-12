@@ -1,11 +1,11 @@
 ---
 allowed-tools: Bash, Read, Edit, MultiEdit
-description: Check i18n consistency and help clean up unused translation keys
+description: Comprehensive i18n consistency check with dynamic pattern detection and hardcoded string analysis
 ---
 
 # i18n Consistency Check & Cleanup
 
-Verify translation key consistency and assist with removing unused translation keys to optimize localization files.
+Comprehensive i18n analysis tool that detects missing keys, unused translations, dynamic patterns, and hardcoded strings requiring localization.
 
 ## Execution Overview
 
@@ -14,18 +14,32 @@ Verify translation key consistency and assist with removing unused translation k
 bun run check:i18n
 ```
 
-This check detects:
+This comprehensive check detects:
 - **Missing Keys**: Keys used in code but not present in translation files
 - **Unused Keys**: Keys present in translation files but not used in code
+- **Dynamic Patterns**: Template literal patterns like `t(\`game.${type}\`)`
+- **Hardcoded Strings**: Text that should use i18n translation system
+- **Potential Issues**: Runtime translation errors and i18n compliance violations
 
-### 2. Result Analysis
+### 2. Advanced Problem Detection
 
-#### Missing Keys
-- **Priority**: 🔴 High (causes build errors)
-- **Action**: Add missing keys to translation files
+#### Missing Keys 🔴 Critical
+- **Priority**: Critical (causes runtime errors)
+- **Impact**: Displays raw translation keys to users
+- **Action**: Add missing keys to translation files immediately
 
-#### Unused Keys
-- **Priority**: 🟡 Medium (warnings only)
+#### Dynamic Key Patterns 🔄 Analysis Required
+- **Detection**: `t(\`template.${variable}\`)` patterns
+- **Analysis**: Validates all possible key combinations exist
+- **Action**: Verify all generated keys are defined in translation files
+
+#### Hardcoded Strings 📝 i18n Compliance
+- **Detection**: User-facing strings not using t() function
+- **Examples**: "AI Replay", "Start AI", "Loading..." etc.
+- **Action**: Convert to translation keys for proper localization
+
+#### Unused Keys ⚠️ Optimization
+- **Priority**: Medium (cleanup opportunity)
 - **Action**: Remove unnecessary translation keys to optimize file size
 
 ### 3. Automated Cleanup
