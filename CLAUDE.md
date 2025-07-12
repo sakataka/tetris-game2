@@ -1,41 +1,43 @@
-# Tetris Game Project
+# Tetris Game Project - AI Assistant Development Guide
 
 ## EXECUTION PRIORITY: Critical Development Rules
 
 ### ABSOLUTE PROHIBITIONS (No Exceptions)
-1. **Type Error Resolution**: NEVER relax TypeScript checks to resolve issues - always fix the root cause
-2. **Test Bypassing**: NEVER skip tests or use inappropriate mocks for error avoidance - address the underlying problem
-3. **Output Hardcoding**: NEVER hardcode user-facing text or API responses - use i18n and proper data sources
-4. **Error Suppression**: NEVER hide or ignore error messages - errors must be properly handled or resolved
-5. **Temporary Fixes**: NEVER implement temporary solutions that create technical debt - build sustainable solutions
-6. **Any Type Usage**: NEVER use `any` type - use `unknown` with proper type guards or define explicit types
-7. **Class Usage**: NEVER use class-based implementations except when absolutely necessary for interface compliance
+1. **Type Error Resolution**: NEVER relax TypeScript checks to resolve issues. ALWAYS fix the root cause by implementing proper types, interfaces, or type guards.
+2. **Test Bypassing**: NEVER skip tests or use inappropriate mocks for error avoidance. ALWAYS address the underlying problem causing test failures.
+3. **Output Hardcoding**: NEVER hardcode user-facing text or API responses. ALWAYS use i18n translation files and proper data sources.
+4. **Error Suppression**: NEVER hide or ignore error messages. ALWAYS implement proper error handling or resolve the underlying issue.
+5. **Temporary Fixes**: NEVER implement temporary solutions that create technical debt. ALWAYS build sustainable, maintainable solutions.
+6. **Any Type Usage**: NEVER use `any` type. ALWAYS use `unknown` with proper type guards or define explicit interfaces/types.
+7. **Class Usage**: NEVER use class-based implementations except when absolutely necessary for interface compliance with external libraries.
 
 ### MANDATORY EXECUTION PATTERNS
-- **Path Import Rules**: ALWAYS use `@/` for cross-directory imports, `./` for same-directory imports
-- **i18n Compliance**: ALL user-facing text MUST use translation files in `/src/locales/`
-- **Functional Programming**: ALWAYS prefer pure functions over class-based implementations
-- **Test Focus**: ONLY test pure functions, utility modules, and business logic - NEVER test React components or framework behavior
+- **Path Import Rules**: ALWAYS use `@/` prefix for cross-directory imports. ALWAYS use `./` prefix for same-directory imports.
+- **i18n Compliance**: ALL user-facing text MUST use translation files located in `/src/locales/` directory.
+- **Functional Programming**: ALWAYS prefer pure functions over class-based implementations for maintainability and testability.
+- **Test Focus**: ONLY test pure functions, utility modules, and business logic. NEVER test React components or framework behavior.
 
 ## Project Architecture Definition
 
 ### Core Implementation Stack
 
 #### Application Libraries (Confirmed Versions)
-- **Frontend**: React 19.1.0, Zustand 5.0.6, Tailwind CSS 4.1.11
-- **Animation**: Motion 12.23.3 (physics-based animations)
-- **i18n**: i18next 25.3.2 + react-i18next 15.6.0
+- **Frontend Framework**: React 19.1.0 with TypeScript 5.8.3 in strict mode
+- **State Management**: Zustand 5.0.6 (functional state management)
+- **Styling**: Tailwind CSS 4.1.11 with utility-first approach
+- **Animation**: Motion 12.23.3 for physics-based animations
+- **Internationalization**: i18next 25.3.2 + react-i18next 15.6.0
 - **UI Components**: shadcn/ui with Radix UI primitives (@radix-ui components)
 - **Utilities**: clsx 2.1.1, tailwind-merge 3.3.1, immer 10.1.1
 
 #### Development & Build Tools
-- **Runtime**: Bun 1.2.18 (package manager, test runner, dev server)
-- **Build**: Vite 7.0.8+ (rolldown-vite) 
-- **TypeScript**: 5.8.3 with strict mode
-- **Quality**: Biome 2.1.1, Lefthook 1.12.2
-- **Testing**: Bun Test, Playwright 1.54.1, fast-check 4.2.0
+- **Runtime Environment**: Bun 1.2.18 (package manager, test runner, dev server)
+- **Build System**: Vite 7.0.8+ (rolldown-vite for enhanced performance)
+- **Code Quality**: Biome 2.1.1 (linting and formatting)
+- **Git Hooks**: Lefthook 1.12.2 (automated pre-commit validation)
+- **Testing Framework**: Bun Test, Playwright 1.54.1, fast-check 4.2.0
 
-### Directory Structure
+### Directory Structure and Testing Guidelines
 ```
 src/
 ├── benchmarks/    # Performance benchmarks (TEST ALL)
@@ -44,7 +46,7 @@ src/
 │   ├── layout/    # Layout components
 │   └── ui/        # shadcn/ui components
 ├── game/          # Pure game logic (TEST ALL)
-│   └── ai/        # Advanced AI system (18 modules, 12,000+ lines, TEST ALL)
+│   └── ai/        # Advanced AI system (TEST ALL)
 │       ├── config/    # YAML-based weight configuration system
 │       │   ├── weight-loader.ts  # Dynamic weight loading from YAML
 │       │   └── weights.yaml      # AI evaluator weight configurations
@@ -56,9 +58,9 @@ src/
 │       │   │   └── features/   # Individual feature extractors
 │       │   ├── base-evaluator.ts # Unified evaluator interface
 │       │   └── ... # Other evaluators (pattern, stacking, advanced-features)
-│       ├── search/    # Unified SearchStrategy interface and implementations
+│       ├── search/    # Search algorithm implementations
 │       │   ├── search-strategy.ts # Common search interface
-│       │   └── ... # Search algorithms with adapter pattern
+│       │   └── ... # Search algorithms with shared configuration patterns
 │       └── tests/     # AI integration tests and strategy validation
 ├── hooks/         # Custom React hooks (TEST ONLY EXTRACTED PURE FUNCTIONS)
 │   ├── actions/   # Game action hooks
@@ -95,9 +97,9 @@ src/
 **Store Modules**: GameStore, SettingsStore, HighScoreStore
 
 **CRITICAL: Zustand v5 Selector Requirements**:
-- **NEVER** return new objects/arrays directly from selectors
-- **ALWAYS** use `useShallow` for object/array selectors
-- **PREFER** individual primitive selectors when possible
+- **NEVER** return new objects/arrays directly from selectors (causes unnecessary re-renders)
+- **ALWAYS** use `useShallow` for object/array selectors to prevent reference equality issues
+- **PREFER** individual primitive selectors when possible for maximum performance
 
 ```typescript
 // ✅ CORRECT: Use useShallow for object selectors
@@ -179,7 +181,7 @@ interface SearchConfig {
 ```
 
 ### YAML Weight Configuration
-AI weights are now managed through `weights.yaml` for easy tuning without code changes
+AI weights are managed through `weights.yaml` for runtime tuning without code changes.
 
 ## Development Commands
 
@@ -201,9 +203,9 @@ bun run check:i18n   # Check i18n key consistency
 ```
 
 ### EXECUTION CONDITIONS
-- **Before ANY commit**: Run `bun run lint` AND `bun run typecheck`
-- **After code changes**: Run `bun test` to verify no regressions
-- **Before production**: Run `bun run ci` for complete CI pipeline
+- **Before ANY commit**: Execute `bun run lint` AND `bun run typecheck` (both MUST pass)
+- **After code changes**: Execute `bun test` to verify no regressions
+- **Before production**: Execute `bun run ci` for complete CI pipeline validation
 - **Git hooks**: Lefthook automatically runs formatting and validation (pre-commit and commit-msg)
 
 ## TESTING STRATEGY
@@ -217,13 +219,13 @@ bun run check:i18n   # Check i18n key consistency
 ### CRITICAL: Testing Guidelines for AI Assistants
 
 **❌ NEVER USE `bun run dev` for automated testing**:
-- Development server runs indefinitely and blocks terminal
+- Development server runs indefinitely and blocks terminal execution
 - AI assistants cannot interact with browser-based applications effectively
-- Use unit tests and build validation instead
+- Use unit tests and build validation instead for reliable automated testing
 
 **✅ RECOMMENDED TESTING APPROACHES**:
 
-1. **Unit/Integration Tests** (Preferred):
+1. **Unit/Integration Tests** (Preferred approach):
 ```bash
 bun test src/                    # All unit tests (excludes benchmarks, visual, e2e)
 bun test src/game/ai/           # Specific AI module tests
@@ -242,7 +244,7 @@ mcp__playwright__browser_navigate "http://localhost:5173"
 mcp__playwright__browser_snapshot
 ```
 
-3. **Build Validation**:
+3. **Build Validation** (Always run for production readiness):
 ```bash
 bun run build
 bun run lint
@@ -251,7 +253,7 @@ bun run typecheck
 
 ### CRITICAL: React useEffect Dependency Issues
 
-**❌ DANGEROUS PATTERN**:
+**❌ DANGEROUS PATTERN** (causes infinite loops):
 ```typescript
 useEffect(() => {
   async function continuousLoop() {
@@ -263,7 +265,7 @@ useEffect(() => {
 }, [isRunning]); // ← Causes infinite recreation
 ```
 
-**✅ CORRECT PATTERN (AI Controller Implementation)**:
+**✅ CORRECT PATTERN** (AI Controller Implementation):
 ```typescript
 const aiEnabledRef = useRef(false);
 const isThinkingRef = useRef(false);
@@ -285,30 +287,31 @@ useEffect(() => {
 ```
 
 **AI-Specific Patterns**:
-- Use `useRef` for AI state that shouldn't trigger re-renders
-- Implement timeout cleanup for AI thinking loops
-- Separate AI decision logic from React state updates
-- Use BitBoard for high-performance board operations
-- Implement 80ms time limits for AI search algorithms
-- Use diversity beam search for exploration-exploitation balance
+- Use `useRef` for AI state that should not trigger re-renders
+- Implement timeout cleanup for AI thinking loops to prevent memory leaks
+- Separate AI decision logic from React state updates for performance
+- Use BitBoard for high-performance board operations (100,000+ evaluations/sec)
+- Implement 80ms time limits for AI search algorithms to maintain responsiveness
+- Use diversity beam search for exploration-exploitation balance in decision making
 
 ## CODE QUALITY ENFORCEMENT
 
 **Error Handling Policy**:
-- IF TypeScript error occurs THEN fix root cause, NEVER relax checks
-- IF test fails THEN address root cause, NEVER skip test
+- IF TypeScript error occurs THEN fix root cause, NEVER relax type checking
+- IF test fails THEN address root cause, NEVER skip test execution
 
 **Text Content Policy**:
-- IF user-facing text needed THEN use i18n from `/src/locales/`
+- IF user-facing text needed THEN use i18n from `/src/locales/` directory
 - Available languages: English (`en.json`), Japanese (`ja.json`)
 
 **Architecture Enforcement**:
-- IF new code needed THEN prefer pure functions over classes
+- IF new code needed THEN prefer pure functions over classes for testability
 - IF state management needed THEN use Zustand functional patterns
-- IF UI component needed THEN check existing shadcn/ui components first
+- IF UI component needed THEN check existing shadcn/ui components first to avoid duplication
 
 ## DEBUG MODE SYSTEM
 
+**Development Environment Only**:
 ```bash
 # Enable debug mode with preset
 http://localhost:5173/?debug=true&preset=tetris
@@ -322,7 +325,7 @@ http://localhost:5173/?debug=true&ai=advanced&visualization=true
 
 **Requirements**:
 - Validate debug parameters for type safety
-- Use immutable state initialization
+- Use immutable state initialization to prevent side effects
 - Never allow debug mode in production builds
 - AI debug mode enables advanced visualization and performance metrics
 
@@ -354,19 +357,16 @@ clearAnimationData: () => set((state) => {
 ## MCP TOOLS INTEGRATION
 
 ### PLAYWRIGHT MCP - Browser Automation
-- Visual UI validation and screenshot capture  
-- User interaction testing and gesture simulation
-- Animation behavior analysis and timing validation
-- **Usage Criteria**: Only when E2E testing is required
+- **Purpose**: Visual UI validation and screenshot capture
+- **Functions**: User interaction testing and gesture simulation, animation behavior analysis and timing validation
+- **Usage Criteria**: ONLY when E2E testing is required for UI validation
 
-### CONTEXT7 MCP - Documentation Research  
-- Research latest library features and capabilities
-- Check for breaking changes and compatibility issues
-- Troubleshoot technical problems with authoritative documentation
+### CONTEXT7 MCP - Documentation Research
+- **Purpose**: Research latest library features and capabilities
+- **Functions**: Check for breaking changes and compatibility issues, troubleshoot technical problems with authoritative documentation
 - **Usage Timing**: When investigating new libraries or unfamiliar functionality
 
 ### O3 MCP - Advanced Problem Solving
-- Resolve complex technical challenges beyond standard solutions
-- Architectural design consultation and best practices
-- Performance optimization strategies and recommendations
+- **Purpose**: Resolve complex technical challenges beyond standard solutions
+- **Functions**: Architectural design consultation and best practices, performance optimization strategies and recommendations
 - **Usage Criteria**: When conventional solutions are insufficient or unclear
