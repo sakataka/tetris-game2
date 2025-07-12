@@ -1,6 +1,6 @@
 # Tetris Game Project - AI Assistant Development Guide
 
-## EXECUTION PRIORITY: Critical Development Rules
+## 🚨 EXECUTION PRIORITY: Critical Development Rules
 
 ### ABSOLUTE PROHIBITIONS (No Exceptions)
 1. **Type Error Resolution**: NEVER relax TypeScript checks to resolve issues. ALWAYS fix the root cause by implementing proper types, interfaces, or type guards.
@@ -17,173 +17,7 @@
 - **Functional Programming**: ALWAYS prefer pure functions over class-based implementations for maintainability and testability.
 - **Test Focus**: ONLY test pure functions, utility modules, and business logic. NEVER test React components or framework behavior.
 
-## Project Architecture Definition
-
-### Core Implementation Stack
-
-#### Application Libraries (Confirmed Versions)
-- **Frontend Framework**: React 19.1.0 with TypeScript 5.8.3 in strict mode
-- **State Management**: Zustand 5.0.6 (functional state management)
-- **Styling**: Tailwind CSS 4.1.11 with utility-first approach
-- **Animation**: Motion 12.23.3 for physics-based animations
-- **Internationalization**: i18next 25.3.2 + react-i18next 15.6.0
-- **UI Components**: shadcn/ui with Radix UI primitives (@radix-ui components)
-- **Utilities**: clsx 2.1.1, tailwind-merge 3.3.1, immer 10.1.1
-
-#### Development & Build Tools
-- **Runtime Environment**: Bun 1.2.18 (package manager, test runner, dev server)
-- **Build System**: Vite 7.0.8+ (rolldown-vite for enhanced performance)
-- **Code Quality**: Biome 2.1.1 (linting and formatting)
-- **Git Hooks**: Lefthook 1.12.2 (automated pre-commit validation)
-- **Testing Framework**: Bun Test, Playwright 1.54.1, fast-check 4.2.0
-
-### Directory Structure and Testing Guidelines
-```
-src/
-├── benchmarks/    # Performance benchmarks (TEST ALL)
-├── components/    # React UI components (DO NOT TEST)
-│   ├── game/      # Game UI components with AI visualization
-│   ├── layout/    # Layout components
-│   └── ui/        # shadcn/ui components
-├── game/          # Pure game logic (TEST ALL)
-│   └── ai/        # Advanced AI system (TEST ALL)
-│       ├── config/    # YAML-based weight configuration system
-│       │   ├── weight-loader.ts  # Dynamic weight loading from YAML
-│       │   └── weights.yaml      # AI evaluator weight configurations
-│       ├── core/      # Core AI engine, BitBoard, collision detection, piece bits
-│       ├── evaluators/ # BaseEvaluator interface, unified evaluator architecture
-│       │   ├── dellacherie/     # Modular Dellacherie evaluator
-│       │   │   ├── calculator/  # Score calculation logic
-│       │   │   ├── core/       # Core evaluator implementation
-│       │   │   └── features/   # Individual feature extractors
-│       │   ├── base-evaluator.ts # Unified evaluator interface
-│       │   └── ... # Other evaluators (pattern, stacking, advanced-features)
-│       ├── search/    # Search algorithm implementations
-│       │   ├── search-strategy.ts # Common search interface
-│       │   └── ... # Search algorithms with shared configuration patterns
-│       └── tests/     # AI integration tests and strategy validation
-├── hooks/         # Custom React hooks (TEST ONLY EXTRACTED PURE FUNCTIONS)
-│   ├── actions/   # Game action hooks
-│   ├── ai/        # AI controller hooks
-│   ├── common/    # Common utility hooks
-│   ├── controls/  # Input and touch control hooks
-│   ├── core/      # Core game hooks
-│   ├── data/      # Data management hooks
-│   ├── effects/   # Side effect hooks
-│   ├── selectors/ # State selector hooks
-│   └── ui/        # UI and animation hooks
-├── store/         # Zustand state management (TEST ALL)
-├── types/         # TypeScript type definitions
-│   ├── errors.ts  # Error type definitions
-│   ├── game.ts    # Game type definitions
-│   ├── result.ts  # Result type definitions
-│   ├── rotation.ts # Rotation type definitions
-│   └── storage.ts # Storage type definitions
-├── utils/         # Shared utilities (TEST ALL)
-├── locales/       # i18n translation files
-├── i18n/          # i18n configuration
-│   └── config.ts  # i18n setup and configuration
-├── lib/           # Shared library utilities
-│   └── utils.ts   # General utility functions
-├── test/          # Test utilities and mocks
-│   ├── __mocks__/ # Mock implementations
-│   ├── generators/ # Test data generators
-│   └── setup.ts   # Test setup configuration
-└── tests/         # Performance tests
-    └── performance/   # Performance benchmarks and tests
-```
-
-### State Management Architecture
-**Store Modules**: GameStore, SettingsStore, HighScoreStore
-
-**CRITICAL: Zustand v5 Selector Requirements**:
-- **NEVER** return new objects/arrays directly from selectors (causes unnecessary re-renders)
-- **ALWAYS** use `useShallow` for object/array selectors to prevent reference equality issues
-- **PREFER** individual primitive selectors when possible for maximum performance
-
-```typescript
-// ✅ CORRECT: Use useShallow for object selectors
-import { useShallow } from "zustand/shallow";
-const { a, b } = useStore(useShallow((state) => ({ a: state.a, b: state.b })));
-
-// ✅ BEST: Individual primitive selectors
-const a = useStore((state) => state.a);
-const b = useStore((state) => state.b);
-```
-
-### Core Game Logic & AI System
-
-**Game Systems**:
-- Board Operations: 20×10 grid with collision detection
-- Tetromino Management: 7 pieces with Super Rotation System (SRS)
-- AI Implementation: Multi-level AI system with BitBoard optimization
-
-**AI Architecture** (Advanced AI system with modular design):
-1. **Core AI Engine**:
-   - **BitBoard**: Ultra-high-performance board representation using Uint32Array (100,000+ evaluations/sec)
-   - **Advanced AI Engine**: Multi-phase decision engine with diversified beam search
-   - **Collision Detection**: Optimized position validation system (< 1ms for 1,000 checks)
-   - **Move Generator**: Comprehensive move analysis with SRS support
-   - **Piece Bits**: Optimized piece bit manipulation for collision detection
-   - **BaseEvaluator Interface**: Unified evaluator interface for consistent AI strategy implementation
-
-2. **AI Evaluators**:
-   - **Dellacherie**: Modularized 6-feature heuristic system with separate feature extractors
-   - **Advanced Features**: T-Spin detection, Perfect Clear opportunities, danger zone analysis
-   - **Pattern Evaluator**: PCO, DT Cannon, ST-Stack competitive pattern detection
-   - **Phase-Based Weights**: Dynamic strategy adaptation (early/mid/late/danger phases)
-   - **Terrain Analysis**: Surface smoothness, accessibility, and strategic position evaluation
-   - **Stacking Evaluator**: Stacking-focused evaluation with gradual line building strategy (DT-20 system)
-   - **YAML Weight Management**: Dynamic weight configuration system for easy AI tuning (weights.yaml)
-
-3. **Search Algorithms**:
-   - **Beam Search**: Multi-depth lookahead with configurable beam width (5-20)
-   - **Diversity Beam Search**: Exploration-exploitation balance with surface profile analysis
-   - **Hold Search**: Strategic Hold piece utilization with penalty system
-   - **Pattern Search**: Depth-first search for pattern completion opportunities
-   - **Performance Benchmarks**: Optimized search with 80ms time limits
-   - **Modular Search Strategies**: Multiple search algorithms with shared configuration patterns
-
-4. **Pattern Recognition System**:
-   - **PCO (Perfect Clear Opener)**: Complete board clearing opening patterns
-   - **DT Cannon**: Double-Triple cannon attack patterns
-   - **ST-Stack**: S-T stacking continuous attack patterns
-   - **Mid-game Pattern Detection**: Advanced pattern recognition for competitive play
-
-5. **AI User Interface**:
-   - **Advanced AI Controls**: Real-time AI parameter adjustment (beam width, thinking time, Hold usage)
-   - **AI Visualization**: Move heatmaps, search tree visualization, thinking process display
-   - **AI Replay System**: Complete game replay with decision analysis and performance metrics
-   - **Performance Monitoring**: Real-time AI performance tracking and optimization insights
-
-## AI Architecture Patterns
-
-### BaseEvaluator Interface
-All AI evaluators implement a unified interface for consistency:
-```typescript
-interface BaseEvaluator {
-  evaluate(state: BoardState): number;
-  calculateFeatures(board: BitBoard): FeatureSet;
-  applyWeights(features: FeatureSet): number;
-  getName(): string;
-}
-```
-
-### Search Configuration Pattern
-Search algorithms use consistent configuration interfaces:
-```typescript
-interface SearchConfig {
-  maxDepth: number;
-  timeLimit: number;
-  enablePruning: boolean;
-  strategyConfig?: Record<string, unknown>;
-}
-```
-
-### YAML Weight Configuration
-AI weights are managed through `weights.yaml` for runtime tuning without code changes.
-
-## Development Commands
+## 📋 Development Commands
 
 ### REQUIRED COMMANDS
 ```bash
@@ -208,24 +42,163 @@ bun run check:i18n   # Check i18n key consistency
 - **Before production**: Execute `bun run ci` for complete CI pipeline validation
 - **Git hooks**: Lefthook automatically runs formatting and validation (pre-commit and commit-msg)
 
-## TESTING STRATEGY
+## 🏗️ Project Architecture
 
-### TESTING RULES
+### Core Implementation Stack
+
+#### Application Libraries (Confirmed Versions)
+- **Frontend Framework**: React 19.1.0 with TypeScript 5.8.3 in strict mode
+- **State Management**: Zustand 5.0.6 (functional state management)
+- **Styling**: Tailwind CSS 4.1.11 with utility-first approach
+- **Animation**: Motion 12.23.3 for physics-based animations
+- **Internationalization**: i18next 25.3.2 + react-i18next 15.6.0
+- **UI Components**: shadcn/ui with Radix UI primitives (@radix-ui components)
+- **Utilities**: clsx 2.1.1, tailwind-merge 3.3.1, immer 10.1.1
+
+#### Development & Build Tools
+- **Runtime Environment**: Bun 1.2.18 (package manager, test runner, dev server)
+- **Build System**: Vite 7.0.8+ (rolldown-vite for enhanced performance)
+- **Code Quality**: Biome 2.1.1 (linting and formatting)
+- **Git Hooks**: Lefthook 1.12.2 (automated pre-commit validation)
+- **Testing Framework**: Bun Test, Playwright 1.54.1, fast-check 4.2.0
+
+### Directory Structure
+```
+src/
+├── benchmarks/    # Performance benchmarks (TEST ALL)
+├── components/    # React UI components (DO NOT TEST)
+│   ├── common/, game/, layout/, ui/
+├── game/          # Pure game logic (TEST ALL)
+│   ├── ai/        # AI system (TEST ALL)
+│   │   ├── config/weights.yaml      # AI weight configuration
+│   │   ├── core/                    # BitBoard, AI engine, collision detection
+│   │   ├── evaluators/              # Dellacherie, pattern, stacking evaluators
+│   │   └── search/                  # Beam search, hold search algorithms
+│   └── [core game files]            # Board, pieces, scoring, T-spin
+├── hooks/         # React hooks (TEST PURE FUNCTIONS ONLY)
+│   ├── ai/, controls/, core/, ui/
+├── store/         # Zustand stores (TEST ALL)
+├── types/         # TypeScript definitions
+├── utils/         # Utilities (TEST ALL)
+├── locales/       # i18n files (en.json, ja.json)
+├── i18n/          # i18n configuration
+├── lib/           # Shared utilities
+└── test/          # Test utilities and mocks
+```
+
+### State Management Architecture
+
+**Store Modules**: GameStore, SettingsStore, HighScoreStore
+
+**CRITICAL: Zustand v5 Selector Requirements**:
+- **NEVER** return new objects/arrays directly from selectors (causes unnecessary re-renders)
+- **ALWAYS** use `useShallow` for object/array selectors to prevent reference equality issues
+- **PREFER** individual primitive selectors when possible for maximum performance
+
+```typescript
+// ✅ CORRECT: Use useShallow for object selectors
+import { useShallow } from "zustand/shallow";
+const { a, b } = useStore(useShallow((state) => ({ a: state.a, b: state.b })));
+
+// ✅ BEST: Individual primitive selectors
+const a = useStore((state) => state.a);
+const b = useStore((state) => state.b);
+```
+
+## 🤖 AI System Architecture
+
+### Core AI Components
+
+**Game Systems**:
+- Board Operations: 20×10 grid with collision detection
+- Tetromino Management: 7 pieces with Super Rotation System (SRS)
+- AI Implementation: Multi-level AI system with BitBoard optimization
+
+**AI Core Engine**:
+- **BitBoard**: High-performance board representation using Uint32Array (target: 100,000+ evaluations/sec)
+- **Advanced AI Engine**: Multi-phase decision engine with beam search
+- **Collision Detection**: Optimized position validation (target: < 1ms for 1,000 checks)
+- **Move Generator**: Move analysis with SRS support
+- **Piece Bits**: Optimized piece bit manipulation
+
+### AI Evaluators and Strategies
+
+**BaseEvaluator Interface**: All AI evaluators implement a unified interface for consistency:
+```typescript
+interface BaseEvaluator {
+  evaluate(state: BoardState): number;
+  calculateFeatures(board: BitBoard): FeatureSet;
+  applyWeights(features: FeatureSet): number;
+  getName(): string;
+}
+```
+
+**Available Evaluators**:
+- **Dellacherie**: Modularized 6-feature heuristic system with separate feature extractors
+- **Advanced Features**: T-Spin detection, Perfect Clear opportunities, danger zone analysis
+- **Pattern Evaluator**: PCO, DT Cannon, ST-Stack competitive pattern detection
+- **Stacking Evaluator**: Stacking-focused evaluation with gradual line building strategy
+
+### AI Configuration System (weights.yaml)
+
+Runtime-tunable AI weights without code changes:
+
+```yaml
+evaluators:
+  dellacherie:
+    linesCleared: 1000.0     # Primary reward
+    holes: -5.0              # Heavy penalty
+    maxHeight: -15.0         # Height control
+    bumpiness: -3.0          # Surface smoothness
+    # ... other parameters
+    
+  phaseWeights:
+    early:    # height ≤ 6: Foundation building
+    mid:      # height 6-12: Aggressive clearing  
+    late:     # height > 12: Survival mode
+```
+
+**Key Parameters**:
+- **Positive values**: Rewards (linesCleared, rowFillRatio)
+- **Negative values**: Penalties (holes, maxHeight, bumpiness)
+- **Phase weights**: Multiply with base weights by game phase
+- **Dynamic adjustments**: Emergency multipliers for danger/survival modes
+
+**AI Tuning**:
+- Changes take effect immediately
+- Debug mode: `?debug=true&ai=advanced&visualization=true`
+- Benchmarks: `bun run benchmark`
+
+### Search Algorithms
+
+**Search Configuration Pattern**: All search algorithms use consistent interfaces:
+```typescript
+interface SearchConfig {
+  maxDepth: number;
+  timeLimit: number;
+  enablePruning: boolean;
+  strategyConfig?: Record<string, unknown>;
+}
+```
+
+**Available Search Strategies**:
+- **Beam Search**: Multi-depth lookahead with configurable beam width (5-20)
+- **Diversity Beam Search**: Exploration-exploitation balance with surface profile analysis
+- **Hold Search**: Strategic Hold piece utilization with penalty system
+- **Pattern Search**: Depth-first search for pattern completion opportunities
+- **Performance Target**: Search algorithms target 80ms response time
+
+## 🧪 Testing Strategy
+
+### Testing Rules
 **TEST TARGETS**: 
 - ✅ Pure functions in `/src/game/`, `/src/utils/`, `/src/store/`, `/src/benchmarks/`
 - ✅ AI modules in `/src/game/ai/` (all evaluators, search algorithms, core engines)
 - ❌ React components, DOM interactions, UI behavior
 
-### CRITICAL: Testing Guidelines for AI Assistants
+### Testing Approaches
 
-**❌ NEVER USE `bun run dev` for automated testing**:
-- Development server runs indefinitely and blocks terminal execution
-- AI assistants cannot interact with browser-based applications effectively
-- Use unit tests and build validation instead for reliable automated testing
-
-**✅ RECOMMENDED TESTING APPROACHES**:
-
-1. **Unit/Integration Tests** (Preferred approach):
+#### 1. Unit/Integration Tests (Preferred)
 ```bash
 bun test src/                    # All unit tests (excludes benchmarks, visual, e2e)
 bun test src/game/ai/           # Specific AI module tests
@@ -234,139 +207,132 @@ bun run test:perf               # Performance tests
 bun run test:full               # Complete test suite
 ```
 
-2. **Playwright E2E Testing** (When MCP Playwright tools are available):
-```bash
-# Start dev server in background (for E2E testing only)
-bun run dev > /dev/null 2>&1 &
-sleep 5
-# Use MCP Playwright tools for browser automation
-mcp__playwright__browser_navigate "http://localhost:5173"
-mcp__playwright__browser_snapshot
+#### 2. Test Examples
+
+**Pure Function Tests**:
+```typescript
+describe("boardUtils", () => {
+  test("should validate board positions", () => {
+    expect(isValidBoardPosition({ x: 0, y: 0 })).toBe(true);
+    expect(isValidBoardPosition({ x: -1, y: 0 })).toBe(false);
+  });
+});
 ```
 
-3. **Build Validation** (Always run for production readiness):
+**AI Performance Tests**:
+```typescript
+describe("BitBoard", () => {
+  it("should meet performance targets", () => {
+    const startTime = performance.now();
+    for (let i = 0; i < 1000; i++) {
+      bitboard.hasCollision(testPosition);
+    }
+    expect(performance.now() - startTime).toBeLessThan(100);
+  });
+});
+```
+
+**Store Tests**:
+```typescript
+describe("GameStore", () => {
+  it("should update without unnecessary renders", () => {
+    const { result } = renderHook(() => useGameStore(state => state.score));
+    act(() => useGameStore.getState().updateScore(100));
+    expect(result.current).toBe(100);
+  });
+});
+```
+
+#### 3. AI Performance Testing
+```bash
+bun run benchmark               # CLI-based AI performance benchmarks
+bun run test:perf              # Automated performance regression tests
+```
+
+### CRITICAL: Testing Guidelines for AI Assistants
+
+**❌ NEVER USE `bun run dev` for automated testing**:
+- Development server runs indefinitely and blocks terminal execution
+- AI assistants cannot interact with browser-based applications effectively
+- Use unit tests and build validation instead for reliable automated testing
+
+**✅ Build Validation** (Always run for production readiness):
 ```bash
 bun run build
 bun run lint
 bun run typecheck
 ```
 
-### CRITICAL: React useEffect Dependency Issues
+## 🔧 Development Patterns
 
-**❌ DANGEROUS PATTERN** (causes infinite loops):
-```typescript
-useEffect(() => {
-  async function continuousLoop() {
-    if (isRunning) {
-      setIsRunning(true); // ← Triggers useEffect again!
-      setTimeout(() => continuousLoop(), 200); // ← Gets overwritten
-    }
-  }
-}, [isRunning]); // ← Causes infinite recreation
-```
+### React useEffect Best Practices
 
-**✅ CORRECT PATTERN** (AI Controller Implementation):
-```typescript
-const aiEnabledRef = useRef(false);
-const isThinkingRef = useRef(false);
-const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+**❌ DANGEROUS**: Dependencies cause infinite loops
+**✅ CORRECT**: Use `useRef` for AI state, minimal dependencies
 
-useEffect(() => {
-  async function aiLoop() {
-    if (!aiEnabledRef.current || isThinkingRef.current) return;
-    
-    isThinkingRef.current = true;
-    // ... AI decision making
-    isThinkingRef.current = false;
-    
-    timeoutRef.current = setTimeout(() => aiLoop(), aiSpeed);
-  }
-  
-  if (enabled) aiLoop();
-}, [enabled]); // ← Only trigger-conditions, not internal state
-```
-
-**AI-Specific Patterns**:
+### AI-Specific Development Patterns
 - Use `useRef` for AI state that should not trigger re-renders
 - Implement timeout cleanup for AI thinking loops to prevent memory leaks
 - Separate AI decision logic from React state updates for performance
-- Use BitBoard for high-performance board operations (100,000+ evaluations/sec)
-- Implement 80ms time limits for AI search algorithms to maintain responsiveness
+- Use BitBoard for high-performance board operations (target: 100,000+ evaluations/sec)
+- Implement 80ms time limits for AI search algorithms (target for responsiveness)
 - Use diversity beam search for exploration-exploitation balance in decision making
 
-## CODE QUALITY ENFORCEMENT
+### State Management Best Practices
+- Use individual primitive selectors: `useStore(state => state.score)`
+- Use `useShallow` for object selectors
+- Conditional updates to prevent unnecessary renders
 
-**Error Handling Policy**:
-- IF TypeScript error occurs THEN fix root cause, NEVER relax type checking
-- IF test fails THEN address root cause, NEVER skip test execution
+## 🛠️ Development Tools and Debugging
 
-**Text Content Policy**:
-- IF user-facing text needed THEN use i18n from `/src/locales/` directory
-- Available languages: English (`en.json`), Japanese (`ja.json`)
-
-**Architecture Enforcement**:
-- IF new code needed THEN prefer pure functions over classes for testability
-- IF state management needed THEN use Zustand functional patterns
-- IF UI component needed THEN check existing shadcn/ui components first to avoid duplication
-
-## DEBUG MODE SYSTEM
-
-**Development Environment Only**:
+### Debug Mode System
 ```bash
-# Enable debug mode with preset
+# Basic debug mode
 http://localhost:5173/?debug=true&preset=tetris
 
-# Custom piece queue
-http://localhost:5173/?debug=true&queue=IJLOSTZ&score=50000
-
-# AI debug mode
+# AI debug with visualization
 http://localhost:5173/?debug=true&ai=advanced&visualization=true
 ```
 
-**Requirements**:
-- Validate debug parameters for type safety
-- Use immutable state initialization to prevent side effects
-- Never allow debug mode in production builds
-- AI debug mode enables advanced visualization and performance metrics
+### MCP Tools Integration
+- **PLAYWRIGHT**: E2E testing and UI validation only
+- **CONTEXT7**: Library documentation research
+- **O3**: Complex technical problem solving
 
-## STATE MANAGEMENT BEST PRACTICES
+## 📏 Code Quality Enforcement
 
-### Required Patterns
-```typescript
-// Individual primitive selectors (most stable)
-const score = useGameStore((state) => state.score);
+- Fix TypeScript errors at root cause, never relax checking
+- Address test failures, never skip tests
+- Use i18n for all user-facing text (`/src/locales/`)
+- Prefer pure functions over classes
+- Check existing shadcn/ui components before creating new ones
 
-// Functional state transitions
-const moveTetrominoBy = (state: GameState, dx: number, dy: number) => {
-  const newPosition = { x: state.currentPiece.x + dx, y: state.currentPiece.y + dy };
-  if (isValidPosition(state.board, state.currentPiece.shape, newPosition)) {
-    state.currentPiece.x = newPosition.x;
-    state.currentPiece.y = newPosition.y;
-  }
-};
+---
 
-// Conditional updates to prevent unnecessary renders
-clearAnimationData: () => set((state) => {
-  if (state.placedPositions.length > 0 || state.clearingLines.length > 0) {
-    state.placedPositions = [];
-    state.clearingLines = [];
-  }
-});
-```
+## 📖 Quick Reference Summary
 
-## MCP TOOLS INTEGRATION
+### Daily Development Workflow
+1. **Before starting**: Check `CLAUDE.md` for project-specific rules
+2. **During development**: Use `bun test` for immediate feedback
+3. **Before committing**: Run `bun run lint && bun run typecheck` (MUST pass)
+4. **Major changes**: Run `bun run ci` for complete validation
 
-### PLAYWRIGHT MCP - Browser Automation
-- **Purpose**: Visual UI validation and screenshot capture
-- **Functions**: User interaction testing and gesture simulation, animation behavior analysis and timing validation
-- **Usage Criteria**: ONLY when E2E testing is required for UI validation
+### Key Architecture Decisions
+- **No classes**: Use pure functions and functional patterns
+- **No `any` types**: Use `unknown` with type guards or explicit interfaces
+- **No hardcoded text**: Use i18n translation files (`/src/locales/`)
+- **No component tests**: Focus on pure function and business logic testing
 
-### CONTEXT7 MCP - Documentation Research
-- **Purpose**: Research latest library features and capabilities
-- **Functions**: Check for breaking changes and compatibility issues, troubleshoot technical problems with authoritative documentation
-- **Usage Timing**: When investigating new libraries or unfamiliar functionality
+### AI System Quick Access
+- **Config**: `/src/game/ai/config/weights.yaml` (runtime tunable)
+- **Debug**: `http://localhost:5173/?debug=true&ai=advanced&visualization=true`
+- **Benchmarks**: `bun run benchmark` for performance testing
+- **Core**: BitBoard system for high-performance evaluations
 
-### O3 MCP - Advanced Problem Solving
-- **Purpose**: Resolve complex technical challenges beyond standard solutions
-- **Functions**: Architectural design consultation and best practices, performance optimization strategies and recommendations
-- **Usage Criteria**: When conventional solutions are insufficient or unclear
+### Emergency Troubleshooting
+- **Build fails**: Check TypeScript errors, run `bun run typecheck`
+- **Tests fail**: Check pure function implementations, avoid React component tests
+- **AI performance**: Check weights.yaml configuration, use debug mode
+- **State issues**: Verify Zustand selector patterns, use `useShallow` for objects
+
+*This document provides comprehensive guidelines for AI assistants working on the Tetris Game project. All rules and patterns should be strictly followed to maintain code quality and project consistency.*
