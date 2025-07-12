@@ -95,10 +95,10 @@ export function useKeyboardControls(keyMapping: KeyMapping = DEFAULT_KEY_MAPPING
     [keyMapping, gameActions, isGameActive, isGameOver, keyCooldowns],
   );
 
-  // Process single-press keys
+  // Process all key actions (single-press and repeatable)
   useEffect(() => {
+    // Handle single-press keys
     const singlePressKeys = pressedKeys.filter((key) => keyMapping[key] && !keyMapping[key].repeat);
-
     singlePressKeys.forEach((key) => {
       if (!processedKeysRef.current.has(key)) {
         executeKeyAction(key);
@@ -106,18 +106,16 @@ export function useKeyboardControls(keyMapping: KeyMapping = DEFAULT_KEY_MAPPING
       }
     });
 
+    // Handle repeatable keys with debounce
+    debouncedKeys.forEach(executeKeyAction);
+
     // Clean up processed keys that are no longer pressed
     processedKeysRef.current.forEach((key) => {
       if (!pressedKeys.includes(key)) {
         processedKeysRef.current.delete(key);
       }
     });
-  }, [pressedKeys, executeKeyAction, keyMapping]);
-
-  // Process repeatable keys with debounce
-  useEffect(() => {
-    debouncedKeys.forEach(executeKeyAction);
-  }, [debouncedKeys, executeKeyAction]);
+  }, [pressedKeys, debouncedKeys, executeKeyAction, keyMapping]);
 
   // Handle preventDefault for specific keys
   useEffect(() => {

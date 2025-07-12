@@ -268,11 +268,14 @@ export function useAdvancedAIController() {
     aiThinkAndMoveRef.current = aiThinkAndMove;
   }, [aiThinkAndMove]);
 
-  // Start/stop AI effect
+  // Sync AI state to refs for stable references
   useEffect(() => {
     aiEnabledRef.current = aiState.isEnabled;
     aiPausedRef.current = aiState.isPaused;
+  }, [aiState.isEnabled, aiState.isPaused]);
 
+  // Handle AI activation (when enabled and not paused)
+  useEffect(() => {
     if (aiState.isEnabled && !aiState.isPaused) {
       const gameState = useGameStore.getState();
 
@@ -289,19 +292,6 @@ export function useAdvancedAIController() {
         isThinkingRef.current = false;
         setAiState((prev) => ({ ...prev, isThinking: false }));
 
-        // Start recording for replay
-        setReplayData({
-          moves: [],
-          decisions: [],
-          gameStates: [],
-          metadata: {
-            startTime: Date.now(),
-            endTime: 0,
-            finalScore: 0,
-            aiSettings,
-          },
-        });
-
         // Use setTimeout to ensure aiThinkAndMoveRef is properly set
         setTimeout(() => {
           // Double-check state before starting AI loop
@@ -316,9 +306,14 @@ export function useAdvancedAIController() {
           ) {
             aiThinkAndMoveRef.current();
           }
-        }, 100); // Increased timeout to ensure state is stable
+        }, 100);
       }
-    } else {
+    }
+  }, [aiState.isEnabled, aiState.isPaused]);
+
+  // Handle AI deactivation (when disabled or paused)
+  useEffect(() => {
+    if (!aiState.isEnabled || aiState.isPaused) {
       isActiveRef.current = false;
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
@@ -326,24 +321,43 @@ export function useAdvancedAIController() {
       }
       isThinkingRef.current = false;
       setAiState((prev) => ({ ...prev, isThinking: false }));
-
-      // Finalize replay data when AI is disabled
-      if (aiState.isEnabled === false) {
-        const finalGameState = useGameStore.getState();
-        setReplayData((prev) => {
-          if (!prev) return prev;
-          return {
-            ...prev,
-            metadata: {
-              ...prev.metadata,
-              endTime: Date.now(),
-              finalScore: finalGameState.score,
-            },
-          };
-        });
-      }
     }
+  }, [aiState.isEnabled, aiState.isPaused]);
 
+  // Handle replay data recording lifecycle
+  useEffect(() => {
+    if (aiState.isEnabled && !aiState.isPaused) {
+      // Start recording for replay
+      setReplayData({
+        moves: [],
+        decisions: [],
+        gameStates: [],
+        metadata: {
+          startTime: Date.now(),
+          endTime: 0,
+          finalScore: 0,
+          aiSettings,
+        },
+      });
+    } else if (!aiState.isEnabled) {
+      // Finalize replay data when AI is disabled
+      const finalGameState = useGameStore.getState();
+      setReplayData((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          metadata: {
+            ...prev.metadata,
+            endTime: Date.now(),
+            finalScore: finalGameState.score,
+          },
+        };
+      });
+    }
+  }, [aiState.isEnabled, aiState.isPaused, aiSettings]);
+
+  // Global cleanup effect
+  useEffect(() => {
     return () => {
       isActiveRef.current = false;
       if (timeoutRef.current) {
@@ -352,7 +366,7 @@ export function useAdvancedAIController() {
       }
       isThinkingRef.current = false;
     };
-  }, [aiState.isEnabled, aiState.isPaused, aiSettings]);
+  }, []);
 
   // Update AI engine configuration when settings change
   useEffect(() => {
