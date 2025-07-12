@@ -1,15 +1,16 @@
 import { beforeEach, describe, expect, it } from "bun:test";
-import { BitBoard } from "@/game/ai/core/bitboard";
+import type { BitBoardData } from "@/game/ai/core/bitboard";
+import { createBitBoard, fromBoardState } from "@/game/ai/core/bitboard";
 import type { GameBoard } from "@/types/game";
 import { createMove, DEFAULT_WEIGHTS, DellacherieEvaluator, findDropPosition } from "./dellacherie";
 
 describe("DellacherieEvaluator", () => {
   let evaluator: DellacherieEvaluator;
-  let board: BitBoard;
+  let board: BitBoardData;
 
   beforeEach(() => {
     evaluator = new DellacherieEvaluator();
-    board = new BitBoard();
+    board = createBitBoard();
   });
 
   describe("Feature Extraction", () => {
@@ -29,7 +30,7 @@ describe("DellacherieEvaluator", () => {
         .map(() => Array(10).fill(0));
       testBoard[19] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 0]; // Missing rightmost cell
 
-      board.fromBoardState(testBoard);
+      board = fromBoardState(board, testBoard);
 
       // Place I-piece vertically to complete the line
       const move = createMove("I", 1, 9, 16); // Vertical I-piece in rightmost column
@@ -45,7 +46,7 @@ describe("DellacherieEvaluator", () => {
         .map(() => Array(10).fill(0));
       testBoard[19] = [1, 0, 1, 0, 1, 0, 1, 0, 1, 0]; // Alternating pattern (10 transitions + 2 walls = 12)
 
-      board.fromBoardState(testBoard);
+      board = fromBoardState(board, testBoard);
 
       // Place piece that doesn't affect this row
       const move = createMove("O", 0, 4, 17);
@@ -66,7 +67,7 @@ describe("DellacherieEvaluator", () => {
       testBoard[18][0] = 0;
       testBoard[17][0] = 1;
 
-      board.fromBoardState(testBoard);
+      board = fromBoardState(board, testBoard);
 
       const move = createMove("O", 0, 4, 17);
       const features = evaluator.extractFeatures(board, move);
@@ -83,7 +84,7 @@ describe("DellacherieEvaluator", () => {
       testBoard[18][3] = 1; // Block above
       testBoard[19][3] = 0; // Hole below
 
-      board.fromBoardState(testBoard);
+      board = fromBoardState(board, testBoard);
 
       const move = createMove("O", 0, 0, 17);
       const features = evaluator.extractFeatures(board, move);
@@ -103,7 +104,7 @@ describe("DellacherieEvaluator", () => {
       testBoard[18][5] = 1;
       testBoard[18][4] = 0; // Well depth 2
 
-      board.fromBoardState(testBoard);
+      board = fromBoardState(board, testBoard);
 
       const move = createMove("O", 0, 0, 16);
       const features = evaluator.extractFeatures(board, move);
@@ -122,7 +123,7 @@ describe("DellacherieEvaluator", () => {
       testBoard[18][3] = 0; // Hole
       testBoard[19][3] = 1; // Bottom block
 
-      board.fromBoardState(testBoard);
+      board = fromBoardState(board, testBoard);
 
       // Place piece away from the hole to not interfere
       const move = createMove("O", 0, 6, 18);
@@ -144,7 +145,7 @@ describe("DellacherieEvaluator", () => {
         testBoard[y][4] = 0; // Well space
       }
 
-      board.fromBoardState(testBoard);
+      board = fromBoardState(board, testBoard);
 
       const move = createMove("O", 0, 0, 12);
       const features = evaluator.extractFeatures(board, move);
@@ -163,7 +164,7 @@ describe("DellacherieEvaluator", () => {
         testBoard[19][x] = 1;
       }
 
-      board.fromBoardState(testBoard);
+      board = fromBoardState(board, testBoard);
 
       const move = createMove("O", 0, 4, 16);
       const features = evaluator.extractFeatures(board, move);
@@ -181,7 +182,7 @@ describe("DellacherieEvaluator", () => {
       testBoard[19][4] = 1; // Bottom block
       testBoard[18][4] = 0; // Hole
 
-      board.fromBoardState(testBoard);
+      board = fromBoardState(board, testBoard);
 
       const moveCreatingDeepHole = createMove("O", 0, 3, 16); // Creates blocks above hole
       const safePlacement = createMove("O", 0, 0, 17); // Safe placement
@@ -212,7 +213,7 @@ describe("DellacherieEvaluator", () => {
         }
       }
 
-      board.fromBoardState(testBoard);
+      board = fromBoardState(board, testBoard);
 
       const preserveWell = createMove("O", 0, 0, 17); // Keeps well open
       const blockWell = createMove("O", 0, 4, 17); // Blocks well
@@ -239,7 +240,7 @@ describe("DellacherieEvaluator", () => {
         }
       }
 
-      board.fromBoardState(testBoard);
+      board = fromBoardState(board, testBoard);
 
       const moveImprovingEscape = createMove("I", 0, 1, 12); // Levels terrain
       const moveWorseningEscape = createMove("I", 1, 1, 9); // Makes terrain worse
@@ -259,7 +260,7 @@ describe("DellacherieEvaluator", () => {
         .map(() => Array(10).fill(0));
       testBoard[19] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 0];
 
-      board.fromBoardState(testBoard);
+      board = fromBoardState(board, testBoard);
 
       const lineClearMove = createMove("I", 1, 9, 16); // Clears line
       const noLineClearMove = createMove("O", 0, 0, 17); // No line clear
@@ -278,7 +279,7 @@ describe("DellacherieEvaluator", () => {
       testBoard[19] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 0];
       testBoard[18] = [1, 1, 1, 1, 1, 1, 1, 1, 0, 0];
 
-      board.fromBoardState(testBoard);
+      board = fromBoardState(board, testBoard);
 
       const lineClearMove = createMove("I", 1, 9, 16); // Clears line but creates hole
       const safeMove = createMove("O", 0, 0, 17); // Safe placement, no clear
@@ -291,8 +292,8 @@ describe("DellacherieEvaluator", () => {
     });
 
     it("should avoid creating holes", () => {
-      const board1 = new BitBoard();
-      const board2 = new BitBoard();
+      const board1 = createBitBoard();
+      let board2 = createBitBoard();
 
       // Setup board2 to create a hole when piece is placed
       const testBoard: GameBoard = Array(20)
@@ -300,7 +301,7 @@ describe("DellacherieEvaluator", () => {
         .map(() => Array(10).fill(0));
       testBoard[18][3] = 1; // This will create hole when O piece placed below
 
-      board2.fromBoardState(testBoard);
+      board2 = fromBoardState(board2, testBoard);
 
       const move1 = createMove("O", 0, 3, 18); // On empty board
       const move2 = createMove("O", 0, 3, 17); // Creates hole under block
@@ -369,7 +370,7 @@ describe("DellacherieEvaluator", () => {
       testBoard[18][4] = 1; // Block at position
       testBoard[18][5] = 1;
 
-      board.fromBoardState(testBoard);
+      board = fromBoardState(board, testBoard);
 
       const dropY2 = findDropPosition(board, "O", 0, 4);
       expect(dropY2).toBe(16); // Should land on top of obstacle
@@ -423,7 +424,7 @@ describe("DellacherieEvaluator", () => {
         }
       }
 
-      board.fromBoardState(testBoard);
+      board = fromBoardState(board, testBoard);
 
       const moves = [
         createMove("I", 0, 0, 14),
@@ -469,7 +470,7 @@ describe("DellacherieEvaluator", () => {
       testBoard[1][4] = 0;
       testBoard[1][5] = 0;
 
-      board.fromBoardState(testBoard);
+      board = fromBoardState(board, testBoard);
 
       const move = createMove("O", 0, 4, 0);
       const score = evaluator.evaluate(board, move);
@@ -489,7 +490,7 @@ describe("DellacherieEvaluator", () => {
         testBoard[y] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 0];
       }
 
-      board.fromBoardState(testBoard);
+      board = fromBoardState(board, testBoard);
 
       const tetrisMove = createMove("I", 1, 9, 16); // Vertical I-piece for Tetris
       const features = evaluator.extractFeatures(board, tetrisMove);
@@ -513,7 +514,7 @@ describe("DellacherieEvaluator", () => {
       testBoard[18][5] = 0; // Hole
       testBoard[19][5] = 1; // Bottom
 
-      board.fromBoardState(testBoard);
+      board = fromBoardState(board, testBoard);
 
       // Place piece away from holes
       const move = createMove("O", 0, 7, 18);
@@ -537,7 +538,7 @@ describe("DellacherieEvaluator", () => {
         }
       }
 
-      board.fromBoardState(testBoard);
+      board = fromBoardState(board, testBoard);
 
       const move = createMove("O", 0, 0, 10);
       const features = evaluator.extractFeatures(board, move);
@@ -583,8 +584,7 @@ describe("Real Game Scenarios", () => {
     ];
 
     const testBoard = createTestBoard(pattern);
-    const board = new BitBoard();
-    board.fromBoardState(testBoard);
+    const board = fromBoardState(createBitBoard(), testBoard);
 
     const tSpinMove = createMove("T", 1, 7, 17); // T-piece in slot
     const score = evaluator.evaluate(board, tSpinMove);
