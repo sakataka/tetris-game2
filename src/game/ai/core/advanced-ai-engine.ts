@@ -1,30 +1,34 @@
-import { getTetrominoShape } from "@/game/tetrominos";
-import type { GameState, Tetromino } from "@/types/game";
 import {
   AdvancedFeatures,
   type PerfectClearOpportunity,
   type TerrainEvaluation,
   type TSpinOpportunity,
-} from "../evaluators/advanced-features";
-import { DellacherieEvaluator } from "../evaluators/dellacherie";
+} from "@/game/ai/evaluators/advanced-features";
+import { DellacherieEvaluator } from "@/game/ai/evaluators/dellacherie";
 import {
   DEFAULT_PATTERN_CONFIG,
   PatternEvaluator,
   type PatternEvaluatorConfig,
-} from "../evaluators/pattern-evaluator";
-import { DynamicWeights } from "../evaluators/weights";
-import { BeamSearch, type BeamSearchConfig, DEFAULT_BEAM_CONFIG } from "../search/beam-search";
+} from "@/game/ai/evaluators/pattern-evaluator";
+import { DynamicWeights } from "@/game/ai/evaluators/weights";
+import {
+  BeamSearch,
+  type BeamSearchConfig,
+  DEFAULT_BEAM_CONFIG,
+} from "@/game/ai/search/beam-search";
 import {
   DEFAULT_HOLD_OPTIONS,
   HoldAwareSearch,
   type HoldSearchOptions,
   type HoldSearchResult,
-} from "../search/hold-search";
+} from "@/game/ai/search/hold-search";
 import {
   DEFAULT_BEAM_SEARCH_CONFIG,
   DEFAULT_HOLD_SEARCH_CONFIG,
   type UnifiedSearchConfig,
-} from "../search/search-config";
+} from "@/game/ai/search/search-config";
+import { getTetrominoShape } from "@/game/tetrominos";
+import type { GameState, Tetromino } from "@/types/game";
 import { type AIConfig, type AIDecision, AIEngine } from "./ai-engine";
 import type { BitBoardData } from "./bitboard";
 import { createBitBoard } from "./bitboard";

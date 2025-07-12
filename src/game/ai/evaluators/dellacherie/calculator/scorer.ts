@@ -1,4 +1,4 @@
-import type { EvaluationFeatures, EvaluationWeights } from "../types";
+import type { EvaluationFeatures, EvaluationWeights } from "@/game/ai/evaluators/dellacherie/types";
 
 /**
  * Calculate weighted score from feature values

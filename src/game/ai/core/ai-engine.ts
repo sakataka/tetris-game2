@@ -1,8 +1,8 @@
+import { DellacherieEvaluator } from "@/game/ai/evaluators/dellacherie";
+import { StackingEvaluator } from "@/game/ai/evaluators/stacking-evaluator";
+import { DynamicWeights } from "@/game/ai/evaluators/weights";
 import { getTetrominoShape } from "@/game/tetrominos";
 import type { GameState } from "@/types/game";
-import { DellacherieEvaluator } from "../evaluators/dellacherie";
-import { StackingEvaluator } from "../evaluators/stacking-evaluator";
-import { DynamicWeights } from "../evaluators/weights";
 import type { BitBoardData } from "./bitboard";
 import {
   canPlace,

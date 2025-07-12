@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test } from "bun:test";
+import { type BitBoardData, createBitBoard, fromBoardState } from "@/game/ai/core/bitboard";
 import type { GameBoard } from "@/types/game";
-import { type BitBoardData, createBitBoard, fromBoardState } from "../core/bitboard";
 import { AdvancedFeatures } from "./advanced-features";
 
 describe("AdvancedFeatures", () => {

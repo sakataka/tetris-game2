@@ -1,9 +1,9 @@
+import type { BitBoardData } from "@/game/ai/core/bitboard";
+import { calculateHeight, clearLines, clone, getRowBits, place } from "@/game/ai/core/bitboard";
+import type { Move, MoveGenerator } from "@/game/ai/core/move-generator";
+import { getPieceBitsAtPosition } from "@/game/ai/core/piece-bits";
+import type { DellacherieEvaluator } from "@/game/ai/evaluators/dellacherie";
 import type { Tetromino } from "@/types/game";
-import type { BitBoardData } from "../core/bitboard";
-import { calculateHeight, clearLines, clone, getRowBits, place } from "../core/bitboard";
-import type { Move, MoveGenerator } from "../core/move-generator";
-import { getPieceBitsAtPosition } from "../core/piece-bits";
-import type { DellacherieEvaluator } from "../evaluators/dellacherie";
 import {
   applyDepthDiscount,
   DEFAULT_DIVERSITY_CONFIG,

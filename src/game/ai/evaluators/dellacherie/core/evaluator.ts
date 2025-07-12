@@ -7,8 +7,8 @@ import type {
   FeatureSet,
   MoveEvaluator,
   WeightedEvaluator,
-} from "../../base-evaluator";
-import { calculateScore } from "../calculator/scorer";
+} from "@/game/ai/evaluators/base-evaluator";
+import { calculateScore } from "@/game/ai/evaluators/dellacherie/calculator/scorer";
 import {
   createWeightManager,
   DEFAULT_WEIGHTS,
@@ -16,18 +16,28 @@ import {
   resetWeights,
   updateWeights,
   type WeightManagerState,
-} from "../calculator/weights";
+} from "@/game/ai/evaluators/dellacherie/calculator/weights";
 import {
   calculateBumpiness,
   calculateEscapeRoute,
   calculateMaxHeight,
   calculateRowFillRatio,
-} from "../features/board-analysis";
-import { calculateBlocksAboveHoles, calculateHoles } from "../features/holes";
-import { calculateLandingHeight } from "../features/landing-height";
-import { calculateColumnTransitions, calculateRowTransitions } from "../features/transitions";
-import { calculateWellOpen, calculateWells } from "../features/wells";
-import type { EvaluationFeatures, EvaluationWeights, Move } from "../types";
+} from "@/game/ai/evaluators/dellacherie/features/board-analysis";
+import {
+  calculateBlocksAboveHoles,
+  calculateHoles,
+} from "@/game/ai/evaluators/dellacherie/features/holes";
+import { calculateLandingHeight } from "@/game/ai/evaluators/dellacherie/features/landing-height";
+import {
+  calculateColumnTransitions,
+  calculateRowTransitions,
+} from "@/game/ai/evaluators/dellacherie/features/transitions";
+import { calculateWellOpen, calculateWells } from "@/game/ai/evaluators/dellacherie/features/wells";
+import type {
+  EvaluationFeatures,
+  EvaluationWeights,
+  Move,
+} from "@/game/ai/evaluators/dellacherie/types";
 
 /**
  * High-performance Dellacherie heuristic evaluator

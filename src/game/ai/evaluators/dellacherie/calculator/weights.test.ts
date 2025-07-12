@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "bun:test";
-import type { EvaluationWeights } from "../types";
+import type { EvaluationWeights } from "@/game/ai/evaluators/dellacherie/types";
 import {
   createWeightManager,
   DEFAULT_WEIGHTS,

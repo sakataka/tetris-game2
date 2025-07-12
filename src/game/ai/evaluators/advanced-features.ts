@@ -1,5 +1,5 @@
-import type { BitBoardData } from "../core/bitboard";
-import { calculateHeight, countOccupiedCells, getRowBits } from "../core/bitboard";
+import type { BitBoardData } from "@/game/ai/core/bitboard";
+import { calculateHeight, countOccupiedCells, getRowBits } from "@/game/ai/core/bitboard";
 
 /**
  * T-Spin opportunity detection result

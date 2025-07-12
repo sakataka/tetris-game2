@@ -1,10 +1,10 @@
 import type { GameError } from "@/types/errors";
 import { GameErrors } from "@/types/errors";
+import type { CellValue, GameBoard, Position, TetrominoShape } from "@/types/game";
 import type { Result } from "@/types/result";
 import { Err, Ok } from "@/types/result";
-import type { CellValue, GameBoard, Position, TetrominoShape } from "../types/game";
-import { isValidBoardPosition } from "../utils/boardUtils";
-import { GAME_CONSTANTS } from "../utils/gameConstants";
+import { isValidBoardPosition } from "@/utils/boardUtils";
+import { GAME_CONSTANTS } from "@/utils/gameConstants";
 
 export function createEmptyBoard(): GameBoard {
   // Defensive checks for CI environment compatibility

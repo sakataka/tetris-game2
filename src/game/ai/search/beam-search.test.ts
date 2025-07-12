@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, test } from "bun:test";
+import { type BitBoardData, createBitBoard } from "@/game/ai/core/bitboard";
+import { DEFAULT_MOVE_OPTIONS, MoveGenerator } from "@/game/ai/core/move-generator";
+import { DellacherieEvaluator } from "@/game/ai/evaluators/dellacherie";
 import { createTetromino } from "@/game/tetrominos";
 import type { GameBoard, Tetromino } from "@/types/game";
-import { type BitBoardData, createBitBoard } from "../core/bitboard";
-import { DEFAULT_MOVE_OPTIONS, MoveGenerator } from "../core/move-generator";
-import { DellacherieEvaluator } from "../evaluators/dellacherie";
 import {
   BeamSearch,
   createBeamSearchState,

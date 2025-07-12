@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, test } from "bun:test";
+import { AdvancedAIEngine, DEFAULT_ADVANCED_CONFIG } from "@/game/ai/core/advanced-ai-engine";
 import { createTetromino } from "@/game/tetrominos";
 import type { GameBoard, GameState } from "@/types/game";
-import { AdvancedAIEngine, DEFAULT_ADVANCED_CONFIG } from "../core/advanced-ai-engine";
 
 describe("Performance Benchmark", () => {
   let advancedAI: AdvancedAIEngine;

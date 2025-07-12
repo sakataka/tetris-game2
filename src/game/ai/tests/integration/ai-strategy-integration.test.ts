@@ -1,15 +1,15 @@
 import { beforeEach, describe, expect, test } from "bun:test";
+import { type BitBoardData, createBitBoard, setRowBits } from "@/game/ai/core/bitboard";
+import { MoveGenerator } from "@/game/ai/core/move-generator";
+import { AdvancedFeatures } from "@/game/ai/evaluators/advanced-features";
+import { DellacherieEvaluator } from "@/game/ai/evaluators/dellacherie";
+import { PatternEvaluator } from "@/game/ai/evaluators/pattern-evaluator";
+import { DEFAULT_PATTERN_WEIGHTS } from "@/game/ai/evaluators/patterns";
+import { determineGamePhase, getPhaseWeights } from "@/game/ai/evaluators/weights";
+import { BeamSearch, type SearchNode } from "@/game/ai/search/beam-search";
+import { calculateSurfaceProfile } from "@/game/ai/search/diversity-beam-search";
 import { createTetromino } from "@/game/tetrominos";
 import type { Position, TetrominoTypeName } from "@/types/game";
-import { type BitBoardData, createBitBoard, setRowBits } from "../../core/bitboard";
-import { MoveGenerator } from "../../core/move-generator";
-import { AdvancedFeatures } from "../../evaluators/advanced-features";
-import { DellacherieEvaluator } from "../../evaluators/dellacherie";
-import { PatternEvaluator } from "../../evaluators/pattern-evaluator";
-import { DEFAULT_PATTERN_WEIGHTS } from "../../evaluators/patterns";
-import { determineGamePhase, getPhaseWeights } from "../../evaluators/weights";
-import { BeamSearch, type SearchNode } from "../../search/beam-search";
-import { calculateSurfaceProfile } from "../../search/diversity-beam-search";
 
 // Helper functions for test setup
 function createBoardWithHeight(height: number): BitBoardDataData {

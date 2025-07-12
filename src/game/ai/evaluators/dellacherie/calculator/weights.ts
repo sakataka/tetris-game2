@@ -1,5 +1,5 @@
 import { getCachedConfiguration, loadDellacherieWeights } from "@/game/ai/config/weight-loader";
-import type { EvaluationWeights } from "../types";
+import type { EvaluationWeights } from "@/game/ai/evaluators/dellacherie/types";
 
 /**
  * LINE-CLEARING FOCUSED weights: Based on o3 MCP recommendations

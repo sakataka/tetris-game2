@@ -1,6 +1,6 @@
+import type { BitBoardData } from "@/game/ai/core/bitboard";
+import { calculateHeight, countOccupiedCells } from "@/game/ai/core/bitboard";
 import type { Tetromino } from "@/types/game";
-import type { BitBoardData } from "../core/bitboard";
-import { calculateHeight, countOccupiedCells } from "../core/bitboard";
 import type { BeamSearch, SearchResult } from "./beam-search";
 
 /**

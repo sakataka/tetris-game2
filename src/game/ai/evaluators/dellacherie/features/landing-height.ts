@@ -1,6 +1,6 @@
 import type { BitBoardData } from "@/game/ai/core/bitboard";
 import { getPieceBitPattern } from "@/game/ai/core/piece-bits";
-import type { Move } from "../types";
+import type { Move } from "@/game/ai/evaluators/dellacherie/types";
 
 /**
  * Calculate landing height feature
