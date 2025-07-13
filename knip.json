@@ -7,9 +7,10 @@
     "**/*.benchmark.{ts,tsx}",
     "src/test/__mocks__/**",
     "src/test/setup.ts",
-    "src/test/generators/**"
+    "src/test/generators/**",
+    "src/design-tokens/**"
   ],
   "ignoreExportsUsedInFile": true,
   "includeEntryExports": false,
-  "ignoreDependencies": ["@biomejs/biome", "bun-types", "@testing-library/jest-dom"]
+  "ignoreDependencies": ["@biomejs/biome", "bun-types", "@testing-library/jest-dom", "chromatic"]
 }
