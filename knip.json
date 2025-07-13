@@ -1,16 +1,25 @@
 {
-  "entry": ["src/main.tsx", "src/game/ai/index.ts", "**/*.test.{ts,tsx}"],
+  "entry": ["src/main.tsx", "src/game/ai/index.ts", "**/*.test.{ts,tsx}", "**/*.bench.{ts,tsx}"],
   "project": ["src/**/*.{ts,tsx}", "*.{ts,js}"],
   "ignore": [
     "dist/**",
     "node_modules/**",
     "**/*.benchmark.{ts,tsx}",
+    "**/*.bench.{ts,tsx}",
     "src/test/__mocks__/**",
     "src/test/setup.ts",
     "src/test/generators/**",
-    "src/design-tokens/**"
+    "src/design-tokens/**",
+    "src/components/ui/ThemeModeSelector.tsx"
   ],
   "ignoreExportsUsedInFile": true,
   "includeEntryExports": false,
-  "ignoreDependencies": ["@biomejs/biome", "bun-types", "@testing-library/jest-dom", "chromatic"]
+  "ignoreDependencies": [
+    "@biomejs/biome",
+    "bun-types",
+    "@testing-library/jest-dom",
+    "chromatic",
+    "@axe-core/react",
+    "playwright"
+  ]
 }

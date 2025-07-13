@@ -180,9 +180,3 @@ export const useTheme = (): ThemeContextValue => {
   }
   return context;
 };
-
-// Hook for consuming design tokens (convenience)
-export const useThemeTokens = () => {
-  const { config } = useTheme();
-  return config.tokens;
-};

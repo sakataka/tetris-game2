@@ -100,22 +100,3 @@ export interface GameState {
   pieceBag: TetrominoTypeName[]; // 7-Bag system: current bag state (legacy format for compatibility)
   tSpinState: TSpinState; // T-Spin detection and display state
 }
-
-/**
- * Movement directions for tetromino control
- */
-export type Direction = "left" | "right" | "down";
-
-/**
- * Game action types for control systems
- */
-export type GameAction =
-  | "move_left"
-  | "move_right"
-  | "move_down"
-  | "rotate_cw"
-  | "rotate_ccw"
-  | "hard_drop"
-  | "hold"
-  | "pause"
-  | "reset";

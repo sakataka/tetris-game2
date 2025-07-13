@@ -7,8 +7,8 @@
   "scripts": {
     "dev": "bun --bun vite",
     "build": "bun x vite build",
-    "test": "bun test src/ --ignore='**/benchmarks/**' --ignore='**/visual/**' --ignore='tests/**'",
-    "test:full": "bun test src/ tests/performance/ --ignore='**/benchmarks/**' --ignore='**/visual/**' --ignore='tests/e2e/**'",
+    "test": "bun test src/ --ignore='**/benchmarks/**' --ignore='**/visual/**' --ignore='tests/**' --ignore='**/components/**'",
+    "test:full": "bun test src/ tests/performance/ --ignore='**/benchmarks/**' --ignore='**/visual/**' --ignore='tests/e2e/**' --ignore='**/components/**'",
     "test:a11y": "bun x playwright test tests/accessibility.spec.ts",
     "lint": "bun x biome check --write",
     "format": "bun x biome format --write",

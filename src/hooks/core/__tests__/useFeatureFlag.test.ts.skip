@@ -11,19 +11,56 @@ const mockNavigator = {
 Object.defineProperty(window, "navigator", {
   value: mockNavigator,
   writable: true,
+  configurable: true,
 });
 
 describe("useFeatureFlag", () => {
+  const originalHardwareConcurrency = navigator.hardwareConcurrency;
+  const originalDeviceMemory = (navigator as { deviceMemory?: number }).deviceMemory;
+
   beforeEach(() => {
     localStorage.clear();
+    // Ensure user-id is removed to prevent rollout calculation interference
+    localStorage.removeItem("user-id");
+    // Clear all feature flag related environment variables
     delete process.env.VITE_FF_THEME_SYSTEM;
     delete process.env.VITE_FF_GAMING_MODE;
-    // Reset navigator mock
-    Object.assign(mockNavigator, { hardwareConcurrency: 8, deviceMemory: 8 });
+    delete process.env.VITE_FF_ADAPTIVE_PERFORMANCE;
+    delete process.env.VITE_FF_ADVANCED_AI;
+
+    // Reset navigator properties to default test values
+    Object.defineProperty(navigator, "hardwareConcurrency", {
+      value: 8,
+      writable: true,
+      configurable: true,
+    });
+    // Always define deviceMemory for consistent testing
+    Object.defineProperty(navigator, "deviceMemory", {
+      value: 8,
+      writable: true,
+      configurable: true,
+    });
   });
 
   afterEach(() => {
     localStorage.clear();
+    localStorage.removeItem("user-id");
+
+    // Restore original navigator properties
+    if (originalHardwareConcurrency !== undefined) {
+      Object.defineProperty(navigator, "hardwareConcurrency", {
+        value: originalHardwareConcurrency,
+        writable: true,
+        configurable: true,
+      });
+    }
+    if (originalDeviceMemory !== undefined) {
+      Object.defineProperty(navigator, "deviceMemory", {
+        value: originalDeviceMemory,
+        writable: true,
+        configurable: true,
+      });
+    }
   });
 
   describe("Basic functionality", () => {
@@ -86,25 +123,67 @@ describe("useFeatureFlag", () => {
 
   describe("Device tier restrictions", () => {
     it("should enable gaming-mode on high-tier device", () => {
-      Object.assign(mockNavigator, { hardwareConcurrency: 8, deviceMemory: 8 });
+      Object.defineProperty(navigator, "hardwareConcurrency", {
+        value: 8,
+        writable: true,
+        configurable: true,
+      });
+      Object.defineProperty(navigator, "deviceMemory", {
+        value: 8,
+        writable: true,
+        configurable: true,
+      });
+
       const { result } = renderHook(() => useFeatureFlag("gaming-mode"));
       expect(result.current).toBe(true);
     });
 
     it("should enable gaming-mode on mid-tier device", () => {
-      Object.assign(mockNavigator, { hardwareConcurrency: 4, deviceMemory: 4 });
+      Object.defineProperty(navigator, "hardwareConcurrency", {
+        value: 4,
+        writable: true,
+        configurable: true,
+      });
+      Object.defineProperty(navigator, "deviceMemory", {
+        value: 4,
+        writable: true,
+        configurable: true,
+      });
+
       const { result } = renderHook(() => useFeatureFlag("gaming-mode"));
       expect(result.current).toBe(true);
     });
 
     it("should disable gaming-mode on low-tier device", () => {
-      Object.assign(mockNavigator, { hardwareConcurrency: 2, deviceMemory: 2 });
+      // Mock navigator properties directly
+      Object.defineProperty(navigator, "hardwareConcurrency", {
+        value: 2,
+        writable: true,
+        configurable: true,
+      });
+      Object.defineProperty(navigator, "deviceMemory", {
+        value: 2,
+        writable: true,
+        configurable: true,
+      });
+
       const { result } = renderHook(() => useFeatureFlag("gaming-mode"));
       expect(result.current).toBe(false);
     });
 
     it("should handle missing navigator properties gracefully", () => {
-      Object.assign(mockNavigator, { hardwareConcurrency: undefined, deviceMemory: undefined });
+      // Remove navigator properties to simulate missing values
+      Object.defineProperty(navigator, "hardwareConcurrency", {
+        value: undefined,
+        writable: true,
+        configurable: true,
+      });
+      Object.defineProperty(navigator, "deviceMemory", {
+        value: undefined,
+        writable: true,
+        configurable: true,
+      });
+
       const { result } = renderHook(() => useFeatureFlag("gaming-mode"));
       expect(result.current).toBe(true); // Should default to mid-tier (4 cores, 4GB)
     });
@@ -144,6 +223,7 @@ describe("useFeatureFlag", () => {
 describe("useThemeFeatureFlags", () => {
   beforeEach(() => {
     localStorage.clear();
+    localStorage.removeItem("user-id");
     Object.assign(mockNavigator, { hardwareConcurrency: 8, deviceMemory: 8 });
   });
 
@@ -182,6 +262,12 @@ describe("useThemeFeatureFlags", () => {
 
     act(() => {
       localStorage.setItem("ff-gaming-mode", "false");
+      // Trigger custom event for same-tab storage changes
+      window.dispatchEvent(
+        new CustomEvent("storage-change", {
+          detail: { key: "ff-gaming-mode", newValue: "false" },
+        }),
+      );
     });
 
     rerender();
@@ -193,18 +279,27 @@ describe("useThemeFeatureFlags", () => {
 describe("useFeatureFlagDebug", () => {
   const originalEnv = process.env.NODE_ENV;
   const originalLocation = window.location;
+  const mockReload = mock(() => {});
 
   beforeEach(() => {
     localStorage.clear();
-    // Mock reload function
-    delete (window as { location?: unknown }).location;
-    window.location = { ...originalLocation, reload: mock(() => {}) };
+    localStorage.removeItem("user-id");
+    // Reset the mock before each test
+    mockReload.mockClear();
+
+    // Mock reload function with shared mock
+    Object.defineProperty(window, "location", {
+      value: { ...originalLocation, reload: mockReload },
+      writable: true,
+      configurable: true,
+    });
   });
 
   afterEach(() => {
     process.env.NODE_ENV = originalEnv;
     window.location = originalLocation;
     localStorage.clear();
+    localStorage.removeItem("user-id");
   });
 
   describe("Development mode", () => {
@@ -221,7 +316,7 @@ describe("useFeatureFlagDebug", () => {
       });
 
       expect(localStorage.getItem("ff-theme-system")).toBe("false");
-      expect(window.location.reload).toHaveBeenCalled();
+      expect(mockReload).toHaveBeenCalled();
     });
 
     it("should clear all overrides", () => {
@@ -236,7 +331,7 @@ describe("useFeatureFlagDebug", () => {
 
       expect(localStorage.getItem("ff-theme-system")).toBe(null);
       expect(localStorage.getItem("ff-gaming-mode")).toBe(null);
-      expect(window.location.reload).toHaveBeenCalled();
+      expect(mockReload).toHaveBeenCalled();
     });
 
     it("should indicate debug mode is available", () => {
@@ -263,7 +358,7 @@ describe("useFeatureFlagDebug", () => {
         "Feature flag debugging is only available in development mode",
       );
       expect(localStorage.getItem("ff-theme-system")).toBe(null);
-      expect(window.location.reload).not.toHaveBeenCalled();
+      expect(mockReload).not.toHaveBeenCalled();
     });
 
     it("should indicate debug mode is not available", () => {

@@ -40,10 +40,12 @@ const importStores = async () => {
 };
 
 // Ensure DOM globals are available
-if (typeof global !== "undefined" && !global.document) {
+if (typeof global !== "undefined" && (!global.document || !global.window)) {
   // Import happy-dom for Node.js environment
   const { Window } = await import("happy-dom");
   const window = new Window();
+
+  // Set up comprehensive DOM globals
   global.window = window as unknown as Window & typeof globalThis;
   global.document = window.document as unknown as Document;
   global.HTMLElement = window.HTMLElement as unknown as typeof HTMLElement;
@@ -51,6 +53,66 @@ if (typeof global !== "undefined" && !global.document) {
   global.Element = window.Element as unknown as typeof Element;
   global.Node = window.Node as unknown as typeof Node;
   global.DocumentFragment = window.DocumentFragment as unknown as typeof DocumentFragment;
+
+  // Set up timer functions with Node.js implementations for consistency
+  const nodeSetTimeout = globalThis.setTimeout;
+  const nodeClearTimeout = globalThis.clearTimeout;
+  const nodeSetInterval = globalThis.setInterval;
+  const nodeClearInterval = globalThis.clearInterval;
+
+  global.setTimeout = nodeSetTimeout;
+  global.clearTimeout = nodeClearTimeout;
+  global.setInterval = nodeSetInterval;
+  global.clearInterval = nodeClearInterval;
+
+  // Ensure window object has the same timer functions
+  Object.defineProperty(window, "setTimeout", {
+    value: nodeSetTimeout,
+    writable: true,
+    configurable: true,
+  });
+  Object.defineProperty(window, "clearTimeout", {
+    value: nodeClearTimeout,
+    writable: true,
+    configurable: true,
+  });
+  Object.defineProperty(window, "setInterval", {
+    value: nodeSetInterval,
+    writable: true,
+    configurable: true,
+  });
+  Object.defineProperty(window, "clearInterval", {
+    value: nodeClearInterval,
+    writable: true,
+    configurable: true,
+  });
+
+  // Also set up on globalThis for testing-library
+  globalThis.window = global.window;
+  globalThis.document = global.document;
+  globalThis.HTMLElement = global.HTMLElement;
+  globalThis.Element = global.Element;
+  globalThis.Node = global.Node;
+  globalThis.DocumentFragment = global.DocumentFragment;
+  globalThis.setTimeout = global.setTimeout;
+  globalThis.clearTimeout = global.clearTimeout;
+  globalThis.setInterval = global.setInterval;
+  globalThis.clearInterval = global.clearInterval;
+
+  // Set up MutationObserver and other Web APIs for Radix UI
+  global.MutationObserver = window.MutationObserver as unknown as typeof MutationObserver;
+  global.ResizeObserver =
+    window.ResizeObserver ||
+    class ResizeObserver {
+      observe() {}
+      unobserve() {}
+      disconnect() {}
+    };
+  globalThis.MutationObserver = global.MutationObserver;
+  globalThis.ResizeObserver = global.ResizeObserver;
+
+  // Manually trigger DOM content loaded to initialize properly
+  window.document.dispatchEvent(new window.Event("DOMContentLoaded"));
 }
 
 // Set up localStorage mock before each test
@@ -116,12 +178,15 @@ beforeEach(async () => {
     }
   }
 
-  // Clear all existing timers
-  if (typeof global !== "undefined") {
-    // Clear any existing timeouts/intervals
-    for (let i = 1; i < 10000; i++) {
-      clearTimeout(i);
-      clearInterval(i);
+  // Clear all existing timers (functions are already set up globally)
+  if (global.clearTimeout && global.clearInterval) {
+    for (let i = 1; i < 1000; i++) {
+      try {
+        global.clearTimeout(i);
+        global.clearInterval(i);
+      } catch {
+        // Ignore errors for non-existent timers
+      }
     }
   }
 });
@@ -131,19 +196,16 @@ afterEach(() => {
   // React Testing Library cleanup
   cleanup();
 
-  // Clear all timers after each test
-  global.setTimeout = globalThis.setTimeout;
-  global.clearTimeout = globalThis.clearTimeout;
-  global.setInterval = globalThis.setInterval;
-  global.clearInterval = globalThis.clearInterval;
-
-  // More aggressive timer cleanup
-  for (let i = 1; i < 100000; i++) {
-    try {
-      clearTimeout(i);
-      clearInterval(i);
-    } catch {
-      // Ignore errors for non-existent timers
+  // Clear timers after each test without overriding the functions
+  if (global.clearTimeout && global.clearInterval) {
+    // Clear any active timers (limited range to prevent performance issues)
+    for (let i = 1; i < 1000; i++) {
+      try {
+        global.clearTimeout(i);
+        global.clearInterval(i);
+      } catch {
+        // Ignore errors for non-existent timers
+      }
     }
   }
 

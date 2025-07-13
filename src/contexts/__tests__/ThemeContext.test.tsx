@@ -1,7 +1,16 @@
 import { afterEach, beforeEach, describe, expect, it } from "bun:test";
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, waitFor } from "@testing-library/react";
 import type React from "react";
 import { ThemeProvider, useTheme } from "../ThemeContext";
+
+// Helper function to get elements by test id from document
+const getByTestId = (testId: string) => {
+  const element = document.querySelector(`[data-testid="${testId}"]`);
+  if (!element) {
+    throw new Error(`Unable to find an element with the testid: ${testId}`);
+  }
+  return element;
+};
 
 // Test component that uses theme context
 const TestComponent: React.FC = () => {
@@ -59,8 +68,8 @@ describe("ThemeProvider", () => {
         </ThemeProvider>,
       );
 
-      expect(screen.getByTestId("current-mode")).toHaveTextContent("normal");
-      expect(screen.getByTestId("available-modes")).toHaveTextContent("compact,normal,gaming");
+      expect(getByTestId("current-mode")).toHaveTextContent("normal");
+      expect(getByTestId("available-modes")).toHaveTextContent("compact,normal,gaming");
     });
 
     it("should use custom default mode", () => {
@@ -70,7 +79,7 @@ describe("ThemeProvider", () => {
         </ThemeProvider>,
       );
 
-      expect(screen.getByTestId("current-mode")).toHaveTextContent("compact");
+      expect(getByTestId("current-mode")).toHaveTextContent("compact");
     });
 
     it("should throw error when useTheme is used outside provider", () => {
@@ -94,10 +103,10 @@ describe("ThemeProvider", () => {
         </ThemeProvider>,
       );
 
-      fireEvent.click(screen.getByTestId("set-compact"));
+      fireEvent.click(getByTestId("set-compact"));
 
       await waitFor(() => {
-        expect(screen.getByTestId("current-mode")).toHaveTextContent("compact");
+        expect(getByTestId("current-mode")).toHaveTextContent("compact");
       });
     });
 
@@ -109,16 +118,16 @@ describe("ThemeProvider", () => {
       );
 
       act(() => {
-        fireEvent.click(screen.getByTestId("set-gaming"));
+        fireEvent.click(getByTestId("set-gaming"));
       });
 
       // Should show transitioning state initially
-      expect(screen.getByTestId("is-transitioning")).toHaveTextContent("true");
+      expect(getByTestId("is-transitioning")).toHaveTextContent("true");
 
       // Should complete transition after timeout
       await waitFor(
         () => {
-          expect(screen.getByTestId("is-transitioning")).toHaveTextContent("false");
+          expect(getByTestId("is-transitioning")).toHaveTextContent("false");
         },
         { timeout: 500 },
       );
@@ -131,13 +140,13 @@ describe("ThemeProvider", () => {
         </ThemeProvider>,
       );
 
-      const currentMode = screen.getByTestId("current-mode").textContent;
+      const currentMode = getByTestId("current-mode").textContent;
 
-      fireEvent.click(screen.getByTestId("set-normal"));
+      fireEvent.click(getByTestId("set-normal"));
 
       // Mode should remain the same
-      expect(screen.getByTestId("current-mode")).toHaveTextContent(currentMode || "");
-      expect(screen.getByTestId("is-transitioning")).toHaveTextContent("false");
+      expect(getByTestId("current-mode")).toHaveTextContent(currentMode || "");
+      expect(getByTestId("is-transitioning")).toHaveTextContent("false");
     });
   });
 
@@ -149,7 +158,7 @@ describe("ThemeProvider", () => {
         </ThemeProvider>,
       );
 
-      fireEvent.click(screen.getByTestId("set-compact"));
+      fireEvent.click(getByTestId("set-compact"));
 
       await waitFor(() => {
         expect(localStorage.getItem("tetris-theme-mode")).toBe("compact");
@@ -165,7 +174,7 @@ describe("ThemeProvider", () => {
         </ThemeProvider>,
       );
 
-      expect(screen.getByTestId("current-mode")).toHaveTextContent("gaming");
+      expect(getByTestId("current-mode")).toHaveTextContent("gaming");
     });
 
     it("should ignore invalid theme modes from localStorage", () => {
@@ -177,7 +186,7 @@ describe("ThemeProvider", () => {
         </ThemeProvider>,
       );
 
-      expect(screen.getByTestId("current-mode")).toHaveTextContent("normal");
+      expect(getByTestId("current-mode")).toHaveTextContent("normal");
     });
   });
 
@@ -206,7 +215,7 @@ describe("ThemeProvider", () => {
       expect(document.documentElement.style.getPropertyValue("--layout-gap")).toBe("0.75rem");
 
       // Switch to normal mode
-      fireEvent.click(screen.getByTestId("set-normal"));
+      fireEvent.click(getByTestId("set-normal"));
 
       await waitFor(() => {
         expect(document.documentElement.style.getPropertyValue("--layout-gap")).toBe("1rem");
@@ -220,7 +229,7 @@ describe("ThemeProvider", () => {
         </ThemeProvider>,
       );
 
-      fireEvent.click(screen.getByTestId("set-gaming"));
+      fireEvent.click(getByTestId("set-gaming"));
 
       await waitFor(() => {
         const rootStyle = document.documentElement.style;
@@ -251,7 +260,7 @@ describe("ThemeProvider", () => {
 
       expect(document.body.classList.contains("theme-normal")).toBe(true);
 
-      fireEvent.click(screen.getByTestId("set-compact"));
+      fireEvent.click(getByTestId("set-compact"));
 
       await waitFor(() => {
         expect(document.body.classList.contains("theme-compact")).toBe(true);
@@ -266,7 +275,7 @@ describe("ThemeProvider", () => {
         </ThemeProvider>,
       );
 
-      fireEvent.click(screen.getByTestId("set-gaming"));
+      fireEvent.click(getByTestId("set-gaming"));
 
       await waitFor(() => {
         expect(document.body.classList.contains("gaming-effects")).toBe(true);
@@ -282,7 +291,7 @@ describe("ThemeProvider", () => {
         </ThemeProvider>,
       );
 
-      expect(screen.getByTestId("available-modes")).toHaveTextContent("normal");
+      expect(getByTestId("available-modes")).toHaveTextContent("normal");
     });
 
     it("should respect feature flag enabled state", () => {
@@ -292,7 +301,7 @@ describe("ThemeProvider", () => {
         </ThemeProvider>,
       );
 
-      expect(screen.getByTestId("available-modes")).toHaveTextContent("compact,normal,gaming");
+      expect(getByTestId("available-modes")).toHaveTextContent("compact,normal,gaming");
     });
   });
 
@@ -315,11 +324,18 @@ describe("ThemeProvider", () => {
         </ThemeProvider>,
       );
 
-      expect(screen.getByTestId("available-modes")).toHaveTextContent("compact,normal");
+      expect(getByTestId("available-modes")).toHaveTextContent("compact,normal");
     });
 
     it("should warn when switching to gaming mode with reduced performance", async () => {
-      const consoleSpy = mock(console.warn);
+      // Store original console.warn
+      const originalWarn = console.warn;
+      const warnCalls: string[] = [];
+
+      // Mock console.warn to capture calls
+      console.warn = (message: string) => {
+        warnCalls.push(message);
+      };
 
       // Mock reduced performance mode
       mockUseAdaptivePerformance.mockReturnValue({
@@ -335,16 +351,16 @@ describe("ThemeProvider", () => {
 
       // Force gaming mode despite reduced performance
       act(() => {
-        fireEvent.click(screen.getByTestId("set-gaming"));
+        fireEvent.click(getByTestId("set-gaming"));
       });
 
       await waitFor(() => {
-        expect(consoleSpy).toHaveBeenCalledWith(
-          expect.stringContaining("Gaming mode enabled with reduced performance"),
-        );
+        expect(warnCalls.length).toBeGreaterThan(0);
+        expect(warnCalls[0]).toContain("Gaming mode enabled with reduced performance");
       });
 
-      consoleSpy.mockRestore();
+      // Restore original console.warn
+      console.warn = originalWarn;
     });
   });
 });
