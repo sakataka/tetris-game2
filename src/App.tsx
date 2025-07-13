@@ -1,6 +1,8 @@
 import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { Game } from "./components/layout/Game";
+import { ThemeProvider } from "./contexts/ThemeContext";
+import { useThemeFeatureFlags } from "./hooks/core/useFeatureFlag";
 import { useSettingsStore } from "./store/settingsStore";
 
 // Import debug tools in development only
@@ -12,6 +14,7 @@ function App() {
   const { i18n } = useTranslation();
   const language = useSettingsStore((state) => state.language);
   const hasInitialized = useRef(false);
+  const { themeSystemEnabled } = useThemeFeatureFlags();
 
   // Initialize language from persisted settings only once
   useEffect(() => {
@@ -32,7 +35,11 @@ function App() {
     }
   }, [language, i18n]);
 
-  return <Game />;
+  return (
+    <ThemeProvider defaultMode="normal" enableFeatureFlag={themeSystemEnabled}>
+      <Game />
+    </ThemeProvider>
+  );
 }
 
 export default App;

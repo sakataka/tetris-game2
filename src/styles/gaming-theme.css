@@ -1,0 +1,304 @@
+/* Gaming Mode Enhancements */
+.theme-gaming {
+  --glow-primary: var(--color-primary);
+  --glow-secondary: var(--color-accent, #8a2be2);
+  --glow-cyberpunk: var(--color-cyberpunk, #ff0080);
+}
+
+/* Gaming Effects Class */
+.gaming-effects {
+  /* Subtle background animation */
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 245, 255, 0.05) 0%,
+    rgba(138, 43, 226, 0.03) 50%,
+    transparent 100%
+  );
+  animation: subtle-pulse 4s ease-in-out infinite;
+}
+
+@keyframes subtle-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.95;
+  }
+}
+
+/* Enhanced component styling in gaming mode */
+.theme-gaming .bg-background-secondary,
+.theme-gaming [data-gaming-enhanced] {
+  background-color: var(--color-background-secondary);
+  border: 1px solid rgba(0, 245, 255, 0.2);
+  box-shadow:
+    0 0 20px rgba(0, 245, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: all var(--animation-normal) ease;
+}
+
+.theme-gaming .bg-background-secondary:hover,
+.theme-gaming [data-gaming-enhanced]:hover {
+  border-color: rgba(0, 245, 255, 0.4);
+  box-shadow:
+    0 0 30px rgba(0, 245, 255, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Gaming mode tetris pieces enhanced glow */
+.theme-gaming [data-piece-type] {
+  filter: drop-shadow(0 0 8px currentColor);
+  animation: piece-glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes piece-glow {
+  from {
+    filter: drop-shadow(0 0 8px currentColor);
+  }
+  to {
+    filter: drop-shadow(0 0 12px currentColor);
+  }
+}
+
+/* Gaming mode tetris board enhancements */
+.theme-gaming .tetris-board {
+  border: 2px solid var(--glow-primary);
+  box-shadow:
+    0 0 20px rgba(0, 245, 255, 0.3),
+    inset 0 0 20px rgba(0, 245, 255, 0.1);
+}
+
+.theme-gaming .tetris-cell {
+  border: 1px solid rgba(0, 245, 255, 0.1);
+}
+
+.theme-gaming .tetris-cell.filled {
+  box-shadow: inset 0 0 10px rgba(0, 245, 255, 0.2);
+}
+
+/* Gaming mode text enhancements */
+.theme-gaming .text-primary {
+  text-shadow: 0 0 10px currentColor;
+}
+
+.theme-gaming .score-display {
+  text-shadow: 0 0 15px var(--glow-primary);
+  animation: score-pulse 3s ease-in-out infinite;
+}
+
+@keyframes score-pulse {
+  0%,
+  100% {
+    text-shadow: 0 0 15px var(--glow-primary);
+  }
+  50% {
+    text-shadow: 0 0 25px var(--glow-primary);
+  }
+}
+
+/* Gaming mode buttons */
+.theme-gaming button {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(0, 245, 255, 0.3);
+  background: linear-gradient(
+    135deg,
+    var(--color-background-secondary) 0%,
+    rgba(0, 245, 255, 0.1) 100%
+  );
+  box-shadow: 0 0 10px rgba(0, 245, 255, 0.1);
+  transition: all var(--animation-normal) ease;
+}
+
+.theme-gaming button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0, 245, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.theme-gaming button:hover {
+  border-color: rgba(0, 245, 255, 0.6);
+  box-shadow:
+    0 0 20px rgba(0, 245, 255, 0.3),
+    inset 0 0 10px rgba(0, 245, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.theme-gaming button:hover::before {
+  left: 100%;
+}
+
+.theme-gaming button:active {
+  transform: translateY(0);
+  box-shadow:
+    0 0 15px rgba(0, 245, 255, 0.4),
+    inset 0 0 15px rgba(0, 245, 255, 0.2);
+}
+
+/* Gaming mode select and input components */
+.theme-gaming select,
+.theme-gaming input {
+  border: 1px solid rgba(0, 245, 255, 0.3);
+  background: rgba(0, 245, 255, 0.05);
+  box-shadow: inset 0 0 10px rgba(0, 245, 255, 0.1);
+}
+
+.theme-gaming select:focus,
+.theme-gaming input:focus {
+  border-color: var(--glow-primary);
+  box-shadow:
+    0 0 15px rgba(0, 245, 255, 0.3),
+    inset 0 0 10px rgba(0, 245, 255, 0.1);
+}
+
+/* Gaming mode modal and popover enhancements */
+.theme-gaming .modal,
+.theme-gaming .popover {
+  border: 2px solid var(--glow-primary);
+  background: var(--color-background-primary);
+  box-shadow:
+    0 0 40px rgba(0, 245, 255, 0.4),
+    inset 0 0 20px rgba(0, 245, 255, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+/* Gaming mode scrollbar styling */
+.theme-gaming ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.theme-gaming ::-webkit-scrollbar-track {
+  background: var(--color-background-secondary);
+  border-radius: 4px;
+}
+
+.theme-gaming ::-webkit-scrollbar-thumb {
+  background: linear-gradient(45deg, var(--glow-primary), var(--glow-secondary));
+  border-radius: 4px;
+  box-shadow: 0 0 10px rgba(0, 245, 255, 0.3);
+}
+
+.theme-gaming ::-webkit-scrollbar-thumb:hover {
+  box-shadow: 0 0 15px rgba(0, 245, 255, 0.5);
+}
+
+/* Gaming mode special effects for high score */
+.theme-gaming .high-score {
+  animation: high-score-celebration 2s ease-in-out;
+}
+
+@keyframes high-score-celebration {
+  0% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.1);
+    box-shadow: 0 0 30px var(--glow-cyberpunk);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 40px var(--glow-primary);
+  }
+  75% {
+    transform: scale(1.08);
+    box-shadow: 0 0 35px var(--glow-secondary);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 20px var(--glow-primary);
+  }
+}
+
+/* Gaming mode line clear effects */
+.theme-gaming .line-clear {
+  animation: line-clear-flash 0.5s ease-in-out;
+}
+
+@keyframes line-clear-flash {
+  0% {
+    opacity: 1;
+  }
+  25% {
+    opacity: 0.3;
+    box-shadow: 0 0 20px var(--glow-primary);
+  }
+  50% {
+    opacity: 0.1;
+    box-shadow: 0 0 30px var(--glow-cyberpunk);
+  }
+  75% {
+    opacity: 0.3;
+    box-shadow: 0 0 25px var(--glow-secondary);
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .gaming-effects,
+  .theme-gaming [data-piece-type],
+  .theme-gaming button::before,
+  .theme-gaming .score-display,
+  .theme-gaming .high-score,
+  .theme-gaming .line-clear {
+    animation: none;
+  }
+
+  .theme-gaming .bg-background-secondary:hover,
+  .theme-gaming [data-gaming-enhanced]:hover,
+  .theme-gaming button:hover {
+    transition: none;
+  }
+
+  .theme-gaming button:hover {
+    transform: none;
+  }
+
+  .theme-gaming button:active {
+    transform: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .theme-gaming {
+    --glow-primary: #ffffff;
+    --glow-secondary: #ffffff;
+    --glow-cyberpunk: #ffffff;
+  }
+
+  .theme-gaming [data-piece-type] {
+    filter: none;
+    border: 2px solid currentColor;
+  }
+
+  .theme-gaming .text-primary {
+    text-shadow: none;
+    font-weight: bold;
+  }
+}
+
+/* Dark mode specific enhancements */
+@media (prefers-color-scheme: dark) {
+  .theme-gaming {
+    --glow-intensity: 0.7;
+  }
+
+  .gaming-effects {
+    background: radial-gradient(
+      ellipse at center,
+      rgba(0, 245, 255, 0.08) 0%,
+      rgba(138, 43, 226, 0.05) 50%,
+      transparent 100%
+    );
+  }
+}
