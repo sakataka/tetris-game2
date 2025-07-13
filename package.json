@@ -9,6 +9,7 @@
     "build": "bun x vite build",
     "test": "bun test src/ --ignore='**/benchmarks/**' --ignore='**/visual/**' --ignore='tests/**'",
     "test:full": "bun test src/ tests/performance/ --ignore='**/benchmarks/**' --ignore='**/visual/**' --ignore='tests/e2e/**'",
+    "test:a11y": "bun x playwright test tests/accessibility.spec.ts",
     "lint": "bun x biome check --write",
     "format": "bun x biome format --write",
     "typecheck": "bun x tsc --noEmit",
@@ -17,6 +18,8 @@
     "prepare": "lefthook install",
     "check:i18n": "bun run scripts/check-i18n-keys.ts",
     "measure:space-efficiency": "bun run scripts/measure-space-efficiency.ts",
+    "audit:accessibility": "bun run scripts/accessibility-audit.ts",
+    "audit:accessibility:comprehensive": "bun run scripts/accessibility-audit.ts --comprehensive",
     "benchmark": "bun run src/benchmarks/cli.ts",
     "e2e": "bun x playwright test --config=playwright.config.ts",
     "storybook": "storybook dev -p 6006",
@@ -41,6 +44,7 @@
     "zustand": "5.0.6"
   },
   "devDependencies": {
+    "@axe-core/react": "^4.10.2",
     "@biomejs/biome": "2.1.1",
     "@playwright/test": "^1.54.1",
     "@storybook/addon-a11y": "^9.0.16",
@@ -56,6 +60,7 @@
     "@types/react": "19.1.8",
     "@types/react-dom": "19.1.6",
     "@vitejs/plugin-react-oxc": "^0.2.3",
+    "axe-playwright": "^2.1.0",
     "chromatic": "^13.1.2",
     "fast-check": "^4.2.0",
     "happy-dom": "^18.0.1",

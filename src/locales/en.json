@@ -1,4 +1,25 @@
 {
+  "app": {
+    "title": "Tetris Game",
+    "subtitle": "Classic Tetris with AI Features"
+  },
+  "accessibility": {
+    "skipToMain": "Skip to main content",
+    "skipToGameBoard": "Skip to game board",
+    "skipToGameInfo": "Skip to game information",
+    "skipToControls": "Skip to game controls",
+    "gameOver": "Game over. Final score: {{score}}. Lines cleared: {{lines}}. Level reached: {{level}}.",
+    "gamePaused": "Game paused. Press P to resume.",
+    "gameResumed": "Game resumed.",
+    "gameReady": "Game ready to start.",
+    "scoreUpdate": "Score: {{score}}. Lines: {{lines}}. Level: {{level}}.",
+    "error": "Error: {{error}}",
+    "currentPiece": "Current piece: {{piece}}",
+    "boardDescription": "Game board has {{filledRows}} rows with pieces out of {{totalRows}} total rows.",
+    "linesCleared": "{{count}} line cleared. Total lines: {{total}}.",
+    "linesCleared_plural": "{{count}} lines cleared. Total lines: {{total}}.",
+    "levelUp": "Level up! Now at level {{level}}."
+  },
   "game": {
     "hold": "Hold",
     "next": "Next",
@@ -32,6 +53,15 @@
       "hold": "Hold",
       "pause": "Pause",
       "reset": "Reset"
+    },
+    "pieces": {
+      "i": "I-piece (straight line)",
+      "o": "O-piece (square)",
+      "t": "T-piece",
+      "s": "S-piece (Z-block)",
+      "z": "Z-piece",
+      "j": "J-piece",
+      "l": "L-piece"
     },
     "settings": {
       "title": "Settings",

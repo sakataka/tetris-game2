@@ -20,9 +20,9 @@ export const designTokens: ExtendedDesignTokens = {
         tertiary: "#16213e", // Accent areas
       },
       text: {
-        primary: "#ffffff", // Primary text
-        secondary: "#d1d5db", // Secondary text
-        muted: "#9ca3af", // Muted text
+        primary: "#ffffff", // Primary text (maintains excellent contrast)
+        secondary: "#e5e7eb", // Secondary text (improved contrast ~7.5:1)
+        muted: "#d1d5db", // Muted text (improved contrast ~5.5:1)
       },
     },
     brand: {

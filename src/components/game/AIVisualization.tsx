@@ -54,9 +54,9 @@ function SearchTreeVisualization({ tree }: { tree: SearchTree }) {
   const { t } = useTranslation();
   return (
     <Card className="p-3">
-      <h4 className="text-sm font-medium mb-2">
+      <h3 className="text-sm font-medium mb-2">
         {t("game.ai.visualization.searchTree", { depth: tree.maxDepth })}
-      </h4>
+      </h3>
       <div className="space-y-2">
         {tree.levels.map((level, levelIndex) => (
           <div
@@ -109,7 +109,7 @@ function EvaluationDetails({ decision }: { decision: AdvancedAIDecision }) {
 
   return (
     <Card className="p-3" data-testid="evaluation-details">
-      <h4 className="text-sm font-medium mb-2">{t("game.ai.visualization.evaluationBreakdown")}</h4>
+      <h3 className="text-sm font-medium mb-2">{t("game.ai.visualization.evaluationBreakdown")}</h3>
       <div className="space-y-1 text-xs">
         <div className="flex justify-between">
           <span>{t("game.ai.visualization.landingHeight")}</span>
@@ -169,15 +169,15 @@ function SpecialOpportunities({
 
   return (
     <Card className="p-3">
-      <h4 className="text-sm font-medium mb-2">
+      <h3 className="text-sm font-medium mb-2">
         {t("game.ai.visualization.specialOpportunities")}
-      </h4>
+      </h3>
 
       {tSpins.length > 0 && (
         <div className="mb-2">
-          <h5 className="text-xs font-medium text-purple-600 mb-1">
+          <h4 className="text-xs font-medium text-purple-600 mb-1">
             {t("game.ai.visualization.tSpinDetected")}
-          </h5>
+          </h4>
           {tSpins.slice(0, 3).map((tSpin, index) => (
             <div
               key={`tspin-${tSpin.type}-${tSpin.position.x}-${tSpin.position.y}-${index}`}
@@ -200,9 +200,9 @@ function SpecialOpportunities({
 
       {perfectClear && (
         <div>
-          <h5 className="text-xs font-medium text-blue-600 mb-1">
+          <h4 className="text-xs font-medium text-blue-600 mb-1">
             {t("game.ai.visualization.perfectClear")}
-          </h5>
+          </h4>
           <div className="text-xs flex justify-between">
             <span>
               {t("game.ai.visualization.blocksRemaining", { blocks: perfectClear.remainingBlocks })}

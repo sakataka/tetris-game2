@@ -1,4 +1,24 @@
 {
+  "app": {
+    "title": "テトリスゲーム",
+    "subtitle": "AI機能付きクラシックテトリス"
+  },
+  "accessibility": {
+    "skipToMain": "メインコンテンツへスキップ",
+    "skipToGameBoard": "ゲームボードへスキップ",
+    "skipToGameInfo": "ゲーム情報へスキップ",
+    "skipToControls": "コントロールへスキップ",
+    "gameOver": "ゲームオーバー。最終スコア：{{score}}。ライン数：{{lines}}。到達レベル：{{level}}。",
+    "gamePaused": "ゲームが一時停止されました。Pキーで再開してください。",
+    "gameResumed": "ゲームが再開されました。",
+    "gameReady": "ゲーム開始準備完了。",
+    "scoreUpdate": "スコア：{{score}}。ライン：{{lines}}。レベル：{{level}}。",
+    "error": "エラー：{{error}}",
+    "currentPiece": "現在のピース：{{piece}}",
+    "boardDescription": "ゲームボードは{{totalRows}}行中{{filledRows}}行にピースがあります。",
+    "linesCleared": "{{count}}ライン消去。合計ライン数：{{total}}。",
+    "levelUp": "レベルアップ！現在レベル{{level}}です。"
+  },
   "game": {
     "hold": "ホールド",
     "next": "ネクスト",
@@ -32,6 +52,15 @@
       "hold": "ホールド",
       "pause": "一時停止",
       "reset": "リセット"
+    },
+    "pieces": {
+      "i": "Iピース（棒状）",
+      "o": "Oピース（正方形）",
+      "t": "Tピース",
+      "s": "Sピース（Z型）",
+      "z": "Zピース",
+      "j": "Jピース",
+      "l": "Lピース"
     },
     "settings": {
       "title": "設定",

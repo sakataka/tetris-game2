@@ -16,7 +16,7 @@ export function ScoreBoard() {
   return (
     <Card className={`${CARD_STYLES.base} ${CARD_STYLES.hover} ${CARD_STYLES.interactive}`}>
       <CardHeader>
-        <CardTitle className="text-base font-bold text-gray-300 text-center">
+        <CardTitle as="h2" className="text-base font-bold text-white text-center">
           {t("game.score.title")}
         </CardTitle>
       </CardHeader>

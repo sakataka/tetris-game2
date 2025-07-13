@@ -40,14 +40,14 @@ export function ResetConfirmationDialog() {
             {t("game.resetConfirmation.title")}
           </DialogTitle>
           <DialogDescription className="text-center">
-            <div className="text-lg text-gray-300">{t("game.resetConfirmation.message")}</div>
+            <div className="text-lg text-white">{t("game.resetConfirmation.message")}</div>
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="flex-col-reverse gap-3 sm:flex-row mt-6">
           <Button
             variant="outline"
             onClick={handleCancel}
-            className="flex-1 text-gray-300 border-gray-600 hover:bg-gray-800"
+            className="flex-1 text-white border-gray-600 hover:bg-gray-800"
             autoFocus
           >
             {t("game.resetConfirmation.cancel")}

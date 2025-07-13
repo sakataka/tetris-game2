@@ -12,13 +12,13 @@ const TestComponent: React.FC = () => {
       <span data-testid="current-mode">{mode}</span>
       <span data-testid="available-modes">{availableModes.join(",")}</span>
       <span data-testid="is-transitioning">{isTransitioning.toString()}</span>
-      <button onClick={() => setMode("compact")} data-testid="set-compact">
+      <button type="button" onClick={() => setMode("compact")} data-testid="set-compact">
         Set Compact
       </button>
-      <button onClick={() => setMode("normal")} data-testid="set-normal">
+      <button type="button" onClick={() => setMode("normal")} data-testid="set-normal">
         Set Normal
       </button>
-      <button onClick={() => setMode("gaming")} data-testid="set-gaming">
+      <button type="button" onClick={() => setMode("gaming")} data-testid="set-gaming">
         Set Gaming
       </button>
     </div>
@@ -136,7 +136,7 @@ describe("ThemeProvider", () => {
       fireEvent.click(screen.getByTestId("set-normal"));
 
       // Mode should remain the same
-      expect(screen.getByTestId("current-mode")).toHaveTextContent(currentMode!);
+      expect(screen.getByTestId("current-mode")).toHaveTextContent(currentMode || "");
       expect(screen.getByTestId("is-transitioning")).toHaveTextContent("false");
     });
   });

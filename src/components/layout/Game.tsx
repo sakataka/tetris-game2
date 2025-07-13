@@ -17,6 +17,8 @@ import { AdvancedAIControls } from "@/components/game/AdvancedAIControls";
 import { AIReplay } from "@/components/game/AIReplay";
 import { AIVisualization } from "@/components/game/AIVisualization";
 import { LayoutModeToggle } from "@/components/ui/LayoutModeToggle";
+import { useFocusManagement } from "@/hooks/accessibility/useFocusManagement";
+import { useScreenReaderAnnouncements } from "@/hooks/accessibility/useScreenReaderAnnouncements";
 import { useAdvancedAIController } from "@/hooks/ai/useAdvancedAIController";
 import { useKeyboardControls } from "@/hooks/controls/useKeyboardControls";
 import { useTouchGestures } from "@/hooks/controls/useTouchGestures";
@@ -34,6 +36,22 @@ export function Game() {
   useKeyboardControls();
   useHighScoreSideEffect();
   const { handleTouchStart, handleTouchEnd } = useTouchGestures();
+
+  // Initialize focus management for accessibility
+  useFocusManagement({
+    enableFocusTrap: true,
+    enableFocusRestore: true,
+    enableKeyboardNavigation: true,
+  });
+
+  // Initialize screen reader announcements
+  useScreenReaderAnnouncements({
+    enableGameStateAnnouncements: true,
+    enableScoreAnnouncements: true,
+    enableErrorAnnouncements: true,
+    enableDetailedDescriptions: false, // Can be toggled in settings
+    announcementDelay: 500,
+  });
 
   // Design tokens and layout management
   const { layoutMode: designLayoutMode, setLayoutMode } = useDesignTokens();
@@ -71,7 +89,12 @@ export function Game() {
 
         <GameLayout mode={layoutMode} enableAIFeatures={enableAIFeatures}>
           {/* Left Sidebar - Game Info */}
-          <aside className="layout-sidebar gap-3 pr-2" aria-label="Game Information">
+          <aside
+            id="game-info"
+            className="layout-sidebar gap-3 pr-2"
+            aria-label="Game Information"
+            tabIndex={-1}
+          >
             {/* Layout Mode Toggle */}
             <div className="mb-3">
               <LayoutModeToggle currentMode={layoutMode} onModeChange={setLayoutMode} />
@@ -81,14 +104,18 @@ export function Game() {
             <HighScore />
             <HoldPiece />
             <NextPiece />
-            <Controls />
+            <div id="game-controls">
+              <Controls />
+            </div>
           </aside>
 
           {/* Game board area */}
           <div className="layout-main">
             <section
+              id="game-board"
               className="relative"
               aria-label="Game Board Area"
+              tabIndex={-1}
               onTouchStart={handleTouchStart}
               onTouchEnd={handleTouchEnd}
               data-testid="game-board"

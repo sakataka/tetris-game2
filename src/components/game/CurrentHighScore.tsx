@@ -26,7 +26,10 @@ export function CurrentHighScore({ score, className }: CurrentHighScoreProps) {
       className={`${CARD_STYLES.base} ${CARD_STYLES.hover} ${CARD_STYLES.interactive} ${className}`}
     >
       <CardHeader>
-        <CardTitle className="text-base font-bold text-gray-300 text-center flex items-center justify-center gap-2">
+        <CardTitle
+          as="h2"
+          className="text-base font-bold text-white text-center flex items-center justify-center gap-2"
+        >
           <Trophy className="h-5 w-5 text-yellow-500" />
           {t("game.highScore.title")}
         </CardTitle>

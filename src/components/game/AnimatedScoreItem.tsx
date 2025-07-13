@@ -38,7 +38,7 @@ export function AnimatedScoreItem({
 
   return (
     <div className="flex items-center justify-between">
-      <p className="text-sm font-medium text-gray-400">{label}</p>
+      <p className="text-sm font-medium text-gray-300">{label}</p>
       <motion.p
         key={animationKey}
         initial={animationProps.initial}

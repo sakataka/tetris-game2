@@ -1,4 +1,6 @@
 import type { ReactNode } from "react";
+import { useTranslation } from "react-i18next";
+import { SkipLinks } from "@/components/accessibility/SkipLinks";
 import { useAdaptivePerformance } from "@/hooks/core/useAdaptivePerformance";
 import { useDesignTokens } from "@/hooks/core/useDesignTokens";
 import { cn } from "@/lib/utils";
@@ -24,6 +26,7 @@ export const GameLayout: React.FC<GameLayoutProps> = ({
   mode = "normal",
   enableAIFeatures = false,
 }) => {
+  const { t } = useTranslation();
   const { layout } = useDesignTokens();
   const { animationsEnabled } = useAdaptivePerformance();
 
@@ -49,7 +52,11 @@ export const GameLayout: React.FC<GameLayoutProps> = ({
       data-layout-mode={mode}
       data-ai-enabled={enableAIFeatures}
     >
+      {/* Skip links for keyboard navigation */}
+      <SkipLinks />
+
       <main
+        id="main-content"
         className={cn(
           "grid gap-6 items-start justify-center min-h-[calc(100vh-2rem)] pt-4",
           "desktop-layout",
@@ -60,8 +67,12 @@ export const GameLayout: React.FC<GameLayoutProps> = ({
           gridTemplateColumns: gridColumns,
           gridTemplateAreas: gridAreas,
         }}
-        aria-label="Tetris Game"
+        aria-labelledby="app-title"
       >
+        {/* Accessible page title for screen readers */}
+        <h1 id="app-title" className="sr-only">
+          {t("app.title")}
+        </h1>
         {children}
       </main>
     </div>

@@ -53,7 +53,7 @@ export function AIReplay({ replayData, onReplayEnd }: AIReplayProps) {
   return (
     <Card className="p-4 space-y-4" data-testid="replay-controls">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">AI Replay</h3>
+        <h2 className="text-lg font-semibold">AI Replay</h2>
         <Button variant="outline" onClick={onReplayEnd} data-testid="close-replay">
           Close
         </Button>
@@ -118,7 +118,7 @@ export function AIReplay({ replayData, onReplayEnd }: AIReplayProps) {
       {/* Current State Display */}
       {currentDecision && (
         <div className="space-y-2">
-          <h4 className="text-sm font-medium">Step {currentStep + 1} Analysis</h4>
+          <h3 className="text-sm font-medium">Step {currentStep + 1} Analysis</h3>
 
           <div className="grid grid-cols-2 gap-4 text-xs">
             <div>
@@ -164,7 +164,7 @@ export function AIReplay({ replayData, onReplayEnd }: AIReplayProps) {
 
       {/* Game Metadata */}
       <div className="pt-2 border-t">
-        <h4 className="text-sm font-medium mb-2">Game Summary</h4>
+        <h3 className="text-sm font-medium mb-2">Game Summary</h3>
         <div className="grid grid-cols-2 gap-2 text-xs">
           <div>
             <span className="text-muted-foreground">Final Score:</span>

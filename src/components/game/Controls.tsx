@@ -19,7 +19,7 @@ export function Controls() {
   return (
     <Card className={`${CARD_STYLES.base} ${CARD_STYLES.hover} ${CARD_STYLES.interactive}`}>
       <CardHeader>
-        <CardTitle className="text-base font-bold text-gray-300 text-center">
+        <CardTitle as="h2" className="text-base font-bold text-white text-center">
           {t("game.controls.title")}
         </CardTitle>
       </CardHeader>

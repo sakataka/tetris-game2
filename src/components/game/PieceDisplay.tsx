@@ -22,7 +22,7 @@ export function PieceDisplay({ type, piece, disabled = false }: PieceDisplayProp
   return (
     <Card className={cn(CARD_STYLES.base, CARD_STYLES.hover, "shadow-xl hover:shadow-2xl")}>
       <CardHeader>
-        <CardTitle className="text-base font-bold text-gray-300 text-center">
+        <CardTitle as="h2" className="text-base font-bold text-white text-center">
           {t(`game.${type}`)}
         </CardTitle>
       </CardHeader>

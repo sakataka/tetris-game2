@@ -16,7 +16,10 @@ export function HighScoreList({ scores, className }: HighScoreListProps) {
   return (
     <Card className={`${CARD_STYLES.base} ${className}`}>
       <CardHeader>
-        <CardTitle className="text-base font-bold text-gray-300 text-center flex items-center justify-center gap-2">
+        <CardTitle
+          as="h2"
+          className="text-base font-bold text-white text-center flex items-center justify-center gap-2"
+        >
           <Trophy className="h-5 w-5 text-yellow-500" />
           {t("game.highScores.topScores")}
         </CardTitle>

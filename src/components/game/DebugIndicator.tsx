@@ -32,15 +32,15 @@ export function DebugIndicator() {
         </div>
 
         {debugParams.queue && debugParams.queue.length > 0 && (
-          <div className="text-xs text-gray-300">Queue: {debugParams.queue.join(", ")}</div>
+          <div className="text-xs text-white">Queue: {debugParams.queue.join(", ")}</div>
         )}
 
         {debugParams.seed !== undefined && (
-          <div className="text-xs text-gray-300">Seed: {debugParams.seed}</div>
+          <div className="text-xs text-white">Seed: {debugParams.seed}</div>
         )}
 
         <details className="mt-2">
-          <summary className="text-xs text-gray-400 cursor-pointer hover:text-gray-200">
+          <summary className="text-xs text-gray-300 cursor-pointer hover:text-gray-200">
             Quick Presets
           </summary>
           <div className="mt-2 grid grid-cols-2 gap-1">
@@ -60,7 +60,7 @@ export function DebugIndicator() {
                     window.history.replaceState({}, "", newUrl);
                   }
                 }}
-                className="text-xs px-2 py-1 bg-gray-800 hover:bg-gray-700 rounded text-gray-300 hover:text-white transition-colors"
+                className="text-xs px-2 py-1 bg-gray-800 hover:bg-gray-700 rounded text-white hover:text-white transition-colors"
               >
                 {name}
               </button>
@@ -69,14 +69,14 @@ export function DebugIndicator() {
         </details>
 
         <details className="mt-2">
-          <summary className="text-xs text-gray-400 cursor-pointer hover:text-gray-200">
+          <summary className="text-xs text-gray-300 cursor-pointer hover:text-gray-200">
             Custom Queue
           </summary>
           <div className="mt-2 space-y-1">
             <input
               type="text"
               placeholder="e.g., IJLOSTZ"
-              className="w-full text-xs px-2 py-1 bg-gray-800 rounded text-gray-300"
+              className="w-full text-xs px-2 py-1 bg-gray-800 rounded text-white"
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   const input = e.currentTarget.value.toUpperCase();
@@ -90,11 +90,11 @@ export function DebugIndicator() {
                 }
               }}
             />
-            <div className="text-xs text-gray-500">Press Enter to apply</div>
+            <div className="text-xs text-gray-400">Press Enter to apply</div>
           </div>
         </details>
 
-        <div className="text-xs text-gray-500 mt-2">
+        <div className="text-xs text-gray-400 mt-2">
           URL parameters: ?debug=true&preset=NAME&queue=PIECES
         </div>
       </div>

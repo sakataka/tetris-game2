@@ -51,13 +51,13 @@ export function GameOverlay() {
                   <p className="text-xl text-yellow-400 font-bold mb-2">
                     {t("game.newHighScore")}!
                   </p>
-                  <p className="text-lg text-gray-300">
+                  <p className="text-lg text-white">
                     {t("game.score.title")}: {score.toLocaleString()}
                   </p>
                 </div>
               )}
               {!isNewHighScore && currentHighScore && (
-                <div className="text-center text-gray-300">
+                <div className="text-center text-white">
                   <p className="text-sm">
                     {t("game.highScore.title")}: {currentHighScore.score.toLocaleString()}
                   </p>
@@ -73,13 +73,13 @@ export function GameOverlay() {
                   {t("game.newGame")}
                 </AnimatedButton>
               </div>
-              <p className="text-center text-sm text-gray-400">{t("game.shortcuts")}: R / Enter</p>
+              <p className="text-center text-sm text-gray-300">{t("game.shortcuts")}: R / Enter</p>
             </div>
           )}
 
           {isPaused && (
             <div className="space-y-4">
-              <p className="text-center text-gray-300">{t("game.resumeHint")}</p>
+              <p className="text-center text-white">{t("game.resumeHint")}</p>
               <div className="flex justify-center">
                 <AnimatedButton
                   onClick={togglePause}

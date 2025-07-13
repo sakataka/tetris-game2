@@ -30,14 +30,14 @@ export function HighScoreItem({ score, rank }: HighScoreItemProps) {
         <Badge
           variant={isTopScore ? "default" : "outline"}
           className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${
-            isTopScore ? "bg-yellow-500 text-black" : "border-gray-600 text-gray-300"
+            isTopScore ? "bg-yellow-500 text-black" : "border-gray-600 text-white"
           }`}
         >
           {rank}
         </Badge>
         <div>
           <div className="text-white font-semibold">{formatScore(score.score)}</div>
-          <div className="text-xs text-gray-400 flex items-center gap-2">
+          <div className="text-xs text-gray-300 flex items-center gap-2">
             <span className="flex items-center gap-1">
               <Target className="h-3 w-3" />
               {score.lines}
@@ -49,7 +49,7 @@ export function HighScoreItem({ score, rank }: HighScoreItemProps) {
           </div>
         </div>
       </div>
-      <div className="text-xs text-gray-400 flex items-center gap-1">
+      <div className="text-xs text-gray-300 flex items-center gap-1">
         <Calendar className="h-3 w-3" />
         {formatDate(score.date)}
       </div>
