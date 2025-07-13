@@ -42,12 +42,19 @@ const mockUseAdaptivePerformance = mock(() => ({
   performanceMode: "full",
 }));
 
-mock.module("@/hooks/core/useAdaptivePerformance", () => ({
-  useAdaptivePerformance: mockUseAdaptivePerformance,
-}));
+// Store original module
+let _originalAdaptivePerformance: typeof import("@/hooks/core/useAdaptivePerformance");
 
 describe("ThemeProvider", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
+    // Store original module before mocking
+    _originalAdaptivePerformance = await import("@/hooks/core/useAdaptivePerformance");
+
+    // Set up module mock
+    mock.module("@/hooks/core/useAdaptivePerformance", () => ({
+      useAdaptivePerformance: mockUseAdaptivePerformance,
+    }));
+
     localStorage.clear();
     document.documentElement.style.cssText = "";
     document.body.className = "";
@@ -55,9 +62,13 @@ describe("ThemeProvider", () => {
   });
 
   afterEach(() => {
+    // Clean up DOM changes
     localStorage.clear();
     document.documentElement.style.cssText = "";
     document.body.className = "";
+
+    // Clean up mocks to prevent interference with other tests
+    mock.restore();
   });
 
   describe("Basic functionality", () => {

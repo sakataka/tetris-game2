@@ -152,9 +152,3 @@ export const useAnimationContext = (): AnimationContextValue => {
   }
   return context;
 };
-
-// Hook for accessing fine-tune configuration directly
-export const useFineTuneConfig = () => {
-  const { config, isConfigLoaded } = useAnimationContext();
-  return { config, isConfigLoaded };
-};

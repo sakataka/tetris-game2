@@ -41,7 +41,6 @@
     "react-dom": "19.1.0",
     "react-i18next": "15.6.0",
     "tailwind-merge": "^3.3.1",
-    "zod": "^4.0.5",
     "zustand": "5.0.6"
   },
   "devDependencies": {
@@ -65,7 +64,6 @@
     "chromatic": "^13.1.2",
     "fast-check": "^4.2.0",
     "happy-dom": "^18.0.1",
-    "json-schema-to-typescript": "^15.0.4",
     "knip": "^5.61.3",
     "lefthook": "1.12.2",
     "rollup-plugin-visualizer": "^6.0.3",
