@@ -12,3 +12,16 @@ export const useScoreState = () =>
       level: state.level,
     })),
   );
+
+/**
+ * Enhanced score state selectors for animation system
+ */
+export const useScoreAnimationState = () =>
+  useGameStore(
+    useShallow((state) => ({
+      score: state.score,
+      scoreAnimationState: state.scoreAnimationState,
+      comboState: state.comboState,
+      floatingScoreEvents: state.floatingScoreEvents,
+    })),
+  );

@@ -81,6 +81,38 @@ export interface TSpinState {
   rotationResult: unknown | null; // RotationResult from the last rotation
 }
 
+/**
+ * Combo state for consecutive line clears
+ */
+export interface ComboState {
+  count: number; // Current combo count (0 = no combo)
+  isActive: boolean; // Whether combo is currently active
+  lastClearType: "single" | "double" | "triple" | "tetris" | "tspin" | null;
+}
+
+/**
+ * Score animation data for enhanced feedback
+ */
+export interface ScoreAnimationState {
+  previousScore: number;
+  scoreIncrease: number;
+  lineCount: number;
+  clearType: "single" | "double" | "triple" | "tetris" | "tspin" | null;
+  isTetris: boolean; // Special effect trigger
+  animationTriggerTime: number;
+}
+
+/**
+ * Floating score text event data
+ */
+export interface FloatingScoreEvent {
+  id: string;
+  points: number;
+  position: Position;
+  startTime: number;
+  isActive: boolean;
+}
+
 export interface GameState {
   board: GameBoard;
   boardBeforeClear: GameBoard | null; // Board state before line clearing for animation
@@ -99,4 +131,7 @@ export interface GameState {
   ghostPosition: Position | null;
   pieceBag: TetrominoTypeName[]; // 7-Bag system: current bag state (legacy format for compatibility)
   tSpinState: TSpinState; // T-Spin detection and display state
+  comboState: ComboState; // Combo tracking for consecutive line clears
+  scoreAnimationState: ScoreAnimationState; // Enhanced score feedback data
+  floatingScoreEvents: FloatingScoreEvent[]; // Active floating score text events
 }

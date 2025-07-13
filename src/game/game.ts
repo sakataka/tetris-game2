@@ -1,9 +1,12 @@
 import type { GameError } from "@/types/errors";
 import { GameErrors } from "@/types/errors";
 import type {
+  ComboState,
+  FloatingScoreEvent,
   GameBoard,
   GameState,
   Position,
+  ScoreAnimationState,
   Tetromino,
   TetrominoShape,
   TetrominoTypeName,
@@ -81,6 +84,20 @@ export function createInitialGameState(): GameState {
       linesCleared: 0,
       rotationResult: null,
     },
+    comboState: {
+      count: 0,
+      isActive: false,
+      lastClearType: null,
+    },
+    scoreAnimationState: {
+      previousScore: 0,
+      scoreIncrease: 0,
+      lineCount: 0,
+      clearType: null,
+      isTetris: false,
+      animationTriggerTime: 0,
+    },
+    floatingScoreEvents: [],
   };
 
   // Calculate initial ghost position
@@ -268,6 +285,9 @@ export function processPlacementAndClearing(state: GameState): PlacementResult {
       clearingLines: [],
       tSpinType: "none",
       tSpinLinesCleared: 0,
+      comboState: state.comboState,
+      scoreAnimationState: state.scoreAnimationState,
+      floatingScoreEvents: state.floatingScoreEvents,
     };
   }
 
@@ -317,6 +337,9 @@ export function processPlacementAndClearing(state: GameState): PlacementResult {
       clearingLines: [],
       tSpinType: "none",
       tSpinLinesCleared: 0,
+      comboState: state.comboState,
+      scoreAnimationState: state.scoreAnimationState,
+      floatingScoreEvents: state.floatingScoreEvents,
     };
   }
 
@@ -327,17 +350,67 @@ export function processPlacementAndClearing(state: GameState): PlacementResult {
 
   // Calculate score using T-Spin aware scoring system
   const scoreToAdd = calculateTSpinScore(linesCleared, state.level, tSpinDetectionResult.type);
+  const newScore = state.score + scoreToAdd;
+
+  // Determine clear type for animations and combos
+  const clearType: "single" | "double" | "triple" | "tetris" | "tspin" | null =
+    tSpinDetectionResult.type !== "none"
+      ? "tspin"
+      : linesCleared === 1
+        ? "single"
+        : linesCleared === 2
+          ? "double"
+          : linesCleared === 3
+            ? "triple"
+            : linesCleared === 4
+              ? "tetris"
+              : null;
+
+  // Update combo state
+  const newComboState: ComboState = {
+    count: linesCleared > 0 ? state.comboState.count + 1 : 0,
+    isActive: linesCleared > 0,
+    lastClearType: clearType,
+  };
+
+  // Create score animation state
+  const scoreAnimationState: ScoreAnimationState = {
+    previousScore: state.score,
+    scoreIncrease: scoreToAdd,
+    lineCount: linesCleared,
+    clearType,
+    isTetris: linesCleared === 4,
+    animationTriggerTime: performance.now(),
+  };
+
+  // Create floating score event if score increased
+  const newFloatingScoreEvents: FloatingScoreEvent[] =
+    scoreToAdd > 0
+      ? [
+          ...state.floatingScoreEvents,
+          {
+            id: `score-${scoreAnimationState.animationTriggerTime}`,
+            points: scoreToAdd,
+            position: { x: 5, y: 10 }, // Center position on game board
+            startTime: scoreAnimationState.animationTriggerTime,
+            isActive: true,
+          },
+        ]
+      : state.floatingScoreEvents;
 
   return {
     board: boardAfterClear,
     boardBeforeClear,
-    score: state.score + scoreToAdd,
+    score: newScore,
     lines,
     level: Math.floor(lines / GAME_CONSTANTS.SCORING.LINES_PER_LEVEL) + 1,
     placedPositions,
     clearingLines: clearedLineIndices.length > 0 ? clearedLineIndices : [],
     tSpinType: tSpinDetectionResult.type,
     tSpinLinesCleared: linesCleared,
+    comboState: newComboState,
+    scoreAnimationState,
+    floatingScoreEvents: newFloatingScoreEvents,
   };
 }
 
@@ -367,6 +440,9 @@ type PlacementResult = {
   clearingLines: number[];
   tSpinType: "none" | "mini" | "normal";
   tSpinLinesCleared: number;
+  comboState: ComboState;
+  scoreAnimationState: ScoreAnimationState;
+  floatingScoreEvents: FloatingScoreEvent[];
 };
 
 type NextPieceResult = {

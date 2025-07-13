@@ -62,6 +62,20 @@ function createTestGameState(board?: GameBoard, pieceType: TetrominoTypeName = "
       linesCleared: 0,
       rotationResult: null,
     },
+    comboState: {
+      count: 0,
+      isActive: false,
+      lastClearType: null,
+    },
+    scoreAnimationState: {
+      previousScore: 0,
+      scoreIncrease: 0,
+      lineCount: 0,
+      clearType: null,
+      isTetris: false,
+      animationTriggerTime: 0,
+    },
+    floatingScoreEvents: [],
   };
 }
 
