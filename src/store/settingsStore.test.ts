@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it } from "bun:test";
 import { act, renderHook } from "@testing-library/react";
+import type { GameSettings } from "@/types/storage";
+import { GAME_CONSTANTS } from "@/utils/gameConstants";
 import { useSettingsStore } from "./settingsStore";
 
 // Mock localStorage for testing
@@ -38,17 +40,25 @@ Object.defineProperty(globalThis, "localStorage", {
   writable: true,
 });
 
+// Default settings for tests
+const DEFAULT_SETTINGS: GameSettings = {
+  language: "en",
+  volume: GAME_CONSTANTS.UI.DEFAULT_VOLUME,
+  showGhostPiece: true,
+  enableTSpinDetection: true,
+  enableAIFeatures: false,
+};
+
 describe("settingsStore", () => {
   beforeEach(() => {
-    // Clear localStorage and reset store
+    // Clear localStorage completely
     localStorage.clear();
 
-    // Reset store to default settings
-    useSettingsStore.setState({
-      language: "en",
-      volume: 0.5,
-      showGhostPiece: true,
-      enableTSpinDetection: true,
+    // Reset store to default state
+    act(() => {
+      useSettingsStore.setState({
+        ...DEFAULT_SETTINGS,
+      });
     });
   });
 
@@ -641,15 +651,14 @@ describe("settingsStore", () => {
 
       const { result } = renderHook(() => useSettingsStore());
 
-      // Setting changes should not crash even if localStorage fails
-      expect(() => {
-        act(() => {
-          result.current.setLanguage("ja");
-          result.current.setVolume(0.8);
-        });
-      }).not.toThrow();
+      // Since Zustand persist middleware handles errors gracefully,
+      // the state should still update even if localStorage fails
+      act(() => {
+        result.current.setLanguage("ja");
+        result.current.setVolume(0.8);
+      });
 
-      // Store state should still be updated
+      // State should still be updated in memory
       expect(result.current.language).toBe("ja");
       expect(result.current.volume).toBe(0.8);
 
@@ -698,13 +707,16 @@ describe("settingsStore", () => {
 
       const { result } = renderHook(() => useSettingsStore());
 
-      // Setting changes should not crash
-      expect(() => {
-        act(() => {
-          result.current.setLanguage("ja");
-          result.current.toggleShowGhostPiece();
-        });
-      }).not.toThrow();
+      // Since Zustand persist middleware handles errors gracefully,
+      // the state should still update even if localStorage fails
+      act(() => {
+        result.current.setLanguage("ja");
+        result.current.toggleShowGhostPiece();
+      });
+
+      // State should still be updated in memory
+      expect(result.current.language).toBe("ja");
+      expect(result.current.showGhostPiece).toBe(false);
 
       // Restore original setItem
       localStorage.setItem = originalSetItem;

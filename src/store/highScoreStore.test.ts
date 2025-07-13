@@ -38,15 +38,24 @@ Object.defineProperty(globalThis, "localStorage", {
   writable: true,
 });
 
+// Default state for tests
+const DEFAULT_HIGH_SCORE_STATE = {
+  currentHighScore: null,
+  highScoresList: [],
+};
+
+// Create isolated test store instance for each test file
+
 describe("highScoreStore", () => {
   beforeEach(() => {
-    // Clear localStorage and reset store
+    // Clear localStorage completely
     localStorage.clear();
 
-    // Reset store to initial state
-    useHighScoreStore.setState({
-      currentHighScore: null,
-      highScoresList: [],
+    // Reset store to default state
+    act(() => {
+      useHighScoreStore.setState({
+        ...DEFAULT_HIGH_SCORE_STATE,
+      });
     });
   });
 
@@ -453,15 +462,19 @@ describe("highScoreStore", () => {
 
       const { result } = renderHook(() => useHighScoreStore());
 
-      // Adding new high score should not crash even if localStorage fails
-      expect(() => {
-        act(() => {
-          result.current.addNewHighScore(1000, 10, 1);
-        });
-      }).not.toThrow();
+      // Since Zustand persist middleware handles errors gracefully,
+      // the state should still update even if localStorage fails
+      act(() => {
+        result.current.addNewHighScore(1000, 10, 1);
+      });
 
-      // Store state should still be updated
-      expect(result.current.currentHighScore?.score).toBe(1000);
+      // State should still be updated in memory
+      expect(result.current.currentHighScore).toEqual({
+        score: 1000,
+        lines: 10,
+        level: 1,
+        date: expect.any(String),
+      });
 
       // Restore original localStorage
       localStorage.setItem = originalSetItem;
@@ -506,12 +519,19 @@ describe("highScoreStore", () => {
 
       const { result } = renderHook(() => useHighScoreStore());
 
-      // Adding high score should not crash
-      expect(() => {
-        act(() => {
-          result.current.addNewHighScore(1000, 10, 1);
-        });
-      }).not.toThrow();
+      // Since Zustand persist middleware handles errors gracefully,
+      // the state should still update even if localStorage fails
+      act(() => {
+        result.current.addNewHighScore(1000, 10, 1);
+      });
+
+      // State should still be updated in memory
+      expect(result.current.currentHighScore).toEqual({
+        score: 1000,
+        lines: 10,
+        level: 1,
+        date: expect.any(String),
+      });
 
       // Restore original setItem
       localStorage.setItem = originalSetItem;

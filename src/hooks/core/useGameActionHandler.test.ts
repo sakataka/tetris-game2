@@ -1,4 +1,4 @@
-import { describe, expect, mock, test } from "bun:test";
+import { describe, expect, test } from "bun:test";
 import { act, renderHook } from "@testing-library/react";
 import { useCallback, useTransition } from "react";
 
@@ -27,7 +27,10 @@ describe("useGameActionHandler", () => {
   });
 
   test("should execute action when game is active", () => {
-    const mockAction = mock();
+    let _actionCalled = false;
+    const mockAction = () => {
+      _actionCalled = true;
+    };
     const { result } = renderHook(() => useTestGameActionHandler(false, false));
 
     act(() => {
@@ -35,12 +38,14 @@ describe("useGameActionHandler", () => {
     });
 
     // Verify the handler exists and can be called
-    // The action should be processed through startTransition for non-urgent actions
     expect(typeof result.current).toBe("function");
   });
 
   test("should execute urgent action immediately", () => {
-    const mockAction = mock();
+    let actionCalled = false;
+    const mockAction = () => {
+      actionCalled = true;
+    };
     const { result } = renderHook(() => useTestGameActionHandler(false, false));
 
     act(() => {
@@ -48,40 +53,48 @@ describe("useGameActionHandler", () => {
     });
 
     // For urgent actions, action should be called immediately
-    // We can verify this by checking the action was called
-    expect(mockAction).toHaveBeenCalledTimes(1);
+    expect(actionCalled).toBe(true);
   });
 
   test("should not execute action when game is over", () => {
-    const mockAction = mock();
+    let actionCalled = false;
+    const mockAction = () => {
+      actionCalled = true;
+    };
     const { result } = renderHook(() => useTestGameActionHandler(true, false)); // isGameOver = true
 
     act(() => {
       result.current(mockAction);
     });
 
-    expect(mockAction).toHaveBeenCalledTimes(0);
+    expect(actionCalled).toBe(false);
   });
 
   test("should not execute action when game is paused", () => {
-    const mockAction = mock();
+    let actionCalled = false;
+    const mockAction = () => {
+      actionCalled = true;
+    };
     const { result } = renderHook(() => useTestGameActionHandler(false, true)); // isPaused = true
 
     act(() => {
       result.current(mockAction);
     });
 
-    expect(mockAction).toHaveBeenCalledTimes(0);
+    expect(actionCalled).toBe(false);
   });
 
   test("should not execute action when both game over and paused", () => {
-    const mockAction = mock();
+    let actionCalled = false;
+    const mockAction = () => {
+      actionCalled = true;
+    };
     const { result } = renderHook(() => useTestGameActionHandler(true, true)); // both true
 
     act(() => {
       result.current(mockAction);
     });
 
-    expect(mockAction).toHaveBeenCalledTimes(0);
+    expect(actionCalled).toBe(false);
   });
 });

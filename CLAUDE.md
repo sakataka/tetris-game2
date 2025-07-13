@@ -13,7 +13,7 @@
 
 ### MANDATORY PATTERNS
 - **Imports**: `@/` for cross-directory, `./` for same-directory
-- **i18n**: ALL user-facing text MUST use `/src/locales/` files
+- **i18n**: ALL user-facing text MUST use `/src/locales/` files (en.json, ja.json)
 - **Functions**: Pure functions over classes for maintainability/testability
 - **Testing**: ONLY test pure functions, utilities, business logic. NEVER test React components
 
@@ -22,42 +22,78 @@
 ### CRITICAL COMMANDS
 ```bash
 bun run lint && bun run typecheck  # MUST pass before commits
-bun test                          # Verify no regressions
-bun run ci                        # Complete CI pipeline
-bun run benchmark                 # AI performance testing
-bun run audit:accessibility       # Accessibility compliance
-bun run storybook                 # Component documentation
+bun test                          # Unit tests (excludes components/benchmarks)
+bun test:full                     # Full test suite including performance tests
+bun run ci                        # Complete CI pipeline validation
+bun run benchmark                 # AI performance benchmarks
+bun run audit:accessibility       # WCAG 2.2 AA accessibility compliance
+bun run audit:accessibility:comprehensive  # Comprehensive accessibility audit
+bun run storybook                 # Component documentation and visual testing
+bun run e2e                       # Playwright end-to-end tests
+```
+
+### ADDITIONAL COMMANDS
+```bash
+bun run check:i18n               # Validate i18n translation keys
+bun run measure:space-efficiency  # Space usage optimization analysis
+bun run test:a11y                # Accessibility-specific tests
+bun run build-storybook          # Build Storybook for production
 ```
 
 ### EXECUTION CONDITIONS
 - **Before commits**: `bun run lint && bun run typecheck` MUST pass
 - **After changes**: `bun test` to verify no regressions
-- **Git hooks**: Lefthook auto-runs formatting/validation
+- **Git hooks**: Lefthook auto-runs formatting/validation (biome format & lint)
+- **Major releases**: `bun run ci` for complete validation pipeline
 
 ## 🏗️ Project Architecture
 
 ### Tech Stack
+- **Runtime**: Bun 1.2.18 (package manager + JavaScript runtime)
 - **Frontend**: React 19.1.0 + TypeScript 5.8.3 (strict mode)
 - **State**: Zustand 5.0.6 (functional state management)
 - **Styling**: Tailwind CSS 4.1.11 + shadcn/ui + Radix UI
 - **Animation**: Motion 12.23.3
-- **i18n**: i18next 25.3.2 + react-i18next 15.6.0
-- **Build**: Bun 1.2.18 + Vite 7.0.8+ (rolldown-vite)
-- **Quality**: Biome 2.1.1 + Lefthook 1.12.2
-- **Testing**: Bun Test + Playwright 1.54.1 + fast-check 4.2.0
+- **i18n**: i18next 25.3.2 + react-i18next 15.6.0 (English/Japanese)
+- **Build**: Vite 7.0.8 (rolldown-vite implementation)
+- **Quality**: Biome 2.1.1 (linting/formatting) + Lefthook 1.12.2 (Git hooks)
+- **Testing**: Bun Test + Playwright 1.54.1 + fast-check 4.2.0 (property-based testing)
+- **Documentation**: Storybook 9.0.16 (component documentation + visual testing)
+- **Accessibility**: @axe-core/react 4.10.2 + axe-playwright 2.1.0
 
 ### Key Directories
 ```
 src/
-├── game/ai/          # AI system (TEST ALL) - weights.yaml, evaluators, search
-├── components/       # React UI (DO NOT TEST) - accessibility, game, ui
-├── contexts/         # Theme management (TEST ALL) - Compact/Normal/Gaming
-├── design-tokens/    # Design system (TEST ALL) - comprehensive tokens
+├── game/             # Core game logic (TEST ALL)
+│   ├── ai/          # AI system - weights.yaml, evaluators, search algorithms
+│   │   ├── config/  # Runtime-tunable weights.yaml configuration
+│   │   ├── core/    # BitBoard, collision detection, move generation
+│   │   ├── evaluators/ # Dellacherie, Pattern, Stacking evaluators
+│   │   └── search/  # Beam search, diversity search, pattern search
+│   └── animations/  # Animation core, FrameBudgetSentinel
+├── components/       # React UI (DO NOT TEST)
+│   ├── accessibility/ # Skip links, WCAG 2.2 AA components
+│   ├── game/        # Game UI components with Stories
+│   ├── layout/      # Layout components for mobile/desktop
+│   └── ui/          # shadcn/ui components
+├── contexts/         # React contexts (TEST ALL)
+│   ├── AnimationContext.tsx # Animation orchestration
+│   └── ThemeContext.tsx     # Compact/Normal/Gaming themes
+├── design-tokens/    # Design system (TEST ALL) - comprehensive token system
 ├── hooks/           # React hooks (TEST PURE FUNCTIONS ONLY)
-├── store/           # Zustand stores (TEST ALL) - game, settings, highscore
-├── utils/           # Utilities (TEST ALL)
+│   ├── accessibility/ # Focus management, screen reader
+│   ├── ai/          # Advanced AI controller hooks
+│   ├── controls/    # Input handling, keyboard/touch controls
+│   └── core/        # Game loop, action handlers, performance monitoring
+├── store/           # Zustand stores (TEST ALL)
+│   ├── gameStore.ts     # Game state management
+│   ├── settingsStore.ts # User preferences, AI settings
+│   └── highScoreStore.ts # High score persistence
+├── utils/           # Utilities (TEST ALL) - game constants, validation
 ├── locales/         # i18n files (en.json, ja.json)
-└── benchmarks/      # Performance tests (TEST ALL)
+├── benchmarks/      # Performance benchmarks (TEST ALL) - AI, collision, bitboard
+├── test/            # Test utilities, mocks, generators
+└── types/           # TypeScript type definitions
 ```
 
 ### State Management (Zustand v5)
@@ -104,15 +140,28 @@ const { a, b } = useStore(useShallow(state => ({ a: state.a, b: state.b })));
 
 ### Key Testing Commands
 ```bash
-bun test src/                    # Unit tests (excludes components)
+bun test                        # Unit tests (excludes components/benchmarks)
+bun test:full                   # Full test suite including performance tests
 bun run benchmark               # AI performance benchmarks
-bun run audit:accessibility     # WCAG 2.2 AA compliance
-bun run storybook               # Component documentation
+bun run test:a11y               # Accessibility-specific Playwright tests
+bun run audit:accessibility     # WCAG 2.2 AA automated compliance audit
+bun run e2e                     # Full Playwright end-to-end testing
+bun run storybook               # Component documentation with visual testing
 ```
+
+### Testing Architecture
+- **Unit Tests**: Pure functions, game logic, AI algorithms, stores
+- **Property-Based Tests**: Using fast-check for game mechanics validation
+- **Performance Tests**: Benchmarks for AI evaluation speed (100k+ evaluations/sec target)
+- **Accessibility Tests**: Automated WCAG 2.2 AA compliance via axe-playwright
+- **E2E Tests**: Playwright tests for user workflows and cross-platform compatibility
+- **Visual Tests**: Storybook stories with interaction and visual regression testing
 
 ### CRITICAL for AI Assistants
 **❌ NEVER** use `bun run dev` for automated testing (blocks terminal)
 **✅ ALWAYS** use unit tests and build validation for reliable testing
+**❌ NEVER** test React components - focus on pure functions and business logic
+**✅ ALWAYS** run `bun run ci` before major changes to ensure full validation
 
 ## 🔧 Development Patterns
 
@@ -146,18 +195,28 @@ bun run storybook               # Component documentation
 - **Accessibility first**: WCAG 2.2 AA compliance with automated testing
 
 ### Quick Access
-- **AI Config**: `/src/game/ai/config/weights.yaml` (runtime tunable)
+- **AI Config**: `/src/game/ai/config/weights.yaml` (runtime-tunable weights)
 - **AI Debug**: `?debug=true&ai=advanced&visualization=true`
-- **Design Tokens**: `/src/design-tokens/index.ts`
-- **Theme Context**: `/src/contexts/ThemeContext.tsx`
-- **Accessibility**: `bun run audit:accessibility`
+- **Design Tokens**: `/src/design-tokens/index.ts` (comprehensive token system)
+- **Theme Context**: `/src/contexts/ThemeContext.tsx` (Compact/Normal/Gaming)
+- **i18n Files**: `/src/locales/en.json`, `/src/locales/ja.json`
+- **Accessibility**: `bun run audit:accessibility` (WCAG 2.2 AA)
+- **Performance**: `bun run benchmark` (AI evaluation speed testing)
+- **Documentation**: `bun run storybook` (component docs + visual testing)
+- **Git Hooks**: `lefthook.yml` (auto-format, lint validation)
+- **Code Quality**: `biome.json` (linting/formatting configuration)
 
 ### Troubleshooting
-- **Build fails**: `bun run typecheck` for TypeScript errors
-- **Tests fail**: Focus on pure functions, avoid React component tests
-- **AI issues**: Check weights.yaml, use debug mode
-- **State issues**: Use proper Zustand selectors with `useShallow`
-- **Theme issues**: Verify ThemeProvider wrapper, CSS variable injection
-- **Accessibility**: Run audit, check WCAG compliance
+- **Build fails**: `bun run typecheck` for TypeScript errors, check import paths (`@/` vs `./`)
+- **Tests fail**: Focus on pure functions, avoid React component tests, check test exclusions
+- **Linting issues**: `bun run lint` with Biome auto-fix, check biome.json configuration
+- **Git hooks fail**: Verify Lefthook installation (`lefthook install`), check commit message format
+- **AI issues**: Check `/src/game/ai/config/weights.yaml`, use debug mode with `?debug=true`
+- **State issues**: Use proper Zustand selectors with `useShallow`, avoid object returns
+- **Theme issues**: Verify ThemeProvider wrapper, CSS variable injection, check design tokens
+- **i18n issues**: `bun run check:i18n` to validate translation keys consistency
+- **Accessibility**: `bun run audit:accessibility` for WCAG compliance, `bun run test:a11y` for Playwright tests
+- **Performance**: `bun run benchmark` for AI evaluation speed, `bun run measure:space-efficiency`
+- **Documentation**: `bun run storybook` for component docs, Stories files for visual testing
 
 *Follow all rules strictly for code quality and project consistency.*
