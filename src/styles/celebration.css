@@ -1,0 +1,636 @@
+/**
+ * Level Celebration Styles
+ * Asset-free CSS animations for level celebration system
+ */
+
+/* Celebration overlay - full screen with backdrop */
+.level-celebration-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 215, 0, 0.15) 0%,
+    rgba(255, 215, 0, 0.05) 50%,
+    transparent 100%
+  );
+  backdrop-filter: blur(2px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: overlayFadeIn 0.3s ease-out;
+}
+
+@keyframes overlayFadeIn {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+  }
+  to {
+    opacity: 1;
+    backdrop-filter: blur(2px);
+  }
+}
+
+/* Main celebration content container */
+.celebration-content {
+  text-align: center;
+  color: #ffd700;
+  text-shadow:
+    0 0 10px currentColor,
+    0 0 20px currentColor,
+    0 0 30px rgba(255, 215, 0, 0.5);
+  position: relative;
+  z-index: 10001;
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow: hidden;
+}
+
+/* Level title styling for different phases */
+.level-title {
+  font-size: clamp(2rem, 8vw, 6rem);
+  font-weight: bold;
+  margin: 0;
+  line-height: 1.2;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  position: relative;
+}
+
+.phase-intro .level-title {
+  animation: levelIntro 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  transform: scale(1.2);
+}
+
+.phase-main .level-title {
+  animation: levelPulse 2s ease-in-out infinite;
+  transform: scale(1.2);
+}
+
+.phase-outro .level-title {
+  animation: levelOutro 0.5s ease-in forwards;
+}
+
+/* Level title animations */
+@keyframes levelIntro {
+  0% {
+    transform: scale(0) rotate(180deg);
+    opacity: 0;
+    filter: blur(10px);
+  }
+  50% {
+    filter: blur(5px);
+  }
+  100% {
+    transform: scale(1.2) rotate(0deg);
+    opacity: 1;
+    filter: blur(0px);
+  }
+}
+
+@keyframes levelPulse {
+  0%,
+  100% {
+    transform: scale(1.2);
+    text-shadow:
+      0 0 10px currentColor,
+      0 0 20px currentColor,
+      0 0 30px rgba(255, 215, 0, 0.5);
+  }
+  50% {
+    transform: scale(1.3);
+    text-shadow:
+      0 0 15px currentColor,
+      0 0 30px currentColor,
+      0 0 45px rgba(255, 215, 0, 0.8);
+  }
+}
+
+@keyframes levelOutro {
+  0% {
+    transform: scale(1.2);
+    opacity: 1;
+    filter: blur(0px);
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+    filter: blur(5px);
+  }
+}
+
+/* Skip hint styling */
+.skip-hint {
+  font-size: clamp(0.875rem, 2vw, 1.125rem);
+  margin-top: 1rem;
+  opacity: 0.8;
+  color: rgba(255, 215, 0, 0.9);
+  animation: hintFadeIn 1s ease-out 0.5s both;
+}
+
+@keyframes hintFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 0.8;
+    transform: translateY(0);
+  }
+}
+
+/* Celebration Effects Container */
+.celebration-effects {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Particle Effects */
+.particles {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+}
+
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: #ffd700;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  box-shadow: 0 0 6px currentColor;
+}
+
+.phase-intro .particle {
+  animation: particleIntro 0.5s ease-out var(--delay);
+}
+
+.phase-main .particle {
+  animation: particleFloat 2s ease-out var(--delay) infinite;
+}
+
+.phase-outro .particle {
+  animation: particleOutro 0.5s ease-in var(--delay);
+}
+
+@keyframes particleIntro {
+  0% {
+    transform: rotate(var(--angle)) translateY(0) scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: rotate(var(--angle)) translateY(-100px) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes particleFloat {
+  0%,
+  100% {
+    transform: rotate(var(--angle)) translateY(-100px) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: rotate(var(--angle)) translateY(-150px) scale(1.2);
+    opacity: 0.8;
+  }
+}
+
+@keyframes particleOutro {
+  0% {
+    transform: rotate(var(--angle)) translateY(-100px) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(var(--angle)) translateY(-200px) scale(0);
+    opacity: 0;
+  }
+}
+
+/* SVG Burst Effect */
+.burst-effect {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #ffd700;
+  opacity: 0.8;
+}
+
+.burst-line {
+  transform-origin: 100px 100px;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 3px currentColor);
+}
+
+.phase-intro .burst-line {
+  animation: burstIntro 0.5s ease-out;
+}
+
+.phase-main .burst-line {
+  animation: burstPulse 2s ease-in-out infinite;
+}
+
+.phase-outro .burst-line {
+  animation: burstOutro 0.5s ease-in;
+}
+
+@keyframes burstIntro {
+  0% {
+    stroke-width: 0;
+    stroke-dasharray: 0 100;
+    opacity: 0;
+  }
+  100% {
+    stroke-width: 3;
+    stroke-dasharray: 80 20;
+    opacity: 0.8;
+  }
+}
+
+@keyframes burstPulse {
+  0%,
+  100% {
+    stroke-width: 3;
+    stroke-dasharray: 80 20;
+    opacity: 0.8;
+  }
+  50% {
+    stroke-width: 5;
+    stroke-dasharray: 60 40;
+    opacity: 1;
+  }
+}
+
+@keyframes burstOutro {
+  0% {
+    stroke-width: 3;
+    stroke-dasharray: 80 20;
+    opacity: 0.8;
+  }
+  100% {
+    stroke-width: 1;
+    stroke-dasharray: 0 100;
+    opacity: 0;
+  }
+}
+
+/* Glow Ring Effect */
+.glow-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px;
+  height: 300px;
+  border: 2px solid #ffd700;
+  border-radius: 50%;
+  box-shadow:
+    inset 0 0 20px rgba(255, 215, 0, 0.3),
+    0 0 20px rgba(255, 215, 0, 0.3),
+    0 0 40px rgba(255, 215, 0, 0.2);
+}
+
+.phase-intro .glow-ring {
+  animation: glowIntro 0.5s ease-out;
+}
+
+.phase-main .glow-ring {
+  animation: glowPulse 2s ease-in-out infinite;
+}
+
+.phase-outro .glow-ring {
+  animation: glowOutro 0.5s ease-in;
+}
+
+@keyframes glowIntro {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.6;
+  }
+}
+
+@keyframes glowPulse {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.6;
+    box-shadow:
+      inset 0 0 20px rgba(255, 215, 0, 0.3),
+      0 0 20px rgba(255, 215, 0, 0.3),
+      0 0 40px rgba(255, 215, 0, 0.2);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.1);
+    opacity: 0.8;
+    box-shadow:
+      inset 0 0 30px rgba(255, 215, 0, 0.5),
+      0 0 30px rgba(255, 215, 0, 0.5),
+      0 0 60px rgba(255, 215, 0, 0.4);
+  }
+}
+
+@keyframes glowOutro {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.3);
+    opacity: 0;
+  }
+}
+
+/* Ripple Effect */
+.ripple-effect {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100px;
+  height: 100px;
+  border: 1px solid rgba(255, 215, 0, 0.6);
+  border-radius: 50%;
+}
+
+.phase-intro .ripple-effect {
+  animation: rippleIntro 0.5s ease-out;
+}
+
+.phase-main .ripple-effect {
+  animation: rippleExpand 2s ease-out infinite;
+}
+
+.phase-outro .ripple-effect {
+  animation: rippleOutro 0.5s ease-in;
+}
+
+@keyframes rippleIntro {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.6;
+  }
+}
+
+@keyframes rippleExpand {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(4);
+    opacity: 0;
+  }
+}
+
+@keyframes rippleOutro {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
+}
+
+/* Sparkle Effects */
+.sparkles {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+}
+
+.sparkle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: #ffd700;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  box-shadow: 0 0 10px currentColor;
+  transform: translate(-50%, -50%) rotate(var(--sparkle-position)) translateY(-200px);
+}
+
+.phase-intro .sparkle {
+  animation: sparkleIntro 0.5s ease-out var(--sparkle-delay);
+}
+
+.phase-main .sparkle {
+  animation: sparkleTwinkle 2s ease-in-out var(--sparkle-delay) infinite;
+}
+
+.phase-outro .sparkle {
+  animation: sparkleOutro 0.5s ease-in var(--sparkle-delay);
+}
+
+@keyframes sparkleIntro {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(var(--sparkle-position)) translateY(-150px) scale(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) rotate(var(--sparkle-position)) translateY(-200px) scale(1);
+  }
+}
+
+@keyframes sparkleTwinkle {
+  0%,
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) rotate(var(--sparkle-position)) translateY(-200px) scale(1);
+  }
+  50% {
+    opacity: 0.3;
+    transform: translate(-50%, -50%) rotate(var(--sparkle-position)) translateY(-220px) scale(1.5);
+  }
+}
+
+@keyframes sparkleOutro {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) rotate(var(--sparkle-position)) translateY(-200px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(var(--sparkle-position)) translateY(-250px) scale(0);
+  }
+}
+
+/* Next Level Preview Styles */
+.next-level-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.next-level-preview.near-level-up {
+  background: rgba(255, 215, 0, 0.1);
+  border-color: rgba(255, 215, 0, 0.3);
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+}
+
+.level-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+}
+
+.current-level {
+  font-weight: bold;
+  color: var(--color-primary, #3b82f6);
+}
+
+.next-level-hint {
+  color: var(--color-text-secondary, #6b7280);
+}
+
+.near-level-up .next-level-hint {
+  color: #ffd700;
+  font-weight: bold;
+}
+
+.progress-bar {
+  position: relative;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.near-level-up .progress-fill {
+  background: linear-gradient(90deg, #ffd700, #ffa500);
+  animation: progressGlow 2s ease-in-out infinite;
+}
+
+@keyframes progressGlow {
+  0%,
+  100% {
+    box-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+  }
+}
+
+.level-up-hint {
+  position: absolute;
+  top: -1.5rem;
+  right: 0;
+  font-size: 0.75rem;
+  color: #ffd700;
+  font-weight: bold;
+  animation: hintBounce 1s ease-in-out infinite;
+}
+
+@keyframes hintBounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+.level-milestones {
+  display: flex;
+  gap: 2px;
+  height: 4px;
+  margin-top: 0.25rem;
+}
+
+.milestone {
+  flex: 1;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 1px;
+}
+
+.milestone.completed {
+  background: var(--color-primary, #3b82f6);
+}
+
+.near-level-up .milestone.completed {
+  background: #ffd700;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .level-title {
+    font-size: clamp(1.5rem, 6vw, 4rem);
+  }
+
+  .glow-ring {
+    width: 200px;
+    height: 200px;
+  }
+
+  .celebration-content {
+    padding: 1rem;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .level-title,
+  .particle,
+  .burst-line,
+  .glow-ring,
+  .ripple-effect,
+  .sparkle {
+    animation: none !important;
+  }
+
+  .phase-intro .level-title,
+  .phase-main .level-title,
+  .phase-outro .level-title {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+
+  .celebration-effects {
+    opacity: 0.3;
+  }
+}

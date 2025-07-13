@@ -71,6 +71,13 @@ function createTestGameState(board: GameBoard, pieceType: TetrominoTypeName = "T
       animationTriggerTime: 0,
     },
     floatingScoreEvents: [],
+    levelCelebrationState: {
+      isActive: false,
+      level: null,
+      startTime: null,
+      phase: "completed",
+      userCancelled: false,
+    },
   };
 }
 

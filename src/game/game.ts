@@ -98,6 +98,13 @@ export function createInitialGameState(): GameState {
       animationTriggerTime: 0,
     },
     floatingScoreEvents: [],
+    levelCelebrationState: {
+      isActive: false,
+      level: null,
+      startTime: null,
+      phase: "completed" as const,
+      userCancelled: false,
+    },
   };
 
   // Calculate initial ghost position
@@ -493,6 +500,18 @@ function buildFinalGameState(
     rotationResult: null, // Reset rotation result after piece lock
   };
 
+  // Check for level up and update celebration state
+  const levelUp = baseState.level < placementResult.level;
+  const newLevelCelebrationState = levelUp
+    ? {
+        isActive: true,
+        level: placementResult.level,
+        startTime: Date.now(),
+        phase: "intro" as const,
+        userCancelled: false,
+      }
+    : baseState.levelCelebrationState;
+
   return updateGhostPosition({
     ...baseState,
     board: placementResult.board,
@@ -508,6 +527,7 @@ function buildFinalGameState(
     canHold: true,
     pieceBag: nextPieceResult.pieceBag,
     tSpinState: newTSpinState,
+    levelCelebrationState: newLevelCelebrationState,
   });
 }
 

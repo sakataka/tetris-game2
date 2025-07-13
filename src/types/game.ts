@@ -113,6 +113,17 @@ export interface FloatingScoreEvent {
   isActive: boolean;
 }
 
+/**
+ * Level celebration state and configuration
+ */
+export interface LevelCelebrationState {
+  isActive: boolean; // Whether celebration is currently showing
+  level: number | null; // The level that was reached
+  startTime: number | null; // When the celebration started
+  phase: "intro" | "main" | "outro" | "completed"; // Current celebration phase
+  userCancelled: boolean; // Whether user cancelled the celebration
+}
+
 export interface GameState {
   board: GameBoard;
   boardBeforeClear: GameBoard | null; // Board state before line clearing for animation
@@ -134,4 +145,5 @@ export interface GameState {
   comboState: ComboState; // Combo tracking for consecutive line clears
   scoreAnimationState: ScoreAnimationState; // Enhanced score feedback data
   floatingScoreEvents: FloatingScoreEvent[]; // Active floating score text events
+  levelCelebrationState: LevelCelebrationState; // Level celebration system state
 }

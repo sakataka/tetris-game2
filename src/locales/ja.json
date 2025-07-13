@@ -30,6 +30,16 @@
     "resumeHint": "Pキーで再開",
     "shortcuts": "ショートカット",
     "newHighScore": "ハイスコア更新",
+    "levelUp": "レベル {{level}}",
+    "level": "レベル",
+    "currentLevel": "現在のレベル",
+    "nextLabel": "次",
+    "linesToNextLevel": "次のレベルまでのライン数",
+    "progressToNextLevel": "次のレベルまでの進行状況：{{total}}ライン中{{current}}ライン",
+    "levelUpSoon": "もうすぐレベル{{nextLevel}}！",
+    "celebration": {
+      "skipHint": "クリックまたはキーを押して続行 ({{timeRemaining}}秒)"
+    },
     "score": {
       "title": "スコア",
       "lines": "ライン",

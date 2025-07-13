@@ -31,6 +31,16 @@
     "resumeHint": "Press P to resume",
     "shortcuts": "Shortcuts",
     "newHighScore": "New High Score",
+    "levelUp": "LEVEL {{level}}",
+    "level": "Level",
+    "currentLevel": "Current Level",
+    "nextLabel": "Next",
+    "linesToNextLevel": "Lines to next level",
+    "progressToNextLevel": "Progress to next level: {{current}} of {{total}} lines",
+    "levelUpSoon": "Level {{nextLevel}} soon!",
+    "celebration": {
+      "skipHint": "Click or press any key to continue ({{timeRemaining}}s)"
+    },
     "score": {
       "title": "Score",
       "lines": "Lines",

@@ -15,6 +15,7 @@ import { createTetromino } from "@/game/tetrominos";
 import type {
   GameAnimationState,
   GameState,
+  LevelCelebrationState,
   LineClearAnimationData,
   TetrominoTypeName,
 } from "@/types/game";
@@ -55,9 +56,16 @@ interface GameStore extends GameState {
   completeLineFallAnimation: () => void;
   resetToPlayingState: () => void; // Error recovery
 
+  // Level celebration actions
+  startLevelCelebration: (level: number) => void;
+  completeLevelCelebration: () => void;
+  cancelLevelCelebration: () => void;
+  updateCelebrationPhase: (phase: LevelCelebrationState["phase"]) => void;
+
   // Derived state selectors
   isGameLoopPaused: () => boolean;
   isAnimationActive: () => boolean;
+  isLevelCelebrationActive: () => boolean;
 }
 
 // Create initial state with debug parameters if present
@@ -269,6 +277,46 @@ export const useGameStore = create<GameStore>()(
           state.lineClearData = null;
         }),
 
+      // Level celebration actions
+      startLevelCelebration: (level: number) =>
+        set((state) => {
+          state.levelCelebrationState = {
+            isActive: true,
+            level,
+            startTime: Date.now(),
+            phase: "intro",
+            userCancelled: false,
+          };
+        }),
+
+      completeLevelCelebration: () =>
+        set((state) => {
+          state.levelCelebrationState = {
+            isActive: false,
+            level: null,
+            startTime: null,
+            phase: "completed",
+            userCancelled: false,
+          };
+        }),
+
+      cancelLevelCelebration: () =>
+        set((state) => {
+          state.levelCelebrationState = {
+            ...state.levelCelebrationState,
+            isActive: false,
+            phase: "completed",
+            userCancelled: true,
+          };
+        }),
+
+      updateCelebrationPhase: (phase: LevelCelebrationState["phase"]) =>
+        set((state) => {
+          if (state.levelCelebrationState.isActive) {
+            state.levelCelebrationState.phase = phase;
+          }
+        }),
+
       // Derived state selectors
       isGameLoopPaused: () => {
         const state = get();
@@ -278,6 +326,11 @@ export const useGameStore = create<GameStore>()(
       isAnimationActive: () => {
         const state = get();
         return state.animationState !== "idle";
+      },
+
+      isLevelCelebrationActive: () => {
+        const state = get();
+        return state.levelCelebrationState.isActive;
       },
     })),
     { name: "game-store" },
