@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { Game } from "./components/layout/Game";
+import { AnimationProvider } from "./contexts/AnimationContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { useThemeFeatureFlags } from "./hooks/core/useFeatureFlag";
 import { useSettingsStore } from "./store/settingsStore";
@@ -37,7 +38,9 @@ function App() {
 
   return (
     <ThemeProvider defaultMode="normal" enableFeatureFlag={themeSystemEnabled}>
-      <Game />
+      <AnimationProvider>
+        <Game />
+      </AnimationProvider>
     </ThemeProvider>
   );
 }
