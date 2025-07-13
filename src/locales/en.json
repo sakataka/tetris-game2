@@ -1,29 +1,19 @@
 {
   "app": {
-    "title": "Tetris Game",
-    "subtitle": "Classic Tetris with AI Features"
+    "title": "Tetris Game"
   },
   "accessibility": {
     "skipToMain": "Skip to main content",
     "skipToGameBoard": "Skip to game board",
     "skipToGameInfo": "Skip to game information",
     "skipToControls": "Skip to game controls",
-    "gameOver": "Game over. Final score: {{score}}. Lines cleared: {{lines}}. Level reached: {{level}}.",
     "gamePaused": "Game paused. Press P to resume.",
     "gameResumed": "Game resumed.",
-    "gameReady": "Game ready to start.",
-    "scoreUpdate": "Score: {{score}}. Lines: {{lines}}. Level: {{level}}.",
-    "error": "Error: {{error}}",
-    "currentPiece": "Current piece: {{piece}}",
-    "boardDescription": "Game board has {{filledRows}} rows with pieces out of {{totalRows}} total rows.",
-    "linesCleared": "{{count}} line cleared. Total lines: {{total}}.",
-    "linesCleared_plural": "{{count}} lines cleared. Total lines: {{total}}.",
-    "levelUp": "Level up! Now at level {{level}}."
+    "gameReady": "Game ready to start."
   },
   "game": {
     "hold": "Hold",
     "next": "Next",
-    "viewReplay": "View Replay",
     "gameOver": "Game Over",
     "paused": "Paused",
     "newGame": "New Game",
@@ -31,16 +21,6 @@
     "resumeHint": "Press P to resume",
     "shortcuts": "Shortcuts",
     "newHighScore": "New High Score",
-    "levelUp": "LEVEL {{level}}",
-    "level": "Level",
-    "currentLevel": "Current Level",
-    "nextLabel": "Next",
-    "linesToNextLevel": "Lines to next level",
-    "progressToNextLevel": "Progress to next level: {{current}} of {{total}} lines",
-    "levelUpSoon": "Level {{nextLevel}} soon!",
-    "celebration": {
-      "skipHint": "Click or press any key to continue ({{timeRemaining}}s)"
-    },
     "score": {
       "title": "Score",
       "lines": "Lines",
@@ -64,15 +44,6 @@
       "pause": "Pause",
       "reset": "Reset"
     },
-    "pieces": {
-      "i": "I-piece (straight line)",
-      "o": "O-piece (square)",
-      "t": "T-piece",
-      "s": "S-piece (Z-block)",
-      "z": "Z-piece",
-      "j": "J-piece",
-      "l": "L-piece"
-    },
     "settings": {
       "title": "Settings",
       "language": "Language",
@@ -84,6 +55,25 @@
       "aiFeatures": "AI Features",
       "aiFeaturesDescription": "Enable AI player and visualization"
     },
+    "lineClears": {
+      "single": "SINGLE",
+      "double": "DOUBLE",
+      "triple": "TRIPLE",
+      "tetris": "TETRIS"
+    },
+    "tSpin": {
+      "mini": "T-SPIN MINI",
+      "normal": "T-SPIN",
+      "miniSingle": "T-SPIN MINI SINGLE",
+      "miniDouble": "T-SPIN MINI DOUBLE",
+      "miniTriple": "T-SPIN MINI TRIPLE",
+      "normalSingle": "T-SPIN SINGLE",
+      "normalDouble": "T-SPIN DOUBLE",
+      "normalTriple": "T-SPIN TRIPLE"
+    },
+    "linesCleared": "{{count}} line cleared",
+    "linesCleared_plural": "{{count}} lines cleared",
+    "tSpinAnnouncement": "{{type}} with {{lines}} lines cleared",
     "resetConfirmation": {
       "title": "Reset Game",
       "message": "Reset the current game?",
@@ -91,31 +81,6 @@
       "cancel": "No"
     },
     "ai": {
-      "replay": {
-        "title": "AI Replay",
-        "close": "Close",
-        "play": "Play",
-        "pause": "Pause",
-        "previous": "Previous",
-        "next": "Next",
-        "step": "Step",
-        "speed": "Speed",
-        "stepAnalysis": "Step {{step}} Analysis",
-        "move": "Move:",
-        "position": "Position:",
-        "performance": "Performance:",
-        "thinkTime": "Think Time:",
-        "nodes": "Nodes:",
-        "score": "Score:",
-        "usedHold": "Used Hold in this move",
-        "tSpinOpportunities": "T-Spin opportunities:",
-        "perfectClearDetected": "Perfect Clear opportunity detected!",
-        "gameSummary": "Game Summary",
-        "finalScore": "Final Score:",
-        "duration": "Duration:",
-        "aiLevel": "AI Level:",
-        "totalMoves": "Total Moves:"
-      },
       "controls": {
         "title": "AI Control",
         "start": "Start AI",
@@ -144,40 +109,7 @@
         "holdUsage": "Hold Usage:",
         "nodes": "nodes",
         "ms": "ms"
-      },
-      "visualization": {
-        "evaluationBreakdown": "Evaluation Breakdown",
-        "landingHeight": "Landing Height:",
-        "linesCleared": "Lines Cleared:",
-        "holes": "Holes:",
-        "rowTransitions": "Row Transitions:",
-        "columnTransitions": "Column Transitions:",
-        "wells": "Wells:",
-        "totalScore": "Total Score:",
-        "specialOpportunities": "Special Opportunities",
-        "perfectClear": "Perfect Clear:",
-        "searchTree": "Search Tree (Depth: {{depth}})",
-        "depthLevel": "D{{level}}:",
-        "moreNodes": "+{{count}} more",
-        "notAvailable": "N/A",
-        "tSpinDetected": "T-Spin Detected:",
-        "tSpinInfo": "{{type}} at ({{x}},{{y}})",
-        "expectedLines": "{{lines}} lines",
-        "blocksRemaining": "{{blocks}} blocks remaining",
-        "estimatedMoves": "~{{moves}} moves"
       }
-    },
-    "touchControls": {
-      "moveLeft": "Move left",
-      "moveRight": "Move right",
-      "rotatePiece": "Rotate piece",
-      "hardDrop": "Hard drop",
-      "softDrop": "Soft drop"
-    },
-    "debug": {
-      "quickPresets": "Quick Presets",
-      "customQueue": "Custom Queue",
-      "pressEnterToApply": "Press Enter to apply"
     }
   }
 }

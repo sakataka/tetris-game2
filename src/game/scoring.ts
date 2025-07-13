@@ -65,35 +65,35 @@ export function calculateTSpinScore(
  * @param linesCleared Number of lines cleared
  * @returns Display name for the T-Spin type
  */
-export function getTSpinDisplayName(tSpinType: TSpinType, linesCleared: number): string {
+export function getTSpinDisplayKey(tSpinType: TSpinType, linesCleared: number): string {
   if (tSpinType === "none") {
     switch (linesCleared) {
       case 1:
-        return "SINGLE";
+        return "game.lineClears.single";
       case 2:
-        return "DOUBLE";
+        return "game.lineClears.double";
       case 3:
-        return "TRIPLE";
+        return "game.lineClears.triple";
       case 4:
-        return "TETRIS";
+        return "game.lineClears.tetris";
       default:
         return "";
     }
   }
 
-  const spinTypeName = tSpinType === "mini" ? "T-SPIN MINI" : "T-SPIN";
+  const baseKey = tSpinType === "mini" ? "game.tSpin.mini" : "game.tSpin.normal";
 
   switch (linesCleared) {
     case 0:
-      return spinTypeName;
+      return baseKey;
     case 1:
-      return `${spinTypeName} SINGLE`;
+      return `${baseKey}Single`;
     case 2:
-      return `${spinTypeName} DOUBLE`;
+      return `${baseKey}Double`;
     case 3:
-      return `${spinTypeName} TRIPLE`;
+      return `${baseKey}Triple`;
     default:
-      return spinTypeName;
+      return baseKey;
   }
 }
 

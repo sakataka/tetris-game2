@@ -1,6 +1,6 @@
 import { motion } from "motion/react";
 import { useTranslation } from "react-i18next";
-import { getTSpinDisplayName, type TSpinType } from "@/game/scoring";
+import { getTSpinDisplayKey, type TSpinType } from "@/game/scoring";
 
 interface TSpinIndicatorProps {
   tSpinType: TSpinType;
@@ -23,7 +23,8 @@ export function TSpinIndicator({ tSpinType, linesCleared, show, onComplete }: TS
     return null;
   }
 
-  const displayName = getTSpinDisplayName(tSpinType, linesCleared);
+  const displayKey = getTSpinDisplayKey(tSpinType, linesCleared);
+  const displayName = displayKey ? t(displayKey) : "";
 
   // Get styling based on T-Spin type
   const getSpinStyles = () => {

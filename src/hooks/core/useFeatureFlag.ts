@@ -39,7 +39,7 @@ const evaluateFlagState = (flag: FeatureFlag): boolean => {
   }
 
   // Check environment variable override
-  const envOverride = process.env[`VITE_FF_${flag.toUpperCase().replace("-", "_")}`];
+  const envOverride = import.meta.env[`VITE_FF_${flag.toUpperCase().replace("-", "_")}`];
   if (envOverride === "true" || envOverride === "false") {
     return envOverride === "true";
   }

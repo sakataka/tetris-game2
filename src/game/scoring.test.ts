@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import {
   calculateTSpinScore,
-  getTSpinDisplayName,
+  getTSpinDisplayKey,
   isValidTSpinCombination,
   type TSpinType,
 } from "./scoring";
@@ -57,33 +57,33 @@ describe("T-Spin Scoring System", () => {
     });
   });
 
-  describe("getTSpinDisplayName", () => {
-    test("should return correct names for normal line clears", () => {
-      expect(getTSpinDisplayName("none", 0)).toBe("");
-      expect(getTSpinDisplayName("none", 1)).toBe("SINGLE");
-      expect(getTSpinDisplayName("none", 2)).toBe("DOUBLE");
-      expect(getTSpinDisplayName("none", 3)).toBe("TRIPLE");
-      expect(getTSpinDisplayName("none", 4)).toBe("TETRIS");
+  describe("getTSpinDisplayKey", () => {
+    test("should return correct translation keys for normal line clears", () => {
+      expect(getTSpinDisplayKey("none", 0)).toBe("");
+      expect(getTSpinDisplayKey("none", 1)).toBe("game.lineClears.single");
+      expect(getTSpinDisplayKey("none", 2)).toBe("game.lineClears.double");
+      expect(getTSpinDisplayKey("none", 3)).toBe("game.lineClears.triple");
+      expect(getTSpinDisplayKey("none", 4)).toBe("game.lineClears.tetris");
     });
 
-    test("should return correct names for T-Spin Mini", () => {
-      expect(getTSpinDisplayName("mini", 0)).toBe("T-SPIN MINI");
-      expect(getTSpinDisplayName("mini", 1)).toBe("T-SPIN MINI SINGLE");
-      expect(getTSpinDisplayName("mini", 2)).toBe("T-SPIN MINI DOUBLE");
-      expect(getTSpinDisplayName("mini", 3)).toBe("T-SPIN MINI TRIPLE");
+    test("should return correct translation keys for T-Spin Mini", () => {
+      expect(getTSpinDisplayKey("mini", 0)).toBe("game.tSpin.mini");
+      expect(getTSpinDisplayKey("mini", 1)).toBe("game.tSpin.miniSingle");
+      expect(getTSpinDisplayKey("mini", 2)).toBe("game.tSpin.miniDouble");
+      expect(getTSpinDisplayKey("mini", 3)).toBe("game.tSpin.miniTriple");
     });
 
-    test("should return correct names for T-Spin Normal", () => {
-      expect(getTSpinDisplayName("normal", 0)).toBe("T-SPIN");
-      expect(getTSpinDisplayName("normal", 1)).toBe("T-SPIN SINGLE");
-      expect(getTSpinDisplayName("normal", 2)).toBe("T-SPIN DOUBLE");
-      expect(getTSpinDisplayName("normal", 3)).toBe("T-SPIN TRIPLE");
+    test("should return correct translation keys for T-Spin Normal", () => {
+      expect(getTSpinDisplayKey("normal", 0)).toBe("game.tSpin.normal");
+      expect(getTSpinDisplayKey("normal", 1)).toBe("game.tSpin.normalSingle");
+      expect(getTSpinDisplayKey("normal", 2)).toBe("game.tSpin.normalDouble");
+      expect(getTSpinDisplayKey("normal", 3)).toBe("game.tSpin.normalTriple");
     });
 
     test("should handle invalid line counts gracefully", () => {
-      expect(getTSpinDisplayName("mini", 5)).toBe("T-SPIN MINI");
-      expect(getTSpinDisplayName("normal", 5)).toBe("T-SPIN");
-      expect(getTSpinDisplayName("none", 5)).toBe("");
+      expect(getTSpinDisplayKey("mini", 5)).toBe("game.tSpin.mini");
+      expect(getTSpinDisplayKey("normal", 5)).toBe("game.tSpin.normal");
+      expect(getTSpinDisplayKey("none", 5)).toBe("");
     });
   });
 
