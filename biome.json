@@ -43,6 +43,16 @@
     "lineWidth": 100
   },
   "files": {
-    "includes": ["**", "!**/node_modules", "!**/dist", "!**/.next", "!**/coverage", "!vercel.json"]
+    "includes": [
+      "**",
+      "!**/node_modules",
+      "!**/dist",
+      "!**/.next",
+      "!**/coverage",
+      "!vercel.json",
+      "!**/storybook-static",
+      "!**/.storybook",
+      "!**/*.stories.*"
+    ]
   }
 }
