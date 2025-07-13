@@ -1,7 +1,7 @@
 import { useAnimate } from "motion/react";
 import { useCallback, useEffect, useRef } from "react";
 import { Card } from "@/components/ui/card";
-import { useResponsiveBoard } from "@/hooks/ui/useResponsiveBoard";
+import { useDesignTokens } from "@/hooks/core/useDesignTokens";
 import { cn } from "@/lib/utils";
 import { useGameStore } from "@/store/gameStore";
 import type { LineClearAnimationData } from "@/types/game";
@@ -11,7 +11,16 @@ import { BOARD_STYLES, CARD_STYLES } from "@/utils/styles";
 import { BoardCell } from "./BoardCell";
 
 export function Board() {
-  const { cellSize } = useResponsiveBoard();
+  const { layoutMode } = useDesignTokens(); // Add layout mode dependency to trigger re-renders
+
+  // Calculate cell size directly based on layout mode for immediate updates
+  const baseCellSize = GAME_CONSTANTS.BOARD.CELL_SIZE;
+  const cellSize = layoutMode === "compact" ? Math.floor(baseCellSize * 1.06) : baseCellSize;
+
+  // Debug logging
+  if (import.meta.env.DEV) {
+    console.log(`[Board] Layout mode: ${layoutMode}, Cell size: ${cellSize}`);
+  }
   const [scope, animate] = useAnimate();
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -177,6 +186,7 @@ export function Board() {
         className={BOARD_STYLES.container}
         aria-label="Tetris game board"
         role="img"
+        data-testid="game-board"
         style={{
           gridTemplateColumns: `repeat(${GAME_CONSTANTS.BOARD.WIDTH}, ${cellSize}px)`,
           gridTemplateRows: `repeat(${GAME_CONSTANTS.BOARD.HEIGHT}, ${cellSize}px)`,

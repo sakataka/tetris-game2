@@ -16,13 +16,16 @@ import {
 import { AdvancedAIControls } from "@/components/game/AdvancedAIControls";
 import { AIReplay } from "@/components/game/AIReplay";
 import { AIVisualization } from "@/components/game/AIVisualization";
+import { LayoutModeToggle } from "@/components/ui/LayoutModeToggle";
 import { useAdvancedAIController } from "@/hooks/ai/useAdvancedAIController";
 import { useKeyboardControls } from "@/hooks/controls/useKeyboardControls";
 import { useTouchGestures } from "@/hooks/controls/useTouchGestures";
+import { useDesignTokens } from "@/hooks/core/useDesignTokens";
 import { useGameLoop } from "@/hooks/core/useGameLoop";
 import { useHighScoreSideEffect } from "@/hooks/effects/useHighScoreSideEffect";
 import { useGameStore } from "@/store/gameStore";
 import { useSettingsStore } from "@/store/settingsStore";
+import { GameLayout } from "./GameLayout";
 import { GameSettings } from "./GameSettings";
 import { MobileGameLayout } from "./MobileGameLayout";
 
@@ -31,6 +34,11 @@ export function Game() {
   useKeyboardControls();
   useHighScoreSideEffect();
   const { handleTouchStart, handleTouchEnd } = useTouchGestures();
+
+  // Design tokens and layout management
+  const { layoutMode: designLayoutMode, setLayoutMode } = useDesignTokens();
+  const layoutMode: "compact" | "normal" =
+    designLayoutMode === "gaming" ? "normal" : designLayoutMode;
 
   // AI features setting
   const enableAIFeatures = useSettingsStore((state) => state.enableAIFeatures);
@@ -58,20 +66,17 @@ export function Game() {
       </div>
 
       {/* Desktop layout */}
-      <div className="hidden md:block min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white p-4 relative">
+      <div className="hidden md:block relative">
         <GameSettings />
 
-        <main
-          className={`grid gap-6 items-start justify-center min-h-[calc(100vh-2rem)] pt-4 ${
-            enableAIFeatures ? "grid-cols-[240px_1fr_300px]" : "grid-cols-[240px_1fr]"
-          }`}
-          aria-label="Tetris Game"
-        >
+        <GameLayout mode={layoutMode} enableAIFeatures={enableAIFeatures}>
           {/* Left Sidebar - Game Info */}
-          <aside
-            className="flex flex-col gap-3 sticky top-4 max-h-[calc(100vh-2rem)] overflow-y-auto pr-2"
-            aria-label="Game Information"
-          >
+          <aside className="layout-sidebar gap-3 pr-2" aria-label="Game Information">
+            {/* Layout Mode Toggle */}
+            <div className="mb-3">
+              <LayoutModeToggle currentMode={layoutMode} onModeChange={setLayoutMode} />
+            </div>
+
             <ScoreBoard />
             <HighScore />
             <HoldPiece />
@@ -80,12 +85,13 @@ export function Game() {
           </aside>
 
           {/* Game board area */}
-          <div className="flex flex-col items-center justify-center">
+          <div className="layout-main">
             <section
               className="relative"
               aria-label="Game Board Area"
               onTouchStart={handleTouchStart}
               onTouchEnd={handleTouchEnd}
+              data-testid="game-board"
             >
               <Board />
               <GameOverlay />
@@ -104,10 +110,7 @@ export function Game() {
 
           {/* Right Sidebar - AI Controls & Visualization (only when AI features enabled) */}
           {enableAIFeatures && (
-            <aside
-              className="flex flex-col gap-3 sticky top-4 max-h-[calc(100vh-2rem)] overflow-y-auto pl-2"
-              aria-label="AI Controls and Visualization"
-            >
+            <aside className="layout-ai gap-3 pl-2" aria-label="AI Controls and Visualization">
               {/* Advanced AI Controls */}
               {aiController && (
                 <ErrorBoundary>
@@ -150,7 +153,7 @@ export function Game() {
               )}
             </aside>
           )}
-        </main>
+        </GameLayout>
       </div>
 
       {/* Reset confirmation dialog */}

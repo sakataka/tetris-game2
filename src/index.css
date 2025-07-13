@@ -107,3 +107,92 @@ body {
     background: rgba(255, 255, 255, 0.3);
   }
 }
+
+/* Layout System - CSS Grid Implementation */
+.desktop-layout {
+  display: grid;
+  gap: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: calc(100vh - 2rem);
+}
+
+/* Compact Mode Override */
+.desktop-layout.compact-mode {
+  gap: 0.75rem;
+}
+
+/* Grid Transition Animations */
+.desktop-layout.transition-grid {
+  transition:
+    grid-template-columns 300ms ease-in-out,
+    gap 300ms ease-in-out;
+}
+
+/* Layout Areas */
+.layout-sidebar {
+  grid-area: sidebar;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.layout-main {
+  grid-area: main;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 2rem);
+}
+
+.layout-ai {
+  grid-area: ai;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 768px) {
+  .desktop-layout {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto 1fr auto;
+    grid-template-areas:
+      "header"
+      "main"
+      "footer";
+    gap: 0.5rem;
+    padding: 0.5rem;
+  }
+
+  .layout-sidebar,
+  .layout-ai {
+    display: none; /* Hidden on mobile, functionality moved to header/footer */
+  }
+}
+
+@media (max-width: 375px) {
+  .desktop-layout {
+    padding: 0.25rem;
+    gap: 0.25rem;
+  }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+  .layout-sidebar {
+    border-right: 2px solid var(--color-semantic-primary, #00f5ff);
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .desktop-layout.transition-grid {
+    transition: none;
+  }
+}
