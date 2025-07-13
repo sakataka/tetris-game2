@@ -20,7 +20,9 @@
     "prepare": "lefthook install",
     "check:i18n": "bun run scripts/check-i18n-keys.ts",
     "benchmark": "bun run src/benchmarks/cli.ts",
-    "e2e": "bun x playwright test --config=playwright.config.ts"
+    "e2e": "bun x playwright test --config=playwright.config.ts",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.14",
@@ -43,6 +45,11 @@
   "devDependencies": {
     "@biomejs/biome": "2.1.1",
     "@playwright/test": "^1.54.1",
+    "@storybook/addon-a11y": "^8.6.14",
+    "@storybook/addon-backgrounds": "^8.6.14",
+    "@storybook/addon-essentials": "^8.6.14",
+    "@storybook/addon-viewport": "^8.6.14",
+    "@storybook/react-vite": "^8.6.14",
     "@tailwindcss/vite": "^4.1.11",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
@@ -50,11 +57,13 @@
     "@types/react": "19.1.8",
     "@types/react-dom": "19.1.6",
     "@vitejs/plugin-react-oxc": "^0.2.3",
+    "chromatic": "^13.1.2",
     "fast-check": "^4.2.0",
     "happy-dom": "^18.0.1",
     "knip": "^5.61.3",
     "lefthook": "1.12.2",
     "rollup-plugin-visualizer": "^6.0.3",
+    "storybook": "^8.6.14",
     "tailwindcss": "4.1.11",
     "typescript": "5.8.3",
     "vite": "npm:rolldown-vite@^7.0.8"
