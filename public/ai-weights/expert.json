@@ -1,0 +1,20 @@
+{
+  "name": "Expert",
+  "description": "Expert-level AI weights with maximum performance",
+  "difficulty": "expert",
+  "weights": {
+    "landingHeight": -2.5,
+    "linesCleared": 1500.0,
+    "potentialLinesFilled": 300.0,
+    "rowTransitions": -1.5,
+    "columnTransitions": -4.0,
+    "holes": -10.0,
+    "wells": -1.5,
+    "blocksAboveHoles": -4.0,
+    "wellOpen": 0.0,
+    "escapeRoute": 0.0,
+    "bumpiness": -5.0,
+    "maxHeight": -25.0,
+    "rowFillRatio": 80.0
+  }
+}

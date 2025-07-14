@@ -1,0 +1,20 @@
+{
+  "name": "Medium",
+  "description": "Balanced AI weights for intermediate play",
+  "difficulty": "medium",
+  "weights": {
+    "landingHeight": -1.5,
+    "linesCleared": 1000.0,
+    "potentialLinesFilled": 200.0,
+    "rowTransitions": -1.0,
+    "columnTransitions": -3.0,
+    "holes": -5.0,
+    "wells": -1.0,
+    "blocksAboveHoles": -2.5,
+    "wellOpen": 0.0,
+    "escapeRoute": 0.0,
+    "bumpiness": -3.0,
+    "maxHeight": -15.0,
+    "rowFillRatio": 50.0
+  }
+}

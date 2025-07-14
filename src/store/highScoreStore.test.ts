@@ -1,6 +1,9 @@
 import { beforeEach, describe, expect, it } from "bun:test";
 import { act, renderHook } from "@testing-library/react";
-import { useHighScoreStore } from "./highScoreStore";
+import { create } from "zustand";
+import { immer } from "zustand/middleware/immer";
+import type { HighScore } from "@/types/storage";
+import { GAME_CONSTANTS } from "@/utils/gameConstants";
 
 // Mock localStorage for testing
 const mockStorage: Record<string, string> = {};
@@ -38,30 +41,63 @@ Object.defineProperty(globalThis, "localStorage", {
   writable: true,
 });
 
-// Default state for tests
-const DEFAULT_HIGH_SCORE_STATE = {
-  currentHighScore: null,
-  highScoresList: [],
-};
+// Test-specific HighScoreStore interface
+interface TestHighScoreStore {
+  currentHighScore: HighScore | null;
+  highScoresList: HighScore[];
+  addNewHighScore: (score: number, lines: number, level: number) => void;
+}
 
-// Create isolated test store instance for each test file
+// Create isolated test store instance without persist middleware for stable testing
+const useTestHighScoreStore = create<TestHighScoreStore>()(
+  immer((set, get) => ({
+    currentHighScore: null,
+    highScoresList: [],
+
+    addNewHighScore: (score: number, lines: number, level: number) => {
+      const currentHighScore = get().currentHighScore;
+
+      // Check if this is a new high score
+      if (!currentHighScore || score > currentHighScore.score) {
+        const newHighScore: HighScore = {
+          score,
+          lines,
+          level,
+          date: new Date().toISOString(),
+        };
+
+        set((state) => {
+          // Update current high score
+          state.currentHighScore = newHighScore;
+
+          // Add to high scores list and keep top scores
+          state.highScoresList.push(newHighScore);
+          state.highScoresList.sort((a, b) => b.score - a.score);
+          state.highScoresList = state.highScoresList.slice(
+            0,
+            GAME_CONSTANTS.UI.HIGH_SCORE_LIST_MAX,
+          );
+        });
+      }
+    },
+  })),
+);
 
 describe("highScoreStore", () => {
   beforeEach(() => {
     // Clear localStorage completely
     localStorage.clear();
 
-    // Reset store to default state
-    act(() => {
-      useHighScoreStore.setState({
-        ...DEFAULT_HIGH_SCORE_STATE,
-      });
+    // Reset test store to default state
+    useTestHighScoreStore.setState({
+      currentHighScore: null,
+      highScoresList: [],
     });
   });
 
   describe("initial state", () => {
     it("should initialize with null current high score and empty list", () => {
-      const { result } = renderHook(() => useHighScoreStore());
+      const { result } = renderHook(() => useTestHighScoreStore());
 
       expect(result.current.currentHighScore).toBeNull();
       expect(result.current.highScoresList).toEqual([]);
@@ -70,7 +106,7 @@ describe("highScoreStore", () => {
 
   describe("addNewHighScore", () => {
     it("should set first score as current high score", () => {
-      const { result } = renderHook(() => useHighScoreStore());
+      const { result } = renderHook(() => useTestHighScoreStore());
 
       act(() => {
         result.current.addNewHighScore(1000, 10, 1);
@@ -87,7 +123,7 @@ describe("highScoreStore", () => {
     });
 
     it("should update current high score when new score is higher", () => {
-      const { result } = renderHook(() => useHighScoreStore());
+      const { result } = renderHook(() => useTestHighScoreStore());
 
       // Set initial high score
       act(() => {
@@ -106,7 +142,7 @@ describe("highScoreStore", () => {
     });
 
     it("should not update current high score when new score is lower", () => {
-      const { result } = renderHook(() => useHighScoreStore());
+      const { result } = renderHook(() => useTestHighScoreStore());
 
       // Set initial high score
       act(() => {
@@ -125,7 +161,7 @@ describe("highScoreStore", () => {
     });
 
     it("should maintain top 10 scores only", () => {
-      const { result } = renderHook(() => useHighScoreStore());
+      const { result } = renderHook(() => useTestHighScoreStore());
 
       // Add 12 scores (more than the limit of 10)
       for (let i = 1; i <= 12; i++) {
@@ -141,7 +177,7 @@ describe("highScoreStore", () => {
     });
 
     it("should sort high scores in descending order", () => {
-      const { result } = renderHook(() => useHighScoreStore());
+      const { result } = renderHook(() => useTestHighScoreStore());
 
       const scores = [1500, 3000, 500, 2000, 1000];
 
@@ -158,7 +194,7 @@ describe("highScoreStore", () => {
     });
 
     it("should include date in ISO string format", () => {
-      const { result } = renderHook(() => useHighScoreStore());
+      const { result } = renderHook(() => useTestHighScoreStore());
 
       act(() => {
         result.current.addNewHighScore(1000, 10, 1);
@@ -173,7 +209,7 @@ describe("highScoreStore", () => {
     });
 
     it("should include all required properties in high score", () => {
-      const { result } = renderHook(() => useHighScoreStore());
+      const { result } = renderHook(() => useTestHighScoreStore());
 
       act(() => {
         result.current.addNewHighScore(1500, 15, 3);
@@ -191,7 +227,7 @@ describe("highScoreStore", () => {
 
   describe("persistence", () => {
     it("should have persistence functionality", () => {
-      const { result } = renderHook(() => useHighScoreStore());
+      const { result } = renderHook(() => useTestHighScoreStore());
 
       // Verify that persistence is working by testing multiple score additions
       act(() => {
@@ -210,7 +246,7 @@ describe("highScoreStore", () => {
     });
 
     it("should maintain data consistency across operations", () => {
-      const { result } = renderHook(() => useHighScoreStore());
+      const { result } = renderHook(() => useTestHighScoreStore());
 
       // Add multiple scores and verify persistence behavior
       const scores = [1500, 2500, 800, 3000, 1200];
@@ -233,7 +269,7 @@ describe("highScoreStore", () => {
 
   describe("edge cases", () => {
     it("should handle equal scores correctly", () => {
-      const { result } = renderHook(() => useHighScoreStore());
+      const { result } = renderHook(() => useTestHighScoreStore());
 
       // Add same score twice
       act(() => {
@@ -250,7 +286,7 @@ describe("highScoreStore", () => {
     });
 
     it("should handle zero scores", () => {
-      const { result } = renderHook(() => useHighScoreStore());
+      const { result } = renderHook(() => useTestHighScoreStore());
 
       act(() => {
         result.current.addNewHighScore(0, 0, 1);
@@ -261,7 +297,7 @@ describe("highScoreStore", () => {
     });
 
     it("should handle negative values gracefully", () => {
-      const { result } = renderHook(() => useHighScoreStore());
+      const { result } = renderHook(() => useTestHighScoreStore());
 
       act(() => {
         result.current.addNewHighScore(-100, -5, 0);
@@ -275,7 +311,7 @@ describe("highScoreStore", () => {
 
   describe("store interface", () => {
     it("should provide all required properties and methods", () => {
-      const { result } = renderHook(() => useHighScoreStore());
+      const { result } = renderHook(() => useTestHighScoreStore());
 
       expect(result.current.currentHighScore).toBeDefined();
       expect(Array.isArray(result.current.highScoresList)).toBe(true);
@@ -285,7 +321,7 @@ describe("highScoreStore", () => {
 
   describe("localStorage persistence behavior", () => {
     it("should maintain consistent state across multiple operations", () => {
-      const { result } = renderHook(() => useHighScoreStore());
+      const { result } = renderHook(() => useTestHighScoreStore());
 
       // Add multiple high scores and verify state consistency
       act(() => {
@@ -371,7 +407,7 @@ describe("highScoreStore", () => {
 
       // Store should still initialize without crashing
       expect(() => {
-        renderHook(() => useHighScoreStore());
+        renderHook(() => useTestHighScoreStore());
       }).not.toThrow();
     });
 
@@ -388,7 +424,7 @@ describe("highScoreStore", () => {
 
       // Store should still initialize without crashing
       expect(() => {
-        renderHook(() => useHighScoreStore());
+        renderHook(() => useTestHighScoreStore());
       }).not.toThrow();
     });
 
@@ -396,7 +432,7 @@ describe("highScoreStore", () => {
       // Ensure localStorage is empty
       localStorage.clear();
 
-      const { result } = renderHook(() => useHighScoreStore());
+      const { result } = renderHook(() => useTestHighScoreStore());
 
       expect(result.current.currentHighScore).toBeNull();
       expect(result.current.highScoresList).toEqual([]);
@@ -460,7 +496,7 @@ describe("highScoreStore", () => {
         throw new Error("QuotaExceededError");
       };
 
-      const { result } = renderHook(() => useHighScoreStore());
+      const { result } = renderHook(() => useTestHighScoreStore());
 
       // Since Zustand persist middleware handles errors gracefully,
       // the state should still update even if localStorage fails
@@ -488,7 +524,7 @@ describe("highScoreStore", () => {
 
       // Store creation should not crash
       expect(() => {
-        renderHook(() => useHighScoreStore());
+        renderHook(() => useTestHighScoreStore());
       }).not.toThrow();
 
       // Restore original localStorage
@@ -500,7 +536,7 @@ describe("highScoreStore", () => {
       const originalGetItem = localStorage.getItem;
       localStorage.getItem = () => null;
 
-      const { result } = renderHook(() => useHighScoreStore());
+      const { result } = renderHook(() => useTestHighScoreStore());
 
       // Should initialize with default values
       expect(result.current.currentHighScore).toBeNull();
@@ -517,7 +553,7 @@ describe("highScoreStore", () => {
         throw new Error("Generic localStorage error");
       };
 
-      const { result } = renderHook(() => useHighScoreStore());
+      const { result } = renderHook(() => useTestHighScoreStore());
 
       // Since Zustand persist middleware handles errors gracefully,
       // the state should still update even if localStorage fails

@@ -1,0 +1,20 @@
+{
+  "name": "Easy",
+  "description": "Beginner-friendly AI weights with focus on safe play",
+  "difficulty": "easy",
+  "weights": {
+    "landingHeight": -1.0,
+    "linesCleared": 800.0,
+    "potentialLinesFilled": 150.0,
+    "rowTransitions": -0.8,
+    "columnTransitions": -2.0,
+    "holes": -3.0,
+    "wells": -0.8,
+    "blocksAboveHoles": -2.0,
+    "wellOpen": 0.0,
+    "escapeRoute": 0.0,
+    "bumpiness": -2.0,
+    "maxHeight": -10.0,
+    "rowFillRatio": 40.0
+  }
+}

@@ -4,6 +4,12 @@
   "type": "module",
   "packageManager": "bun@1.2.18",
   "license": "ISC",
+  "sideEffects": [
+    "*.css",
+    "./src/index.css",
+    "./src/styles/*.css",
+    "./src/i18n/config.ts"
+  ],
   "scripts": {
     "dev": "bun --bun vite",
     "build": "bun x vite build",
@@ -23,7 +29,9 @@
     "benchmark": "bun run src/benchmarks/cli.ts",
     "e2e": "bun x playwright test --config=playwright.config.ts",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "analyze": "bun run scripts/analyze-bundle.ts",
+    "analyze:visual": "bun x vite build && npx vite-bundle-analyzer dist/stats.html"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.14",
@@ -74,6 +82,7 @@
     "rollup-plugin-visualizer": "^6.0.3",
     "storybook": "^9.0.16",
     "tailwindcss": "4.1.11",
+    "terser": "^5.43.1",
     "typescript": "5.8.3",
     "vite": "npm:rolldown-vite@^7.0.9"
   },

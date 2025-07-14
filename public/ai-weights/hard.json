@@ -1,0 +1,20 @@
+{
+  "name": "Hard",
+  "description": "Advanced AI weights with aggressive line clearing",
+  "difficulty": "hard",
+  "weights": {
+    "landingHeight": -2.0,
+    "linesCleared": 1200.0,
+    "potentialLinesFilled": 250.0,
+    "rowTransitions": -1.2,
+    "columnTransitions": -3.5,
+    "holes": -7.0,
+    "wells": -1.2,
+    "blocksAboveHoles": -3.0,
+    "wellOpen": 0.0,
+    "escapeRoute": 0.0,
+    "bumpiness": -4.0,
+    "maxHeight": -18.0,
+    "rowFillRatio": 60.0
+  }
+}
