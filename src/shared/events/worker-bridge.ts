@@ -36,7 +36,7 @@ export class WorkerEventBridge {
   private pendingRequests = new Map<
     string,
     {
-      resolve: (value: any) => void;
+      resolve: (value: AIDecision | AdvancedAIDecision) => void;
       reject: (error: Error) => void;
       timestamp: number;
     }
@@ -200,7 +200,7 @@ export class WorkerEventBridge {
   /**
    * Handle metrics report
    */
-  private handleMetricsReport(payload: any): void {
+  private handleMetricsReport(payload: unknown): void {
     console.log("AI Worker Metrics:", payload);
   }
 
@@ -246,7 +246,7 @@ export class WorkerEventBridge {
    * Initialize AI in worker
    */
   public async initializeAI(
-    config: any,
+    config: Record<string, unknown>,
     weights: EvaluationWeights,
     useAdvanced = false,
   ): Promise<void> {

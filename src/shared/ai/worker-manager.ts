@@ -108,7 +108,7 @@ export class AIWorkerManager {
   /**
    * Get default AI configuration
    */
-  private getDefaultAIConfig(): any {
+  private getDefaultAIConfig(): Record<string, unknown> {
     return {
       thinkingTimeLimit: this.config.timeoutMs,
       evaluator: "dellacherie",

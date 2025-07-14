@@ -120,7 +120,11 @@ export class GameEventBus {
       this.listeners.set(eventType, new Set());
     }
 
-    const handlers = this.listeners.get(eventType)!;
+    const handlers = this.listeners.get(eventType);
+    if (!handlers) {
+      this.listeners.set(eventType, new Set());
+      return this.subscribe(eventType, handler);
+    }
 
     if (handlers.size >= this.config.maxListeners) {
       console.warn(

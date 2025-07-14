@@ -49,9 +49,9 @@ export type WorkerMessage =
     }
   | { type: "EVALUATE_POSITION"; payload: { gameState: GameState; timeoutMs: number } }
   | { type: "SET_DIFFICULTY"; payload: { difficulty: "easy" | "medium" | "hard" | "expert" } }
-  | { type: "GET_METRICS"; payload: {} }
-  | { type: "RESET_METRICS"; payload: {} }
-  | { type: "TERMINATE"; payload: {} };
+  | { type: "GET_METRICS"; payload: Record<string, never> }
+  | { type: "RESET_METRICS"; payload: Record<string, never> }
+  | { type: "TERMINATE"; payload: Record<string, never> };
 
 export type WorkerResponse =
   | {
