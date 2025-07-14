@@ -180,6 +180,41 @@ bun run storybook               # Component documentation with visual testing
 **Storybook**: Interactive documentation with a11y testing, visual testing, design token examples
 **Location**: `src/components/*/[Component].stories.tsx`
 
+## 🔧 MCP Tool Usage Guidelines
+
+### When to Use MCP Tools
+Use these specialized MCP tools only when specifically needed for their intended purposes:
+
+#### 1. **O3 MCP (`mcp__o3__o3-search`)**
+- **Purpose**: Advanced web search and complex problem consultation
+- **When to use**: Architecture decisions, technical research, best practices inquiry
+- **CRITICAL**: Always provide detailed context including:
+  - Current tech stack (React 19, TypeScript, Zustand, Bun, etc.)
+  - Specific performance requirements (e.g., <10μs evaluation time)
+  - Project constraints and future plans (WebWorker, WASM, multi-platform)
+  - Concrete implementation details and current challenges
+- **Example**: Instead of "How to optimize performance?", ask "Given our Tetris game with React 19, Zustand state management, and Uint32Array BitBoard targeting 100k+ evaluations/sec, what are the specific architectural benefits of extracting pure game logic into an internal package?"
+
+#### 2. **Context7 MCP (`mcp__context7__resolve-library-id`, `mcp__context7__get-library-docs`)**
+- **Purpose**: Library documentation lookup and API reference
+- **When to use**: Need current documentation for specific libraries/frameworks
+- **Process**: First resolve library ID, then fetch documentation
+- **Example**: TypeScript features, React patterns, Zustand best practices
+
+#### 3. **Playwright MCP (`mcp__playwright__*`)**
+- **Purpose**: End-to-end testing and browser automation
+- **When to use**: 
+  - Running `bun run e2e` tests
+  - Accessibility testing (`bun run test:a11y`)
+  - Cross-platform compatibility validation
+  - UI workflow testing
+- **Integration**: Works with project's existing Playwright configuration
+
+### Usage Principles
+- **Selective Usage**: Only use these tools when their specific capabilities are required
+- **Context-Rich Queries**: Always provide comprehensive background information
+- **Integration Focus**: Ensure MCP tool usage aligns with project architecture and constraints
+
 ## 📖 Quick Reference
 
 ### Development Workflow
