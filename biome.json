@@ -1,12 +1,5 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.1.1/schema.json",
-  "assist": {
-    "actions": {
-      "source": {
-        "organizeImports": "on"
-      }
-    }
-  },
   "linter": {
     "enabled": true,
     "rules": {
@@ -30,8 +23,7 @@
         "noUnusedTemplateLiteral": "error",
         "useNumberNamespace": "error",
         "noInferrableTypes": "error",
-        "noUselessElse": "error",
-        "useArrayLiterals": "error"
+        "noUselessElse": "error"
       }
     }
   },
@@ -41,18 +33,5 @@
     "indentStyle": "space",
     "indentWidth": 2,
     "lineWidth": 100
-  },
-  "files": {
-    "includes": [
-      "**",
-      "!**/node_modules",
-      "!**/dist",
-      "!**/.next",
-      "!**/coverage",
-      "!vercel.json",
-      "!**/storybook-static",
-      "!**/.storybook",
-      "!**/*.stories.*"
-    ]
   }
 }

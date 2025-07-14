@@ -1,0 +1,372 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Game Engine Golden Master Tests > should handle hold mechanic consistently > hold-mechanic-seed-99999.snap 1`] = `
+[
+  "Frame 0: Hold Z",
+  "Frame 1: Tick",
+  "Frame 2: Tick",
+  "Frame 3: Hard drop",
+  "Frame 4: Tick",
+  "Frame 5: Tick",
+  "Frame 6: Hard drop",
+  "Frame 7: Hold L",
+  "Frame 8: Tick",
+  "Frame 9: Hard drop",
+  "Frame 10: Tick",
+  "Frame 11: Tick",
+  "Frame 12: Hard drop",
+  "Frame 13: Tick",
+  "Frame 14: Hold J",
+  "Frame 15: Hard drop",
+  "Frame 16: Tick",
+  "Frame 17: Tick",
+  "Frame 18: Hard drop",
+  "Frame 19: Tick",
+  "Frame 20: Tick",
+  "Frame 21: Hold L",
+  "Frame 22: Tick",
+  "Frame 23: Tick",
+  "Frame 24: Hard drop",
+  "Frame 25: Tick",
+  "Frame 26: Tick",
+  "Frame 27: Hard drop",
+  "Frame 28: Hold S",
+  "Frame 29: Tick",
+]
+`;
+
+exports[`Game Engine Golden Master Tests > should handle line clearing consistently > line-clears-seed-77777.snap 1`] = `[]`;
+
+exports[`Game Engine Golden Master Tests > should produce identical game sequences for seed 12345 > game-events-seed-12345.snap 1`] = `
+[
+  {
+    "payload": {
+      "distance": 12,
+      "score": 24,
+    },
+    "type": "HARD_DROP",
+  },
+  {
+    "payload": {
+      "piece": "S",
+      "position": {
+        "x": 3,
+        "y": 21,
+      },
+      "rotation": 2,
+    },
+    "type": "PIECE_PLACED",
+  },
+  {
+    "payload": {
+      "distance": 10,
+      "score": 20,
+    },
+    "type": "HARD_DROP",
+  },
+  {
+    "payload": {
+      "piece": "J",
+      "position": {
+        "x": 3,
+        "y": 19,
+      },
+      "rotation": 3,
+    },
+    "type": "PIECE_PLACED",
+  },
+  {
+    "payload": {
+      "distance": 8,
+      "score": 16,
+    },
+    "type": "HARD_DROP",
+  },
+  {
+    "payload": {
+      "piece": "O",
+      "position": {
+        "x": 4,
+        "y": 17,
+      },
+      "rotation": 2,
+    },
+    "type": "PIECE_PLACED",
+  },
+  {
+    "payload": {
+      "distance": 6,
+      "score": 12,
+    },
+    "type": "HARD_DROP",
+  },
+  {
+    "payload": {
+      "piece": "Z",
+      "position": {
+        "x": 3,
+        "y": 15,
+      },
+      "rotation": 3,
+    },
+    "type": "PIECE_PLACED",
+  },
+  {
+    "payload": {
+      "distance": 4,
+      "score": 8,
+    },
+    "type": "HARD_DROP",
+  },
+  {
+    "payload": {
+      "piece": "L",
+      "position": {
+        "x": 3,
+        "y": 13,
+      },
+      "rotation": 2,
+    },
+    "type": "PIECE_PLACED",
+  },
+  {
+    "payload": {
+      "distance": 2,
+      "score": 4,
+    },
+    "type": "HARD_DROP",
+  },
+  {
+    "payload": {
+      "piece": "T",
+      "position": {
+        "x": 3,
+        "y": 11,
+      },
+      "rotation": 3,
+    },
+    "type": "PIECE_PLACED",
+  },
+  {
+    "payload": {
+      "piece": "I",
+      "position": {
+        "x": 2,
+        "y": 8,
+      },
+      "rotation": 2,
+    },
+    "type": "PIECE_PLACED",
+  },
+  {
+    "payload": {
+      "distance": 8,
+      "score": 16,
+    },
+    "type": "HARD_DROP",
+  },
+  {
+    "payload": {
+      "piece": "J",
+      "position": {
+        "x": 4,
+        "y": 8,
+      },
+      "rotation": 0,
+    },
+    "type": "PIECE_PLACED",
+  },
+  {
+    "payload": {
+      "piece": "T",
+      "position": {
+        "x": 3,
+        "y": 5,
+      },
+      "rotation": 2,
+    },
+    "type": "PIECE_PLACED",
+  },
+  {
+    "payload": {
+      "distance": 1,
+      "score": 2,
+    },
+    "type": "HARD_DROP",
+  },
+  {
+    "payload": {
+      "piece": "O",
+      "position": {
+        "x": 4,
+        "y": 4,
+      },
+      "rotation": 1,
+    },
+    "type": "PIECE_PLACED",
+  },
+  {
+    "payload": {
+      "piece": "S",
+      "position": {
+        "x": 3,
+        "y": 1,
+      },
+      "rotation": 1,
+    },
+    "type": "PIECE_PLACED",
+  },
+  {
+    "payload": {
+      "finalScore": 102,
+      "totalLines": 0,
+    },
+    "type": "GAME_OVER",
+  },
+]
+`;
+
+exports[`Game Engine Golden Master Tests > should produce identical game sequences for seed 12345 > game-sequence-seed-12345.snap 1`] = `
+[
+  "{"frame":0,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"currentPiece":{"type":"S","position":{"x":3,"y":0},"rotation":0,"shape":[[false,true,true],[true,true,false],[false,false,false]]},"nextPieces":["J","O","Z","L","T"],"score":0,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":1,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"currentPiece":{"type":"S","position":{"x":2,"y":1},"rotation":0,"shape":[[false,true,true],[true,true,false],[false,false,false]]},"nextPieces":["J","O","Z","L","T"],"score":0,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":2,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"currentPiece":{"type":"S","position":{"x":3,"y":2},"rotation":0,"shape":[[false,true,true],[true,true,false],[false,false,false]]},"nextPieces":["J","O","Z","L","T"],"score":0,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":3,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"currentPiece":{"type":"S","position":{"x":3,"y":3},"rotation":1,"shape":[[false,true,false],[false,true,true],[false,false,true]]},"nextPieces":["J","O","Z","L","T"],"score":0,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":4,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"currentPiece":{"type":"S","position":{"x":3,"y":4},"rotation":1,"shape":[[false,true,false],[false,true,true],[false,false,true]]},"nextPieces":["J","O","Z","L","T"],"score":0,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":5,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"currentPiece":{"type":"S","position":{"x":2,"y":5},"rotation":1,"shape":[[false,true,false],[false,true,true],[false,false,true]]},"nextPieces":["J","O","Z","L","T"],"score":0,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":6,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"currentPiece":{"type":"S","position":{"x":3,"y":6},"rotation":1,"shape":[[false,true,false],[false,true,true],[false,false,true]]},"nextPieces":["J","O","Z","L","T"],"score":0,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":7,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"currentPiece":{"type":"S","position":{"x":3,"y":7},"rotation":2,"shape":[[false,false,false],[false,true,true],[true,true,false]]},"nextPieces":["J","O","Z","L","T"],"score":0,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":8,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"currentPiece":{"type":"S","position":{"x":3,"y":8},"rotation":2,"shape":[[false,false,false],[false,true,true],[true,true,false]]},"nextPieces":["J","O","Z","L","T"],"score":0,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":9,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"currentPiece":{"type":"S","position":{"x":2,"y":9},"rotation":2,"shape":[[false,false,false],[false,true,true],[true,true,false]]},"nextPieces":["J","O","Z","L","T"],"score":0,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":10,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,48,24],"currentPiece":{"type":"J","position":{"x":3,"y":0},"rotation":0,"shape":[[true,false,false],[true,true,true],[false,false,false]]},"nextPieces":["O","Z","L","T","I"],"score":24,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":11,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,48,24],"currentPiece":{"type":"J","position":{"x":3,"y":1},"rotation":1,"shape":[[false,true,true],[false,true,false],[false,true,false]]},"nextPieces":["O","Z","L","T","I"],"score":24,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":12,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,48,24],"currentPiece":{"type":"J","position":{"x":3,"y":2},"rotation":1,"shape":[[false,true,true],[false,true,false],[false,true,false]]},"nextPieces":["O","Z","L","T","I"],"score":24,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":13,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,48,24],"currentPiece":{"type":"J","position":{"x":2,"y":3},"rotation":1,"shape":[[false,true,true],[false,true,false],[false,true,false]]},"nextPieces":["O","Z","L","T","I"],"score":24,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":14,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,48,24],"currentPiece":{"type":"J","position":{"x":3,"y":4},"rotation":1,"shape":[[false,true,true],[false,true,false],[false,true,false]]},"nextPieces":["O","Z","L","T","I"],"score":24,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":15,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,48,24],"currentPiece":{"type":"J","position":{"x":3,"y":5},"rotation":2,"shape":[[false,false,false],[true,true,true],[false,false,true]]},"nextPieces":["O","Z","L","T","I"],"score":24,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":16,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,48,24],"currentPiece":{"type":"J","position":{"x":3,"y":6},"rotation":2,"shape":[[false,false,false],[true,true,true],[false,false,true]]},"nextPieces":["O","Z","L","T","I"],"score":24,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":17,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,48,24],"currentPiece":{"type":"J","position":{"x":2,"y":7},"rotation":2,"shape":[[false,false,false],[true,true,true],[false,false,true]]},"nextPieces":["O","Z","L","T","I"],"score":24,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":18,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,48,24],"currentPiece":{"type":"J","position":{"x":3,"y":8},"rotation":2,"shape":[[false,false,false],[true,true,true],[false,false,true]]},"nextPieces":["O","Z","L","T","I"],"score":24,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":19,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,48,24],"currentPiece":{"type":"J","position":{"x":3,"y":9},"rotation":3,"shape":[[false,true,false],[false,true,false],[true,true,false]]},"nextPieces":["O","Z","L","T","I"],"score":24,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":20,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,16,24,48,24],"currentPiece":{"type":"O","position":{"x":4,"y":0},"rotation":0,"shape":[[true,true],[true,true]]},"nextPieces":["Z","L","T","I","J"],"score":44,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":21,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,16,24,48,24],"currentPiece":{"type":"O","position":{"x":3,"y":1},"rotation":0,"shape":[[true,true],[true,true]]},"nextPieces":["Z","L","T","I","J"],"score":44,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":22,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,16,24,48,24],"currentPiece":{"type":"O","position":{"x":4,"y":2},"rotation":0,"shape":[[true,true],[true,true]]},"nextPieces":["Z","L","T","I","J"],"score":44,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":23,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,16,24,48,24],"currentPiece":{"type":"O","position":{"x":4,"y":3},"rotation":1,"shape":[[true,true],[true,true]]},"nextPieces":["Z","L","T","I","J"],"score":44,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":24,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,16,24,48,24],"currentPiece":{"type":"O","position":{"x":4,"y":4},"rotation":1,"shape":[[true,true],[true,true]]},"nextPieces":["Z","L","T","I","J"],"score":44,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":25,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,16,24,48,24],"currentPiece":{"type":"O","position":{"x":3,"y":5},"rotation":1,"shape":[[true,true],[true,true]]},"nextPieces":["Z","L","T","I","J"],"score":44,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":26,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,16,24,48,24],"currentPiece":{"type":"O","position":{"x":4,"y":6},"rotation":1,"shape":[[true,true],[true,true]]},"nextPieces":["Z","L","T","I","J"],"score":44,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":27,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,16,24,48,24],"currentPiece":{"type":"O","position":{"x":4,"y":7},"rotation":2,"shape":[[true,true],[true,true]]},"nextPieces":["Z","L","T","I","J"],"score":44,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":28,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,16,24,48,24],"currentPiece":{"type":"O","position":{"x":4,"y":8},"rotation":2,"shape":[[true,true],[true,true]]},"nextPieces":["Z","L","T","I","J"],"score":44,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":29,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,16,24,48,24],"currentPiece":{"type":"O","position":{"x":3,"y":9},"rotation":2,"shape":[[true,true],[true,true]]},"nextPieces":["Z","L","T","I","J"],"score":44,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":30,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,48,48,16,16,24,48,24],"currentPiece":{"type":"Z","position":{"x":3,"y":0},"rotation":0,"shape":[[true,true,false],[false,true,true],[false,false,false]]},"nextPieces":["L","T","I","J","T"],"score":60,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":31,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,48,48,16,16,24,48,24],"currentPiece":{"type":"Z","position":{"x":3,"y":1},"rotation":1,"shape":[[false,false,true],[false,true,true],[false,true,false]]},"nextPieces":["L","T","I","J","T"],"score":60,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":32,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,48,48,16,16,24,48,24],"currentPiece":{"type":"Z","position":{"x":3,"y":2},"rotation":1,"shape":[[false,false,true],[false,true,true],[false,true,false]]},"nextPieces":["L","T","I","J","T"],"score":60,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":33,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,48,48,16,16,24,48,24],"currentPiece":{"type":"Z","position":{"x":2,"y":3},"rotation":1,"shape":[[false,false,true],[false,true,true],[false,true,false]]},"nextPieces":["L","T","I","J","T"],"score":60,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":34,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,48,48,16,16,24,48,24],"currentPiece":{"type":"Z","position":{"x":3,"y":4},"rotation":1,"shape":[[false,false,true],[false,true,true],[false,true,false]]},"nextPieces":["L","T","I","J","T"],"score":60,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":35,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,48,48,16,16,24,48,24],"currentPiece":{"type":"Z","position":{"x":3,"y":5},"rotation":2,"shape":[[false,false,false],[true,true,false],[false,true,true]]},"nextPieces":["L","T","I","J","T"],"score":60,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":36,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,48,48,16,16,24,48,24],"currentPiece":{"type":"Z","position":{"x":3,"y":6},"rotation":2,"shape":[[false,false,false],[true,true,false],[false,true,true]]},"nextPieces":["L","T","I","J","T"],"score":60,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":37,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,48,48,16,16,24,48,24],"currentPiece":{"type":"Z","position":{"x":2,"y":7},"rotation":2,"shape":[[false,false,false],[true,true,false],[false,true,true]]},"nextPieces":["L","T","I","J","T"],"score":60,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":38,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,48,48,16,16,24,48,24],"currentPiece":{"type":"Z","position":{"x":3,"y":8},"rotation":2,"shape":[[false,false,false],[true,true,false],[false,true,true]]},"nextPieces":["L","T","I","J","T"],"score":60,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":39,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,48,48,16,16,24,48,24],"currentPiece":{"type":"Z","position":{"x":3,"y":9},"rotation":3,"shape":[[false,true,false],[true,true,false],[true,false,false]]},"nextPieces":["L","T","I","J","T"],"score":60,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":40,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,24,56,48,16,16,24,48,24],"currentPiece":{"type":"L","position":{"x":3,"y":0},"rotation":0,"shape":[[false,false,true],[true,true,true],[false,false,false]]},"nextPieces":["T","I","J","T","O"],"score":72,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":41,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,24,56,48,16,16,24,48,24],"currentPiece":{"type":"L","position":{"x":2,"y":1},"rotation":0,"shape":[[false,false,true],[true,true,true],[false,false,false]]},"nextPieces":["T","I","J","T","O"],"score":72,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":42,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,24,56,48,16,16,24,48,24],"currentPiece":{"type":"L","position":{"x":3,"y":2},"rotation":0,"shape":[[false,false,true],[true,true,true],[false,false,false]]},"nextPieces":["T","I","J","T","O"],"score":72,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":43,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,24,56,48,16,16,24,48,24],"currentPiece":{"type":"L","position":{"x":3,"y":3},"rotation":1,"shape":[[false,true,false],[false,true,false],[false,true,true]]},"nextPieces":["T","I","J","T","O"],"score":72,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":44,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,24,56,48,16,16,24,48,24],"currentPiece":{"type":"L","position":{"x":3,"y":4},"rotation":1,"shape":[[false,true,false],[false,true,false],[false,true,true]]},"nextPieces":["T","I","J","T","O"],"score":72,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":45,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,24,56,48,16,16,24,48,24],"currentPiece":{"type":"L","position":{"x":2,"y":5},"rotation":1,"shape":[[false,true,false],[false,true,false],[false,true,true]]},"nextPieces":["T","I","J","T","O"],"score":72,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":46,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,24,56,48,16,16,24,48,24],"currentPiece":{"type":"L","position":{"x":3,"y":6},"rotation":1,"shape":[[false,true,false],[false,true,false],[false,true,true]]},"nextPieces":["T","I","J","T","O"],"score":72,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":47,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,24,56,48,16,16,24,48,24],"currentPiece":{"type":"L","position":{"x":3,"y":7},"rotation":2,"shape":[[false,false,false],[true,true,true],[true,false,false]]},"nextPieces":["T","I","J","T","O"],"score":72,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":48,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,24,56,48,16,16,24,48,24],"currentPiece":{"type":"L","position":{"x":3,"y":8},"rotation":2,"shape":[[false,false,false],[true,true,true],[true,false,false]]},"nextPieces":["T","I","J","T","O"],"score":72,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":49,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,24,56,48,16,16,24,48,24],"currentPiece":{"type":"L","position":{"x":2,"y":9},"rotation":2,"shape":[[false,false,false],[true,true,true],[true,false,false]]},"nextPieces":["T","I","J","T","O"],"score":72,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":50,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,56,24,24,56,48,16,16,24,48,24],"currentPiece":{"type":"T","position":{"x":3,"y":0},"rotation":0,"shape":[[false,true,false],[true,true,true],[false,false,false]]},"nextPieces":["I","J","T","O","S"],"score":80,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":51,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,56,24,24,56,48,16,16,24,48,24],"currentPiece":{"type":"T","position":{"x":3,"y":1},"rotation":1,"shape":[[false,true,false],[false,true,true],[false,true,false]]},"nextPieces":["I","J","T","O","S"],"score":80,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":52,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,56,24,24,56,48,16,16,24,48,24],"currentPiece":{"type":"T","position":{"x":3,"y":2},"rotation":1,"shape":[[false,true,false],[false,true,true],[false,true,false]]},"nextPieces":["I","J","T","O","S"],"score":80,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":53,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,56,24,24,56,48,16,16,24,48,24],"currentPiece":{"type":"T","position":{"x":2,"y":3},"rotation":1,"shape":[[false,true,false],[false,true,true],[false,true,false]]},"nextPieces":["I","J","T","O","S"],"score":80,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":54,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,56,24,24,56,48,16,16,24,48,24],"currentPiece":{"type":"T","position":{"x":3,"y":4},"rotation":1,"shape":[[false,true,false],[false,true,true],[false,true,false]]},"nextPieces":["I","J","T","O","S"],"score":80,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":55,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,56,24,24,56,48,16,16,24,48,24],"currentPiece":{"type":"T","position":{"x":3,"y":5},"rotation":2,"shape":[[false,false,false],[true,true,true],[false,true,false]]},"nextPieces":["I","J","T","O","S"],"score":80,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":56,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,56,24,24,56,48,16,16,24,48,24],"currentPiece":{"type":"T","position":{"x":3,"y":6},"rotation":2,"shape":[[false,false,false],[true,true,true],[false,true,false]]},"nextPieces":["I","J","T","O","S"],"score":80,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":57,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,56,24,24,56,48,16,16,24,48,24],"currentPiece":{"type":"T","position":{"x":2,"y":7},"rotation":2,"shape":[[false,false,false],[true,true,true],[false,true,false]]},"nextPieces":["I","J","T","O","S"],"score":80,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":58,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,56,24,24,56,48,16,16,24,48,24],"currentPiece":{"type":"T","position":{"x":3,"y":8},"rotation":2,"shape":[[false,false,false],[true,true,true],[false,true,false]]},"nextPieces":["I","J","T","O","S"],"score":80,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":59,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,56,24,24,56,48,16,16,24,48,24],"currentPiece":{"type":"T","position":{"x":3,"y":9},"rotation":3,"shape":[[false,true,false],[true,true,false],[false,true,false]]},"nextPieces":["I","J","T","O","S"],"score":80,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":60,"matrix":[0,0,0,0,0,0,0,0,0,0,0,16,24,16,56,24,24,56,48,16,16,24,48,24],"currentPiece":{"type":"I","position":{"x":3,"y":0},"rotation":0,"shape":[[false,false,false,false],[true,true,true,true],[false,false,false,false],[false,false,false,false]]},"nextPieces":["J","T","O","S","L"],"score":84,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":61,"matrix":[0,0,0,0,0,0,0,0,0,0,0,16,24,16,56,24,24,56,48,16,16,24,48,24],"currentPiece":{"type":"I","position":{"x":2,"y":1},"rotation":0,"shape":[[false,false,false,false],[true,true,true,true],[false,false,false,false],[false,false,false,false]]},"nextPieces":["J","T","O","S","L"],"score":84,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":62,"matrix":[0,0,0,0,0,0,0,0,0,0,0,16,24,16,56,24,24,56,48,16,16,24,48,24],"currentPiece":{"type":"I","position":{"x":3,"y":2},"rotation":0,"shape":[[false,false,false,false],[true,true,true,true],[false,false,false,false],[false,false,false,false]]},"nextPieces":["J","T","O","S","L"],"score":84,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":63,"matrix":[0,0,0,0,0,0,0,0,0,0,0,16,24,16,56,24,24,56,48,16,16,24,48,24],"currentPiece":{"type":"I","position":{"x":3,"y":3},"rotation":1,"shape":[[false,false,true,false],[false,false,true,false],[false,false,true,false],[false,false,true,false]]},"nextPieces":["J","T","O","S","L"],"score":84,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":64,"matrix":[0,0,0,0,0,0,0,0,0,0,0,16,24,16,56,24,24,56,48,16,16,24,48,24],"currentPiece":{"type":"I","position":{"x":3,"y":4},"rotation":1,"shape":[[false,false,true,false],[false,false,true,false],[false,false,true,false],[false,false,true,false]]},"nextPieces":["J","T","O","S","L"],"score":84,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":65,"matrix":[0,0,0,0,0,0,0,0,0,0,0,16,24,16,56,24,24,56,48,16,16,24,48,24],"currentPiece":{"type":"I","position":{"x":2,"y":5},"rotation":1,"shape":[[false,false,true,false],[false,false,true,false],[false,false,true,false],[false,false,true,false]]},"nextPieces":["J","T","O","S","L"],"score":84,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":66,"matrix":[0,0,0,0,0,0,0,0,0,0,0,16,24,16,56,24,24,56,48,16,16,24,48,24],"currentPiece":{"type":"I","position":{"x":3,"y":6},"rotation":1,"shape":[[false,false,true,false],[false,false,true,false],[false,false,true,false],[false,false,true,false]]},"nextPieces":["J","T","O","S","L"],"score":84,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":67,"matrix":[0,0,0,0,0,0,0,0,0,0,0,16,24,16,56,24,24,56,48,16,16,24,48,24],"currentPiece":{"type":"I","position":{"x":3,"y":7},"rotation":2,"shape":[[false,false,false,false],[false,false,false,false],[true,true,true,true],[false,false,false,false]]},"nextPieces":["J","T","O","S","L"],"score":84,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":68,"matrix":[0,0,0,0,0,0,0,0,0,0,0,16,24,16,56,24,24,56,48,16,16,24,48,24],"currentPiece":{"type":"I","position":{"x":3,"y":8},"rotation":2,"shape":[[false,false,false,false],[false,false,false,false],[true,true,true,true],[false,false,false,false]]},"nextPieces":["J","T","O","S","L"],"score":84,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":69,"matrix":[0,0,0,0,0,0,0,0,0,0,60,16,24,16,56,24,24,56,48,16,16,24,48,24],"currentPiece":{"type":"J","position":{"x":3,"y":0},"rotation":0,"shape":[[true,false,false],[true,true,true],[false,false,false]]},"nextPieces":["T","O","S","L","I"],"score":84,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":70,"matrix":[0,0,0,0,0,0,0,0,16,112,60,16,24,16,56,24,24,56,48,16,16,24,48,24],"currentPiece":{"type":"T","position":{"x":3,"y":0},"rotation":0,"shape":[[false,true,false],[true,true,true],[false,false,false]]},"nextPieces":["O","S","L","I","Z"],"score":100,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":71,"matrix":[0,0,0,0,0,0,0,0,16,112,60,16,24,16,56,24,24,56,48,16,16,24,48,24],"currentPiece":{"type":"T","position":{"x":3,"y":1},"rotation":1,"shape":[[false,true,false],[false,true,true],[false,true,false]]},"nextPieces":["O","S","L","I","Z"],"score":100,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":72,"matrix":[0,0,0,0,0,0,0,0,16,112,60,16,24,16,56,24,24,56,48,16,16,24,48,24],"currentPiece":{"type":"T","position":{"x":3,"y":2},"rotation":1,"shape":[[false,true,false],[false,true,true],[false,true,false]]},"nextPieces":["O","S","L","I","Z"],"score":100,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":73,"matrix":[0,0,0,0,0,0,0,0,16,112,60,16,24,16,56,24,24,56,48,16,16,24,48,24],"currentPiece":{"type":"T","position":{"x":2,"y":3},"rotation":1,"shape":[[false,true,false],[false,true,true],[false,true,false]]},"nextPieces":["O","S","L","I","Z"],"score":100,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":74,"matrix":[0,0,0,0,0,0,0,0,16,112,60,16,24,16,56,24,24,56,48,16,16,24,48,24],"currentPiece":{"type":"T","position":{"x":3,"y":4},"rotation":1,"shape":[[false,true,false],[false,true,true],[false,true,false]]},"nextPieces":["O","S","L","I","Z"],"score":100,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":75,"matrix":[0,0,0,0,0,0,0,0,16,112,60,16,24,16,56,24,24,56,48,16,16,24,48,24],"currentPiece":{"type":"T","position":{"x":3,"y":5},"rotation":2,"shape":[[false,false,false],[true,true,true],[false,true,false]]},"nextPieces":["O","S","L","I","Z"],"score":100,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":76,"matrix":[0,0,0,0,0,0,56,16,16,112,60,16,24,16,56,24,24,56,48,16,16,24,48,24],"currentPiece":{"type":"O","position":{"x":4,"y":0},"rotation":0,"shape":[[true,true],[true,true]]},"nextPieces":["S","L","I","Z","T"],"score":100,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":77,"matrix":[0,0,0,0,0,0,56,16,16,112,60,16,24,16,56,24,24,56,48,16,16,24,48,24],"currentPiece":{"type":"O","position":{"x":3,"y":1},"rotation":0,"shape":[[true,true],[true,true]]},"nextPieces":["S","L","I","Z","T"],"score":100,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":78,"matrix":[0,0,0,0,0,0,56,16,16,112,60,16,24,16,56,24,24,56,48,16,16,24,48,24],"currentPiece":{"type":"O","position":{"x":4,"y":2},"rotation":0,"shape":[[true,true],[true,true]]},"nextPieces":["S","L","I","Z","T"],"score":100,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":79,"matrix":[0,0,0,0,0,0,56,16,16,112,60,16,24,16,56,24,24,56,48,16,16,24,48,24],"currentPiece":{"type":"O","position":{"x":4,"y":3},"rotation":1,"shape":[[true,true],[true,true]]},"nextPieces":["S","L","I","Z","T"],"score":100,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":80,"matrix":[0,0,0,0,48,48,56,16,16,112,60,16,24,16,56,24,24,56,48,16,16,24,48,24],"currentPiece":{"type":"S","position":{"x":3,"y":0},"rotation":0,"shape":[[false,true,true],[true,true,false],[false,false,false]]},"nextPieces":["L","I","Z","T","J"],"score":102,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":81,"matrix":[0,0,0,0,48,48,56,16,16,112,60,16,24,16,56,24,24,56,48,16,16,24,48,24],"currentPiece":{"type":"S","position":{"x":2,"y":1},"rotation":0,"shape":[[false,true,true],[true,true,false],[false,false,false]]},"nextPieces":["L","I","Z","T","J"],"score":102,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":82,"matrix":[0,0,0,0,48,48,56,16,16,112,60,16,24,16,56,24,24,56,48,16,16,24,48,24],"currentPiece":{"type":"S","position":{"x":3,"y":2},"rotation":0,"shape":[[false,true,true],[true,true,false],[false,false,false]]},"nextPieces":["L","I","Z","T","J"],"score":102,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":83,"matrix":[0,0,0,0,48,48,56,16,16,112,60,16,24,16,56,24,24,56,48,16,16,24,48,24],"currentPiece":{"type":"S","position":{"x":3,"y":1},"rotation":1,"shape":[[false,true,false],[false,true,true],[false,false,true]]},"nextPieces":["L","I","Z","T","J"],"score":102,"lines":0,"level":1,"gameOver":false}",
+  "{"frame":84,"matrix":[0,16,48,32,48,48,56,16,16,112,60,16,24,16,56,24,24,56,48,16,16,24,48,24],"currentPiece":{"type":"L","position":{"x":3,"y":0},"rotation":0,"shape":[[false,false,true],[true,true,true],[false,false,false]]},"nextPieces":["I","Z","T","J","L"],"score":102,"lines":0,"level":1,"gameOver":true}",
+]
+`;
+
+exports[`Game Engine Golden Master Tests > should produce identical game sequences for seed 54321 > game-sequence-seed-54321.snap 1`] = `
+[
+  "{"frame":0,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"score":0,"lines":0,"gameOver":false}",
+  "{"frame":1,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"score":0,"lines":0,"gameOver":false}",
+  "{"frame":2,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"score":0,"lines":0,"gameOver":false}",
+  "{"frame":3,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"score":0,"lines":0,"gameOver":false}",
+  "{"frame":4,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"score":0,"lines":0,"gameOver":false}",
+  "{"frame":5,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,24,12],"score":34,"lines":0,"gameOver":false}",
+  "{"frame":6,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,24,12],"score":34,"lines":0,"gameOver":false}",
+  "{"frame":7,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,24,12],"score":34,"lines":0,"gameOver":false}",
+  "{"frame":8,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,24,12],"score":34,"lines":0,"gameOver":false}",
+  "{"frame":9,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,24,12],"score":34,"lines":0,"gameOver":false}",
+  "{"frame":10,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,112,16,24,12],"score":64,"lines":0,"gameOver":false}",
+  "{"frame":11,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,112,16,24,12],"score":64,"lines":0,"gameOver":false}",
+  "{"frame":12,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,112,16,24,12],"score":64,"lines":0,"gameOver":false}",
+  "{"frame":13,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,112,16,24,12],"score":64,"lines":0,"gameOver":false}",
+  "{"frame":14,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,112,16,24,12],"score":64,"lines":0,"gameOver":false}",
+  "{"frame":15,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,32,32,32,32,112,16,24,12],"score":88,"lines":0,"gameOver":false}",
+  "{"frame":16,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,32,32,32,32,112,16,24,12],"score":88,"lines":0,"gameOver":false}",
+  "{"frame":17,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,32,32,32,32,112,16,24,12],"score":88,"lines":0,"gameOver":false}",
+  "{"frame":18,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,32,32,32,32,112,16,24,12],"score":88,"lines":0,"gameOver":false}",
+  "{"frame":19,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,32,32,32,32,112,16,24,12],"score":88,"lines":0,"gameOver":false}",
+  "{"frame":20,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,32,32,32,60,120,16,24,12],"score":116,"lines":0,"gameOver":false}",
+  "{"frame":21,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,32,32,32,60,120,16,24,12],"score":116,"lines":0,"gameOver":false}",
+  "{"frame":22,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,32,32,32,60,120,16,24,12],"score":116,"lines":0,"gameOver":false}",
+  "{"frame":23,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,32,32,32,60,120,16,24,12],"score":116,"lines":0,"gameOver":false}",
+  "{"frame":24,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,32,32,32,60,120,16,24,12],"score":116,"lines":0,"gameOver":false}",
+  "{"frame":25,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,96,96,32,32,32,60,120,16,24,12],"score":136,"lines":0,"gameOver":false}",
+  "{"frame":26,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,96,96,32,32,32,60,120,16,24,12],"score":136,"lines":0,"gameOver":false}",
+  "{"frame":27,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,96,96,32,32,32,60,120,16,24,12],"score":136,"lines":0,"gameOver":false}",
+  "{"frame":28,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,96,96,32,32,32,60,120,16,24,12],"score":136,"lines":0,"gameOver":false}",
+  "{"frame":29,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,96,96,32,32,32,60,120,16,24,12],"score":136,"lines":0,"gameOver":false}",
+  "{"frame":30,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,32,48,112,96,32,32,32,60,120,16,24,12],"score":152,"lines":0,"gameOver":false}",
+  "{"frame":31,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,32,48,112,96,32,32,32,60,120,16,24,12],"score":152,"lines":0,"gameOver":false}",
+  "{"frame":32,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,32,48,112,96,32,32,32,60,120,16,24,12],"score":152,"lines":0,"gameOver":false}",
+  "{"frame":33,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,32,48,112,96,32,32,32,60,120,16,24,12],"score":152,"lines":0,"gameOver":false}",
+  "{"frame":34,"matrix":[0,0,0,0,0,0,0,0,0,0,0,0,32,48,112,96,32,32,32,60,120,16,24,12],"score":152,"lines":0,"gameOver":false}",
+  "{"frame":35,"matrix":[0,0,0,0,0,0,0,0,0,0,0,28,48,48,112,96,32,32,32,60,120,16,24,12],"score":164,"lines":0,"gameOver":false}",
+  "{"frame":36,"matrix":[0,0,0,0,0,0,0,0,0,0,0,28,48,48,112,96,32,32,32,60,120,16,24,12],"score":164,"lines":0,"gameOver":false}",
+  "{"frame":37,"matrix":[0,0,0,0,0,0,0,0,0,0,0,28,48,48,112,96,32,32,32,60,120,16,24,12],"score":164,"lines":0,"gameOver":false}",
+  "{"frame":38,"matrix":[0,0,0,0,0,0,0,0,0,0,0,28,48,48,112,96,32,32,32,60,120,16,24,12],"score":164,"lines":0,"gameOver":false}",
+  "{"frame":39,"matrix":[0,0,0,0,0,0,0,0,0,0,0,28,48,48,112,96,32,32,32,60,120,16,24,12],"score":164,"lines":0,"gameOver":false}",
+  "{"frame":40,"matrix":[0,0,0,0,0,0,0,0,0,0,240,28,48,48,112,96,32,32,32,60,120,16,24,12],"score":172,"lines":0,"gameOver":false}",
+  "{"frame":41,"matrix":[0,0,0,0,0,0,0,0,0,0,240,28,48,48,112,96,32,32,32,60,120,16,24,12],"score":172,"lines":0,"gameOver":false}",
+  "{"frame":42,"matrix":[0,0,0,0,0,0,0,0,0,0,240,28,48,48,112,96,32,32,32,60,120,16,24,12],"score":172,"lines":0,"gameOver":false}",
+  "{"frame":43,"matrix":[0,0,0,0,0,0,0,0,0,0,240,28,48,48,112,96,32,32,32,60,120,16,24,12],"score":172,"lines":0,"gameOver":false}",
+  "{"frame":44,"matrix":[0,0,0,0,0,0,0,0,0,0,240,28,48,48,112,96,32,32,32,60,120,16,24,12],"score":172,"lines":0,"gameOver":false}",
+  "{"frame":45,"matrix":[0,0,0,0,0,0,0,32,48,16,240,28,48,48,112,96,32,32,32,60,120,16,24,12],"score":178,"lines":0,"gameOver":false}",
+  "{"frame":46,"matrix":[0,0,0,0,0,0,0,32,48,16,240,28,48,48,112,96,32,32,32,60,120,16,24,12],"score":178,"lines":0,"gameOver":false}",
+  "{"frame":47,"matrix":[0,0,0,0,0,0,0,32,48,16,240,28,48,48,112,96,32,32,32,60,120,16,24,12],"score":178,"lines":0,"gameOver":false}",
+  "{"frame":48,"matrix":[0,0,0,0,0,0,0,32,48,16,240,28,48,48,112,96,32,32,32,60,120,16,24,12],"score":178,"lines":0,"gameOver":false}",
+  "{"frame":49,"matrix":[0,0,0,0,0,0,0,32,48,16,240,28,48,48,112,96,32,32,32,60,120,16,24,12],"score":178,"lines":0,"gameOver":false}",
+]
+`;
