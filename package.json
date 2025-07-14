@@ -36,7 +36,7 @@
     "i18next": "25.3.2",
     "immer": "^10.1.1",
     "lucide-react": "^0.525.0",
-    "motion": "^12.23.3",
+    "motion": "^12.23.5",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-i18next": "15.6.0",
@@ -70,7 +70,7 @@
     "storybook": "^9.0.16",
     "tailwindcss": "4.1.11",
     "typescript": "5.8.3",
-    "vite": "npm:rolldown-vite@^7.0.8"
+    "vite": "npm:rolldown-vite@^7.0.9"
   },
   "trustedDependencies": [
     "@tailwindcss/oxide",
