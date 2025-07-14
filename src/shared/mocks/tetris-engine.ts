@@ -4,7 +4,7 @@
  * TODO: Remove this file once Issue #139 (Core Game Engine Package) is completed
  */
 
-import type { Position, Tetromino, TetrominoTypeName, CellValue } from "@/types/game";
+import type { CellValue, Position, Tetromino, TetrominoTypeName } from "@/types/game";
 
 export interface GameEngineState {
   board: CellValue[][];
