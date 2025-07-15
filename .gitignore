@@ -5,6 +5,10 @@ node_modules
 dist
 storybook-static
 
+# Generated test files (esbuild artifacts)
+**/tests/**/*.js
+**/tests/**/*.js.map
+
 # Env files
 .env
 .env.local
