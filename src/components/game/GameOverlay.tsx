@@ -1,16 +1,14 @@
 import { useTranslation } from "react-i18next";
 import { AnimatedButton } from "@/components/ui/AnimatedButton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { useGameStore } from "@/store/gameStore";
+import { useGamePlay } from "@/features/game-play";
+import { useScoringData } from "@/features/scoring";
 import { useHighScoreStore } from "@/store/highScoreStore";
 import { MODAL_STYLES } from "@/utils/styles";
 
 export function GameOverlay() {
-  const isGameOver = useGameStore((state) => state.isGameOver);
-  const isPaused = useGameStore((state) => state.isPaused);
-  const score = useGameStore((state) => state.score);
-  const resetGame = useGameStore((state) => state.resetGame);
-  const togglePause = useGameStore((state) => state.togglePause);
+  const { isGameOver, isPaused, resetGame, pauseGame } = useGamePlay();
+  const { score } = useScoringData();
   const currentHighScore = useHighScoreStore((state) => state.currentHighScore);
   const { t } = useTranslation();
 
@@ -82,7 +80,7 @@ export function GameOverlay() {
               <p className="text-center text-white">{t("game.resumeHint")}</p>
               <div className="flex justify-center">
                 <AnimatedButton
-                  onClick={togglePause}
+                  onClick={pauseGame}
                   variant="default"
                   size="lg"
                   className="bg-blue-600 hover:bg-blue-700 text-white"

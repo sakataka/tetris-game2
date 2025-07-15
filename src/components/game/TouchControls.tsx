@@ -1,16 +1,15 @@
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronsDown, RotateCw } from "lucide-react";
 import { GameControlButton } from "@/components/game/GameControlButton";
+import { useGamePlayState } from "@/features/game-play";
 import { useMovementControls } from "@/hooks/controls/useMovementControls";
 import { useRotationControl } from "@/hooks/controls/useRotationControl";
-import { useGameStore } from "@/store/gameStore";
 
 interface TouchControlsProps {
   className?: string;
 }
 
 export function TouchControls({ className }: TouchControlsProps) {
-  const isPaused = useGameStore((state) => state.isPaused);
-  const isGameOver = useGameStore((state) => state.isGameOver);
+  const { isPaused, isGameOver } = useGamePlayState();
   const { handleRotate } = useRotationControl();
   const { handleMoveLeft, handleMoveRight, handleMoveDown, handleDrop } = useMovementControls();
 

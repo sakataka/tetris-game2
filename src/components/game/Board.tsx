@@ -1,9 +1,10 @@
 import { useAnimate } from "motion/react";
 import { useCallback, useEffect, useRef } from "react";
 import { Card } from "@/components/ui/card";
+import { useGamePlayState } from "@/features/game-play";
+import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
 import { useDesignTokens } from "@/hooks/core/useDesignTokens";
 import { cn } from "@/lib/utils";
-import { useGameStore } from "@/store/gameStore";
 import type { LineClearAnimationData } from "@/types/game";
 import { ANIMATION_PRESETS } from "@/utils/animationConstants";
 import { GAME_CONSTANTS } from "@/utils/gameConstants";
@@ -25,8 +26,11 @@ export function Board() {
   const abortControllerRef = useRef<AbortController | null>(null);
 
   // Get animation state from store with stable selectors
-  const animationState = useGameStore((state) => state.animationState);
-  const lineClearData = useGameStore((state) => state.lineClearData);
+  const { animationState, lineClearData } = useGamePlayState();
+
+  // Get animation control functions
+  const completeLineClearAnimation = useGamePlayStore((state) => state.completeLineClearAnimation);
+  const completeLineFallAnimation = useGamePlayStore((state) => state.completeLineFallAnimation);
 
   // Execute line clear animation with AbortController
   const executeLineClearAnimation = useCallback(
@@ -59,18 +63,18 @@ export function Board() {
         );
 
         if (signal.aborted) return;
-        useGameStore.getState().completeLineClearAnimation();
+        completeLineClearAnimation();
       } catch (error) {
         console.error("Line clear animation failed:", error);
       } finally {
         // Ensure reliable state recovery
-        const { animationState: currentState } = useGameStore.getState();
+        const { animationState: currentState } = useGamePlayStore.getState();
         if (currentState === "line-clearing") {
-          useGameStore.getState().completeLineClearAnimation();
+          completeLineClearAnimation();
         }
       }
     },
-    [animate],
+    [animate, completeLineClearAnimation],
   );
 
   // Calculate affected rows for non-continuous line clearing
@@ -99,7 +103,7 @@ export function Board() {
         // Calculate affected rows for non-continuous line clearing
         const affectedRows = calculateAffectedRows(lineClearData.clearedLineIndices);
         if (affectedRows.length === 0) {
-          useGameStore.getState().completeLineFallAnimation();
+          completeLineFallAnimation();
           return;
         }
 
@@ -120,18 +124,18 @@ export function Board() {
         );
 
         if (signal.aborted) return;
-        useGameStore.getState().completeLineFallAnimation();
+        completeLineFallAnimation();
       } catch (error) {
         console.error("Line fall animation failed:", error);
       } finally {
         // Ensure reliable state recovery
-        const { animationState: currentState } = useGameStore.getState();
+        const { animationState: currentState } = useGamePlayStore.getState();
         if (currentState === "line-falling") {
-          useGameStore.getState().completeLineFallAnimation();
+          completeLineFallAnimation();
         }
       }
     },
-    [lineClearData, animate, calculateAffectedRows],
+    [lineClearData, animate, calculateAffectedRows, completeLineFallAnimation],
   );
 
   // Effect for managing line clear animation

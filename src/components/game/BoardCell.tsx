@@ -1,5 +1,7 @@
 import { motion } from "motion/react";
 import { useMemo } from "react";
+import { useGamePlayState } from "@/features/game-play";
+import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
 import { forEachPieceCell } from "@/game/board";
 import { getTetrominoColorIndex } from "@/game/tetrominos";
 import { useCellAnimation } from "@/hooks/ui/useCellAnimation";
@@ -22,12 +24,17 @@ interface BoardCellProps {
  * Uses fine-grained selectors to minimize re-renders
  */
 export function BoardCell({ row, col, cellSize = GAME_CONSTANTS.BOARD.CELL_SIZE }: BoardCellProps) {
-  // Fine-grained selectors - only re-render when specific data changes
-  const baseCellValue = useGameStore((state) => state.board[row]?.[col] ?? 0);
-  const currentPiece = useGameStore((state) => state.currentPiece);
+  // Get state from new architecture
+  const { board, currentPiece, ghostPiece } = useGamePlayState();
+  const baseCellValue = board[row]?.[col] ?? 0;
+  const ghostPosition = ghostPiece?.position;
+
+  // Get animation control functions
+  const clearAnimationData = useGamePlayStore((state) => state.clearAnimationData);
+
+  // Legacy states that are not yet in new architecture
   const boardBeforeClear = useGameStore((state) => state.boardBeforeClear);
   const clearingLines = useGameStore((state) => state.clearingLines);
-  const ghostPosition = useGameStore((state) => state.ghostPosition);
   const placedPositions = useGameStore((state) => state.placedPositions);
   const animationTriggerKey = useGameStore((state) => state.animationTriggerKey);
   const showGhostPiece = useSettingsStore((state) => state.showGhostPiece);
@@ -104,8 +111,8 @@ export function BoardCell({ row, col, cellSize = GAME_CONSTANTS.BOARD.CELL_SIZE 
   const handleAnimationComplete = () => {
     // Only trigger completion for clearing lines and placed pieces
     if (cellState.isClearingLine || cellState.isPlacedPiece) {
-      // Use the gameStore's clearAnimationData method
-      useGameStore.getState().clearAnimationData();
+      // Use the new architecture's clearAnimationData method
+      clearAnimationData();
     }
   };
 
