@@ -53,26 +53,42 @@
       "tSpinDetection": "T-Spin検出",
       "tSpinDetectionDescription": "T-Spin検出とスコアリングを有効にする",
       "aiFeatures": "AI機能",
-      "aiFeaturesDescription": "AIプレイヤーと可視化を有効にする"
-    },
-    "lineClears": {
-      "single": "シングル",
-      "double": "ダブル",
-      "triple": "トリプル",
-      "tetris": "テトリス"
-    },
-    "tSpin": {
-      "mini": "T-スピンミニ",
-      "normal": "T-スピン",
-      "miniSingle": "T-スピンミニシングル",
-      "miniDouble": "T-スピンミニダブル",
-      "miniTriple": "T-スピンミニトリプル",
-      "normalSingle": "T-スピンシングル",
-      "normalDouble": "T-スピンダブル",
-      "normalTriple": "T-スピントリプル"
+      "aiFeaturesDescription": "AIプレイヤーと可視化を有効にする",
+      "animations": "アニメーション",
+      "audio": "オーディオ",
+      "auto": "自動",
+      "badge": "バッジ",
+      "close": "閉じる",
+      "colorScheme": "カラースキーム",
+      "compact": "コンパクト",
+      "dark": "ダーク",
+      "gameplay": "ゲームプレイ",
+      "gaming": "ゲーミング",
+      "haptics": "ハプティック",
+      "light": "ライト",
+      "normal": "ノーマル",
+      "open": "開く",
+      "performance": "パフォーマンス",
+      "performanceMode": "パフォーマンスモード",
+      "showGrid": "グリッド表示",
+      "sound": "サウンド",
+      "targetFPS": "ターゲットFPS",
+      "theme": "テーマ",
+      "themeMode": "テーマモード",
+      "visual": "ビジュアル",
+      "volume": "音量"
     },
     "linesCleared": "{{count}}ライン消去",
     "tSpinAnnouncement": "{{type}} {{lines}}ライン消去",
+    "pieces": {
+      "i": "Iピース",
+      "o": "Oピース",
+      "t": "Tピース",
+      "s": "Sピース",
+      "z": "Zピース",
+      "j": "Jピース",
+      "l": "Lピース"
+    },
     "resetConfirmation": {
       "title": "ゲームリセット",
       "message": "現在のゲームをリセットしますか？",
@@ -107,7 +123,27 @@
         "timeouts": "タイムアウト:",
         "holdUsage": "ホールド使用率:",
         "nodes": "ノード",
-        "ms": "ミリ秒"
+        "ms": "ミリ秒",
+        "avgNodes": "平均ノード数",
+        "efficiency": "効率",
+        "statistics": "統計",
+        "thinkingTime": "思考時間",
+        "totalMoves": "総移動数",
+        "visualization": "可視化"
+      },
+      "visualization": {
+        "columnTransitions": "列遷移",
+        "evaluationBreakdown": "評価内訳",
+        "holes": "穴",
+        "landingHeight": "着地高度",
+        "linesCleared": "消したライン数",
+        "notAvailable": "利用不可",
+        "perfectClear": "パーフェクトクリア",
+        "rowTransitions": "行遷移",
+        "specialOpportunities": "特殊機会",
+        "tSpinDetected": "T-スピン検出",
+        "totalScore": "総スコア",
+        "wells": "穴"
       }
     }
   }

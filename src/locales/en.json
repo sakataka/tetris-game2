@@ -53,27 +53,43 @@
       "tSpinDetection": "T-Spin Detection",
       "tSpinDetectionDescription": "Enable T-Spin detection and scoring",
       "aiFeatures": "AI Features",
-      "aiFeaturesDescription": "Enable AI player and visualization"
-    },
-    "lineClears": {
-      "single": "SINGLE",
-      "double": "DOUBLE",
-      "triple": "TRIPLE",
-      "tetris": "TETRIS"
-    },
-    "tSpin": {
-      "mini": "T-SPIN MINI",
-      "normal": "T-SPIN",
-      "miniSingle": "T-SPIN MINI SINGLE",
-      "miniDouble": "T-SPIN MINI DOUBLE",
-      "miniTriple": "T-SPIN MINI TRIPLE",
-      "normalSingle": "T-SPIN SINGLE",
-      "normalDouble": "T-SPIN DOUBLE",
-      "normalTriple": "T-SPIN TRIPLE"
+      "aiFeaturesDescription": "Enable AI player and visualization",
+      "animations": "Animations",
+      "audio": "Audio",
+      "auto": "Auto",
+      "badge": "Badge",
+      "close": "Close",
+      "colorScheme": "Color Scheme",
+      "compact": "Compact",
+      "dark": "Dark",
+      "gameplay": "Gameplay",
+      "gaming": "Gaming",
+      "haptics": "Haptics",
+      "light": "Light",
+      "normal": "Normal",
+      "open": "Open",
+      "performance": "Performance",
+      "performanceMode": "Performance Mode",
+      "showGrid": "Show Grid",
+      "sound": "Sound",
+      "targetFPS": "Target FPS",
+      "theme": "Theme",
+      "themeMode": "Theme Mode",
+      "visual": "Visual",
+      "volume": "Volume"
     },
     "linesCleared": "{{count}} line cleared",
     "linesCleared_plural": "{{count}} lines cleared",
     "tSpinAnnouncement": "{{type}} with {{lines}} lines cleared",
+    "pieces": {
+      "i": "I-piece",
+      "o": "O-piece",
+      "t": "T-piece",
+      "s": "S-piece",
+      "z": "Z-piece",
+      "j": "J-piece",
+      "l": "L-piece"
+    },
     "resetConfirmation": {
       "title": "Reset Game",
       "message": "Reset the current game?",
@@ -108,7 +124,27 @@
         "timeouts": "Timeouts:",
         "holdUsage": "Hold Usage:",
         "nodes": "nodes",
-        "ms": "ms"
+        "ms": "ms",
+        "avgNodes": "Avg Nodes",
+        "efficiency": "Efficiency",
+        "statistics": "Statistics",
+        "thinkingTime": "Thinking Time",
+        "totalMoves": "Total Moves",
+        "visualization": "Visualization"
+      },
+      "visualization": {
+        "columnTransitions": "Column Transitions",
+        "evaluationBreakdown": "Evaluation Breakdown",
+        "holes": "Holes",
+        "landingHeight": "Landing Height",
+        "linesCleared": "Lines Cleared",
+        "notAvailable": "Not Available",
+        "perfectClear": "Perfect Clear",
+        "rowTransitions": "Row Transitions",
+        "specialOpportunities": "Special Opportunities",
+        "tSpinDetected": "T-Spin Detected",
+        "totalScore": "Total Score",
+        "wells": "Wells"
       }
     }
   }
