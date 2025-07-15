@@ -4,26 +4,12 @@
  * Provides type-safe event handling and subscription management
  */
 
-import type { AdvancedAIDecision } from "@/game/ai/core/advanced-ai-engine";
-import type { AIDecision } from "@/game/ai/core/ai-engine";
-// Import actual types from our codebase
-import type {
-  GameBoard,
-  GameState,
-  LineClearAnimationData,
-  Position,
-  Tetromino,
-  TetrominoTypeName,
-} from "@/types/game";
+import type { GameEventPayload, GameEventType } from "./event-map";
 
-export type EventHandler<T = unknown> = (event: T) => void | Promise<void>;
+export type EventHandler<T extends GameEventType> = (
+  payload: GameEventPayload<T>,
+) => void | Promise<void>;
 export type UnsubscribeFn = () => void;
-
-export interface GameEventBase {
-  type: string;
-  timestamp?: number;
-  source?: string;
-}
 
 export interface GameEventBusConfig {
   maxListeners?: number;
@@ -32,192 +18,12 @@ export interface GameEventBusConfig {
 }
 
 /**
- * Event types for the game
- */
-export interface GameEvents {
-  // AI Events
-  AI_MOVE_REQUESTED: {
-    type: "AI_MOVE_REQUESTED";
-    payload: {
-      gameState: GameState;
-    };
-  };
-  AI_MOVE_CALCULATED: {
-    type: "AI_MOVE_CALCULATED";
-    payload: {
-      result: AIDecision | AdvancedAIDecision;
-      responseTime: number;
-      source: "worker" | "main-thread";
-    };
-  };
-  AI_ERROR: {
-    type: "AI_ERROR";
-    payload: {
-      message: string;
-      code: string;
-      source: "worker" | "main-thread";
-    };
-  };
-  AI_DIFFICULTY_CHANGED: {
-    type: "AI_DIFFICULTY_CHANGED";
-    payload: {
-      difficulty: "easy" | "medium" | "hard" | "expert";
-    };
-  };
-
-  // Worker Events
-  WORKER_INITIALIZED: {
-    type: "WORKER_INITIALIZED";
-    payload: {
-      version: string;
-      capabilities: string[];
-    };
-  };
-  WORKER_ERROR: {
-    type: "WORKER_ERROR";
-    payload: {
-      message: string;
-      code: string;
-    };
-  };
-  WORKER_TERMINATED: {
-    type: "WORKER_TERMINATED";
-    payload: {
-      reason: string;
-    };
-  };
-
-  // Game Events
-  POSITION_NEEDS_EVALUATION: {
-    type: "POSITION_NEEDS_EVALUATION";
-    payload: {
-      gameState: GameState;
-    };
-  };
-
-  // Game Play Events
-  GAME_STARTED: {
-    type: "GAME_STARTED";
-    payload: Record<string, never>;
-  };
-  GAME_PAUSED: {
-    type: "GAME_PAUSED";
-    payload: {
-      isPaused: boolean;
-    };
-  };
-  GAME_OVER: {
-    type: "GAME_OVER";
-    payload: {
-      finalScore: number;
-      linesCleared: number;
-      level: number;
-    };
-  };
-  GAME_RESET: {
-    type: "GAME_RESET";
-    payload: Record<string, never>;
-  };
-
-  // Movement Events
-  MOVE_LEFT: {
-    type: "MOVE_LEFT";
-    payload: Record<string, never>;
-  };
-  MOVE_RIGHT: {
-    type: "MOVE_RIGHT";
-    payload: Record<string, never>;
-  };
-  ROTATE_CLOCKWISE: {
-    type: "ROTATE_CLOCKWISE";
-    payload: Record<string, never>;
-  };
-  ROTATE_COUNTER_CLOCKWISE: {
-    type: "ROTATE_COUNTER_CLOCKWISE";
-    payload: Record<string, never>;
-  };
-  SOFT_DROP: {
-    type: "SOFT_DROP";
-    payload: Record<string, never>;
-  };
-  HARD_DROP: {
-    type: "HARD_DROP";
-    payload: Record<string, never>;
-  };
-  HOLD_PIECE: {
-    type: "HOLD_PIECE";
-    payload: Record<string, never>;
-  };
-
-  // Piece Events
-  PIECE_SPAWNED: {
-    type: "PIECE_SPAWNED";
-    payload: {
-      piece: Tetromino;
-      nextPieces: TetrominoTypeName[];
-    };
-  };
-  PIECE_PLACED: {
-    type: "PIECE_PLACED";
-    payload: {
-      piece: Tetromino;
-      position: Position;
-    };
-  };
-  PIECE_HELD: {
-    type: "PIECE_HELD";
-    payload: {
-      heldPiece: TetrominoTypeName;
-      newCurrentPiece: Tetromino | null;
-    };
-  };
-
-  // Line Clear Events
-  LINES_CLEARED: {
-    type: "LINES_CLEARED";
-    payload: {
-      lines: number[];
-      linesCleared: number;
-      isTSpin: boolean;
-      isPerfectClear: boolean;
-    };
-  };
-  LINE_CLEAR_ANIMATION_START: {
-    type: "LINE_CLEAR_ANIMATION_START";
-    payload: {
-      lineClearData: LineClearAnimationData;
-    };
-  };
-  LINE_CLEAR_ANIMATION_COMPLETE: {
-    type: "LINE_CLEAR_ANIMATION_COMPLETE";
-    payload: Record<string, never>;
-  };
-
-  // Board State Events
-  BOARD_UPDATED: {
-    type: "BOARD_UPDATED";
-    payload: {
-      board: GameBoard;
-    };
-  };
-  GHOST_PIECE_UPDATED: {
-    type: "GHOST_PIECE_UPDATED";
-    payload: {
-      ghostPiece: Tetromino | null;
-    };
-  };
-}
-
-export type GameEventType = keyof GameEvents;
-export type GameEvent = GameEvents[GameEventType];
-
-/**
  * Game Event Bus implementation
  */
 export class GameEventBus {
-  private listeners = new Map<string, Set<EventHandler>>();
+  private listeners = new Map<string, Set<EventHandler<any>>>();
   private config: Required<GameEventBusConfig>;
-  private eventHistory: GameEvent[] = [];
+  private eventHistory: Array<{ type: GameEventType; payload: any }> = [];
   private maxHistorySize = 100;
 
   constructor(config: GameEventBusConfig = {}) {
@@ -231,10 +37,7 @@ export class GameEventBus {
   /**
    * Subscribe to an event type
    */
-  public subscribe<T extends GameEventType>(
-    eventType: T,
-    handler: EventHandler<GameEvents[T]>,
-  ): UnsubscribeFn {
+  public subscribe<T extends GameEventType>(eventType: T, handler: EventHandler<T>): UnsubscribeFn {
     if (!this.listeners.has(eventType)) {
       this.listeners.set(eventType, new Set());
     }
@@ -251,7 +54,7 @@ export class GameEventBus {
       );
     }
 
-    handlers.add(handler as EventHandler);
+    handlers.add(handler as EventHandler<any>);
 
     if (this.config.enableLogging) {
       console.log(`[EventBus] Subscribed to ${eventType}`);
@@ -259,7 +62,7 @@ export class GameEventBus {
 
     // Return unsubscribe function
     return () => {
-      handlers.delete(handler as EventHandler);
+      handlers.delete(handler as EventHandler<any>);
       if (this.config.enableLogging) {
         console.log(`[EventBus] Unsubscribed from ${eventType}`);
       }
@@ -269,12 +72,9 @@ export class GameEventBus {
   /**
    * Subscribe to an event type with a once-only handler
    */
-  public once<T extends GameEventType>(
-    eventType: T,
-    handler: EventHandler<GameEvents[T]>,
-  ): UnsubscribeFn {
-    const unsubscribe = this.subscribe(eventType, (event) => {
-      handler(event);
+  public once<T extends GameEventType>(eventType: T, handler: EventHandler<T>): UnsubscribeFn {
+    const unsubscribe = this.subscribe(eventType, (payload) => {
+      handler(payload);
       unsubscribe();
     });
     return unsubscribe;
@@ -283,20 +83,20 @@ export class GameEventBus {
   /**
    * Emit an event
    */
-  public async emit<T extends GameEventType>(event: GameEvents[T]): Promise<void> {
-    // Add timestamp if not present
-    if (!("timestamp" in event)) {
-      (event as any).timestamp = Date.now();
-    }
+  public async emit<T extends GameEventType>(
+    eventType: T,
+    payload: GameEventPayload<T>,
+  ): Promise<void> {
+    const event = { type: eventType, payload };
 
     // Store in history
     this.addToHistory(event);
 
     if (this.config.enableLogging) {
-      console.log(`[EventBus] Emitting ${event.type}`, event);
+      console.log(`[EventBus] Emitting ${eventType}`, payload);
     }
 
-    const handlers = this.listeners.get(event.type);
+    const handlers = this.listeners.get(eventType);
     if (!handlers || handlers.size === 0) {
       return;
     }
@@ -304,12 +104,12 @@ export class GameEventBus {
     // Execute handlers
     if (this.config.asyncHandlers) {
       // Async execution - handlers run in parallel
-      const promises = Array.from(handlers).map((handler) => this.executeHandler(handler, event));
+      const promises = Array.from(handlers).map((handler) => this.executeHandler(handler, payload));
       await Promise.all(promises);
     } else {
       // Sync execution - handlers run sequentially
       for (const handler of handlers) {
-        await this.executeHandler(handler, event);
+        await this.executeHandler(handler, payload);
       }
     }
   }
@@ -317,39 +117,33 @@ export class GameEventBus {
   /**
    * Emit an event synchronously (fire and forget)
    */
-  public emitSync<T extends GameEventType>(event: GameEvents[T]): void {
-    this.emit(event).catch((error) => {
-      console.error(`Error in event handler for ${event.type}:`, error);
+  public emitSync<T extends GameEventType>(eventType: T, payload: GameEventPayload<T>): void {
+    this.emit(eventType, payload).catch((error) => {
+      console.error(`Error in event handler for ${eventType}:`, error);
     });
   }
 
   /**
    * Execute a handler with error handling
    */
-  private async executeHandler(handler: EventHandler, event: GameEvent): Promise<void> {
+  private async executeHandler(handler: EventHandler<any>, payload: any): Promise<void> {
     try {
-      await handler(event);
+      await handler(payload);
     } catch (error) {
-      console.error(`Error in event handler for ${event.type}:`, error);
+      console.error("Error in event handler:", error);
 
       // Emit error event if it's not already an error event
-      if (event.type !== "AI_ERROR" && event.type !== "WORKER_ERROR") {
-        this.emitSync({
-          type: "AI_ERROR",
-          payload: {
-            message: error instanceof Error ? error.message : "Unknown error in event handler",
-            code: "EVENT_HANDLER_ERROR",
-            source: "main-thread",
-          },
-        });
-      }
+      this.emitSync("AI_ERROR", {
+        error: error instanceof Error ? error.message : "Unknown error in event handler",
+        requestId: undefined,
+      });
     }
   }
 
   /**
    * Add event to history
    */
-  private addToHistory(event: GameEvent): void {
+  private addToHistory(event: { type: GameEventType; payload: any }): void {
     this.eventHistory.push(event);
     if (this.eventHistory.length > this.maxHistorySize) {
       this.eventHistory.shift();
@@ -359,7 +153,7 @@ export class GameEventBus {
   /**
    * Get event history
    */
-  public getHistory(): readonly GameEvent[] {
+  public getHistory(): Array<{ type: GameEventType; payload: any }> {
     return [...this.eventHistory];
   }
 

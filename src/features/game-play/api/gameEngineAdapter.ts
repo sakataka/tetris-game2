@@ -1,24 +1,17 @@
-import type { AIEngine } from "@/game/ai";
-import type { GameEngine } from "@/game/game";
-import type { GameState, Piece, Position } from "@/types/game";
+import type { GameEngine } from "@/game/GameEngine";
+import { SimpleGameEngine } from "@/game/SimpleGameEngine";
+import type { GameState, Tetromino } from "@/types/game";
 
 /**
  * Adapter for communicating with the core game engine
  * This isolates the game-play feature from direct engine dependencies
  */
 export class GameEngineAdapter {
-  private gameEngine: GameEngine | null = null;
-  private aiEngine: AIEngine | null = null;
-  private eventListeners: Map<string, ((data: any) => void)[]> = new Map();
+  private gameEngine: GameEngine;
+  private eventListeners: Map<string, ((data: unknown) => void)[]> = new Map();
 
-  /**
-   * Initialize the game engine
-   */
-  async initialize(engine: GameEngine, aiEngine?: AIEngine): Promise<void> {
-    this.gameEngine = engine;
-    this.aiEngine = aiEngine;
-
-    // Set up event listeners for game events
+  constructor() {
+    this.gameEngine = new SimpleGameEngine();
     this.setupGameEventListeners();
   }
 
@@ -26,11 +19,6 @@ export class GameEngineAdapter {
    * Start a new game
    */
   startGame(): void {
-    if (!this.gameEngine) {
-      console.error("[GameEngineAdapter] Game engine not initialized");
-      return;
-    }
-
     try {
       this.gameEngine.startGame();
       this.emit("game-started", { timestamp: Date.now() });
@@ -44,10 +32,8 @@ export class GameEngineAdapter {
    * Pause/resume the game
    */
   pauseGame(): void {
-    if (!this.gameEngine) return;
-
     try {
-      this.gameEngine.pause();
+      this.gameEngine.pauseGame();
       this.emit("game-paused", { timestamp: Date.now() });
     } catch (error) {
       console.error("[GameEngineAdapter] Failed to pause game:", error);
@@ -59,10 +45,8 @@ export class GameEngineAdapter {
    * Reset the game
    */
   resetGame(): void {
-    if (!this.gameEngine) return;
-
     try {
-      this.gameEngine.reset();
+      this.gameEngine.resetGame();
       this.emit("game-reset", { timestamp: Date.now() });
     } catch (error) {
       console.error("[GameEngineAdapter] Failed to reset game:", error);
@@ -74,8 +58,6 @@ export class GameEngineAdapter {
    * Execute player move
    */
   moveLeft(): boolean {
-    if (!this.gameEngine) return false;
-
     try {
       const result = this.gameEngine.moveLeft();
       if (result) {
@@ -92,8 +74,6 @@ export class GameEngineAdapter {
    * Execute player move
    */
   moveRight(): boolean {
-    if (!this.gameEngine) return false;
-
     try {
       const result = this.gameEngine.moveRight();
       if (result) {
@@ -110,10 +90,8 @@ export class GameEngineAdapter {
    * Execute rotation
    */
   rotateClockwise(): boolean {
-    if (!this.gameEngine) return false;
-
     try {
-      const result = this.gameEngine.rotate();
+      const result = this.gameEngine.rotateClockwise();
       if (result) {
         this.emit("piece-rotated", { direction: "clockwise", timestamp: Date.now() });
       }
@@ -128,14 +106,12 @@ export class GameEngineAdapter {
    * Execute counter-clockwise rotation
    */
   rotateCounterClockwise(): boolean {
-    if (!this.gameEngine) return false;
-
     try {
-      const result = this.gameEngine.rotateCounterClockwise?.();
+      const result = this.gameEngine.rotateCounterClockwise();
       if (result) {
         this.emit("piece-rotated", { direction: "counter-clockwise", timestamp: Date.now() });
       }
-      return result ?? false;
+      return result;
     } catch (error) {
       console.error("[GameEngineAdapter] Failed to rotate counter-clockwise:", error);
       return false;
@@ -146,8 +122,6 @@ export class GameEngineAdapter {
    * Execute soft drop
    */
   softDrop(): boolean {
-    if (!this.gameEngine) return false;
-
     try {
       const result = this.gameEngine.softDrop();
       if (result) {
@@ -164,8 +138,6 @@ export class GameEngineAdapter {
    * Execute hard drop
    */
   hardDrop(): boolean {
-    if (!this.gameEngine) return false;
-
     try {
       const result = this.gameEngine.hardDrop();
       if (result) {
@@ -182,10 +154,8 @@ export class GameEngineAdapter {
    * Execute hold piece
    */
   holdPiece(): boolean {
-    if (!this.gameEngine) return false;
-
     try {
-      const result = this.gameEngine.hold();
+      const result = this.gameEngine.holdPiece();
       if (result) {
         this.emit("piece-held", { timestamp: Date.now() });
       }
@@ -200,8 +170,6 @@ export class GameEngineAdapter {
    * Get current game state
    */
   getGameState(): GameState | null {
-    if (!this.gameEngine) return null;
-
     try {
       return this.gameEngine.getState();
     } catch (error) {
@@ -214,8 +182,6 @@ export class GameEngineAdapter {
    * Get current board
    */
   getBoard(): GameState["board"] | null {
-    if (!this.gameEngine) return null;
-
     try {
       return this.gameEngine.getBoard();
     } catch (error) {
@@ -227,9 +193,7 @@ export class GameEngineAdapter {
   /**
    * Get current piece
    */
-  getCurrentPiece(): Piece | null {
-    if (!this.gameEngine) return null;
-
+  getCurrentPiece(): Tetromino | null {
     try {
       return this.gameEngine.getCurrentPiece();
     } catch (error) {
@@ -241,11 +205,9 @@ export class GameEngineAdapter {
   /**
    * Get ghost piece position
    */
-  getGhostPiece(): Piece | null {
-    if (!this.gameEngine) return null;
-
+  getGhostPiece(): Tetromino | null {
     try {
-      return this.gameEngine.getGhostPiece?.() ?? null;
+      return this.gameEngine.getGhostPiece();
     } catch (error) {
       console.error("[GameEngineAdapter] Failed to get ghost piece:", error);
       return null;
@@ -256,8 +218,6 @@ export class GameEngineAdapter {
    * Set up event listeners for game engine events
    */
   private setupGameEventListeners(): void {
-    if (!this.gameEngine) return;
-
     // Listen for game engine events and re-emit them
     this.gameEngine.on?.("line-cleared", (data) => {
       this.emit("line-cleared", data);
@@ -279,17 +239,17 @@ export class GameEngineAdapter {
   /**
    * Add event listener
    */
-  on(event: string, callback: (data: any) => void): void {
+  on(event: string, callback: (data: unknown) => void): void {
     if (!this.eventListeners.has(event)) {
       this.eventListeners.set(event, []);
     }
-    this.eventListeners.get(event)!.push(callback);
+    this.eventListeners.get(event)?.push(callback);
   }
 
   /**
    * Remove event listener
    */
-  off(event: string, callback: (data: any) => void): void {
+  off(event: string, callback: (data: unknown) => void): void {
     const listeners = this.eventListeners.get(event);
     if (listeners) {
       const index = listeners.indexOf(callback);
@@ -302,7 +262,7 @@ export class GameEngineAdapter {
   /**
    * Emit event to listeners
    */
-  private emit(event: string, data: any): void {
+  private emit(event: string, data: unknown): void {
     const listeners = this.eventListeners.get(event);
     if (listeners) {
       listeners.forEach((callback) => {
@@ -319,8 +279,6 @@ export class GameEngineAdapter {
    * Cleanup resources
    */
   destroy(): void {
-    this.gameEngine = null;
-    this.aiEngine = null;
     this.eventListeners.clear();
   }
 }

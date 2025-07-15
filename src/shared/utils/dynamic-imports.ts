@@ -58,7 +58,10 @@ export function createLazyComponent<T extends ComponentType<any>>(
  * Lazy load AI features
  */
 export const LazyAIControlPanel = createLazyComponent(
-  () => import("../../features/ai-control/ui/AIControlPanel"),
+  () =>
+    import("../../features/ai-control/ui/AIControlPanel").then((m) => ({
+      default: m.AIControlPanel,
+    })),
   {
     fallback: () =>
       React.createElement(
@@ -85,7 +88,7 @@ export const LazyAIControlPanel = createLazyComponent(
           }),
         ],
       ),
-    error: ({ error, retry }) =>
+    error: ({ error: _error, retry }) =>
       React.createElement(
         "div",
         {
@@ -118,7 +121,8 @@ export const LazyAIControlPanel = createLazyComponent(
  * Lazy load settings
  */
 export const LazySettingsPanel = createLazyComponent(
-  () => import("../../features/settings/ui/SettingsPanel"),
+  () =>
+    import("../../features/settings/ui/SettingsPanel").then((m) => ({ default: m.SettingsPanel })),
   {
     fallback: () =>
       React.createElement(
@@ -153,7 +157,10 @@ export const LazySettingsPanel = createLazyComponent(
  * Lazy load advanced AI features
  */
 export const LazyAdvancedAIControls = createLazyComponent(
-  () => import("../../components/game/AdvancedAIControls"),
+  () =>
+    import("../../components/game/AdvancedAIControls").then((m) => ({
+      default: m.AdvancedAIControls,
+    })),
   {
     fallback: () =>
       React.createElement(
@@ -220,7 +227,7 @@ export async function dynamicImportWithRetry<T>(
 /**
  * Preload critical features for better UX
  */
-export function preloadCriticalFeatures(): Promise<(void | undefined)[]> {
+export function preloadCriticalFeatures(): Promise<(undefined | undefined)[]> {
   const preloadPromises = [
     // Preload game-play feature (always needed)
     import("../../features/game-play").catch(() => {}),
@@ -229,7 +236,7 @@ export function preloadCriticalFeatures(): Promise<(void | undefined)[]> {
     import("../../features/scoring").catch(() => {}),
   ];
 
-  return Promise.all(preloadPromises);
+  return Promise.all(preloadPromises) as Promise<unknown[]>;
 }
 
 /**

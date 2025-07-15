@@ -24,7 +24,7 @@ class GameEventBus {
       this.handlers.set(eventType, new Set());
     }
 
-    this.handlers.get(eventType)!.add(handler);
+    this.handlers.get(eventType)?.add(handler);
 
     // Return unsubscribe function
     return () => {
@@ -301,7 +301,7 @@ describe("Concurrency and Race Condition Tests", () => {
 
       // Subscribe to all event types
       eventTypes.forEach((type) => {
-        eventBus.subscribe(type, (event) => {
+        eventBus.subscribe(type, (_event) => {
           receivedEvents.set(type, (receivedEvents.get(type) || 0) + 1);
         });
       });
@@ -513,13 +513,13 @@ describe("Concurrency and Race Condition Tests", () => {
 
     it("should prevent race conditions in AI processing", async () => {
       const aiRequests: Array<{ id: string; processed: boolean }> = [];
-      let processingCount = 0;
+      let _processingCount = 0;
       let completedCount = 0;
 
       // Simulate AI request handler
       eventBus.subscribe("AI_PROCESS_REQUEST", async (event) => {
         const requestId = event.payload.requestId;
-        processingCount++;
+        _processingCount++;
 
         // Simulate AI processing time
         await new Promise((resolve) => setTimeout(resolve, Math.random() * 20));

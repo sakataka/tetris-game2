@@ -114,12 +114,9 @@ export class WorkerEventBridge {
     switch (response.type) {
       case "WORKER_READY":
         // Worker is ready, resolve initialization
-        this.eventBus.emitSync({
-          type: "WORKER_INITIALIZED",
-          payload: {
-            version: response.payload.version,
-            capabilities: response.payload.capabilities,
-          },
+        this.eventBus.emitSync("WORKER_INITIALIZED", {
+          version: response.payload.version,
+          capabilities: response.payload.capabilities,
         });
         break;
 
@@ -169,13 +166,10 @@ export class WorkerEventBridge {
       this.responseTime.reduce((a, b) => a + b, 0) / this.responseTime.length;
 
     // Emit event with AI result
-    this.eventBus.emitSync({
-      type: "AI_MOVE_CALCULATED",
-      payload: {
-        result,
-        responseTime: metrics.time,
-        source: "worker",
-      },
+    this.eventBus.emitSync("AI_MOVE_CALCULATED", {
+      result,
+      responseTime: metrics.time,
+      source: "worker",
     });
   }
 
@@ -187,13 +181,9 @@ export class WorkerEventBridge {
     this.stats.errors++;
 
     // Emit error event
-    this.eventBus.emitSync({
-      type: "AI_ERROR",
-      payload: {
-        message: payload.message,
-        code: payload.code,
-        source: "worker",
-      },
+    this.eventBus.emitSync("AI_ERROR", {
+      error: payload.message,
+      requestId: undefined,
     });
   }
 
@@ -358,22 +348,15 @@ export class WorkerEventBridge {
       try {
         const result = await this.evaluatePositionMainThread(event.payload.gameState);
 
-        this.eventBus.emitSync({
-          type: "AI_MOVE_CALCULATED",
-          payload: {
-            result,
-            responseTime: 0, // Main thread doesn't track time separately
-            source: "main-thread",
-          },
+        this.eventBus.emitSync("AI_MOVE_CALCULATED", {
+          result,
+          responseTime: 0, // Main thread doesn't track time separately
+          source: "main-thread",
         });
       } catch (error) {
-        this.eventBus.emitSync({
-          type: "AI_ERROR",
-          payload: {
-            message: error instanceof Error ? error.message : "Main thread AI error",
-            code: "MAIN_THREAD_AI_ERROR",
-            source: "main-thread",
-          },
+        this.eventBus.emitSync("AI_ERROR", {
+          error: error instanceof Error ? error.message : "Main thread AI error",
+          requestId: undefined,
         });
       }
     });

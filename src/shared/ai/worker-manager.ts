@@ -207,24 +207,17 @@ export class AIWorkerManager {
       }
 
       // Emit the AI move result
-      this.eventBus.emitSync({
-        type: "AI_MOVE_CALCULATED",
-        payload: {
-          result,
-          responseTime: result.thinkingTime,
-          source: this.bridge && this.isInitialized ? "worker" : "main-thread",
-        },
+      this.eventBus.emitSync("AI_MOVE_CALCULATED", {
+        result,
+        responseTime: result.thinkingTime,
+        source: this.bridge && this.isInitialized ? "worker" : "main-thread",
       });
     } catch (error) {
       console.error("AI move calculation failed:", error);
 
-      this.eventBus.emitSync({
-        type: "AI_ERROR",
-        payload: {
-          message: error instanceof Error ? error.message : "AI calculation failed",
-          code: "AI_MOVE_FAILED",
-          source: this.bridge && this.isInitialized ? "worker" : "main-thread",
-        },
+      this.eventBus.emitSync("AI_ERROR", {
+        error: error instanceof Error ? error.message : "AI calculation failed",
+        requestId: undefined,
       });
     } finally {
       this.isProcessing = false;
@@ -253,20 +246,14 @@ export class AIWorkerManager {
    * Request AI move evaluation
    */
   public async requestAIMove(gameState: GameState): Promise<void> {
-    this.eventBus.emitSync({
-      type: "AI_MOVE_REQUESTED",
-      payload: { gameState },
-    });
+    this.eventBus.emitSync("AI_MOVE_REQUESTED", { gameState });
   }
 
   /**
    * Change AI difficulty
    */
   public async changeDifficulty(difficulty: "easy" | "medium" | "hard" | "expert"): Promise<void> {
-    this.eventBus.emitSync({
-      type: "AI_DIFFICULTY_CHANGED",
-      payload: { difficulty },
-    });
+    this.eventBus.emitSync("AI_DIFFICULTY_CHANGED", { difficulty });
   }
 
   /**

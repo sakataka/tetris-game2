@@ -148,7 +148,7 @@ export const useSettings = (): UseSettingsReturn => {
             `set${key.charAt(0).toUpperCase()}${key.slice(1)}` as keyof typeof actions;
           const action = actions[actionName];
           if (typeof action === "function") {
-            (action as (value: any) => void)(value);
+            (action as (value: unknown) => void)(value);
           }
         });
 

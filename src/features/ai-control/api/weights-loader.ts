@@ -52,7 +52,10 @@ class AIWeightsLoader {
     const cacheKey = `preset-${difficulty}`;
 
     if (this.cache.has(cacheKey)) {
-      return this.cache.get(cacheKey)!;
+      const cached = this.cache.get(cacheKey);
+      if (cached) {
+        return cached;
+      }
     }
 
     try {
@@ -183,7 +186,7 @@ class AIWeightsLoader {
     return {
       name: `Default ${difficulty}`,
       description: `Built-in ${difficulty} difficulty weights`,
-      difficulty: difficulty as any,
+      difficulty: difficulty as "easy" | "medium" | "hard" | "expert",
       weights: defaultWeights[difficulty] || defaultWeights.medium,
     };
   }

@@ -70,7 +70,7 @@ interface ScoringState {
 
 export const useScoringStore = create<ScoringState>()(
   devtools(
-    (set, get) => ({
+    (set, _get) => ({
       // Initial state
       score: 0,
       lines: 0,

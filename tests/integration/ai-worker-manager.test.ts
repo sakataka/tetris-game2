@@ -261,7 +261,7 @@ describe("AI Worker Manager Integration", () => {
   });
 
   it("should handle configuration updates", () => {
-    const initialConfig = {
+    const _initialConfig = {
       difficulty: "medium" as const,
       timeoutMs: 1000,
     };
@@ -298,9 +298,9 @@ describe("AI Worker Manager Integration", () => {
   });
 
   it("should handle AI errors gracefully", async () => {
-    let errorReceived = false;
+    let _errorReceived = false;
     eventBus.subscribe("AI_ERROR", () => {
-      errorReceived = true;
+      _errorReceived = true;
     });
 
     // Create a gamestate that might cause issues (empty/invalid)

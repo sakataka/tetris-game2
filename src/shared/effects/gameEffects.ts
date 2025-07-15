@@ -44,7 +44,7 @@ export class GameEffectsManager {
     if (!this.handlers.has(eventType)) {
       this.handlers.set(eventType, []);
     }
-    this.handlers.get(eventType)!.push(handler);
+    this.handlers.get(eventType)?.push(handler);
   }
 
   /**

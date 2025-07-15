@@ -4,12 +4,22 @@ import type { AISettings } from "../ui/AIControlPanel";
 
 interface AIWorkerMessage {
   type: "START" | "STOP" | "PAUSE" | "RESUME" | "STEP" | "UPDATE_SETTINGS" | "MOVE_REQUEST";
-  payload?: any;
+  payload?: {
+    gameState?: GameState;
+    settings?: AISettings;
+    requestId?: string;
+  };
 }
 
 interface AIWorkerResponse {
   type: "DECISION" | "ERROR" | "THINKING_START" | "THINKING_END" | "STATUS";
-  payload?: any;
+  payload?: {
+    decision?: AdvancedAIDecision;
+    error?: string;
+    status?: string;
+    thinkingTime?: number;
+    requestId?: string;
+  };
 }
 
 /**
@@ -18,7 +28,7 @@ interface AIWorkerResponse {
  */
 export class AIWorkerAdapter {
   private worker: Worker | null = null;
-  private eventListeners: Map<string, ((data: any) => void)[]> = new Map();
+  private eventListeners: Map<string, ((data: unknown) => void)[]> = new Map();
   private isInitialized = false;
   private currentSettings: AISettings | null = null;
 
@@ -75,7 +85,7 @@ export class AIWorkerAdapter {
     this.currentSettings = settings;
     this.sendMessage({
       type: "START",
-      payload: settings,
+      payload: { settings },
     });
 
     this.emit("ai-started", { settings });
@@ -124,10 +134,10 @@ export class AIWorkerAdapter {
         reject(new Error("AI step timeout"));
       }, 5000);
 
-      const handleDecision = (decision: AdvancedAIDecision) => {
+      const handleDecision = (data: unknown) => {
         clearTimeout(timeout);
         this.off("decision", handleDecision);
-        resolve(decision);
+        resolve(data as AdvancedAIDecision);
       };
 
       this.on("decision", handleDecision);
@@ -144,7 +154,7 @@ export class AIWorkerAdapter {
     this.currentSettings = settings;
     this.sendMessage({
       type: "UPDATE_SETTINGS",
-      payload: settings,
+      payload: { settings },
     });
   }
 
@@ -156,7 +166,7 @@ export class AIWorkerAdapter {
 
     this.sendMessage({
       type: "MOVE_REQUEST",
-      payload: gameState,
+      payload: { gameState },
     });
 
     this.emit("thinking-start", {});
@@ -173,7 +183,7 @@ export class AIWorkerAdapter {
         break;
 
       case "ERROR":
-        this.emit("error", new Error(message.payload?.message || "AI Worker error"));
+        this.emit("error", new Error(message.payload?.error || "AI Worker error"));
         this.emit("thinking-end", {});
         break;
 
@@ -214,17 +224,17 @@ export class AIWorkerAdapter {
   /**
    * Add event listener
    */
-  on(event: string, callback: (data: any) => void): void {
+  on(event: string, callback: (data: unknown) => void): void {
     if (!this.eventListeners.has(event)) {
       this.eventListeners.set(event, []);
     }
-    this.eventListeners.get(event)!.push(callback);
+    this.eventListeners.get(event)?.push(callback);
   }
 
   /**
    * Remove event listener
    */
-  off(event: string, callback: (data: any) => void): void {
+  off(event: string, callback: (data: unknown) => void): void {
     const listeners = this.eventListeners.get(event);
     if (listeners) {
       const index = listeners.indexOf(callback);
@@ -237,7 +247,7 @@ export class AIWorkerAdapter {
   /**
    * Emit event to listeners
    */
-  private emit(event: string, data: any): void {
+  private emit(event: string, data: unknown): void {
     const listeners = this.eventListeners.get(event);
     if (listeners) {
       listeners.forEach((callback) => {

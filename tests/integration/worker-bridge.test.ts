@@ -89,7 +89,7 @@ class MockWorker {
     }
   }
 
-  removeEventListener(type: string, listener: EventListener) {
+  removeEventListener(type: string, _listener: EventListener) {
     if (type === "message") {
       this.onmessage = null;
     }

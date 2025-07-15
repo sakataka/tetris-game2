@@ -1,16 +1,12 @@
-import { beforeEach, describe, expect, it } from "bun:test";
+import { describe, expect, it } from "bun:test";
 import * as fc from "fast-check";
 import {
   type BitBoardData,
-  canPlaceRow,
   clearLines,
-  clone,
   countOccupiedCells,
   createBitBoard,
-  fromBoardState,
   getRowBits,
   setRowBits,
-  toBoardState,
 } from "../../src/game/ai/core/bitboard";
 import { createBoardEngine } from "../../src/game/board-engine";
 import type { GameState } from "../../src/types/game";
@@ -337,7 +333,8 @@ describe("Game Engine Property-Based Tests", () => {
               const { board, piece, position, action } = testCase;
 
               try {
-                let result1: any, result2: any;
+                let result1: any;
+                let result2: any;
 
                 switch (action) {
                   case "isValid":
@@ -369,7 +366,7 @@ describe("Game Engine Property-Based Tests", () => {
 
                 // Results should be identical
                 expect(result1).toEqual(result2);
-              } catch (error) {
+              } catch (_error) {
                 // Both engines should throw the same type of error
                 expect(() => {
                   switch (action) {
@@ -427,7 +424,7 @@ function countHolesInBitBoard(bitBoard: BitBoardData): number {
   return holes;
 }
 
-function validatePiecePosition(bitBoard: BitBoardData, piece: any): boolean {
+function validatePiecePosition(_bitBoard: BitBoardData, piece: any): boolean {
   // Simplified piece validation - pieces outside board bounds are invalid
   // For a 10-wide board, x positions beyond 7 are generally invalid for most pieces
   return piece.x >= -2 && piece.x <= 7 && piece.y >= -2 && piece.y <= 19;

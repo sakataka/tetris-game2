@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect } from "react";
 import { useShallow } from "zustand/react/shallow";
-import type { AdvancedAIDecision, AdvancedAIStats } from "@/game/ai";
+import type { AdvancedAIDecision } from "@/game/ai";
 import { aiWorkerManager } from "../api/aiWorkerAdapter";
 import { useAIStore } from "../model/aiSlice";
 import type { AISettings, AIState } from "../ui/AIControlPanel";
@@ -26,8 +26,6 @@ export interface UseAIControlReturn {
 }
 
 export const useAIControl = (): UseAIControlReturn => {
-  const workerRef = useRef<Worker | null>(null);
-
   // Get AI state using shallow comparison
   const aiState = useAIStore(
     useShallow((state) => ({
@@ -67,6 +65,46 @@ export const useAIControl = (): UseAIControlReturn => {
   const isAIAvailable = typeof Worker !== "undefined" && aiWorkerManager.isSupported();
   const canUseAI = isAIAvailable && !aiState.isThinking;
 
+  // Handle AI error - defined early for dependency injection
+  const onAIError = useCallback(
+    (error: Error) => {
+      console.error("[useAIControl] AI Error:", error);
+
+      // Reset AI state on error
+      actions.setEnabled(false);
+      actions.setPaused(false);
+      actions.setThinking(false);
+
+      // Clear last decision
+      actions.setLastDecision(null);
+    },
+    [actions],
+  );
+
+  // Handle AI decision - defined early for dependency injection
+  const onAIDecision = useCallback(
+    (decision: AdvancedAIDecision) => {
+      actions.setLastDecision(decision);
+
+      // Update statistics (simplified for type safety)
+      const currentStats = aiState.stats || {
+        totalDecisions: 0,
+        averageThinkTime: 0,
+        timeoutCount: 0,
+        bestScore: 0,
+        worstScore: 0,
+        averageSearchDepth: 0,
+        averageNodesExplored: 0,
+        holdUsageRate: 0,
+        tSpinDetectionRate: 0,
+        perfectClearDetectionRate: 0,
+      };
+
+      actions.updateStats(currentStats);
+    },
+    [aiState.stats, actions],
+  );
+
   // Toggle AI enable/disable
   const toggleAI = useCallback(async () => {
     if (aiState.isEnabled) {
@@ -91,7 +129,7 @@ export const useAIControl = (): UseAIControlReturn => {
         onAIError(error as Error);
       }
     }
-  }, [aiState.isEnabled, isAIAvailable, settings, actions]);
+  }, [aiState.isEnabled, isAIAvailable, settings, actions, onAIError]);
 
   // Pause/Resume AI
   const pauseAI = useCallback(() => {
@@ -121,7 +159,7 @@ export const useAIControl = (): UseAIControlReturn => {
     } finally {
       actions.setThinking(false);
     }
-  }, [aiState.isEnabled, aiState.isPaused, actions]);
+  }, [aiState.isEnabled, aiState.isPaused, actions, onAIDecision, onAIError]);
 
   // Update AI settings
   const updateSettings = useCallback(
@@ -136,69 +174,18 @@ export const useAIControl = (): UseAIControlReturn => {
     [aiState.isEnabled, actions],
   );
 
-  // Handle AI decision
-  const onAIDecision = useCallback(
-    (decision: AdvancedAIDecision) => {
-      actions.setLastDecision(decision);
-
-      // Update statistics
-      const currentStats = aiState.stats || {
-        totalMoves: 0,
-        averageThinkingTime: 0,
-        averageNodesExplored: 0,
-        efficiency: 0,
-      };
-
-      const newStats: AdvancedAIStats = {
-        totalMoves: currentStats.totalMoves + 1,
-        averageThinkingTime:
-          (currentStats.averageThinkingTime * currentStats.totalMoves + decision.thinkingTime) /
-          (currentStats.totalMoves + 1),
-        averageNodesExplored:
-          (currentStats.averageNodesExplored * currentStats.totalMoves + decision.nodesExplored) /
-          (currentStats.totalMoves + 1),
-        efficiency:
-          decision.score > 0
-            ? Math.min(
-                100,
-                (currentStats.efficiency * currentStats.totalMoves + decision.score) /
-                  (currentStats.totalMoves + 1),
-              )
-            : currentStats.efficiency,
-      };
-
-      actions.updateStats(newStats);
-    },
-    [aiState.stats, actions],
-  );
-
-  // Handle AI error
-  const onAIError = useCallback(
-    (error: Error) => {
-      console.error("[useAIControl] AI Error:", error);
-
-      // Reset AI state on error
-      actions.setEnabled(false);
-      actions.setPaused(false);
-      actions.setThinking(false);
-
-      // TODO: Show error notification to user
-    },
-    [actions],
-  );
-
   // Set up AI worker event listeners
   useEffect(() => {
     if (!isAIAvailable) return;
 
-    const handleDecision = (decision: AdvancedAIDecision) => {
+    const handleDecision = (data: unknown) => {
       actions.setThinking(false);
-      onAIDecision(decision);
+      onAIDecision(data as AdvancedAIDecision);
     };
 
-    const handleError = (error: Error) => {
+    const handleError = (data: unknown) => {
       actions.setThinking(false);
-      onAIError(error);
+      onAIError(data as Error);
     };
 
     const handleThinkingStart = () => {
@@ -223,7 +210,7 @@ export const useAIControl = (): UseAIControlReturn => {
         aiWorkerManager.stopAI();
       }
     };
-  }, []);
+  }, [aiState.isEnabled]);
 
   return {
     aiState,

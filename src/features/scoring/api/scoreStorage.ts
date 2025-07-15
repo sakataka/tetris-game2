@@ -250,7 +250,7 @@ export class ScoreStorageAdapter {
 
       // Validate each score entry
       const validScores = importData.highScores.filter(
-        (score: any) =>
+        (score: unknown) =>
           score.id &&
           typeof score.score === "number" &&
           typeof score.lines === "number" &&

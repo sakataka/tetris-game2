@@ -4,7 +4,7 @@
  * Bundle size analysis and optimization tooling
  */
 
-import { readdir, readFile, stat } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import { basename, join, resolve } from "node:path";
 import { promisify } from "node:util";
 import { gzip } from "node:zlib";
@@ -237,7 +237,7 @@ class BundleOptimizer {
       .filter((f) => f.type === "vendor")
       .reduce((sum, f) => sum + f.gzipSize, 0);
 
-    const appSize = analysis.totalGzipSize - vendorSize;
+    const _appSize = analysis.totalGzipSize - vendorSize;
     const estimatedFullSize = analysis.totalGzipSize * 1.5; // Assume 50% waste without tree-shaking
 
     return Math.round(((estimatedFullSize - analysis.totalGzipSize) / estimatedFullSize) * 100);

@@ -199,7 +199,7 @@ export const useSettingsStore = create<SettingsState>()(
         })),
 
       loadFromStorage: (settings) =>
-        set((state) => {
+        set((_state) => {
           // Validate and merge settings
           const validatedSettings = get().validateSettings
             ? validateSettingsData({ ...DEFAULT_SETTINGS, ...settings })

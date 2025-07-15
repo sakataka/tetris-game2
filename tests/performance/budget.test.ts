@@ -37,7 +37,7 @@ const PERFORMANCE_BUDGETS = {
  * Mock implementations for performance testing
  */
 class MockAIEngine {
-  evaluatePosition(gameState: any): Promise<number> {
+  evaluatePosition(_gameState: any): Promise<number> {
     return new Promise((resolve) => {
       // Simulate AI evaluation work
       const complexity = Math.random() * 100;
@@ -49,7 +49,7 @@ class MockAIEngine {
     });
   }
 
-  synchronousEvaluate(gameState: any): number {
+  synchronousEvaluate(_gameState: any): number {
     // Simulate synchronous AI evaluation
     let result = 0;
     for (let i = 0; i < 1000; i++) {
@@ -576,14 +576,14 @@ async function simulateAppStartup(): Promise<void> {
   // Simulate loading game assets
   const mockAssets = Array.from({ length: 10 }, (_, i) => `asset-${i}`);
 
-  for (const asset of mockAssets) {
+  for (const _asset of mockAssets) {
     // Simulate asset loading time
     await new Promise((resolve) => setTimeout(resolve, Math.random() * 10));
   }
 
   // Simulate initializing game systems
-  const gameEngine = new MockAIEngine();
-  const bitBoard = new MockBitBoard();
+  const _gameEngine = new MockAIEngine();
+  const _bitBoard = new MockBitBoard();
   const gameState = new MockGameState();
 
   // Simulate initial game setup

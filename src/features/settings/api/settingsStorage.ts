@@ -233,7 +233,7 @@ export class SettingsStorageAdapter {
   /**
    * Validate settings object
    */
-  private validateSettings(settings: any): GameSettings | null {
+  private validateSettings(settings: unknown): GameSettings | null {
     if (!settings || typeof settings !== "object") {
       return null;
     }

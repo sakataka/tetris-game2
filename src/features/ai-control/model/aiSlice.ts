@@ -53,7 +53,7 @@ interface AIControlState {
 
 export const useAIStore = create<AIControlState>()(
   devtools(
-    (set, get) => ({
+    (set, _get) => ({
       // Initial state
       isEnabled: false,
       isPaused: false,

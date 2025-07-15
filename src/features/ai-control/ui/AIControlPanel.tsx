@@ -28,7 +28,7 @@ export interface AIState {
   isPaused: boolean;
   isThinking: boolean;
   lastDecision?: AdvancedAIDecision | null;
-  stats?: AdvancedAIStats;
+  stats?: AdvancedAIStats | null;
 }
 
 export interface AIControlPanelProps {
@@ -237,17 +237,15 @@ export function AIControlPanel({
             </div>
             <div>
               <span className="text-muted-foreground">{t("game.ai.controls.avgTime")}:</span>
-              <span className="ml-1">
-                {aiState.stats.averageThinkingTime?.toFixed(1) ?? "N/A"}ms
-              </span>
+              <span className="ml-1">{aiState.stats.averageThinkTime?.toFixed(1) ?? "N/A"}ms</span>
             </div>
             <div>
               <span className="text-muted-foreground">{t("game.ai.controls.totalMoves")}:</span>
-              <span className="ml-1">{aiState.stats.totalMoves ?? 0}</span>
+              <span className="ml-1">{aiState.stats.totalDecisions ?? 0}</span>
             </div>
             <div>
               <span className="text-muted-foreground">{t("game.ai.controls.efficiency")}:</span>
-              <span className="ml-1">{aiState.stats.efficiency?.toFixed(2) ?? "N/A"}%</span>
+              <span className="ml-1">{aiState.stats.tSpinDetectionRate?.toFixed(2) ?? "N/A"}%</span>
             </div>
           </div>
         </div>

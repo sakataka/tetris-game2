@@ -5,7 +5,7 @@
 
 import { beforeEach, describe, expect, test } from "bun:test";
 import { PerformanceMonitor } from "@/shared/performance/monitor";
-import { type EvaluationResult, evaluationResultPool, ObjectPool } from "@/workers/ai/object-pool";
+import { evaluationResultPool, ObjectPool } from "@/workers/ai/object-pool";
 import { BoardRingBuffer, RingBuffer } from "@/workers/ai/ring-buffer";
 
 describe("RingBuffer", () => {
@@ -135,13 +135,13 @@ describe("ObjectPool", () => {
     pool.prewarm(3);
 
     // Acquire 3 objects (all from pool)
-    const obj1 = pool.acquire();
-    const obj2 = pool.acquire();
-    const obj3 = pool.acquire();
+    const _obj1 = pool.acquire();
+    const _obj2 = pool.acquire();
+    const _obj3 = pool.acquire();
 
     // Acquire 2 more (should create new ones)
-    const obj4 = pool.acquire();
-    const obj5 = pool.acquire();
+    const _obj4 = pool.acquire();
+    const _obj5 = pool.acquire();
 
     const stats = pool.getStats();
     expect(stats.acquired).toBe(5);
@@ -237,7 +237,7 @@ describe("PerformanceMonitor", () => {
 describe("Memory Optimization Integration", () => {
   test("should achieve target performance metrics", () => {
     const boardBuffer = new BoardRingBuffer(100, 24);
-    const monitor = new PerformanceMonitor();
+    const _monitor = new PerformanceMonitor();
 
     // Simulate 1000 board evaluations
     const sourceBoard = new Uint32Array(24);

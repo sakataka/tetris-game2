@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { gameEventBus } from "@/shared/events/game-event-bus";
 import type {
@@ -89,54 +89,54 @@ export const useGamePlay = (): UseGamePlayReturn => {
 
   // Wrap movement actions to emit events
   const moveLeft = useCallback(() => {
-    gameEventBus.emitSync({ type: "MOVE_LEFT", payload: {} });
+    gameEventBus.emitSync("MOVE_LEFT", undefined);
     storeActions.moveLeft();
   }, [storeActions]);
 
   const moveRight = useCallback(() => {
-    gameEventBus.emitSync({ type: "MOVE_RIGHT", payload: {} });
+    gameEventBus.emitSync("MOVE_RIGHT", undefined);
     storeActions.moveRight();
   }, [storeActions]);
 
   const rotateClockwise = useCallback(() => {
-    gameEventBus.emitSync({ type: "ROTATE_CLOCKWISE", payload: {} });
+    gameEventBus.emitSync("ROTATE_CLOCKWISE", undefined);
     storeActions.rotateClockwise();
   }, [storeActions]);
 
   const rotateCounterClockwise = useCallback(() => {
-    gameEventBus.emitSync({ type: "ROTATE_COUNTER_CLOCKWISE", payload: {} });
+    gameEventBus.emitSync("ROTATE_COUNTER_CLOCKWISE", undefined);
     storeActions.rotateCounterClockwise();
   }, [storeActions]);
 
   const softDrop = useCallback(() => {
-    gameEventBus.emitSync({ type: "SOFT_DROP", payload: {} });
+    gameEventBus.emitSync("SOFT_DROP", undefined);
     storeActions.softDrop();
   }, [storeActions]);
 
   const hardDrop = useCallback(() => {
-    gameEventBus.emitSync({ type: "HARD_DROP", payload: {} });
+    gameEventBus.emitSync("HARD_DROP", { distance: 0 });
     storeActions.hardDrop();
   }, [storeActions]);
 
   const holdPiece = useCallback(() => {
-    gameEventBus.emitSync({ type: "HOLD_PIECE", payload: {} });
+    gameEventBus.emitSync("HOLD_PIECE", undefined);
     storeActions.holdPiece();
   }, [storeActions]);
 
   // Wrap game control actions to emit events
   const startGame = useCallback(() => {
-    gameEventBus.emitSync({ type: "GAME_STARTED", payload: {} });
+    gameEventBus.emitSync("GAME_STARTED", undefined);
     storeActions.startGame();
   }, [storeActions]);
 
   const pauseGame = useCallback(() => {
     const isPaused = !gameState.isPaused;
-    gameEventBus.emitSync({ type: "GAME_PAUSED", payload: { isPaused } });
+    gameEventBus.emitSync("GAME_PAUSED", { isPaused });
     storeActions.pauseGame();
   }, [gameState.isPaused, storeActions]);
 
   const resetGame = useCallback(() => {
-    gameEventBus.emitSync({ type: "GAME_RESET", payload: {} });
+    gameEventBus.emitSync("GAME_RESET", undefined);
     storeActions.resetGame();
   }, [storeActions]);
 
@@ -200,43 +200,43 @@ export const useGamePlayActions = () => {
   // Return wrapped actions that emit events
   return {
     startGame: useCallback(() => {
-      gameEventBus.emitSync({ type: "GAME_STARTED", payload: {} });
+      gameEventBus.emitSync("GAME_STARTED", undefined);
       storeActions.startGame();
     }, [storeActions]),
     pauseGame: useCallback(() => {
-      gameEventBus.emitSync({ type: "GAME_PAUSED", payload: { isPaused: true } });
+      gameEventBus.emitSync("GAME_PAUSED", { isPaused: true });
       storeActions.pauseGame();
     }, [storeActions]),
     resetGame: useCallback(() => {
-      gameEventBus.emitSync({ type: "GAME_RESET", payload: {} });
+      gameEventBus.emitSync("GAME_RESET", undefined);
       storeActions.resetGame();
     }, [storeActions]),
     moveLeft: useCallback(() => {
-      gameEventBus.emitSync({ type: "MOVE_LEFT", payload: {} });
+      gameEventBus.emitSync("MOVE_LEFT", undefined);
       storeActions.moveLeft();
     }, [storeActions]),
     moveRight: useCallback(() => {
-      gameEventBus.emitSync({ type: "MOVE_RIGHT", payload: {} });
+      gameEventBus.emitSync("MOVE_RIGHT", undefined);
       storeActions.moveRight();
     }, [storeActions]),
     rotateClockwise: useCallback(() => {
-      gameEventBus.emitSync({ type: "ROTATE_CLOCKWISE", payload: {} });
+      gameEventBus.emitSync("ROTATE_CLOCKWISE", undefined);
       storeActions.rotateClockwise();
     }, [storeActions]),
     rotateCounterClockwise: useCallback(() => {
-      gameEventBus.emitSync({ type: "ROTATE_COUNTER_CLOCKWISE", payload: {} });
+      gameEventBus.emitSync("ROTATE_COUNTER_CLOCKWISE", undefined);
       storeActions.rotateCounterClockwise();
     }, [storeActions]),
     softDrop: useCallback(() => {
-      gameEventBus.emitSync({ type: "SOFT_DROP", payload: {} });
+      gameEventBus.emitSync("SOFT_DROP", undefined);
       storeActions.softDrop();
     }, [storeActions]),
     hardDrop: useCallback(() => {
-      gameEventBus.emitSync({ type: "HARD_DROP", payload: {} });
+      gameEventBus.emitSync("HARD_DROP", { distance: 0 });
       storeActions.hardDrop();
     }, [storeActions]),
     holdPiece: useCallback(() => {
-      gameEventBus.emitSync({ type: "HOLD_PIECE", payload: {} });
+      gameEventBus.emitSync("HOLD_PIECE", undefined);
       storeActions.holdPiece();
     }, [storeActions]),
   };

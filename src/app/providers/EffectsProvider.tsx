@@ -68,7 +68,7 @@ export function useGameEffects(): EffectsContextValue {
 export function useEmitGameEvent() {
   const { gameEffects } = useGameEffects();
 
-  return (eventType: string, payload?: any) => {
+  return (eventType: string, payload?: unknown) => {
     gameEffects.emit(eventType, payload);
   };
 }
