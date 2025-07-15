@@ -1,114 +1,57 @@
 /**
- * Mock Frame Budget Sentinel for testing Animation Orchestrator
- * Provides controllable budget simulation for unit testing
+ * Mock Frame Budget Sentinel for testing
+ * Provides a controllable implementation of FrameBudgetSentinel for tests
  */
 
-import type { FrameBudgetSentinel } from "@/game/animations/sentinel/FrameBudgetSentinel";
-
-export interface MockFrameBudgetConfig {
+export interface MockFrameBudgetOptions {
   initialBudget?: number;
-  budgetPerFrame?: number;
   alwaysGrant?: boolean;
-  alwaysDeny?: boolean;
 }
 
-/**
- * Mock implementation for testing Animation Orchestrator integration
- */
-export class MockFrameBudgetSentinel implements FrameBudgetSentinel {
+export class MockFrameBudgetSentinel {
+  private budget: number;
   private isMonitoring = false;
-  private currentBudget: number;
-  private budgetPerFrame: number;
-  private config: Required<MockFrameBudgetConfig>;
+  private alwaysGrant: boolean;
 
-  constructor(config: MockFrameBudgetConfig = {}) {
-    this.config = {
-      initialBudget: config.initialBudget ?? 16.67,
-      budgetPerFrame: config.budgetPerFrame ?? 16.67,
-      alwaysGrant: config.alwaysGrant ?? false,
-      alwaysDeny: config.alwaysDeny ?? false,
-    };
-
-    this.currentBudget = this.config.initialBudget;
-    this.budgetPerFrame = this.config.budgetPerFrame;
+  constructor(options: MockFrameBudgetOptions = {}) {
+    this.budget = options.initialBudget ?? 16.67;
+    this.alwaysGrant = options.alwaysGrant ?? false;
   }
 
   startMonitoring(): void {
     this.isMonitoring = true;
-    this.currentBudget = this.config.initialBudget;
   }
 
-  getCurrentBudget(): number {
-    if (!this.isMonitoring) {
-      return 0;
-    }
-    return Math.max(0, this.currentBudget);
-  }
-
-  requestBudget(requiredMs: number): boolean {
-    if (!this.isMonitoring) {
-      return false;
-    }
-
-    // Test override modes
-    if (this.config.alwaysGrant) {
-      return true;
-    }
-    if (this.config.alwaysDeny) {
-      return false;
-    }
-
-    // Normal budget checking
-    const canGrant = this.currentBudget >= requiredMs;
-    if (canGrant) {
-      this.currentBudget -= requiredMs;
-    }
-
-    return canGrant;
-  }
-
-  /**
-   * Reset budget to initial value (for testing)
-   */
-  resetBudget(): void {
-    this.currentBudget = this.config.initialBudget;
-  }
-
-  /**
-   * Set current budget manually (for testing)
-   */
-  setBudget(budget: number): void {
-    this.currentBudget = budget;
-  }
-
-  /**
-   * Simulate frame advance with budget reset
-   */
-  advanceFrame(): void {
-    this.currentBudget = this.budgetPerFrame;
-  }
-
-  /**
-   * Stop monitoring (cleanup)
-   */
   stopMonitoring(): void {
     this.isMonitoring = false;
   }
 
-  /**
-   * Update configuration during test
-   */
-  updateConfig(config: Partial<MockFrameBudgetConfig>): void {
-    this.config = { ...this.config, ...config };
-    if (config.initialBudget !== undefined) {
-      this.budgetPerFrame = config.initialBudget;
+  requestBudget(amount: number): boolean {
+    if (this.alwaysGrant) {
+      return true;
     }
+
+    if (amount <= this.budget) {
+      this.budget -= amount;
+      return true;
+    }
+
+    return false;
   }
 
-  /**
-   * Get current monitoring state
-   */
-  isCurrentlyMonitoring(): boolean {
+  getRemainingBudget(): number {
+    return this.budget;
+  }
+
+  resetBudget(): void {
+    this.budget = 16.67;
+  }
+
+  setBudget(amount: number): void {
+    this.budget = amount;
+  }
+
+  isActive(): boolean {
     return this.isMonitoring;
   }
 }

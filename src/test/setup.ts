@@ -54,6 +54,12 @@ if (typeof global !== "undefined" && (!global.document || !global.window)) {
   global.Node = window.Node as unknown as typeof Node;
   global.DocumentFragment = window.DocumentFragment as unknown as typeof DocumentFragment;
 
+  // Ensure document.body exists and is a proper DOM element
+  if (!window.document.body) {
+    const body = window.document.createElement("body");
+    window.document.appendChild(body);
+  }
+
   // Set up timer functions with Node.js implementations for consistency
   const nodeSetTimeout = globalThis.setTimeout;
   const nodeClearTimeout = globalThis.clearTimeout;
@@ -111,6 +117,17 @@ if (typeof global !== "undefined" && (!global.document || !global.window)) {
   globalThis.MutationObserver = global.MutationObserver;
   globalThis.ResizeObserver = global.ResizeObserver;
 
+  // Set up getComputedStyle for testing
+  if (!window.getComputedStyle) {
+    Object.defineProperty(window, "getComputedStyle", {
+      value: () => ({
+        getPropertyValue: () => "",
+      }),
+      writable: true,
+      configurable: true,
+    });
+  }
+
   // Manually trigger DOM content loaded to initialize properly
   window.document.dispatchEvent(new window.Event("DOMContentLoaded"));
 }
@@ -119,6 +136,17 @@ if (typeof global !== "undefined" && (!global.document || !global.window)) {
 beforeEach(async () => {
   // Import stores for cleanup
   await importStores();
+
+  // Ensure DOM body exists for testing-library
+  if (global.document && !global.document.body) {
+    const body = global.document.createElement("body");
+    global.document.appendChild(body);
+  }
+
+  // Clear any existing content from document.body
+  if (global.document?.body) {
+    global.document.body.innerHTML = "";
+  }
 
   // Set up proper localStorage mock for tests
   const storage = new Map<string, string>();
