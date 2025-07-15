@@ -53,20 +53,20 @@ export const getSupportedCSSProps = (): SupportedCSSProps => {
   }
 
   return {
-    // Transform with webkit fallback
-    transform: supportsTransform ? "transform" : isWebKit ? "-webkit-transform" : "transform",
+    // Transform with webkit fallback (React uses camelCase)
+    transform: supportsTransform ? "transform" : isWebKit ? "WebkitTransform" : "transform",
 
-    // Will-change optimization (not critical, can be null)
-    willChange: supportsWillChange ? "will-change" : null,
+    // Will-change optimization (not critical, can be null) - React uses camelCase
+    willChange: supportsWillChange ? "willChange" : null,
 
-    // Transition with webkit fallback
-    transition: supportsTransition ? "transition" : isWebKit ? "-webkit-transition" : "transition",
+    // Transition with webkit fallback (React uses camelCase)
+    transition: supportsTransition ? "transition" : isWebKit ? "WebkitTransition" : "transition",
 
-    // Backface visibility for smoother animations
-    backfaceVisibility: isWebKit ? "-webkit-backface-visibility" : "backface-visibility",
+    // Backface visibility for smoother animations (React uses camelCase)
+    backfaceVisibility: isWebKit ? "WebkitBackfaceVisibility" : "backfaceVisibility",
 
-    // Perspective for 3D transforms
-    perspective: isWebKit ? "-webkit-perspective" : "perspective",
+    // Perspective for 3D transforms (React uses camelCase)
+    perspective: isWebKit ? "WebkitPerspective" : "perspective",
   };
 };
 

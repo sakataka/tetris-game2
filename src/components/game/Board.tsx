@@ -1,5 +1,5 @@
 import { useAnimate } from "motion/react";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { useGamePlayState } from "@/features/game-play";
 import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
@@ -12,16 +12,20 @@ import { BOARD_STYLES, CARD_STYLES } from "@/utils/styles";
 import { BoardCell } from "./BoardCell";
 
 export function Board() {
-  const { layoutMode } = useDesignTokens(); // Add layout mode dependency to trigger re-renders
+  const { layoutMode } = useDesignTokens();
 
-  // Calculate cell size directly based on layout mode for immediate updates
-  const baseCellSize = GAME_CONSTANTS.BOARD.CELL_SIZE;
-  const cellSize = layoutMode === "compact" ? Math.floor(baseCellSize * 1.06) : baseCellSize;
+  // Memoize cell size calculation to prevent unnecessary re-renders
+  const cellSize = useMemo(() => {
+    const baseCellSize = GAME_CONSTANTS.BOARD.CELL_SIZE;
+    return layoutMode === "compact" ? Math.floor(baseCellSize * 1.06) : baseCellSize;
+  }, [layoutMode]);
 
-  // Debug logging
-  if (import.meta.env.DEV) {
-    console.log(`[Board] Layout mode: ${layoutMode}, Cell size: ${cellSize}`);
-  }
+  // Reduce debug logging frequency
+  useEffect(() => {
+    if (import.meta.env.DEV) {
+      console.log(`[Board] Layout mode: ${layoutMode}, Cell size: ${cellSize}`);
+    }
+  }, [layoutMode, cellSize]);
   const [scope, animate] = useAnimate();
   const abortControllerRef = useRef<AbortController | null>(null);
 

@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { gameEventBus } from "@/shared/events/game-event-bus";
 import type {
@@ -168,8 +168,9 @@ export const useGamePlay = (): UseGamePlayReturn => {
  * Use this when you only need to read state without actions
  */
 export const useGamePlayState = () => {
-  return useGamePlayStore(
-    useShallow((state) => ({
+  // Memoize the selector to prevent infinite re-renders
+  const selector = useMemo(
+    () => (state: ReturnType<typeof useGamePlayStore.getState>) => ({
       board: state.board,
       currentPiece: state.currentPiece,
       ghostPiece: state.ghostPiece,
@@ -181,8 +182,11 @@ export const useGamePlayState = () => {
       isGameOver: state.isGameOver,
       animationState: state.animationState,
       lineClearData: state.lineClearData,
-    })),
+    }),
+    [],
   );
+
+  return useGamePlayStore(useShallow(selector));
 };
 
 /**
@@ -190,8 +194,9 @@ export const useGamePlayState = () => {
  * Use this when you only need actions without state
  */
 export const useGamePlayActions = () => {
-  const storeActions = useGamePlayStore(
-    useShallow((state) => ({
+  // Memoize the actions selector to prevent infinite re-renders
+  const actionsSelector = useMemo(
+    () => (state: ReturnType<typeof useGamePlayStore.getState>) => ({
       startGame: state.startGame,
       pauseGame: state.pauseGame,
       resetGame: state.resetGame,
@@ -203,8 +208,11 @@ export const useGamePlayActions = () => {
       softDrop: state.softDrop,
       hardDrop: state.hardDrop,
       holdPiece: state.holdPiece,
-    })),
+    }),
+    [],
   );
+
+  const storeActions = useGamePlayStore(useShallow(actionsSelector));
 
   // Return wrapped actions that emit events
   return {

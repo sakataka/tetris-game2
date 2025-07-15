@@ -69,13 +69,7 @@ export class SettingsStorageAdapter {
     try {
       const item = localStorage.getItem(this.SETTINGS_KEY);
       if (!item) {
-        // Try to migrate from old settings store
-        console.log("[SettingsStorage] No saved settings found, checking for migration");
-        const migratedSettings = await this.migrateLegacySettings();
-        if (migratedSettings) {
-          return migratedSettings;
-        }
-        console.log("[SettingsStorage] No settings to migrate");
+        console.log("[SettingsStorage] No saved settings found");
         return null;
       }
 
@@ -358,92 +352,6 @@ export class SettingsStorageAdapter {
     } catch (error) {
       console.error("[SettingsStorage] Failed to check if settings exist:", error);
       return false;
-    }
-  }
-
-  /**
-   * Migrate settings from legacy store
-   */
-  private async migrateLegacySettings(): Promise<GameSettings | null> {
-    try {
-      const LEGACY_KEY = "tetris-settings";
-      const legacyItem = localStorage.getItem(LEGACY_KEY);
-
-      if (!legacyItem) {
-        console.log("[SettingsStorage] No legacy settings found");
-        return null;
-      }
-
-      console.log("[SettingsStorage] Found legacy settings, migrating...");
-      const legacyData = JSON.parse(legacyItem);
-
-      // Extract legacy settings structure
-      let legacySettings: unknown;
-      if (legacyData && typeof legacyData === "object" && "state" in legacyData) {
-        // Zustand persist format
-        legacySettings = legacyData.state;
-      } else {
-        // Direct settings object
-        legacySettings = legacyData;
-      }
-
-      if (!legacySettings || typeof legacySettings !== "object") {
-        console.warn("[SettingsStorage] Invalid legacy settings format");
-        return null;
-      }
-
-      const legacy = legacySettings as Record<string, unknown>;
-
-      // Map legacy settings to new format
-      const migratedSettings: GameSettings = {
-        // Visual settings
-        showGhostPiece: typeof legacy.showGhostPiece === "boolean" ? legacy.showGhostPiece : true,
-        showGrid: true, // New setting, default to true
-        enableAnimations: true, // New setting, default to true
-
-        // Gameplay settings
-        enableTSpinDetection:
-          typeof legacy.enableTSpinDetection === "boolean" ? legacy.enableTSpinDetection : true,
-        enableAIFeatures:
-          typeof legacy.enableAIFeatures === "boolean" ? legacy.enableAIFeatures : false,
-        autoRepeatDelay: 170, // New setting, use default
-        autoRepeatRate: 50, // New setting, use default
-
-        // Theme settings
-        theme: "normal", // New setting, use default
-        colorScheme: "dark", // New setting, use default
-
-        // Audio settings - map from legacy volume
-        enableSound: typeof legacy.volume === "number" && legacy.volume > 0,
-        soundVolume: typeof legacy.volume === "number" ? legacy.volume : 0.5,
-        enableHaptics: false, // New setting, default to false
-
-        // Language settings
-        language: typeof legacy.language === "string" ? legacy.language : "en",
-
-        // Performance settings
-        targetFPS: 60, // New setting, use default
-        enablePerformanceMode: false, // New setting, default to false
-      };
-
-      // Validate migrated settings
-      const validatedSettings = this.validateSettings(migratedSettings);
-      if (!validatedSettings) {
-        console.warn("[SettingsStorage] Migrated settings validation failed");
-        return null;
-      }
-
-      // Save migrated settings to new format
-      await this.saveSettings(validatedSettings);
-
-      // Remove legacy settings to prevent re-migration
-      localStorage.removeItem(LEGACY_KEY);
-
-      console.log("[SettingsStorage] Successfully migrated legacy settings");
-      return validatedSettings;
-    } catch (error) {
-      console.error("[SettingsStorage] Failed to migrate legacy settings:", error);
-      return null;
     }
   }
 }

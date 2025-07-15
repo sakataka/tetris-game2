@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { designTokens } from "@/design-tokens";
 import type { ExtendedDesignTokens, LayoutMode } from "@/design-tokens/types";
 
@@ -24,40 +24,50 @@ interface DesignTokensHook {
 export const useDesignTokens = (): DesignTokensHook => {
   const [layoutMode, setLayoutModeState] = useState<LayoutMode>("normal");
 
-  // Debug logging for layout mode changes
+  // Debug logging for layout mode changes (reduce frequency)
   useEffect(() => {
     if (import.meta.env.DEV) {
       console.log(`[useDesignTokens] Layout mode state is now: ${layoutMode}`);
     }
   }, [layoutMode]);
 
-  const setLayoutMode = useCallback(
-    (mode: LayoutMode) => {
-      if (import.meta.env.DEV) {
-        console.log(`[useDesignTokens] Layout mode changing from ${layoutMode} to ${mode}`);
-      }
-      setLayoutModeState(mode);
-    },
+  const setLayoutMode = useCallback((mode: LayoutMode) => {
+    if (import.meta.env.DEV) {
+      console.log(`[useDesignTokens] Layout mode changing to ${mode}`);
+    }
+    setLayoutModeState(mode);
+  }, []);
+
+  // Memoize layout tokens to prevent unnecessary re-renders
+  const currentLayoutTokens = useMemo(
+    () => ({
+      ...designTokens.layout,
+      mode: layoutMode,
+    }),
     [layoutMode],
   );
 
-  // Create layout tokens with current mode
-  const currentLayoutTokens = {
-    ...designTokens.layout,
-    mode: layoutMode,
-  };
-
-  return {
-    tokens: {
+  // Memoize the entire tokens object
+  const tokens = useMemo(
+    () => ({
       ...designTokens,
       layout: currentLayoutTokens,
-    },
-    layoutMode,
-    setLayoutMode,
-    colors: designTokens.colors,
-    typography: designTokens.typography,
-    spacing: designTokens.spacing,
-    layout: currentLayoutTokens,
-    animation: designTokens.animation,
-  };
+    }),
+    [currentLayoutTokens],
+  );
+
+  // Memoize the return object to prevent infinite re-renders
+  return useMemo(
+    () => ({
+      tokens,
+      layoutMode,
+      setLayoutMode,
+      colors: designTokens.colors,
+      typography: designTokens.typography,
+      spacing: designTokens.spacing,
+      layout: currentLayoutTokens,
+      animation: designTokens.animation,
+    }),
+    [tokens, layoutMode, setLayoutMode, currentLayoutTokens],
+  );
 };
