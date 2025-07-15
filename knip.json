@@ -3,7 +3,6 @@
     "src/main.tsx",
     "src/game/ai/index.ts",
     "**/*.test.{ts,tsx}",
-    "**/*.bench.{ts,tsx}",
     "src/features/*/index.ts",
     "src/components/ui/ThemeModeSelector.tsx",
     "src/app/providers/EffectsProvider.tsx"
@@ -29,7 +28,6 @@
     "bun-types",
     "@testing-library/jest-dom",
     "chromatic",
-    "@axe-core/react",
-    "playwright"
+    "@axe-core/react"
   ]
 }
