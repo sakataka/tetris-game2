@@ -13,7 +13,8 @@
       "!**/.cache/**",
       "!**/public/build/**",
       "!**/storybook-static/**",
-      "!**/*.d.ts"
+      "!**/*.d.ts",
+      "!vercel.json"
     ],
     "experimentalScannerIgnores": [
       "dist",
