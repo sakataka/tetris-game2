@@ -12,7 +12,7 @@ class MockWorker {
 
   constructor(public url: string) {}
 
-  postMessage(message: any) {
+  postMessage(message: unknown) {
     // Simulate async message handling
     setTimeout(() => {
       if (this.onmessage) {
@@ -85,7 +85,7 @@ class MockWorker {
 
   addEventListener(type: string, listener: EventListener) {
     if (type === "message") {
-      this.onmessage = listener as any;
+      this.onmessage = listener as (event: MessageEvent) => void;
     }
   }
 
@@ -97,7 +97,7 @@ class MockWorker {
 }
 
 // Mock Worker constructor
-(global as any).Worker = MockWorker;
+(global as unknown as { Worker: typeof MockWorker }).Worker = MockWorker;
 
 describe("Worker Event Bridge Integration", () => {
   let eventBus: GameEventBus;
@@ -209,7 +209,7 @@ describe("Worker Event Bridge Integration", () => {
 
     // Mock the evaluation (it will use fallback since we're not in a real worker environment)
     // This tests the fallback functionality
-    let aiResult: any = null;
+    let aiResult: unknown = null;
     eventBus.subscribe("AI_MOVE_CALCULATED", (event) => {
       aiResult = event.payload.result;
     });

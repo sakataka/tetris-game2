@@ -43,6 +43,7 @@ function createTestGameState(board?: GameBoard, pieceType: TetrominoTypeName = "
     board: emptyBoard,
     boardBeforeClear: null,
     currentPiece: createTetromino(pieceType),
+    ghostPiece: null,
     nextPiece: "T",
     heldPiece: null,
     canHold: true,

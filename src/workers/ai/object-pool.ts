@@ -31,8 +31,14 @@ export class ObjectPool<T extends Poolable> {
     let obj: T;
 
     if (this.pool.length > 0) {
-      obj = this.pool.pop()!;
-      this.poolHits++;
+      const pooledObj = this.pool.pop();
+      if (pooledObj) {
+        obj = pooledObj;
+        this.poolHits++;
+      } else {
+        obj = this.factory();
+        this.created++;
+      }
     } else {
       obj = this.factory();
       this.created++;

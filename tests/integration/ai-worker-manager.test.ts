@@ -27,10 +27,10 @@ class MockWorker {
     }, 10);
   }
 
-  postMessage(message: any) {
+  postMessage(message: unknown) {
     setTimeout(() => {
       if (this.onmessage) {
-        let response: any;
+        let response: unknown;
 
         switch (message.type) {
           case "INIT_AI":
@@ -90,7 +90,7 @@ class MockWorker {
 }
 
 // Mock Worker constructor
-(global as any).Worker = MockWorker;
+(global as unknown as { Worker: typeof MockWorker }).Worker = MockWorker;
 
 describe("AI Worker Manager Integration", () => {
   let eventBus: GameEventBus;
@@ -163,7 +163,7 @@ describe("AI Worker Manager Integration", () => {
   });
 
   it("should handle AI move requests", async () => {
-    let aiResult: any = null;
+    let aiResult: unknown = null;
     eventBus.subscribe("AI_MOVE_CALCULATED", (event) => {
       aiResult = event.payload.result;
     });

@@ -250,12 +250,17 @@ export class ScoreStorageAdapter {
 
       // Validate each score entry
       const validScores = importData.highScores.filter(
-        (score: unknown) =>
-          score.id &&
-          typeof score.score === "number" &&
-          typeof score.lines === "number" &&
-          typeof score.level === "number" &&
-          typeof score.timestamp === "number",
+        (score: unknown): score is HighScoreEntry => {
+          if (!score || typeof score !== "object") return false;
+          const s = score as Record<string, unknown>;
+          return (
+            typeof s.id === "string" &&
+            typeof s.score === "number" &&
+            typeof s.lines === "number" &&
+            typeof s.level === "number" &&
+            typeof s.timestamp === "number"
+          );
+        },
       );
 
       await this.saveToStorage(this.HIGH_SCORES_KEY, validScores.slice(0, this.MAX_HIGH_SCORES));

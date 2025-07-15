@@ -238,6 +238,8 @@ export class SettingsStorageAdapter {
       return null;
     }
 
+    const s = settings as Record<string, unknown>;
+
     // Check required boolean fields
     const booleanFields = [
       "showGhostPiece",
@@ -251,67 +253,55 @@ export class SettingsStorageAdapter {
     ];
 
     for (const field of booleanFields) {
-      if (typeof settings[field] !== "boolean") {
-        console.warn(`[SettingsStorage] Invalid ${field}: ${settings[field]}`);
+      if (typeof s[field] !== "boolean") {
+        console.warn(`[SettingsStorage] Invalid ${field}: ${s[field]}`);
         return null;
       }
     }
 
     // Check number fields with ranges
-    if (
-      typeof settings.soundVolume !== "number" ||
-      settings.soundVolume < 0 ||
-      settings.soundVolume > 1
-    ) {
-      console.warn(`[SettingsStorage] Invalid soundVolume: ${settings.soundVolume}`);
+    if (typeof s.soundVolume !== "number" || s.soundVolume < 0 || s.soundVolume > 1) {
+      console.warn(`[SettingsStorage] Invalid soundVolume: ${s.soundVolume}`);
       return null;
     }
 
     if (
-      typeof settings.autoRepeatDelay !== "number" ||
-      settings.autoRepeatDelay < 50 ||
-      settings.autoRepeatDelay > 300
+      typeof s.autoRepeatDelay !== "number" ||
+      s.autoRepeatDelay < 50 ||
+      s.autoRepeatDelay > 300
     ) {
-      console.warn(`[SettingsStorage] Invalid autoRepeatDelay: ${settings.autoRepeatDelay}`);
+      console.warn(`[SettingsStorage] Invalid autoRepeatDelay: ${s.autoRepeatDelay}`);
       return null;
     }
 
-    if (
-      typeof settings.autoRepeatRate !== "number" ||
-      settings.autoRepeatRate < 20 ||
-      settings.autoRepeatRate > 100
-    ) {
-      console.warn(`[SettingsStorage] Invalid autoRepeatRate: ${settings.autoRepeatRate}`);
+    if (typeof s.autoRepeatRate !== "number" || s.autoRepeatRate < 20 || s.autoRepeatRate > 100) {
+      console.warn(`[SettingsStorage] Invalid autoRepeatRate: ${s.autoRepeatRate}`);
       return null;
     }
 
-    if (
-      typeof settings.targetFPS !== "number" ||
-      settings.targetFPS < 30 ||
-      settings.targetFPS > 120
-    ) {
-      console.warn(`[SettingsStorage] Invalid targetFPS: ${settings.targetFPS}`);
+    if (typeof s.targetFPS !== "number" || s.targetFPS < 30 || s.targetFPS > 120) {
+      console.warn(`[SettingsStorage] Invalid targetFPS: ${s.targetFPS}`);
       return null;
     }
 
     // Check enum fields
-    if (!["compact", "normal", "gaming"].includes(settings.theme)) {
-      console.warn(`[SettingsStorage] Invalid theme: ${settings.theme}`);
+    if (!["compact", "normal", "gaming"].includes(s.theme as string)) {
+      console.warn(`[SettingsStorage] Invalid theme: ${s.theme}`);
       return null;
     }
 
-    if (!["dark", "light", "auto"].includes(settings.colorScheme)) {
-      console.warn(`[SettingsStorage] Invalid colorScheme: ${settings.colorScheme}`);
+    if (!["dark", "light", "auto"].includes(s.colorScheme as string)) {
+      console.warn(`[SettingsStorage] Invalid colorScheme: ${s.colorScheme}`);
       return null;
     }
 
     // Check string fields
-    if (typeof settings.language !== "string" || settings.language.length !== 2) {
-      console.warn(`[SettingsStorage] Invalid language: ${settings.language}`);
+    if (typeof s.language !== "string" || s.language.length !== 2) {
+      console.warn(`[SettingsStorage] Invalid language: ${s.language}`);
       return null;
     }
 
-    return settings as GameSettings;
+    return s as unknown as GameSettings;
   }
 
   /**

@@ -22,7 +22,7 @@ const MockBoard = () => {
 
           return (
             <div
-              key={`cell-${i}`}
+              key={`cell-${row}-${col}`}
               className={`w-6 h-6 border border-slate-700 ${
                 isEmpty ? "bg-slate-800/50" : "bg-blue-500"
               }`}

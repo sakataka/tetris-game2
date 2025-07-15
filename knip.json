@@ -1,5 +1,13 @@
 {
-  "entry": ["src/main.tsx", "src/game/ai/index.ts", "**/*.test.{ts,tsx}", "**/*.bench.{ts,tsx}"],
+  "entry": [
+    "src/main.tsx",
+    "src/game/ai/index.ts",
+    "**/*.test.{ts,tsx}",
+    "**/*.bench.{ts,tsx}",
+    "src/features/*/index.ts",
+    "src/components/ui/ThemeModeSelector.tsx",
+    "src/app/providers/EffectsProvider.tsx"
+  ],
   "project": ["src/**/*.{ts,tsx}", "*.{ts,js}"],
   "ignore": [
     "dist/**",
@@ -10,7 +18,9 @@
     "src/test/setup.ts",
     "src/test/generators/**",
     "src/design-tokens/**",
-    "src/components/ui/ThemeModeSelector.tsx"
+    "src/features/*/ui/**",
+    "src/features/*/api/**",
+    "src/features/*/lib/**"
   ],
   "ignoreExportsUsedInFile": true,
   "includeEntryExports": false,

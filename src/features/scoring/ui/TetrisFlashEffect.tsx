@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 interface TetrisFlashEffectProps {
   isActive?: boolean;
@@ -11,6 +11,11 @@ interface TetrisFlashEffectProps {
  */
 export function TetrisFlashEffect({ isActive = false, onComplete }: TetrisFlashEffectProps) {
   const [showEffect, setShowEffect] = useState(false);
+
+  // Generate stable particle IDs
+  const particleIds = useMemo(() => {
+    return Array.from({ length: 20 }, (_, i) => `particle-${crypto.randomUUID()}-${i}`);
+  }, []);
 
   useEffect(() => {
     if (isActive) {
@@ -76,9 +81,9 @@ export function TetrisFlashEffect({ isActive = false, onComplete }: TetrisFlashE
 
       {/* Particle effects */}
       <div className="fixed inset-0 pointer-events-none z-40">
-        {Array.from({ length: 20 }).map((_, i) => (
+        {particleIds.map((particleId, i) => (
           <motion.div
-            key={i}
+            key={particleId}
             initial={{
               opacity: 0,
               scale: 0,

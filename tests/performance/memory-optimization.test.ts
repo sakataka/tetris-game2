@@ -30,7 +30,7 @@ describe("RingBuffer", () => {
     expect(obj3).not.toBeNull();
     expect(buffer.getStats().size).toBe(0); // Buffer should be empty
 
-    buffer.release(obj1!);
+    if (obj1) buffer.release(obj1);
     expect(buffer.getStats().size).toBe(1);
 
     const obj4 = buffer.acquire();
@@ -45,8 +45,8 @@ describe("RingBuffer", () => {
     const obj2 = buffer.acquire();
 
     // Try to release 3 objects into a buffer of capacity 2
-    buffer.release(obj1!);
-    buffer.release(obj2!);
+    if (obj1) buffer.release(obj1);
+    if (obj2) buffer.release(obj2);
     buffer.release({ value: 999 }); // This should be discarded
 
     expect(buffer.getStats().size).toBe(2);

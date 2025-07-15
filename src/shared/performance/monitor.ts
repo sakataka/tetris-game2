@@ -242,6 +242,3 @@ export class PerformanceMonitor {
     return warnings;
   }
 }
-
-// Global performance monitor instance
-export const performanceMonitor = new PerformanceMonitor();

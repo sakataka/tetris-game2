@@ -36,8 +36,12 @@ const PERFORMANCE_BUDGETS = {
 /**
  * Mock implementations for performance testing
  */
+interface MockGameState {
+  [key: string]: unknown;
+}
+
 class MockAIEngine {
-  evaluatePosition(_gameState: any): Promise<number> {
+  evaluatePosition(_gameState: MockGameState): Promise<number> {
     return new Promise((resolve) => {
       // Simulate AI evaluation work
       const complexity = Math.random() * 100;
@@ -49,7 +53,7 @@ class MockAIEngine {
     });
   }
 
-  synchronousEvaluate(_gameState: any): number {
+  synchronousEvaluate(_gameState: MockGameState): number {
     // Simulate synchronous AI evaluation
     let result = 0;
     for (let i = 0; i < 1000; i++) {
@@ -137,16 +141,16 @@ class MockCollisionDetector {
   }
 }
 
-class MockGameState {
-  private state: any = {};
+class MockGameStateManager {
+  private state: MockGameState = {};
   private updateCount = 0;
 
-  update(newState: any): void {
+  update(newState: MockGameState): void {
     this.state = { ...this.state, ...newState };
     this.updateCount++;
   }
 
-  getState(): any {
+  getState(): MockGameState {
     return { ...this.state };
   }
 
@@ -175,7 +179,7 @@ function getMemoryUsage(): number {
   return 0;
 }
 
-function createMockGameState(): any {
+function createMockGameState(): MockGameState {
   return {
     board: Array.from({ length: 20 }, () => Array(10).fill(0)),
     currentPiece: null,
@@ -195,13 +199,13 @@ describe("Performance Budget Tests", () => {
   let aiEngine: MockAIEngine;
   let bitBoard: MockBitBoard;
   let collisionDetector: MockCollisionDetector;
-  let gameState: MockGameState;
+  let gameState: MockGameStateManager;
 
   beforeEach(() => {
     aiEngine = new MockAIEngine();
     bitBoard = new MockBitBoard();
     collisionDetector = new MockCollisionDetector();
-    gameState = new MockGameState();
+    gameState = new MockGameStateManager();
   });
 
   describe("AI Performance Budget", () => {
@@ -584,7 +588,7 @@ async function simulateAppStartup(): Promise<void> {
   // Simulate initializing game systems
   const _gameEngine = new MockAIEngine();
   const _bitBoard = new MockBitBoard();
-  const gameState = new MockGameState();
+  const gameState = new MockGameStateManager();
 
   // Simulate initial game setup
   gameState.update({ initialized: true });

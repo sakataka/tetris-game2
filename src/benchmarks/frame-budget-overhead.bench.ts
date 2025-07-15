@@ -181,15 +181,16 @@ describe("Frame Budget Sentinel Overhead Benchmark", () => {
   });
 });
 
-// Export benchmark runner for CLI usage
-export const runBenchmark = () => {
-  console.log("🚀 Frame Budget Sentinel Performance Benchmark");
-  console.log("=".repeat(50));
-  console.log(`Platform: ${process.platform}`);
-  console.log(`Node version: ${process.version}`);
-  console.log(`Date: ${new Date().toISOString()}`);
-  console.log("=".repeat(50));
+// Internal benchmark runner for CLI usage
+// Note: This function is kept for potential future CLI usage but currently unused
+// const _runBenchmark = () => {
+//   console.log("🚀 Frame Budget Sentinel Performance Benchmark");
+//   console.log("=".repeat(50));
+//   console.log(`Platform: ${process.platform}`);
+//   console.log(`Node version: ${process.version}`);
+//   console.log(`Date: ${new Date().toISOString()}`);
+//   console.log("=".repeat(50));
 
-  // Run the benchmark suite
-  // Note: In actual usage, this would be run via `bun test`
-};
+//   // Run the benchmark suite
+//   // Note: In actual usage, this would be run via `bun test`
+// };

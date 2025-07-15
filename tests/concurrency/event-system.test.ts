@@ -6,7 +6,7 @@ import { beforeEach, describe, expect, it } from "bun:test";
  */
 interface GameEvent {
   type: string;
-  payload: any;
+  payload: unknown;
   timestamp?: number;
 }
 
@@ -48,7 +48,8 @@ class GameEventBus {
     this.currentRecursionDepth = 0;
 
     while (this.eventQueue.length > 0 && this.currentRecursionDepth < this.maxRecursionDepth) {
-      const event = this.eventQueue.shift()!;
+      const event = this.eventQueue.shift();
+      if (!event) break;
       this.processEvent(event);
       this.currentRecursionDepth++;
     }
@@ -91,17 +92,21 @@ class GameEventBus {
 /**
  * Mock State Manager for Concurrency Testing
  */
+interface StateUpdate {
+  [key: string]: unknown;
+}
+
 class ConcurrentStateManager {
-  private state: any = {};
+  private state: StateUpdate = {};
   private updateQueue: Array<() => void> = [];
   private isUpdating = false;
-  private subscribers: Set<(state: any) => void> = new Set();
+  private subscribers: Set<(state: StateUpdate) => void> = new Set();
 
-  getState(): any {
+  getState(): StateUpdate {
     return { ...this.state };
   }
 
-  setState(updates: any): void {
+  setState(updates: StateUpdate): void {
     this.updateQueue.push(() => {
       this.state = { ...this.state, ...updates };
       this.notifySubscribers();
@@ -116,14 +121,15 @@ class ConcurrentStateManager {
     this.isUpdating = true;
 
     while (this.updateQueue.length > 0) {
-      const update = this.updateQueue.shift()!;
+      const update = this.updateQueue.shift();
+      if (!update) break;
       update();
     }
 
     this.isUpdating = false;
   }
 
-  subscribe(callback: (state: any) => void): () => void {
+  subscribe(callback: (state: StateUpdate) => void): () => void {
     this.subscribers.add(callback);
 
     return () => {
@@ -340,7 +346,7 @@ describe("Concurrency and Race Condition Tests", () => {
 
       // Set up subscriber to track final values
       stateManager.subscribe((state) => {
-        if (state.counter !== undefined) {
+        if (typeof state.counter === "number") {
           finalValues.add(state.counter);
         }
       });
@@ -366,7 +372,7 @@ describe("Concurrency and Race Condition Tests", () => {
 
     it("should maintain state consistency during rapid updates", async () => {
       let updateCount = 0;
-      const stateHistory: any[] = [];
+      const stateHistory: StateUpdate[] = [];
 
       stateManager.subscribe((state) => {
         updateCount++;
@@ -407,12 +413,12 @@ describe("Concurrency and Race Condition Tests", () => {
     });
 
     it("should handle subscriber modifications during state updates", async () => {
-      const subscribers: Array<(state: any) => void> = [];
+      const subscribers: Array<(state: StateUpdate) => void> = [];
       let totalNotifications = 0;
 
       // Create initial subscribers
       for (let i = 0; i < 5; i++) {
-        const subscriber = (state: any) => {
+        const subscriber = (state: StateUpdate) => {
           totalNotifications++;
 
           // Some subscribers modify the subscription list

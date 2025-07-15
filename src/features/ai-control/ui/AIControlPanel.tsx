@@ -123,12 +123,14 @@ export function AIControlPanel({
 
       {/* AI Level Selection */}
       <div className="space-y-2">
-        <label className="text-sm font-medium">{t("game.ai.controls.level")}</label>
+        <label htmlFor="ai-level-select" className="text-sm font-medium">
+          {t("game.ai.controls.level")}
+        </label>
         <Select
           value={settings.aiLevel}
           onValueChange={(value: "basic" | "advanced") => updateSettings({ aiLevel: value })}
         >
-          <SelectTrigger data-testid="ai-level-select">
+          <SelectTrigger id="ai-level-select" data-testid="ai-level-select">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -153,10 +155,11 @@ export function AIControlPanel({
         <div className="space-y-4 pt-2 border-t">
           {/* Beam Width */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">
+            <label htmlFor="beam-width-slider" className="text-sm font-medium">
               {t("game.ai.controls.beamWidth")}: {settings.beamWidth}
             </label>
             <Slider
+              id="beam-width-slider"
               value={[settings.beamWidth]}
               onValueChange={([value]) => updateSettings({ beamWidth: value })}
               min={1}
@@ -168,10 +171,11 @@ export function AIControlPanel({
 
           {/* Thinking Time Limit */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">
+            <label htmlFor="thinking-time-slider" className="text-sm font-medium">
               {t("game.ai.controls.thinkingTime")}: {settings.thinkingTimeLimit}ms
             </label>
             <Slider
+              id="thinking-time-slider"
               value={[settings.thinkingTimeLimit]}
               onValueChange={([value]) => updateSettings({ thinkingTimeLimit: value })}
               min={10}
@@ -209,10 +213,11 @@ export function AIControlPanel({
 
           {/* Playback Speed */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">
+            <label htmlFor="playback-speed-slider" className="text-sm font-medium">
               {t("game.ai.controls.playbackSpeed")}: {settings.playbackSpeed}x
             </label>
             <Slider
+              id="playback-speed-slider"
               value={[settings.playbackSpeed]}
               onValueChange={([value]) => updateSettings({ playbackSpeed: value })}
               min={0.1}

@@ -21,9 +21,9 @@ export interface GameEventBusConfig {
  * Game Event Bus implementation
  */
 export class GameEventBus {
-  private listeners = new Map<string, Set<EventHandler<any>>>();
+  private listeners = new Map<string, Set<EventHandler<GameEventType>>>();
   private config: Required<GameEventBusConfig>;
-  private eventHistory: Array<{ type: GameEventType; payload: any }> = [];
+  private eventHistory: Array<{ type: GameEventType; payload: unknown }> = [];
   private maxHistorySize = 100;
 
   constructor(config: GameEventBusConfig = {}) {
@@ -54,7 +54,7 @@ export class GameEventBus {
       );
     }
 
-    handlers.add(handler as EventHandler<any>);
+    handlers.add(handler as EventHandler<GameEventType>);
 
     if (this.config.enableLogging) {
       console.log(`[EventBus] Subscribed to ${eventType}`);
@@ -62,7 +62,7 @@ export class GameEventBus {
 
     // Return unsubscribe function
     return () => {
-      handlers.delete(handler as EventHandler<any>);
+      handlers.delete(handler as EventHandler<GameEventType>);
       if (this.config.enableLogging) {
         console.log(`[EventBus] Unsubscribed from ${eventType}`);
       }
@@ -126,9 +126,12 @@ export class GameEventBus {
   /**
    * Execute a handler with error handling
    */
-  private async executeHandler(handler: EventHandler<any>, payload: any): Promise<void> {
+  private async executeHandler(
+    handler: EventHandler<GameEventType>,
+    payload: unknown,
+  ): Promise<void> {
     try {
-      await handler(payload);
+      await handler(payload as GameEventPayload<GameEventType>);
     } catch (error) {
       console.error("Error in event handler:", error);
 
@@ -143,7 +146,7 @@ export class GameEventBus {
   /**
    * Add event to history
    */
-  private addToHistory(event: { type: GameEventType; payload: any }): void {
+  private addToHistory(event: { type: GameEventType; payload: unknown }): void {
     this.eventHistory.push(event);
     if (this.eventHistory.length > this.maxHistorySize) {
       this.eventHistory.shift();
@@ -153,7 +156,7 @@ export class GameEventBus {
   /**
    * Get event history
    */
-  public getHistory(): Array<{ type: GameEventType; payload: any }> {
+  public getHistory(): Array<{ type: GameEventType; payload: unknown }> {
     return [...this.eventHistory];
   }
 

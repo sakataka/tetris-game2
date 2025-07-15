@@ -4,8 +4,8 @@
  * Handles message serialization, error recovery, and performance monitoring
  */
 
-import type { AdvancedAIDecision } from "@/game/ai/core/advanced-ai-engine";
-import type { AIDecision } from "@/game/ai/core/ai-engine";
+import type { AdvancedAIConfig, AdvancedAIDecision } from "@/game/ai/core/advanced-ai-engine";
+import type { AIConfig, AIDecision } from "@/game/ai/core/ai-engine";
 import type { EvaluationWeights } from "@/game/ai/evaluators/dellacherie";
 import type { GameState } from "@/types/game";
 import type { WorkerMessage, WorkerResponse } from "../../workers/ai-worker";
@@ -236,7 +236,7 @@ export class WorkerEventBridge {
    * Initialize AI in worker
    */
   public async initializeAI(
-    config: Record<string, unknown>,
+    config: AIConfig | AdvancedAIConfig,
     weights: EvaluationWeights,
     useAdvanced = false,
   ): Promise<void> {
@@ -344,9 +344,9 @@ export class WorkerEventBridge {
     console.log("Setting up main thread AI fallback");
 
     // Subscribe to AI evaluation requests
-    this.eventBus.subscribe("POSITION_NEEDS_EVALUATION", async (event) => {
+    this.eventBus.subscribe("AI_MOVE_REQUESTED", async (payload) => {
       try {
-        const result = await this.evaluatePositionMainThread(event.payload.gameState);
+        const result = await this.evaluatePositionMainThread(payload.gameState);
 
         this.eventBus.emitSync("AI_MOVE_CALCULATED", {
           result,

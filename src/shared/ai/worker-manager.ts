@@ -3,8 +3,8 @@
  * High-level interface for managing AI workers and fallbacks
  */
 
-import type { AdvancedAIDecision } from "@/game/ai/core/advanced-ai-engine";
-import type { AIDecision } from "@/game/ai/core/ai-engine";
+import type { AdvancedAIConfig, AdvancedAIDecision } from "@/game/ai/core/advanced-ai-engine";
+import type { AIConfig, AIDecision } from "@/game/ai/core/ai-engine";
 import type { EvaluationWeights } from "@/game/ai/evaluators/dellacherie";
 import type { GameState } from "@/types/game";
 import type { GameEventBus } from "../events/game-event-bus";
@@ -56,23 +56,23 @@ export class AIWorkerManager {
    */
   private setupEventHandlers(): void {
     // Listen for AI move requests
-    this.eventBus.subscribe("AI_MOVE_REQUESTED", async (event) => {
+    this.eventBus.subscribe("AI_MOVE_REQUESTED", async (payload) => {
       if (this.isProcessing) {
         console.warn("AI is already processing a move, skipping request");
         return;
       }
 
-      await this.processAIMove(event.payload.gameState);
+      await this.processAIMove(payload.gameState);
     });
 
     // Listen for difficulty changes
-    this.eventBus.subscribe("AI_DIFFICULTY_CHANGED", async (event) => {
-      this.config.difficulty = event.payload.difficulty;
+    this.eventBus.subscribe("AI_DIFFICULTY_CHANGED", async (payload) => {
+      this.config.difficulty = payload.difficulty;
 
       // Send difficulty change to worker if available
       if (this.bridge) {
         try {
-          await this.bridge.setDifficulty(event.payload.difficulty);
+          await this.bridge.setDifficulty(payload.difficulty);
         } catch (error) {
           console.error("Failed to update worker difficulty:", error);
         }
@@ -108,30 +108,46 @@ export class AIWorkerManager {
   /**
    * Get default AI configuration
    */
-  private getDefaultAIConfig(): Record<string, unknown> {
-    return {
+  private getDefaultAIConfig(): AIConfig | AdvancedAIConfig {
+    const baseConfig: AIConfig = {
       thinkingTimeLimit: this.config.timeoutMs,
       evaluator: "dellacherie",
       enableLogging: process.env.NODE_ENV === "development",
       fallbackOnTimeout: true,
       useDynamicWeights: true,
-      // Advanced AI config (if using advanced AI)
-      ...(this.config.useAdvancedAI && {
+    };
+
+    if (this.config.useAdvancedAI) {
+      const advancedConfig: AdvancedAIConfig = {
+        ...baseConfig,
         beamSearchConfig: {
           beamWidth: 5,
           maxDepth: 3,
-          timeoutMs: this.config.timeoutMs / 2,
+          useHold: true,
+          enablePruning: true,
+          timeLimit: this.config.timeoutMs / 2,
+          enableDiversity: false,
+          diversityConfig: {
+            baseDiversityRatio: 0.2,
+            depthDiscountFactor: 0.95,
+            uncertaintyPenalty: 0.1,
+            complexityBonusWeight: 0.1,
+            dynamicDiversityRatio: false,
+          },
         },
         holdSearchOptions: {
-          enabled: true,
-          maxDepth: 2,
-          timeoutMs: this.config.timeoutMs / 3,
+          allowHoldUsage: true,
+          holdPenalty: 10,
+          maxHoldUsage: 2,
         },
         enableAdvancedFeatures: true,
         enableSearchLogging: false,
         enablePatternDetection: true,
-      }),
-    };
+      };
+      return advancedConfig;
+    }
+
+    return baseConfig;
   }
 
   /**
@@ -233,12 +249,12 @@ export class AIWorkerManager {
     if (this.config.useAdvancedAI) {
       // Dynamic import to avoid blocking
       const { AdvancedAIEngine } = await import("@/game/ai/core/advanced-ai-engine");
-      const aiEngine = new AdvancedAIEngine(this.getDefaultAIConfig());
+      const aiEngine = new AdvancedAIEngine(this.getDefaultAIConfig() as AdvancedAIConfig);
       return aiEngine.findBestMove(gameState);
     }
     // Dynamic import to avoid blocking
     const { AIEngine } = await import("@/game/ai/core/ai-engine");
-    const aiEngine = new AIEngine(this.getDefaultAIConfig());
+    const aiEngine = new AIEngine(this.getDefaultAIConfig() as AIConfig);
     return aiEngine.findBestMove(gameState);
   }
 

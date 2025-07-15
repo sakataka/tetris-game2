@@ -12,7 +12,7 @@ export interface EffectConfig {
 
 export interface GameEvent {
   type: string;
-  payload?: any;
+  payload?: unknown;
   timestamp: number;
 }
 
@@ -63,7 +63,7 @@ export class GameEffectsManager {
   /**
    * Emit a game event to trigger effects
    */
-  emit(eventType: string, payload?: any): void {
+  emit(eventType: string, payload?: unknown): void {
     const event: GameEvent = {
       type: eventType,
       payload,
@@ -113,25 +113,29 @@ export class GameEffectsManager {
     if (!this.config.enableAnimations) return;
 
     this.on("LINE_CLEARED", (event) => {
-      const { lines, positions } = event.payload || {};
+      const payload = event.payload as { lines?: number[]; positions?: unknown } | undefined;
+      const { lines, positions } = payload || {};
       console.log(`[Effects] Line clear animation: ${lines} lines at positions`, positions);
       // Animation logic would be implemented here
     });
 
     this.on("PIECE_PLACED", (event) => {
-      const { piece, position } = event.payload || {};
+      const payload = event.payload as { piece?: unknown; position?: unknown } | undefined;
+      const { piece, position } = payload || {};
       console.log("[Effects] Piece placement animation", piece, position);
       // Piece placement effect logic
     });
 
     this.on("HARD_DROP", (event) => {
-      const { distance } = event.payload || {};
+      const payload = event.payload as { distance?: number } | undefined;
+      const { distance } = payload || {};
       console.log(`[Effects] Hard drop animation: ${distance} cells`);
       // Hard drop trail effect
     });
 
     this.on("T_SPIN", (event) => {
-      const { type } = event.payload || {};
+      const payload = event.payload as { type?: string } | undefined;
+      const { type } = payload || {};
       console.log(`[Effects] T-Spin ${type} animation`);
       // T-Spin celebration effect
     });
@@ -149,8 +153,9 @@ export class GameEffectsManager {
     });
 
     this.on("LINE_CLEARED", (event) => {
-      const { lines } = event.payload || {};
-      if (lines === 4) {
+      const payload = event.payload as { lines?: number[] } | undefined;
+      const { lines } = payload || {};
+      if (lines && lines.length === 4) {
         console.log("[Effects] Playing TETRIS sound");
         // playSound('tetris');
       } else {
@@ -209,8 +214,9 @@ export class GameEffectsManager {
     });
 
     this.on("LINE_CLEARED", (event) => {
-      const { lines } = event.payload || {};
-      const pattern = lines === 4 ? [100, 50, 100] : [75];
+      const payload = event.payload as { lines?: number[] } | undefined;
+      const { lines } = payload || {};
+      const pattern = lines && lines.length === 4 ? [100, 50, 100] : [75];
       console.log("[Effects] Haptic feedback: line clear", pattern);
       // navigator.vibrate(pattern);
     });

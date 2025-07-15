@@ -31,7 +31,7 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "analyze": "bun run scripts/analyze-bundle.ts",
-    "analyze:visual": "bun x vite build && npx vite-bundle-analyzer dist/stats.html"
+    "analyze:visual": "bun x vite build && bun x rollup-plugin-visualizer dist/stats.html"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.14",
@@ -79,7 +79,8 @@
     "tailwindcss": "4.1.11",
     "terser": "^5.43.1",
     "typescript": "5.8.3",
-    "vite": "npm:rolldown-vite@^7.0.9"
+    "vite": "npm:rolldown-vite@^7.0.9",
+    "vitest": "^2.2.8"
   },
   "trustedDependencies": [
     "@tailwindcss/oxide",

@@ -13,17 +13,17 @@ const ANIMATION_PRESETS = {
   scoreIncrease: {
     initial: { scale: 1, opacity: 0.8 },
     animate: { scale: [1, 1.1, 1], opacity: 1 },
-    transition: { duration: 0.5, ease: "easeOut" },
+    transition: { duration: 0.5 },
   },
   linesCleared: {
     initial: { scale: 1, y: 0 },
     animate: { scale: [1, 1.05, 1], y: [0, -2, 0] },
-    transition: { duration: 0.4, ease: "easeInOut" },
+    transition: { duration: 0.4 },
   },
   levelIncrease: {
     initial: { scale: 1, rotate: 0 },
     animate: { scale: [1, 1.2, 1], rotate: [0, 5, 0] },
-    transition: { duration: 0.6, ease: "easeOut" },
+    transition: { duration: 0.6 },
   },
 };
 
@@ -55,7 +55,7 @@ export function AnimatedScoreItem({
     : {
         initial: {},
         animate: {},
-        transition: {},
+        transition: undefined,
       };
 
   return (

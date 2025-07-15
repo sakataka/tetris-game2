@@ -65,6 +65,7 @@ export function createInitialGameState(): GameState {
     board: createEmptyBoard(),
     boardBeforeClear: null,
     currentPiece: createTetromino(currentType),
+    ghostPiece: null,
     nextPiece: nextType,
     heldPiece: null as TetrominoTypeName | null,
     canHold: true,

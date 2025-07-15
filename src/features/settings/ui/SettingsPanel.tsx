@@ -78,7 +78,7 @@ export function SettingsPanel({
       if (dropdownRef.current && !dropdownRef.current.contains(target)) {
         const settingsPanel = document.querySelector("[data-settings-panel]");
         if (!settingsPanel || !settingsPanel.contains(target)) {
-          setIsOpen();
+          setIsOpen(false);
         }
       }
     };
@@ -116,7 +116,7 @@ export function SettingsPanel({
           {t("game.settings.title")}
         </h2>
         <AnimatedButton
-          onClick={() => setIsOpen()}
+          onClick={() => setIsOpen(false)}
           variant="ghost"
           size="sm"
           className="text-gray-400 hover:text-white"
@@ -134,10 +134,14 @@ export function SettingsPanel({
 
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <label className={`text-gray-300 ${compact ? "text-xs" : "text-sm"}`}>
+            <label
+              htmlFor="ghost-piece-toggle"
+              className={`text-gray-300 ${compact ? "text-xs" : "text-sm"}`}
+            >
               {t("game.settings.ghostPiece")}
             </label>
             <Switch
+              id="ghost-piece-toggle"
               checked={settings.showGhostPiece}
               onCheckedChange={(checked) => updateSettings({ showGhostPiece: checked })}
               data-testid="ghost-piece-toggle"
@@ -145,10 +149,14 @@ export function SettingsPanel({
           </div>
 
           <div className="flex items-center justify-between">
-            <label className={`text-gray-300 ${compact ? "text-xs" : "text-sm"}`}>
+            <label
+              htmlFor="show-grid-toggle"
+              className={`text-gray-300 ${compact ? "text-xs" : "text-sm"}`}
+            >
               {t("game.settings.showGrid")}
             </label>
             <Switch
+              id="show-grid-toggle"
               checked={settings.showGrid}
               onCheckedChange={(checked) => updateSettings({ showGrid: checked })}
               data-testid="show-grid-toggle"
@@ -156,10 +164,14 @@ export function SettingsPanel({
           </div>
 
           <div className="flex items-center justify-between">
-            <label className={`text-gray-300 ${compact ? "text-xs" : "text-sm"}`}>
+            <label
+              htmlFor="animations-toggle"
+              className={`text-gray-300 ${compact ? "text-xs" : "text-sm"}`}
+            >
               {t("game.settings.animations")}
             </label>
             <Switch
+              id="animations-toggle"
               checked={settings.enableAnimations}
               onCheckedChange={(checked) => updateSettings({ enableAnimations: checked })}
               data-testid="animations-toggle"
@@ -176,10 +188,14 @@ export function SettingsPanel({
 
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <label className={`text-gray-300 ${compact ? "text-xs" : "text-sm"}`}>
+            <label
+              htmlFor="t-spin-toggle"
+              className={`text-gray-300 ${compact ? "text-xs" : "text-sm"}`}
+            >
               {t("game.settings.tSpinDetection")}
             </label>
             <Switch
+              id="t-spin-toggle"
               checked={settings.enableTSpinDetection}
               onCheckedChange={(checked) => updateSettings({ enableTSpinDetection: checked })}
               data-testid="t-spin-toggle"
@@ -187,10 +203,14 @@ export function SettingsPanel({
           </div>
 
           <div className="flex items-center justify-between">
-            <label className={`text-gray-300 ${compact ? "text-xs" : "text-sm"}`}>
+            <label
+              htmlFor="ai-features-toggle"
+              className={`text-gray-300 ${compact ? "text-xs" : "text-sm"}`}
+            >
               {t("game.settings.aiFeatures")}
             </label>
             <Switch
+              id="ai-features-toggle"
               checked={settings.enableAIFeatures}
               onCheckedChange={(checked) => updateSettings({ enableAIFeatures: checked })}
               data-testid="ai-features-toggle"
@@ -207,7 +227,10 @@ export function SettingsPanel({
 
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <label className={`text-gray-300 ${compact ? "text-xs" : "text-sm"}`}>
+            <label
+              htmlFor="theme-select"
+              className={`text-gray-300 ${compact ? "text-xs" : "text-sm"}`}
+            >
               {t("game.settings.themeMode")}
             </label>
             <Select
@@ -216,7 +239,7 @@ export function SettingsPanel({
                 updateSettings({ theme: value })
               }
             >
-              <SelectTrigger className="w-32" data-testid="theme-select">
+              <SelectTrigger id="theme-select" className="w-32" data-testid="theme-select">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -228,7 +251,10 @@ export function SettingsPanel({
           </div>
 
           <div className="flex items-center justify-between">
-            <label className={`text-gray-300 ${compact ? "text-xs" : "text-sm"}`}>
+            <label
+              htmlFor="color-scheme-select"
+              className={`text-gray-300 ${compact ? "text-xs" : "text-sm"}`}
+            >
               {t("game.settings.colorScheme")}
             </label>
             <Select
@@ -237,7 +263,11 @@ export function SettingsPanel({
                 updateSettings({ colorScheme: value })
               }
             >
-              <SelectTrigger className="w-32" data-testid="color-scheme-select">
+              <SelectTrigger
+                id="color-scheme-select"
+                className="w-32"
+                data-testid="color-scheme-select"
+              >
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -258,10 +288,14 @@ export function SettingsPanel({
 
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <label className={`text-gray-300 ${compact ? "text-xs" : "text-sm"}`}>
+            <label
+              htmlFor="sound-toggle"
+              className={`text-gray-300 ${compact ? "text-xs" : "text-sm"}`}
+            >
               {t("game.settings.sound")}
             </label>
             <Switch
+              id="sound-toggle"
               checked={settings.enableSound}
               onCheckedChange={(checked) => updateSettings({ enableSound: checked })}
               data-testid="sound-toggle"
@@ -270,10 +304,14 @@ export function SettingsPanel({
 
           {settings.enableSound && (
             <div className="space-y-1">
-              <label className={`text-gray-300 ${compact ? "text-xs" : "text-sm"}`}>
+              <label
+                htmlFor="volume-slider"
+                className={`text-gray-300 ${compact ? "text-xs" : "text-sm"}`}
+              >
                 {t("game.settings.volume")}: {Math.round(settings.soundVolume * 100)}%
               </label>
               <Slider
+                id="volume-slider"
                 value={[settings.soundVolume]}
                 onValueChange={([value]) => updateSettings({ soundVolume: value })}
                 min={0}
@@ -285,10 +323,14 @@ export function SettingsPanel({
           )}
 
           <div className="flex items-center justify-between">
-            <label className={`text-gray-300 ${compact ? "text-xs" : "text-sm"}`}>
+            <label
+              htmlFor="haptics-toggle"
+              className={`text-gray-300 ${compact ? "text-xs" : "text-sm"}`}
+            >
               {t("game.settings.haptics")}
             </label>
             <Switch
+              id="haptics-toggle"
               checked={settings.enableHaptics}
               onCheckedChange={(checked) => updateSettings({ enableHaptics: checked })}
               data-testid="haptics-toggle"
@@ -304,7 +346,7 @@ export function SettingsPanel({
         </h3>
 
         <Select value={settings.language} onValueChange={handleLanguageChange}>
-          <SelectTrigger data-testid="language-select">
+          <SelectTrigger id="language-select" data-testid="language-select">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -325,10 +367,14 @@ export function SettingsPanel({
 
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <label className={`text-gray-300 ${compact ? "text-xs" : "text-sm"}`}>
+            <label
+              htmlFor="performance-mode-toggle"
+              className={`text-gray-300 ${compact ? "text-xs" : "text-sm"}`}
+            >
               {t("game.settings.performanceMode")}
             </label>
             <Switch
+              id="performance-mode-toggle"
               checked={settings.enablePerformanceMode}
               onCheckedChange={(checked) => updateSettings({ enablePerformanceMode: checked })}
               data-testid="performance-mode-toggle"
@@ -336,10 +382,14 @@ export function SettingsPanel({
           </div>
 
           <div className="space-y-1">
-            <label className={`text-gray-300 ${compact ? "text-xs" : "text-sm"}`}>
+            <label
+              htmlFor="fps-slider"
+              className={`text-gray-300 ${compact ? "text-xs" : "text-sm"}`}
+            >
               {t("game.settings.targetFPS")}: {settings.targetFPS}
             </label>
             <Slider
+              id="fps-slider"
               value={[settings.targetFPS]}
               onValueChange={([value]) => updateSettings({ targetFPS: value })}
               min={30}
@@ -356,7 +406,7 @@ export function SettingsPanel({
   return (
     <div ref={dropdownRef} className={className}>
       <AnimatedButton
-        onClick={() => setIsOpen()}
+        onClick={() => setIsOpen(!isOpen)}
         variant="ghost"
         size={compact ? "sm" : "default"}
         className={`${CONTROL_STYLES.button} ${compact ? "p-2" : "p-3"}`}

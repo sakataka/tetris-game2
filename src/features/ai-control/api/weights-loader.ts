@@ -3,8 +3,6 @@
  * Prevents bundling large weight files
  */
 
-import React from "react";
-
 export interface AIWeights {
   landingHeight: number;
   linesCleared: number;
@@ -213,96 +211,6 @@ class AIWeightsLoader {
 }
 
 export const aiWeightsLoader = new AIWeightsLoader();
-
-/**
- * Hook for loading AI weights
- */
-export function useAIWeights(difficulty: string) {
-  const [weights, setWeights] = React.useState<AIWeights | null>(null);
-  const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState<string | null>(null);
-
-  React.useEffect(() => {
-    let cancelled = false;
-
-    async function loadWeights() {
-      try {
-        setLoading(true);
-        setError(null);
-
-        const loadedWeights = await aiWeightsLoader.loadWeights(difficulty);
-
-        if (!cancelled) {
-          setWeights(loadedWeights);
-        }
-      } catch (err) {
-        if (!cancelled) {
-          setError(err instanceof Error ? err.message : "Failed to load weights");
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
-    }
-
-    loadWeights();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [difficulty]);
-
-  return { weights, loading, error };
-}
-
-/**
- * Hook for loading all available presets
- */
-export function useAIWeightPresets() {
-  const [presets, setPresets] = React.useState<WeightPreset[]>([]);
-  const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState<string | null>(null);
-
-  React.useEffect(() => {
-    let cancelled = false;
-
-    async function loadPresets() {
-      try {
-        setLoading(true);
-        setError(null);
-
-        const loadedPresets = await aiWeightsLoader.loadAllPresets();
-
-        if (!cancelled) {
-          setPresets(loadedPresets);
-        }
-      } catch (err) {
-        if (!cancelled) {
-          setError(err instanceof Error ? err.message : "Failed to load presets");
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
-    }
-
-    loadPresets();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const reload = React.useCallback(() => {
-    aiWeightsLoader.clearCache();
-    // Trigger re-fetch by updating a state that the effect depends on
-    setLoading(true);
-  }, []);
-
-  return { presets, loading, error, reload };
-}
 
 /**
  * Preload critical weights on app start

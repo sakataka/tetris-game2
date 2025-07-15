@@ -17,6 +17,7 @@ interface BoardCellProps {
   row: number;
   col: number;
   cellSize?: number;
+  showGhost?: boolean;
 }
 
 /**

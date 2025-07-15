@@ -333,8 +333,8 @@ describe("Game Engine Property-Based Tests", () => {
               const { board, piece, position, action } = testCase;
 
               try {
-                let result1: any;
-                let result2: any;
+                let result1: unknown;
+                let result2: unknown;
 
                 switch (action) {
                   case "isValid":
@@ -407,6 +407,14 @@ describe("Game Engine Property-Based Tests", () => {
   });
 });
 
+// Helper types
+interface PieceData {
+  x: number;
+  y: number;
+  rotation: number;
+  pieceType: string;
+}
+
 // Helper functions
 function countHolesInBitBoard(bitBoard: BitBoardData): number {
   let holes = 0;
@@ -424,7 +432,7 @@ function countHolesInBitBoard(bitBoard: BitBoardData): number {
   return holes;
 }
 
-function validatePiecePosition(_bitBoard: BitBoardData, piece: any): boolean {
+function validatePiecePosition(_bitBoard: BitBoardData, piece: PieceData): boolean {
   // Simplified piece validation - pieces outside board bounds are invalid
   // For a 10-wide board, x positions beyond 7 are generally invalid for most pieces
   return piece.x >= -2 && piece.x <= 7 && piece.y >= -2 && piece.y <= 19;

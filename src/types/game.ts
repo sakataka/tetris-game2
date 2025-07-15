@@ -128,6 +128,7 @@ export interface GameState {
   board: GameBoard;
   boardBeforeClear: GameBoard | null; // Board state before line clearing for animation
   currentPiece: Tetromino | null;
+  ghostPiece: Tetromino | null; // Ghost piece for preview
   nextPiece: TetrominoTypeName;
   heldPiece: TetrominoTypeName | null;
   canHold: boolean;
