@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useShallow } from "zustand/shallow";
 import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import {
@@ -17,6 +17,7 @@ import { AdvancedAIControls } from "@/components/game/AdvancedAIControls";
 import { AIReplay } from "@/components/game/AIReplay";
 import { AIVisualization } from "@/components/game/AIVisualization";
 import { LayoutModeToggle } from "@/components/ui/LayoutModeToggle";
+import { useGamePlay } from "@/features/game-play";
 import { useFocusManagement } from "@/hooks/accessibility/useFocusManagement";
 import { useScreenReaderAnnouncements } from "@/hooks/accessibility/useScreenReaderAnnouncements";
 import { useAdvancedAIController } from "@/hooks/ai/useAdvancedAIController";
@@ -35,6 +36,19 @@ export function Game() {
   useGameLoop();
   useKeyboardControls();
   useHighScoreSideEffect();
+
+  // Auto-start the game on mount
+  const { startGame, isPlaying } = useGamePlay();
+  const resetOldGame = useGameStore((state) => state.resetGame);
+
+  useEffect(() => {
+    // Start the game automatically if it's not already playing
+    if (!isPlaying) {
+      // Reset the old game store to ensure it's initialized
+      resetOldGame();
+      startGame();
+    }
+  }, [isPlaying, startGame, resetOldGame]);
   const { handleTouchStart, handleTouchEnd } = useTouchGestures();
 
   // Initialize focus management for accessibility
