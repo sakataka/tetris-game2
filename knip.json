@@ -5,9 +5,10 @@
     "**/*.test.{ts,tsx}",
     "src/features/*/index.ts",
     "src/components/ui/ThemeModeSelector.tsx",
-    "src/app/providers/EffectsProvider.tsx"
+    "src/app/providers/EffectsProvider.tsx",
+    "packages/tetris-engine/src/index.ts"
   ],
-  "project": ["src/**/*.{ts,tsx}", "*.{ts,js}"],
+  "project": ["src/**/*.{ts,tsx}", "packages/**/*.{ts,tsx}", "*.{ts,js}"],
   "ignore": [
     "dist/**",
     "node_modules/**",
@@ -19,7 +20,9 @@
     "src/design-tokens/**",
     "src/features/*/ui/**",
     "src/features/*/api/**",
-    "src/features/*/lib/**"
+    "src/features/*/lib/**",
+    "packages/tetris-engine/src/core/**",
+    "packages/tetris-engine/src/events/**"
   ],
   "ignoreExportsUsedInFile": true,
   "includeEntryExports": false,
@@ -28,6 +31,7 @@
     "bun-types",
     "@testing-library/jest-dom",
     "chromatic",
-    "@axe-core/react"
+    "@axe-core/react",
+    "@vitest/coverage-v8"
   ]
 }
