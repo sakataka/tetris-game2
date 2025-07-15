@@ -1,13 +1,6 @@
 {
   "buildCommand": "bun x biome ci && bun x tsc --noEmit && bun x vite build",
   "installCommand": "bun install",
-  "env": {
-    "NODE_ENV": "production"
-  },
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
-  ]
+  "env": { "NODE_ENV": "production" },
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }
