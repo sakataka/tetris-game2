@@ -28,8 +28,7 @@ bun run ci                        # Complete CI pipeline validation
 ### TESTING COMMANDS
 ```bash
 bun test                          # Unit tests (excludes components)
-bun run test:a11y                # Accessibility-specific Playwright tests
-bun run audit:accessibility       # WCAG 2.2 AA compliance audit
+bun run test:full                 # Full test suite execution
 bun run e2e                       # End-to-end tests
 ```
 
@@ -44,11 +43,11 @@ bun run analyze:visual           # Visual bundle analysis
 ### ENGINE PACKAGE COMMANDS
 ```bash
 cd packages/tetris-engine
-bun test                         # Engine unit tests
-bun run test:coverage            # Engine test coverage
+bun test                         # Engine unit tests (using vitest)
+bun run test:coverage            # Engine test coverage analysis
 bun run test:performance         # Engine performance benchmarks
-bun run test:golden-master       # Golden master tests
-bun run build                    # Build engine package
+bun run test:golden-master       # Golden master regression tests
+bun run build                    # Build engine package (esbuild ESM-only)
 bun run dev                      # Build engine in watch mode
 ```
 
@@ -88,20 +87,20 @@ tetris-game2/
 - **Purpose**: Framework-agnostic, high-performance Tetris game engine
 - **Architecture**: Event-driven with BitBoard implementation using Uint32Array
 - **Features**: Zero dependencies, tree-shakable, 100% test coverage
-- **Testing**: Unit tests, property-based testing, golden master tests, performance benchmarks
-- **Build**: TypeScript with ESM/CJS dual format output
+- **Testing**: Vitest-based unit tests, property-based testing, golden master tests, performance benchmarks
+- **Build**: TypeScript with ESM-only output via esbuild
 
 ### Tech Stack
-- **Runtime**: Bun 1.2 (package manager + JavaScript runtime)
+- **Runtime**: Bun 1.2.18 (package manager + JavaScript runtime)
 - **Frontend**: React 19.1 + TypeScript 5.8 (strict mode)
-- **State**: Zustand 5.0 (functional state management)
+- **State**: Zustand 5.0.6 (functional state management)
 - **Styling**: Tailwind CSS 4.1 + shadcn/ui + Radix UI
 - **Animation**: Motion 12.23
 - **i18n**: i18next 25.3 + react-i18next 15.6 (English/Japanese)
 - **Build**: Vite 7.0 (rolldown-vite implementation)
 - **Quality**: Biome 2.1 (linting/formatting) + Lefthook 1.12 (Git hooks)
 - **Testing**: Bun Test + Playwright 1.54 + fast-check 4.2 (property-based testing)
-- **Documentation**: Storybook 9.0 (component documentation + visual testing)
+- **Documentation**: Storybook 9.0.17 (component documentation + visual testing)
 - **Accessibility**: @axe-core/react 4.10 + axe-playwright 2.1
 
 ### Key Directories
@@ -158,10 +157,6 @@ tetris-game2/
 │   ├── events/      # Type-safe event system
 │   ├── types/       # Shared type definitions
 │   └── utils/       # Shared utilities
-├── store/           # Zustand stores - TEST ALL (Legacy, migrating to features/)
-│   ├── gameStore.ts     # Game state management
-│   ├── settingsStore.ts # User preferences, AI settings
-│   └── highScoreStore.ts # High score persistence
 ├── utils/           # Utilities - TEST ALL
 ├── locales/         # i18n files (en.json, ja.json)
 ├── test/            # Test utilities, mocks, generators
@@ -169,11 +164,11 @@ tetris-game2/
 ```
 
 ### Architecture Pattern: Feature-Sliced Design
-**Current Migration**: Transitioning from component-centric to Feature-Sliced Design
+**Migration Complete**: Successfully transitioned to Feature-Sliced Design architecture
 - **Features Layer**: `/src/features/` - Business logic organized by feature
 - **Shared Layer**: `/src/shared/` - Reusable modules across features
 - **App Layer**: `/src/app/` - Application configuration and providers
-- **Legacy**: `/src/components/` and `/src/store/` - Gradually migrating to features
+- **Legacy**: `/src/components/` - UI components (gradually migrating to features)
 
 **Each Feature Structure**:
 - `api/` - External API adapters and data fetching
@@ -264,12 +259,12 @@ phase:
 
 ## ♿ Accessibility (WCAG 2.2 AA)
 
-**AI Decision Point**: Use `bun run audit:accessibility` to validate WCAG 2.2 AA compliance. Include accessibility tests in development.
+**AI Decision Point**: Validate WCAG 2.2 AA compliance through integrated accessibility testing. Include accessibility tests in development.
 
 - **Skip Links**: Keyboard navigation shortcuts (`/src/components/accessibility/SkipLinks.tsx`)
 - **Screen Reader**: Comprehensive announcements for game state changes
 - **Focus Management**: Proper tab order and focus indicators
-- **Testing**: `@axe-core/react` + Playwright audits
+- **Testing**: `@axe-core/react` + Playwright audits integrated into test suite
 
 ## 📚 Component Documentation
 
@@ -298,9 +293,9 @@ Use these specialized MCP tools only when specifically needed for their intended
 - **Purpose**: End-to-end testing and browser automation
 - **When to use**: 
   - Running `bun run e2e` tests
-  - Accessibility testing (`bun run test:a11y`)
   - Cross-platform compatibility validation
   - UI workflow testing
+  - Accessibility testing integration
 - **Integration**: Works with project's existing Playwright configuration
 
 ## 📖 Quick Reference
@@ -325,6 +320,6 @@ Use these specialized MCP tools only when specifically needed for their intended
 - **Design Tokens**: `/src/design-tokens/index.ts` (comprehensive token system)
 - **Theme Context**: `/src/contexts/ThemeContext.tsx` (Compact/Normal/Gaming)
 - **i18n Files**: `/src/locales/en.json`, `/src/locales/ja.json`
-- **Accessibility**: `bun run audit:accessibility` (WCAG 2.2 AA)
+- **Accessibility**: Integrated WCAG 2.2 AA compliance testing
 - **Bundle Analysis**: `bun run analyze` (bundle size analysis)
 - **Documentation**: `bun run storybook` (component docs + visual testing)
