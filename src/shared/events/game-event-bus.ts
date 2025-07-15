@@ -7,7 +7,14 @@
 import type { AdvancedAIDecision } from "@/game/ai/core/advanced-ai-engine";
 import type { AIDecision } from "@/game/ai/core/ai-engine";
 // Import actual types from our codebase
-import type { GameState } from "@/types/game";
+import type {
+  GameBoard,
+  GameState,
+  LineClearAnimationData,
+  Position,
+  Tetromino,
+  TetrominoTypeName,
+} from "@/types/game";
 
 export type EventHandler<T = unknown> = (event: T) => void | Promise<void>;
 export type UnsubscribeFn = () => void;
@@ -85,6 +92,118 @@ export interface GameEvents {
     type: "POSITION_NEEDS_EVALUATION";
     payload: {
       gameState: GameState;
+    };
+  };
+
+  // Game Play Events
+  GAME_STARTED: {
+    type: "GAME_STARTED";
+    payload: Record<string, never>;
+  };
+  GAME_PAUSED: {
+    type: "GAME_PAUSED";
+    payload: {
+      isPaused: boolean;
+    };
+  };
+  GAME_OVER: {
+    type: "GAME_OVER";
+    payload: {
+      finalScore: number;
+      linesCleared: number;
+      level: number;
+    };
+  };
+  GAME_RESET: {
+    type: "GAME_RESET";
+    payload: Record<string, never>;
+  };
+
+  // Movement Events
+  MOVE_LEFT: {
+    type: "MOVE_LEFT";
+    payload: Record<string, never>;
+  };
+  MOVE_RIGHT: {
+    type: "MOVE_RIGHT";
+    payload: Record<string, never>;
+  };
+  ROTATE_CLOCKWISE: {
+    type: "ROTATE_CLOCKWISE";
+    payload: Record<string, never>;
+  };
+  ROTATE_COUNTER_CLOCKWISE: {
+    type: "ROTATE_COUNTER_CLOCKWISE";
+    payload: Record<string, never>;
+  };
+  SOFT_DROP: {
+    type: "SOFT_DROP";
+    payload: Record<string, never>;
+  };
+  HARD_DROP: {
+    type: "HARD_DROP";
+    payload: Record<string, never>;
+  };
+  HOLD_PIECE: {
+    type: "HOLD_PIECE";
+    payload: Record<string, never>;
+  };
+
+  // Piece Events
+  PIECE_SPAWNED: {
+    type: "PIECE_SPAWNED";
+    payload: {
+      piece: Tetromino;
+      nextPieces: TetrominoTypeName[];
+    };
+  };
+  PIECE_PLACED: {
+    type: "PIECE_PLACED";
+    payload: {
+      piece: Tetromino;
+      position: Position;
+    };
+  };
+  PIECE_HELD: {
+    type: "PIECE_HELD";
+    payload: {
+      heldPiece: TetrominoTypeName;
+      newCurrentPiece: Tetromino | null;
+    };
+  };
+
+  // Line Clear Events
+  LINES_CLEARED: {
+    type: "LINES_CLEARED";
+    payload: {
+      lines: number[];
+      linesCleared: number;
+      isTSpin: boolean;
+      isPerfectClear: boolean;
+    };
+  };
+  LINE_CLEAR_ANIMATION_START: {
+    type: "LINE_CLEAR_ANIMATION_START";
+    payload: {
+      lineClearData: LineClearAnimationData;
+    };
+  };
+  LINE_CLEAR_ANIMATION_COMPLETE: {
+    type: "LINE_CLEAR_ANIMATION_COMPLETE";
+    payload: Record<string, never>;
+  };
+
+  // Board State Events
+  BOARD_UPDATED: {
+    type: "BOARD_UPDATED";
+    payload: {
+      board: GameBoard;
+    };
+  };
+  GHOST_PIECE_UPDATED: {
+    type: "GHOST_PIECE_UPDATED";
+    payload: {
+      ghostPiece: Tetromino | null;
     };
   };
 }

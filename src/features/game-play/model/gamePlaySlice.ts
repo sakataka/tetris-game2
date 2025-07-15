@@ -1,14 +1,20 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
-import type { GameState, LineClearAnimationData, Piece } from "@/types/game";
+import type {
+  GameAnimationState,
+  GameBoard,
+  LineClearAnimationData,
+  Tetromino,
+  TetrominoTypeName,
+} from "@/types/game";
 
 interface GamePlayState {
   // Core game state
-  board: GameState["board"];
-  currentPiece: Piece | null;
-  ghostPiece: Piece | null;
-  nextPieces: string[];
-  heldPiece: string | null;
+  board: GameBoard;
+  currentPiece: Tetromino | null;
+  ghostPiece: Tetromino | null;
+  nextPieces: TetrominoTypeName[];
+  heldPiece: TetrominoTypeName | null;
   canHold: boolean;
 
   // Game status
@@ -23,15 +29,15 @@ interface GamePlayState {
   lockDelayActive: boolean;
 
   // Animation state
-  animationState: "idle" | "line-clearing" | "line-falling" | "piece-placing";
+  animationState: GameAnimationState;
   lineClearData: LineClearAnimationData | null;
 
   // State update actions
-  updateBoard: (board: GameState["board"]) => void;
-  updateCurrentPiece: (piece: Piece | null) => void;
-  updateGhostPiece: (piece: Piece | null) => void;
-  updateNextPieces: (pieces: string[]) => void;
-  updateHeldPiece: (piece: string | null) => void;
+  updateBoard: (board: GameBoard) => void;
+  updateCurrentPiece: (piece: Tetromino | null) => void;
+  updateGhostPiece: (piece: Tetromino | null) => void;
+  updateNextPieces: (pieces: TetrominoTypeName[]) => void;
+  updateHeldPiece: (piece: TetrominoTypeName | null) => void;
   setCanHold: (canHold: boolean) => void;
 
   // Game control actions
@@ -66,7 +72,9 @@ export const useGamePlayStore = create<GamePlayState>()(
   devtools(
     (set, get) => ({
       // Initial state
-      board: null,
+      board: Array(20)
+        .fill(null)
+        .map(() => Array(10).fill(0)) as GameBoard,
       currentPiece: null,
       ghostPiece: null,
       nextPieces: [],
@@ -108,7 +116,9 @@ export const useGamePlayStore = create<GamePlayState>()(
 
       resetGame: () =>
         set(() => ({
-          board: null,
+          board: Array(20)
+            .fill(null)
+            .map(() => Array(10).fill(0)) as GameBoard,
           currentPiece: null,
           ghostPiece: null,
           nextPieces: [],

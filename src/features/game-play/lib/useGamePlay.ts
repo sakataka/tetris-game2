@@ -1,14 +1,22 @@
+import { useCallback, useEffect } from "react";
 import { useShallow } from "zustand/react/shallow";
-import { useGameStore } from "@/store/gameStore";
-import type { GameState, Piece } from "@/types/game";
+import { gameEventBus } from "@/shared/events/game-event-bus";
+import type {
+  GameAnimationState,
+  GameBoard,
+  LineClearAnimationData,
+  Tetromino,
+  TetrominoTypeName,
+} from "@/types/game";
+import { useGamePlayStore } from "../model/gamePlaySlice";
 
 export interface UseGamePlayReturn {
   // Core game state
-  board: GameState["board"];
-  currentPiece: Piece | null;
-  ghostPiece: Piece | null;
-  nextPieces: string[];
-  heldPiece: string | null;
+  board: GameBoard;
+  currentPiece: Tetromino | null;
+  ghostPiece: Tetromino | null;
+  nextPieces: TetrominoTypeName[];
+  heldPiece: TetrominoTypeName | null;
   canHold: boolean;
 
   // Game status
@@ -23,8 +31,8 @@ export interface UseGamePlayReturn {
   lockDelayActive: boolean;
 
   // Animation state
-  animationState: GameState["animationState"];
-  lineClearData: GameState["lineClearData"];
+  animationState: GameAnimationState;
+  lineClearData: LineClearAnimationData | null;
 
   // Actions
   startGame: () => void;
@@ -43,7 +51,7 @@ export interface UseGamePlayReturn {
 
 export const useGamePlay = (): UseGamePlayReturn => {
   // Use shallow comparison for object selectors to prevent unnecessary re-renders
-  const gameState = useGameStore(
+  const gameState = useGamePlayStore(
     useShallow((state) => ({
       board: state.board,
       currentPiece: state.currentPiece,
@@ -63,8 +71,8 @@ export const useGamePlay = (): UseGamePlayReturn => {
     })),
   );
 
-  // Individual primitive selectors for actions (better performance)
-  const actions = useGameStore(
+  // Get actions from store
+  const storeActions = useGamePlayStore(
     useShallow((state) => ({
       startGame: state.startGame,
       pauseGame: state.pauseGame,
@@ -79,9 +87,71 @@ export const useGamePlay = (): UseGamePlayReturn => {
     })),
   );
 
+  // Wrap movement actions to emit events
+  const moveLeft = useCallback(() => {
+    gameEventBus.emitSync({ type: "MOVE_LEFT", payload: {} });
+    storeActions.moveLeft();
+  }, [storeActions]);
+
+  const moveRight = useCallback(() => {
+    gameEventBus.emitSync({ type: "MOVE_RIGHT", payload: {} });
+    storeActions.moveRight();
+  }, [storeActions]);
+
+  const rotateClockwise = useCallback(() => {
+    gameEventBus.emitSync({ type: "ROTATE_CLOCKWISE", payload: {} });
+    storeActions.rotateClockwise();
+  }, [storeActions]);
+
+  const rotateCounterClockwise = useCallback(() => {
+    gameEventBus.emitSync({ type: "ROTATE_COUNTER_CLOCKWISE", payload: {} });
+    storeActions.rotateCounterClockwise();
+  }, [storeActions]);
+
+  const softDrop = useCallback(() => {
+    gameEventBus.emitSync({ type: "SOFT_DROP", payload: {} });
+    storeActions.softDrop();
+  }, [storeActions]);
+
+  const hardDrop = useCallback(() => {
+    gameEventBus.emitSync({ type: "HARD_DROP", payload: {} });
+    storeActions.hardDrop();
+  }, [storeActions]);
+
+  const holdPiece = useCallback(() => {
+    gameEventBus.emitSync({ type: "HOLD_PIECE", payload: {} });
+    storeActions.holdPiece();
+  }, [storeActions]);
+
+  // Wrap game control actions to emit events
+  const startGame = useCallback(() => {
+    gameEventBus.emitSync({ type: "GAME_STARTED", payload: {} });
+    storeActions.startGame();
+  }, [storeActions]);
+
+  const pauseGame = useCallback(() => {
+    const isPaused = !gameState.isPaused;
+    gameEventBus.emitSync({ type: "GAME_PAUSED", payload: { isPaused } });
+    storeActions.pauseGame();
+  }, [gameState.isPaused, storeActions]);
+
+  const resetGame = useCallback(() => {
+    gameEventBus.emitSync({ type: "GAME_RESET", payload: {} });
+    storeActions.resetGame();
+  }, [storeActions]);
+
   return {
     ...gameState,
-    ...actions,
+    startGame,
+    pauseGame,
+    resetGame,
+    moveLeft,
+    moveRight,
+    rotateClockwise,
+    rotateCounterClockwise,
+    softDrop,
+    hardDrop,
+    holdPiece,
   };
 };
 
@@ -90,7 +160,7 @@ export const useGamePlay = (): UseGamePlayReturn => {
  * Use this when you only need to read state without actions
  */
 export const useGamePlayState = () => {
-  return useGameStore(
+  return useGamePlayStore(
     useShallow((state) => ({
       board: state.board,
       currentPiece: state.currentPiece,
@@ -112,7 +182,7 @@ export const useGamePlayState = () => {
  * Use this when you only need actions without state
  */
 export const useGamePlayActions = () => {
-  return useGameStore(
+  const storeActions = useGamePlayStore(
     useShallow((state) => ({
       startGame: state.startGame,
       pauseGame: state.pauseGame,
@@ -126,4 +196,48 @@ export const useGamePlayActions = () => {
       holdPiece: state.holdPiece,
     })),
   );
+
+  // Return wrapped actions that emit events
+  return {
+    startGame: useCallback(() => {
+      gameEventBus.emitSync({ type: "GAME_STARTED", payload: {} });
+      storeActions.startGame();
+    }, [storeActions]),
+    pauseGame: useCallback(() => {
+      gameEventBus.emitSync({ type: "GAME_PAUSED", payload: { isPaused: true } });
+      storeActions.pauseGame();
+    }, [storeActions]),
+    resetGame: useCallback(() => {
+      gameEventBus.emitSync({ type: "GAME_RESET", payload: {} });
+      storeActions.resetGame();
+    }, [storeActions]),
+    moveLeft: useCallback(() => {
+      gameEventBus.emitSync({ type: "MOVE_LEFT", payload: {} });
+      storeActions.moveLeft();
+    }, [storeActions]),
+    moveRight: useCallback(() => {
+      gameEventBus.emitSync({ type: "MOVE_RIGHT", payload: {} });
+      storeActions.moveRight();
+    }, [storeActions]),
+    rotateClockwise: useCallback(() => {
+      gameEventBus.emitSync({ type: "ROTATE_CLOCKWISE", payload: {} });
+      storeActions.rotateClockwise();
+    }, [storeActions]),
+    rotateCounterClockwise: useCallback(() => {
+      gameEventBus.emitSync({ type: "ROTATE_COUNTER_CLOCKWISE", payload: {} });
+      storeActions.rotateCounterClockwise();
+    }, [storeActions]),
+    softDrop: useCallback(() => {
+      gameEventBus.emitSync({ type: "SOFT_DROP", payload: {} });
+      storeActions.softDrop();
+    }, [storeActions]),
+    hardDrop: useCallback(() => {
+      gameEventBus.emitSync({ type: "HARD_DROP", payload: {} });
+      storeActions.hardDrop();
+    }, [storeActions]),
+    holdPiece: useCallback(() => {
+      gameEventBus.emitSync({ type: "HOLD_PIECE", payload: {} });
+      storeActions.holdPiece();
+    }, [storeActions]),
+  };
 };
