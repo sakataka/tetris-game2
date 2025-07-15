@@ -1,21 +1,29 @@
 import { Pause, Play, RefreshCw } from "lucide-react";
 import { AnimatedButton } from "@/components/ui/AnimatedButton";
+import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
+import { useScoringStore } from "@/features/scoring/model/scoringSlice";
 import { useHapticFeedback } from "@/hooks/common/useHapticFeedback";
-import { useGameStore } from "@/store/gameStore";
 import { GameSettings } from "./GameSettings";
 
 export function MobileHeader() {
-  const score = useGameStore((state) => state.score);
-  const lines = useGameStore((state) => state.lines);
-  const level = useGameStore((state) => state.level);
-  const nextPiece = useGameStore((state) => state.nextPiece);
-  const heldPiece = useGameStore((state) => state.heldPiece);
-  const isPaused = useGameStore((state) => state.isPaused);
-  const isGameOver = useGameStore((state) => state.isGameOver);
-  const togglePause = useGameStore((state) => state.togglePause);
-  const showResetDialog = useGameStore((state) => state.showResetDialog);
-  const holdPiece = useGameStore((state) => state.holdPiece);
-  const canHold = useGameStore((state) => state.canHold);
+  // Get scoring data from scoring store
+  const score = useScoringStore((state) => state.score);
+  const lines = useScoringStore((state) => state.lines);
+  const level = useScoringStore((state) => state.level);
+
+  // Get game state from gameplay store
+  const nextPieces = useGamePlayStore((state) => state.nextPieces);
+  const heldPiece = useGamePlayStore((state) => state.heldPiece);
+  const isPaused = useGamePlayStore((state) => state.isPaused);
+  const isGameOver = useGamePlayStore((state) => state.isGameOver);
+  const pauseGame = useGamePlayStore((state) => state.pauseGame);
+  const showResetDialog = useGamePlayStore((state) => state.showResetDialog);
+  const holdPiece = useGamePlayStore((state) => state.holdPiece);
+  const canHold = useGamePlayStore((state) => state.canHold);
+
+  // Get next piece for compatibility
+  const nextPiece = nextPieces[0] || null;
+
   const { lightImpact, heavyImpact } = useHapticFeedback();
 
   const handleReset = () => {
@@ -25,7 +33,7 @@ export function MobileHeader() {
 
   const handleTogglePause = () => {
     lightImpact();
-    togglePause();
+    pauseGame();
   };
 
   const handleHoldPiece = () => {

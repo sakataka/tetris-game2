@@ -7,9 +7,8 @@
 2. **Test Bypassing**: NEVER skip tests or use inappropriate mocks. ALWAYS address underlying problems.
 3. **Output Hardcoding**: NEVER hardcode user-facing text. ALWAYS use i18n translation files (`/src/locales/`).
 4. **Error Suppression**: NEVER hide error messages. ALWAYS implement proper error handling.
-5. **Temporary Fixes**: NEVER implement temporary solutions. ALWAYS build sustainable solutions.
-6. **Any Type Usage**: NEVER use `any` type. ALWAYS use `unknown` with type guards or explicit interfaces.
-7. **Class Usage**: NEVER use classes except for external library interface compliance.
+5. **Any Type Usage**: NEVER use `any` type. ALWAYS use `unknown` with type guards or explicit interfaces.
+6. **Class Usage**: NEVER use classes except for external library interface compliance.
 
 ### MANDATORY PATTERNS
 - **Imports**: `@/` for cross-directory, `./` for same-directory
@@ -253,8 +252,6 @@ phase:
 ### AI Assistant Guidelines
 - **❌ NEVER** use `bun run dev` for automated testing (blocks terminal)
 - **❌ NEVER** test React components - focus on pure functions and business logic
-- **✅ ALWAYS** use unit tests and build validation for reliable testing
-- **✅ ALWAYS** run `bun run ci` before major changes to ensure full validation
 
 ## 🔧 Development Patterns
 
@@ -291,18 +288,11 @@ Use these specialized MCP tools only when specifically needed for their intended
 #### 1. **O3 MCP (`mcp__o3__o3-search`)**
 - **Purpose**: Advanced web search and complex problem consultation
 - **When to use**: Architecture decisions, technical research, best practices inquiry
-- **CRITICAL**: Always provide detailed context including:
-  - Current tech stack (React 19, TypeScript, Zustand, Bun, etc.)
-  - Specific performance requirements (e.g., <10μs evaluation time)
-  - Project constraints and future plans (WebWorker, WASM, multi-platform)
-  - Concrete implementation details and current challenges
-- **Example**: Instead of "How to optimize performance?", ask "Given our Tetris game with React 19, Zustand state management, and Uint32Array BitBoard targeting 100k+ evaluations/sec, what are the specific architectural benefits of extracting pure game logic into an internal package?"
 
 #### 2. **Context7 MCP (`mcp__context7__resolve-library-id`, `mcp__context7__get-library-docs`)**
 - **Purpose**: Library documentation lookup and API reference
 - **When to use**: Need current documentation for specific libraries/frameworks
 - **Process**: First resolve library ID, then fetch documentation
-- **Example**: TypeScript features, React patterns, Zustand best practices
 
 #### 3. **Playwright MCP (`mcp__playwright__*`)**
 - **Purpose**: End-to-end testing and browser automation
@@ -312,11 +302,6 @@ Use these specialized MCP tools only when specifically needed for their intended
   - Cross-platform compatibility validation
   - UI workflow testing
 - **Integration**: Works with project's existing Playwright configuration
-
-### Usage Principles
-- **Selective Usage**: Only use these tools when their specific capabilities are required
-- **Context-Rich Queries**: Always provide comprehensive background information
-- **Integration Focus**: Ensure MCP tool usage aligns with project architecture and constraints
 
 ## 📖 Quick Reference
 
@@ -343,14 +328,3 @@ Use these specialized MCP tools only when specifically needed for their intended
 - **Accessibility**: `bun run audit:accessibility` (WCAG 2.2 AA)
 - **Bundle Analysis**: `bun run analyze` (bundle size analysis)
 - **Documentation**: `bun run storybook` (component docs + visual testing)
-
-### Troubleshooting
-- **Build fails**: `bun run typecheck` for TypeScript errors, check import paths (`@/` vs `./`)
-- **Tests fail**: Focus on pure functions, avoid React component tests, check test exclusions
-- **Linting issues**: `bun run lint` with Biome auto-fix
-- **AI issues**: Check `/src/game/ai/config/weights.yaml`, use debug mode with `?debug=true`
-- **State issues**: Use proper Zustand selectors with `useShallow`, avoid object returns
-- **Feature issues**: Check `/src/features/*/lib/` for business logic, `/src/features/*/model/` for state management
-- **Engine issues**: Test engine package independently with `cd packages/tetris-engine && bun test`
-
-*Follow all rules strictly for code quality and project consistency.*

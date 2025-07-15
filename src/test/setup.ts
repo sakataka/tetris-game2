@@ -14,6 +14,10 @@ interface GameState {
   resetGame?: () => void;
 }
 
+interface ScoringState {
+  reset?: () => void;
+}
+
 interface GlobalWithJest {
   jest?: {
     clearAllMocks?: () => void;
@@ -23,17 +27,17 @@ interface GlobalWithJest {
 // Import stores for cleanup
 let gameStore: unknown;
 let settingsStore: unknown;
-let highScoreStore: unknown;
+let scoringStore: unknown;
 
 // Dynamically import stores to avoid dependency issues
 const importStores = async () => {
   try {
-    const { useGameStore } = await import("@/store/gameStore");
-    const { useSettingsStore } = await import("@/store/settingsStore");
-    const { useHighScoreStore } = await import("@/store/highScoreStore");
-    gameStore = useGameStore;
+    const { useGamePlayStore } = await import("@/features/game-play/model/gamePlaySlice");
+    const { useSettingsStore } = await import("@/features/settings");
+    const { useScoringStore } = await import("@/features/scoring");
+    gameStore = useGamePlayStore;
     settingsStore = useSettingsStore;
-    highScoreStore = useHighScoreStore;
+    scoringStore = useScoringStore;
   } catch {
     // Stores might not be available in some test contexts
   }
@@ -198,11 +202,11 @@ beforeEach(async () => {
     }
   }
 
-  if (highScoreStore && typeof highScoreStore === "object" && "persist" in highScoreStore) {
-    const store = highScoreStore as unknown as ZustandStore;
-    const persist = store.persist;
-    if (persist?.clearStorage) {
-      persist.clearStorage();
+  if (scoringStore && typeof scoringStore === "object" && "getState" in scoringStore) {
+    const store = scoringStore as unknown as ZustandStore;
+    const state = store.getState() as ScoringState;
+    if (state?.reset) {
+      state.reset();
     }
   }
 

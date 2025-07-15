@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
+import { type HighScoreEntry, type ScoreStatistics, scoreStorage } from "../api/scoreStorage";
 import type { FloatingScoreEvent } from "../ui/ScoreDisplay";
 
 interface ScoringState {
@@ -32,6 +33,14 @@ interface ScoringState {
   totalDoubles: number;
   totalTriples: number;
 
+  // High scores
+  currentHighScore: HighScoreEntry | null;
+  highScoresList: HighScoreEntry[];
+  scoreStatistics: ScoreStatistics | null;
+  isNewHighScore: boolean;
+  gameStartTime: number;
+  gameMode: "normal" | "ai" | "challenge";
+
   // Actions
   setScore: (score: number) => void;
   setLines: (lines: number) => void;
@@ -62,6 +71,18 @@ interface ScoringState {
   incrementSingles: () => void;
   incrementDoubles: () => void;
   incrementTriples: () => void;
+
+  // High score actions
+  addNewHighScore: (playerName?: string) => Promise<void>;
+  loadHighScores: () => Promise<void>;
+  clearHighScores: () => Promise<void>;
+  deleteHighScore: (id: string) => Promise<void>;
+  isHighScore: (score: number) => Promise<boolean>;
+  getScoreRank: (score: number) => Promise<number>;
+  setGameMode: (mode: "normal" | "ai" | "challenge") => void;
+  setGameStartTime: (time: number) => void;
+  exportHighScores: () => Promise<string>;
+  importHighScores: (jsonData: string) => Promise<void>;
 
   // Utility actions
   reset: () => void;
@@ -99,6 +120,14 @@ export const useScoringStore = create<ScoringState>()(
       totalSingles: 0,
       totalDoubles: 0,
       totalTriples: 0,
+
+      // High scores
+      currentHighScore: null,
+      highScoresList: [],
+      scoreStatistics: null,
+      isNewHighScore: false,
+      gameStartTime: 0,
+      gameMode: "normal",
 
       // Core data actions
       setScore: (score) => set(() => ({ score })),
@@ -186,6 +215,9 @@ export const useScoringStore = create<ScoringState>()(
           comboActive: false,
           comboLastUpdate: 0,
           floatingScoreEvents: [],
+          // High score state is preserved on game reset
+          isNewHighScore: false,
+          gameStartTime: Date.now(),
           // Note: Statistics are NOT reset on game reset
           // Only reset when explicitly calling resetStatistics()
         })),
@@ -201,6 +233,118 @@ export const useScoringStore = create<ScoringState>()(
           totalTriples: 0,
           maxCombo: 0,
         })),
+
+      // High score actions
+      addNewHighScore: async (playerName?: string) => {
+        const state = _get();
+        const duration = state.gameStartTime ? Date.now() - state.gameStartTime : undefined;
+
+        try {
+          const entry = await scoreStorage.saveHighScore(
+            {
+              score: state.score,
+              lines: state.lines,
+              level: state.level,
+            },
+            playerName,
+            duration,
+            state.gameMode,
+          );
+
+          // Update current high score if this is better
+          const currentBest = state.currentHighScore;
+          const isNewBest = !currentBest || entry.score > currentBest.score;
+
+          set(() => ({
+            currentHighScore: isNewBest ? entry : currentBest,
+            isNewHighScore: isNewBest,
+          }));
+
+          // Reload the full list
+          await _get().loadHighScores();
+        } catch (error) {
+          console.error("Failed to save high score:", error);
+        }
+      },
+
+      loadHighScores: async () => {
+        try {
+          const [highScores, statistics] = await Promise.all([
+            scoreStorage.getHighScores(),
+            scoreStorage.getStatistics(),
+          ]);
+
+          set(() => ({
+            highScoresList: highScores,
+            currentHighScore: highScores[0] || null,
+            scoreStatistics: statistics,
+          }));
+        } catch (error) {
+          console.error("Failed to load high scores:", error);
+        }
+      },
+
+      clearHighScores: async () => {
+        try {
+          await scoreStorage.clearHighScores();
+          set(() => ({
+            highScoresList: [],
+            currentHighScore: null,
+            isNewHighScore: false,
+          }));
+        } catch (error) {
+          console.error("Failed to clear high scores:", error);
+        }
+      },
+
+      deleteHighScore: async (id: string) => {
+        try {
+          await scoreStorage.deleteHighScore(id);
+          await _get().loadHighScores();
+        } catch (error) {
+          console.error("Failed to delete high score:", error);
+        }
+      },
+
+      isHighScore: async (score: number) => {
+        try {
+          return await scoreStorage.isHighScore(score);
+        } catch (error) {
+          console.error("Failed to check if high score:", error);
+          return false;
+        }
+      },
+
+      getScoreRank: async (score: number) => {
+        try {
+          return await scoreStorage.getScoreRank(score);
+        } catch (error) {
+          console.error("Failed to get score rank:", error);
+          return -1;
+        }
+      },
+
+      setGameMode: (mode) => set(() => ({ gameMode: mode })),
+      setGameStartTime: (time) => set(() => ({ gameStartTime: time })),
+
+      exportHighScores: async () => {
+        try {
+          return await scoreStorage.exportHighScores();
+        } catch (error) {
+          console.error("Failed to export high scores:", error);
+          throw error;
+        }
+      },
+
+      importHighScores: async (jsonData: string) => {
+        try {
+          await scoreStorage.importHighScores(jsonData);
+          await _get().loadHighScores();
+        } catch (error) {
+          console.error("Failed to import high scores:", error);
+          throw error;
+        }
+      },
     }),
     { name: "scoring-store" },
   ),

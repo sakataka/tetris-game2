@@ -1,16 +1,16 @@
 import { Board, GameOverlay, TouchControls, TSpinIndicator } from "@/components/game";
+import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
+import { useSettingsData } from "@/features/settings";
 import { useTouchGestures } from "@/hooks/controls/useTouchGestures";
-import { useGameStore } from "@/store/gameStore";
-import { useSettingsStore } from "@/store/settingsStore";
 import { MobileHeader } from "./MobileHeader";
 
 export function MobileGameLayout() {
   const { handleTouchStart, handleTouchEnd } = useTouchGestures();
 
   // T-Spin indicator state
-  const tSpinState = useGameStore((state) => state.tSpinState);
-  const enableTSpinDetection = useSettingsStore((state) => state.enableTSpinDetection);
-  const hideTSpinIndicator = useGameStore((state) => state.hideTSpinIndicator);
+  const tSpinState = useGamePlayStore((state) => state.tSpinState);
+  const { enableTSpinDetection } = useSettingsData();
+  const hideTSpinIndicator = useGamePlayStore((state) => state.hideTSpinIndicator);
 
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex flex-col">

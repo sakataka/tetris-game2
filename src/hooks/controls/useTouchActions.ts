@@ -27,7 +27,7 @@ export function useTouchActions(): TouchActionsReturn {
           // Long swipe down = hard drop
           executeAction(drop, true);
         } else {
-          // Short swipe down = soft drop
+          // Short swipe down = soft drop (using updated action name)
           executeAction(moveDown);
         }
         break;

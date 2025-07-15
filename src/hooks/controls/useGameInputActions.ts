@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useGameStoreActions } from "@/hooks/core/useGameStoreActions";
+import { useGamePlayActions } from "@/features/game-play";
 
 /**
  * Game input actions interface
@@ -24,28 +24,28 @@ export interface GameInputActions {
  * Responsibilities:
  * - Maps core game actions to input-specific interface
  * - Provides domain-specific action names for different input types
- * - Leverages useGameStoreActions for DRY principle
+ * - Uses the new gamePlay store exclusively
  *
  * @returns Game input actions object with semantic naming
  */
 export function useGameInputActions(): GameInputActions {
-  // Get core actions from game store (eliminates duplication)
-  const actions = useGameStoreActions();
+  // Get all actions from the new game play store
+  const gamePlayActions = useGamePlayActions();
 
   // Transform core actions to input-specific semantic names
   return useMemo(
     () => ({
-      moveLeft: actions.moveLeft,
-      moveRight: actions.moveRight,
-      rotateClockwise: actions.rotate,
-      rotateCounterClockwise: actions.rotate, // In current implementation, both use same rotation
-      rotate180: actions.rotate180,
-      softDrop: actions.moveDown,
-      hardDrop: actions.drop,
-      hold: actions.holdPiece,
-      pause: actions.togglePause,
-      reset: actions.showResetDialog,
+      moveLeft: gamePlayActions.moveLeft,
+      moveRight: gamePlayActions.moveRight,
+      rotateClockwise: gamePlayActions.rotateClockwise,
+      rotateCounterClockwise: gamePlayActions.rotateCounterClockwise,
+      rotate180: gamePlayActions.rotate180,
+      softDrop: gamePlayActions.softDrop,
+      hardDrop: gamePlayActions.hardDrop,
+      hold: gamePlayActions.holdPiece,
+      pause: gamePlayActions.pauseGame,
+      reset: gamePlayActions.resetGame,
     }),
-    [actions],
+    [gamePlayActions],
   );
 }

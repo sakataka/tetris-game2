@@ -2,12 +2,11 @@ import { motion } from "motion/react";
 import { useMemo } from "react";
 import { useGamePlayState } from "@/features/game-play";
 import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
+import { useSettingsData } from "@/features/settings";
 import { forEachPieceCell } from "@/game/board";
 import { getTetrominoColorIndex } from "@/game/tetrominos";
 import { useCellAnimation } from "@/hooks/ui/useCellAnimation";
 import { cn } from "@/lib/utils";
-import { useGameStore } from "@/store/gameStore";
-import { useSettingsStore } from "@/store/settingsStore";
 import { createCellKey, isValidBoardPosition } from "@/utils/boardUtils";
 import { getCellColor } from "@/utils/colors";
 import { GAME_CONSTANTS } from "@/utils/gameConstants";
@@ -33,12 +32,12 @@ export function BoardCell({ row, col, cellSize = GAME_CONSTANTS.BOARD.CELL_SIZE 
   // Get animation control functions
   const clearAnimationData = useGamePlayStore((state) => state.clearAnimationData);
 
-  // Legacy states that are not yet in new architecture
-  const boardBeforeClear = useGameStore((state) => state.boardBeforeClear);
-  const clearingLines = useGameStore((state) => state.clearingLines);
-  const placedPositions = useGameStore((state) => state.placedPositions);
-  const animationTriggerKey = useGameStore((state) => state.animationTriggerKey);
-  const showGhostPiece = useSettingsStore((state) => state.showGhostPiece);
+  // Animation states from new architecture
+  const boardBeforeClear = useGamePlayStore((state) => state.boardBeforeClear);
+  const clearingLines = useGamePlayStore((state) => state.clearingLines);
+  const placedPositions = useGamePlayStore((state) => state.placedPositions);
+  const animationTriggerKey = useGamePlayStore((state) => state.animationTriggerKey);
+  const { showGhostPiece } = useSettingsData();
 
   // Compute cell display state
   const cellState = useMemo(() => {

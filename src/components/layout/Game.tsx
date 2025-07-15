@@ -18,6 +18,9 @@ import { AIReplay } from "@/components/game/AIReplay";
 import { AIVisualization } from "@/components/game/AIVisualization";
 import { LayoutModeToggle } from "@/components/ui/LayoutModeToggle";
 import { useGamePlay } from "@/features/game-play";
+import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
+import { useScoringStore } from "@/features/scoring/model/scoringSlice";
+import { useSettingsData } from "@/features/settings";
 import { useFocusManagement } from "@/hooks/accessibility/useFocusManagement";
 import { useScreenReaderAnnouncements } from "@/hooks/accessibility/useScreenReaderAnnouncements";
 import { useAdvancedAIController } from "@/hooks/ai/useAdvancedAIController";
@@ -26,8 +29,6 @@ import { useTouchGestures } from "@/hooks/controls/useTouchGestures";
 import { useDesignTokens } from "@/hooks/core/useDesignTokens";
 import { useGameLoop } from "@/hooks/core/useGameLoop";
 import { useHighScoreSideEffect } from "@/hooks/effects/useHighScoreSideEffect";
-import { useGameStore } from "@/store/gameStore";
-import { useSettingsStore } from "@/store/settingsStore";
 import { GameLayout } from "./GameLayout";
 import { GameSettings } from "./GameSettings";
 import { MobileGameLayout } from "./MobileGameLayout";
@@ -39,16 +40,13 @@ export function Game() {
 
   // Auto-start the game on mount
   const { startGame, isPlaying } = useGamePlay();
-  const resetOldGame = useGameStore((state) => state.resetGame);
 
   useEffect(() => {
     // Start the game automatically if it's not already playing
     if (!isPlaying) {
-      // Reset the old game store to ensure it's initialized
-      resetOldGame();
       startGame();
     }
-  }, [isPlaying, startGame, resetOldGame]);
+  }, [isPlaying, startGame]);
   const { handleTouchStart, handleTouchEnd } = useTouchGestures();
 
   // Initialize focus management for accessibility
@@ -73,7 +71,7 @@ export function Game() {
     designLayoutMode === "gaming" ? "normal" : designLayoutMode;
 
   // AI features setting
-  const enableAIFeatures = useSettingsStore((state) => state.enableAIFeatures);
+  const { enableAIFeatures, enableTSpinDetection } = useSettingsData();
 
   // Advanced AI controller (always call hook, but conditionally use result)
   const aiControllerResult = useAdvancedAIController();
@@ -83,12 +81,18 @@ export function Game() {
   const [showReplay, setShowReplay] = useState(false);
 
   // T-Spin indicator state
-  const tSpinState = useGameStore((state) => state.tSpinState);
-  const enableTSpinDetection = useSettingsStore((state) => state.enableTSpinDetection);
-  const hideTSpinIndicator = useGameStore((state) => state.hideTSpinIndicator);
+  const tSpinState = useGamePlayStore((state) => state.tSpinState);
+  const hideTSpinIndicator = useGamePlayStore((state) => state.hideTSpinIndicator);
 
-  // Game state for AI visualization
-  const gameState = useGameStore(useShallow((state) => state));
+  // Game state for AI visualization (combine data from multiple stores)
+  const gamePlayData = useGamePlayStore(useShallow((state) => state));
+  const scoringData = useScoringStore(useShallow((state) => state));
+  const gameState = {
+    ...gamePlayData,
+    ...scoringData,
+    nextPiece: gamePlayData.nextPieces[0] || null, // Add compatibility for old GameState interface
+    floatingScoreEvents: gamePlayData.floatingScoreEvents, // Use gamePlay store's floatingScoreEvents
+  };
 
   return (
     <>

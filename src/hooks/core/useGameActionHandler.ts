@@ -1,5 +1,5 @@
 import { useCallback, useTransition } from "react";
-import { useGameStore } from "@/store/gameStore";
+import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
 
 /**
  * Shared game action handler that provides consistent action execution across all hooks
@@ -16,8 +16,8 @@ import { useGameStore } from "@/store/gameStore";
  * - Easier to modify game state validation logic
  */
 export function useGameActionHandler() {
-  const isGameOver = useGameStore((state) => state.isGameOver);
-  const isPaused = useGameStore((state) => state.isPaused);
+  const isGameOver = useGamePlayStore((state) => state.isGameOver);
+  const isPaused = useGamePlayStore((state) => state.isPaused);
   const [, startTransition] = useTransition();
 
   return useCallback(

@@ -1,19 +1,19 @@
 import { Target, TrendingUp, Trophy } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { HighScore } from "@/types/storage";
+import type { HighScoreEntry } from "@/features/scoring";
 import { CARD_STYLES, CONTROL_STYLES } from "@/utils/styles";
 
 interface CurrentHighScoreProps {
-  score: HighScore;
+  score: HighScoreEntry;
   className?: string;
 }
 
 export function CurrentHighScore({ score, className }: CurrentHighScoreProps) {
   const { t } = useTranslation();
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
+  const formatDate = (timestamp: number) => {
+    const date = new Date(timestamp);
     return date.toLocaleDateString();
   };
 
@@ -38,7 +38,7 @@ export function CurrentHighScore({ score, className }: CurrentHighScoreProps) {
         <div className="space-y-2">
           <div className="text-center">
             <div className="text-xl font-bold text-yellow-400 mb-1">{formatScore(score.score)}</div>
-            <div className="text-sm text-gray-400">{formatDate(score.date)}</div>
+            <div className="text-sm text-gray-400">{formatDate(score.timestamp)}</div>
           </div>
           <div className="grid grid-cols-2 gap-2 text-center">
             <div className={`${CONTROL_STYLES.interactiveItem} rounded-md p-1.5`}>

@@ -1,10 +1,10 @@
 import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
+import { useSettingsData } from "@/features/settings";
 import { Game } from "./components/layout/Game";
 import { AnimationProvider } from "./contexts/AnimationContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { useThemeFeatureFlags } from "./hooks/core/useFeatureFlag";
-import { useSettingsStore } from "./store/settingsStore";
 
 // Import debug tools in development only
 if (import.meta.env.DEV) {
@@ -13,7 +13,7 @@ if (import.meta.env.DEV) {
 
 function App() {
   const { i18n } = useTranslation();
-  const language = useSettingsStore((state) => state.language);
+  const { language } = useSettingsData();
   const hasInitialized = useRef(false);
   const { themeSystemEnabled } = useThemeFeatureFlags();
 

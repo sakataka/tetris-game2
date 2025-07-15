@@ -8,19 +8,33 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useGameStore } from "@/store/gameStore";
-import { useHighScoreStore } from "@/store/highScoreStore";
+import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
+import { useScoringStore } from "@/features/scoring";
 import { MODAL_STYLES } from "@/utils/styles";
 
 export function ResetConfirmationDialog() {
   const { t } = useTranslation();
-  const { showResetConfirmation, hideResetDialog, confirmReset, score, lines, level } =
-    useGameStore();
-  const { addNewHighScore } = useHighScoreStore();
+
+  // Get reset confirmation state from gamePlay store
+  const showResetConfirmation = useGamePlayStore((state) => state.showResetConfirmation);
+  const hideResetDialog = useGamePlayStore((state) => state.hideResetDialog);
+  const confirmReset = useGamePlayStore((state) => state.confirmReset);
+
+  // Get score data from appropriate stores
+  const scoreData = useScoringStore((state) => ({
+    score: state.score,
+    lines: state.lines,
+    level: state.level,
+  }));
+  const { addNewHighScore, setScore, setLines, setLevel } = useScoringStore();
 
   const handleConfirm = () => {
     // Save score before reset (same logic as game over)
-    addNewHighScore(score, lines, level);
+    // Update scoring store with current game data before saving
+    setScore(scoreData.score);
+    setLines(scoreData.lines);
+    setLevel(scoreData.level);
+    addNewHighScore();
     confirmReset();
   };
 

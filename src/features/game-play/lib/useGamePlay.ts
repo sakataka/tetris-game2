@@ -44,6 +44,7 @@ export interface UseGamePlayReturn {
   moveRight: () => void;
   rotateClockwise: () => void;
   rotateCounterClockwise: () => void;
+  rotate180: () => void;
   softDrop: () => void;
   hardDrop: () => void;
   holdPiece: () => void;
@@ -81,6 +82,7 @@ export const useGamePlay = (): UseGamePlayReturn => {
       moveRight: state.moveRight,
       rotateClockwise: state.rotateClockwise,
       rotateCounterClockwise: state.rotateCounterClockwise,
+      rotate180: state.rotate180,
       softDrop: state.softDrop,
       hardDrop: state.hardDrop,
       holdPiece: state.holdPiece,
@@ -106,6 +108,11 @@ export const useGamePlay = (): UseGamePlayReturn => {
   const rotateCounterClockwise = useCallback(() => {
     gameEventBus.emitSync("ROTATE_COUNTER_CLOCKWISE", undefined);
     storeActions.rotateCounterClockwise();
+  }, [storeActions]);
+
+  const rotate180 = useCallback(() => {
+    gameEventBus.emitSync("ROTATE_180", undefined);
+    storeActions.rotate180();
   }, [storeActions]);
 
   const softDrop = useCallback(() => {
@@ -149,6 +156,7 @@ export const useGamePlay = (): UseGamePlayReturn => {
     moveRight,
     rotateClockwise,
     rotateCounterClockwise,
+    rotate180,
     softDrop,
     hardDrop,
     holdPiece,
@@ -191,6 +199,7 @@ export const useGamePlayActions = () => {
       moveRight: state.moveRight,
       rotateClockwise: state.rotateClockwise,
       rotateCounterClockwise: state.rotateCounterClockwise,
+      rotate180: state.rotate180,
       softDrop: state.softDrop,
       hardDrop: state.hardDrop,
       holdPiece: state.holdPiece,
@@ -226,6 +235,10 @@ export const useGamePlayActions = () => {
     rotateCounterClockwise: useCallback(() => {
       gameEventBus.emitSync("ROTATE_COUNTER_CLOCKWISE", undefined);
       storeActions.rotateCounterClockwise();
+    }, [storeActions]),
+    rotate180: useCallback(() => {
+      gameEventBus.emitSync("ROTATE_180", undefined);
+      storeActions.rotate180();
     }, [storeActions]),
     softDrop: useCallback(() => {
       gameEventBus.emitSync("SOFT_DROP", undefined);

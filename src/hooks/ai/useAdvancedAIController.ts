@@ -1,5 +1,8 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { AISettings, AIState } from "@/components/game/AdvancedAIControls";
+import { useAIStore } from "@/features/ai-control/model/aiSlice";
+import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
+import { useScoringStore } from "@/features/scoring/model/scoringSlice";
 import {
   type AdvancedAIDecision,
   AdvancedAIEngine,
@@ -7,7 +10,6 @@ import {
   DEFAULT_ADVANCED_CONFIG,
 } from "@/game/ai/core/advanced-ai-engine";
 import type { GameAction, Move } from "@/game/ai/core/move-generator";
-import { useGameStore } from "@/store/gameStore";
 import type { GameState } from "@/types/game";
 
 /**
@@ -15,22 +17,42 @@ import type { GameState } from "@/types/game";
  * Supports advanced features, visualization, and detailed analytics
  */
 export function useAdvancedAIController() {
-  const [aiSettings, setAiSettings] = useState<AISettings>({
-    aiLevel: "advanced",
-    beamWidth: 16, // Increased for better line clearing opportunities
-    thinkingTimeLimit: 80, // Increased for deeper search
-    useHold: true,
-    enableVisualization: true,
-    playbackSpeed: 1.2, // Slightly faster for more aggressive gameplay
-  });
+  // Use the new AI store for state management
+  const aiStore = useAIStore();
+  const {
+    isEnabled,
+    isPaused,
+    isThinking,
+    aiLevel,
+    beamWidth,
+    thinkingTimeLimit,
+    useHold,
+    enableVisualization,
+    playbackSpeed,
+    lastDecision,
+    stats,
+  } = aiStore;
 
-  const [aiState, setAiState] = useState<AIState>({
-    isEnabled: false,
-    isPaused: false,
-    isThinking: false,
-  });
+  // Create AI settings object for compatibility
+  const aiSettings: AISettings = useMemo(
+    () => ({
+      aiLevel,
+      beamWidth,
+      thinkingTimeLimit,
+      useHold,
+      enableVisualization,
+      playbackSpeed,
+    }),
+    [aiLevel, beamWidth, thinkingTimeLimit, useHold, enableVisualization, playbackSpeed],
+  );
 
-  const [lastDecision, setLastDecision] = useState<AdvancedAIDecision | null>(null);
+  // Create AI state object for compatibility
+  const aiState: AIState = {
+    isEnabled,
+    isPaused,
+    isThinking,
+  };
+
   const [replayData, setReplayData] = useState<{
     moves: Move[];
     decisions: AdvancedAIDecision[];
@@ -68,12 +90,12 @@ export function useAdvancedAIController() {
     return new AdvancedAIEngine(config);
   });
 
-  // Game actions
-  const moveLeft = useGameStore((state) => state.moveLeft);
-  const moveRight = useGameStore((state) => state.moveRight);
-  const rotate = useGameStore((state) => state.rotate);
-  const drop = useGameStore((state) => state.drop);
-  const holdPiece = useGameStore((state) => state.holdPiece);
+  // Game actions from the new gamePlay store
+  const moveLeft = useGamePlayStore((state) => state.moveLeft);
+  const moveRight = useGamePlayStore((state) => state.moveRight);
+  const rotate = useGamePlayStore((state) => state.rotateClockwise);
+  const drop = useGamePlayStore((state) => state.hardDrop);
+  const holdPiece = useGamePlayStore((state) => state.holdPiece);
 
   // Find best move using advanced AI
   const findBestMoveWithAI = useCallback(
@@ -94,7 +116,7 @@ export function useAdvancedAIController() {
     async (actions: GameAction[]) => {
       for (const action of actions) {
         // Check if AI is still active and game is playable before each action
-        const currentState = useGameStore.getState();
+        const currentState = useGamePlayStore.getState();
         if (
           !isActiveRef.current ||
           !aiEnabledRef.current ||
@@ -109,7 +131,7 @@ export function useAdvancedAIController() {
         await delay(Math.floor(150 / aiSettings.playbackSpeed)); // Faster execution
 
         // Double-check state after delay
-        const stateAfterDelay = useGameStore.getState();
+        const stateAfterDelay = useGamePlayStore.getState();
         if (
           !isActiveRef.current ||
           !aiEnabledRef.current ||
@@ -157,8 +179,18 @@ export function useAdvancedAIController() {
   // Main AI thinking loop
   const aiThinkAndMove = useCallback(async () => {
     // Get fresh game state at the start of each iteration
-    const gameState = useGameStore.getState();
-    const { currentPiece, isGameOver, isPaused } = gameState;
+    const gamePlayState = useGamePlayStore.getState();
+    const scoringState = useScoringStore.getState();
+
+    // Create compatible game state for AI
+    const gameState = {
+      ...gamePlayState,
+      ...scoringState,
+      nextPiece: gamePlayState.nextPieces[0] || null,
+      floatingScoreEvents: gamePlayState.floatingScoreEvents, // Use gamePlay store's floatingScoreEvents
+    };
+
+    const { currentPiece, isGameOver, isPaused } = gamePlayState;
 
     if (
       !aiEnabledRef.current ||
@@ -187,13 +219,13 @@ export function useAdvancedAIController() {
     }
 
     isThinkingRef.current = true;
-    setAiState((prev) => ({ ...prev, isThinking: true }));
+    aiStore.setThinking(true);
 
     try {
       const decision = await findBestMoveWithAI(gameState);
 
       // Re-check game state after AI thinking (state might have changed)
-      const currentGameState = useGameStore.getState();
+      const currentGameState = useGamePlayStore.getState();
       if (
         !isActiveRef.current ||
         currentGameState.isGameOver ||
@@ -212,7 +244,7 @@ export function useAdvancedAIController() {
           hasSequence: decision.bestPath?.[0]?.sequence?.length || 0,
         });
 
-        setLastDecision(decision);
+        aiStore.setLastDecision(decision);
 
         // Record for replay if enabled (use callback to avoid dependency issues)
         setReplayData((prev) => {
@@ -239,12 +271,12 @@ export function useAdvancedAIController() {
     } finally {
       if (isActiveRef.current) {
         isThinkingRef.current = false;
-        setAiState((prev) => ({ ...prev, isThinking: false }));
+        aiStore.setThinking(false);
 
         // Schedule next AI move with fresh state check
         timeoutRef.current = setTimeout(
           () => {
-            const nextGameState = useGameStore.getState();
+            const nextGameState = useGamePlayStore.getState();
             if (
               isActiveRef.current &&
               aiEnabledRef.current &&
@@ -261,7 +293,13 @@ export function useAdvancedAIController() {
         );
       }
     }
-  }, [findBestMoveWithAI, executeActionSequence, aiSettings.playbackSpeed]);
+  }, [
+    findBestMoveWithAI,
+    executeActionSequence,
+    aiSettings.playbackSpeed,
+    aiStore.setLastDecision,
+    aiStore.setThinking,
+  ]);
 
   // Update ref when aiThinkAndMove changes
   useEffect(() => {
@@ -277,7 +315,7 @@ export function useAdvancedAIController() {
   // Handle AI activation (when enabled and not paused)
   useEffect(() => {
     if (aiState.isEnabled && !aiState.isPaused) {
-      const gameState = useGameStore.getState();
+      const gameState = useGamePlayStore.getState();
 
       if (!gameState.isGameOver && !gameState.isPaused && gameState.animationState === "idle") {
         isActiveRef.current = true;
@@ -290,12 +328,12 @@ export function useAdvancedAIController() {
 
         // Reset thinking state
         isThinkingRef.current = false;
-        setAiState((prev) => ({ ...prev, isThinking: false }));
+        aiStore.setThinking(false);
 
         // Use setTimeout to ensure aiThinkAndMoveRef is properly set
         setTimeout(() => {
           // Double-check state before starting AI loop
-          const currentState = useGameStore.getState();
+          const currentState = useGamePlayStore.getState();
           if (
             aiEnabledRef.current &&
             !aiPausedRef.current &&
@@ -309,7 +347,7 @@ export function useAdvancedAIController() {
         }, 100);
       }
     }
-  }, [aiState.isEnabled, aiState.isPaused]);
+  }, [aiState.isEnabled, aiState.isPaused, aiStore]);
 
   // Handle AI deactivation (when disabled or paused)
   useEffect(() => {
@@ -320,9 +358,9 @@ export function useAdvancedAIController() {
         timeoutRef.current = null;
       }
       isThinkingRef.current = false;
-      setAiState((prev) => ({ ...prev, isThinking: false }));
+      aiStore.setThinking(false);
     }
-  }, [aiState.isEnabled, aiState.isPaused]);
+  }, [aiState.isEnabled, aiState.isPaused, aiStore]);
 
   // Handle replay data recording lifecycle
   useEffect(() => {
@@ -341,7 +379,7 @@ export function useAdvancedAIController() {
       });
     } else if (!aiState.isEnabled) {
       // Finalize replay data when AI is disabled
-      const finalGameState = useGameStore.getState();
+      const finalGameState = useGamePlayStore.getState();
       setReplayData((prev) => {
         if (!prev) return prev;
         return {
@@ -387,25 +425,19 @@ export function useAdvancedAIController() {
 
   // Action handlers
   const toggleAI = useCallback(() => {
-    setAiState((prev) => ({
-      ...prev,
-      isEnabled: !prev.isEnabled,
-      isPaused: false,
-    }));
+    aiStore.setEnabled(!aiState.isEnabled);
+    aiStore.setPaused(false);
 
     if (!aiState.isEnabled) {
-      setLastDecision(null);
+      aiStore.setLastDecision(null);
     } else {
       aiEngine.abortThinking();
     }
-  }, [aiState.isEnabled, aiEngine]);
+  }, [aiState.isEnabled, aiEngine, aiStore]);
 
   const pauseAI = useCallback(() => {
-    setAiState((prev) => ({
-      ...prev,
-      isPaused: !prev.isPaused,
-    }));
-  }, []);
+    aiStore.setPaused(!aiState.isPaused);
+  }, [aiState.isPaused, aiStore]);
 
   const stepAI = useCallback(() => {
     if (aiState.isPaused && aiState.isEnabled) {
@@ -413,9 +445,12 @@ export function useAdvancedAIController() {
     }
   }, [aiState.isPaused, aiState.isEnabled]);
 
-  const handleSettingsChange = useCallback((newSettings: AISettings) => {
-    setAiSettings(newSettings);
-  }, []);
+  const handleSettingsChange = useCallback(
+    (newSettings: AISettings) => {
+      aiStore.updateSettings(newSettings);
+    },
+    [aiStore],
+  );
 
   // Get AI stats
   const aiStats: AdvancedAIStats | undefined = aiEngine.getAdvancedStats();
@@ -423,11 +458,11 @@ export function useAdvancedAIController() {
   return {
     aiState: {
       ...aiState,
-      lastDecision,
-      stats: aiStats,
+      lastDecision: lastDecision,
+      stats: aiStats || stats,
     },
     aiSettings,
-    lastDecision,
+    lastDecision: lastDecision,
     replayData,
     onToggleAI: toggleAI,
     onPause: pauseAI,

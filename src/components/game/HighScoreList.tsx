@@ -1,12 +1,12 @@
 import { Trophy } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { HighScore } from "@/types/storage";
+import type { HighScoreEntry } from "@/features/scoring";
 import { CARD_STYLES } from "@/utils/styles";
 import { HighScoreItem } from "./HighScoreItem";
 
 interface HighScoreListProps {
-  scores: HighScore[];
+  scores: HighScoreEntry[];
   className?: string;
 }
 
@@ -30,7 +30,7 @@ export function HighScoreList({ scores, className }: HighScoreListProps) {
         ) : (
           <div className="space-y-2">
             {scores.map((score, index) => (
-              <HighScoreItem key={`${score.date}-${score.score}`} score={score} rank={index + 1} />
+              <HighScoreItem key={score.id} score={score} rank={index + 1} />
             ))}
           </div>
         )}

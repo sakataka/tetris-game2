@@ -1,17 +1,17 @@
 import { useShallow } from "zustand/shallow";
-import { useGameStore } from "@/store/gameStore";
+import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
 
 export const useGameStoreActions = () =>
-  useGameStore(
+  useGamePlayStore(
     useShallow((state) => ({
       moveLeft: state.moveLeft,
       moveRight: state.moveRight,
-      moveDown: state.moveDown,
-      rotate: state.rotate,
+      moveDown: state.softDrop, // renamed from moveDown to softDrop
+      rotate: state.rotateClockwise, // renamed from rotate to rotateClockwise
       rotate180: state.rotate180,
-      drop: state.drop,
+      drop: state.hardDrop, // renamed from drop to hardDrop
       holdPiece: state.holdPiece,
-      togglePause: state.togglePause,
+      togglePause: state.pauseGame, // renamed from togglePause to pauseGame
       resetGame: state.resetGame,
       showResetDialog: state.showResetDialog,
       hideResetDialog: state.hideResetDialog,

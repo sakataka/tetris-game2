@@ -1,16 +1,16 @@
 import { Calendar, Target, TrendingUp } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import type { HighScore } from "@/types/storage";
+import type { HighScoreEntry } from "@/features/scoring";
 import { CONTROL_STYLES } from "@/utils/styles";
 
 interface HighScoreItemProps {
-  score: HighScore;
+  score: HighScoreEntry;
   rank: number;
 }
 
 export function HighScoreItem({ score, rank }: HighScoreItemProps) {
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
+  const formatDate = (timestamp: number) => {
+    const date = new Date(timestamp);
     return date.toLocaleDateString();
   };
 
@@ -51,7 +51,7 @@ export function HighScoreItem({ score, rank }: HighScoreItemProps) {
       </div>
       <div className="text-xs text-gray-300 flex items-center gap-1">
         <Calendar className="h-3 w-3" />
-        {formatDate(score.date)}
+        {formatDate(score.timestamp)}
       </div>
     </div>
   );

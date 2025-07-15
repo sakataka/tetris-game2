@@ -5,18 +5,20 @@ import { useTranslation } from "react-i18next";
 import { AnimatedButton } from "@/components/ui/AnimatedButton";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { useSettingsStore } from "@/store/settingsStore";
+import { useSettings } from "@/features/settings";
 import { CONTROL_STYLES, MODAL_STYLES } from "@/utils/styles";
 
 export function GameSettings() {
   const { i18n, t } = useTranslation();
-  const showGhostPiece = useSettingsStore((state) => state.showGhostPiece);
-  const toggleShowGhostPiece = useSettingsStore((state) => state.toggleShowGhostPiece);
-  const enableTSpinDetection = useSettingsStore((state) => state.enableTSpinDetection);
-  const toggleTSpinDetection = useSettingsStore((state) => state.toggleTSpinDetection);
-  const enableAIFeatures = useSettingsStore((state) => state.enableAIFeatures);
-  const toggleAIFeatures = useSettingsStore((state) => state.toggleAIFeatures);
-  const setLanguage = useSettingsStore((state) => state.setLanguage);
+  const {
+    showGhostPiece,
+    enableTSpinDetection,
+    enableAIFeatures,
+    setShowGhostPiece,
+    setEnableTSpinDetection,
+    setEnableAIFeatures,
+    setLanguage,
+  } = useSettings();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -49,12 +51,12 @@ export function GameSettings() {
 
   const handleLanguageChange = async (value: string) => {
     await i18n.changeLanguage(value);
-    setLanguage(value as "ja" | "en");
+    await setLanguage(value);
     // Don't close the dropdown immediately - let user see the change
   };
 
   const handleGhostPieceToggle = () => {
-    toggleShowGhostPiece();
+    setShowGhostPiece(!showGhostPiece);
   };
 
   return (
@@ -150,7 +152,7 @@ export function GameSettings() {
                 className={`${CONTROL_STYLES.interactiveItem} flex items-center justify-between p-2 rounded cursor-pointer w-full text-left`}
                 onClick={(e) => {
                   e.stopPropagation();
-                  toggleTSpinDetection();
+                  setEnableTSpinDetection(!enableTSpinDetection);
                 }}
               >
                 <div className="flex flex-col">
@@ -187,7 +189,7 @@ export function GameSettings() {
                 className={`${CONTROL_STYLES.interactiveItem} flex items-center justify-between p-2 rounded cursor-pointer w-full text-left`}
                 onClick={(e) => {
                   e.stopPropagation();
-                  toggleAIFeatures();
+                  setEnableAIFeatures(!enableAIFeatures);
                 }}
               >
                 <div className="flex flex-col">

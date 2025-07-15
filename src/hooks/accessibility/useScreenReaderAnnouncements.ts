@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useShallow } from "zustand/shallow";
-import { useGameStore } from "@/store/gameStore";
+import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
+import { useScoringStore } from "@/features/scoring/model/scoringSlice";
 
 export interface AnnouncementConfig {
   enableGameStateAnnouncements: boolean;
@@ -39,18 +40,34 @@ export const useScreenReaderAnnouncements = (
     ...config,
   };
 
-  const gameData = useGameStore(
+  // Get game state from the new stores
+  const gamePlayData = useGamePlayStore(
     useShallow((state) => ({
-      score: state.score,
-      lines: state.lines,
-      level: state.level,
       currentPiece: state.currentPiece,
-      nextPiece: state.nextPiece,
+      nextPieces: state.nextPieces,
       heldPiece: state.heldPiece,
       isGameOver: state.isGameOver,
       isPaused: state.isPaused,
       board: state.board,
     })),
+  );
+
+  const scoringData = useScoringStore(
+    useShallow((state) => ({
+      score: state.score,
+      lines: state.lines,
+      level: state.level,
+    })),
+  );
+
+  // Combine data for compatibility
+  const gameData = useMemo(
+    () => ({
+      ...gamePlayData,
+      ...scoringData,
+      nextPiece: gamePlayData.nextPieces[0] || null, // Compatibility with old API
+    }),
+    [gamePlayData, scoringData],
   );
 
   // Create ARIA live regions

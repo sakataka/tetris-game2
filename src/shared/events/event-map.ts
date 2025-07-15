@@ -27,6 +27,7 @@ export interface GameEventMap {
   HARD_DROP: { distance: number };
   ROTATE_CLOCKWISE: undefined;
   ROTATE_COUNTER_CLOCKWISE: undefined;
+  ROTATE_180: undefined;
   HOLD_PIECE: undefined;
 
   // Game State Events

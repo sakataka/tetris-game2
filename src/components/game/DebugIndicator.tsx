@@ -1,15 +1,15 @@
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { useGameStore } from "@/store/gameStore";
+import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
 import type { TetrominoTypeName } from "@/types/game";
 import { generateDebugUrl } from "@/utils/debugParams";
 import { getDebugPreset, getPresetNames } from "@/utils/debugPresets";
 
 export function DebugIndicator() {
-  const debugMode = useGameStore((state) => state.debugMode);
-  const debugParams = useGameStore((state) => state.debugParams);
-  const applyDebugPreset = useGameStore((state) => state.applyDebugPreset);
-  const setDebugQueue = useGameStore((state) => state.setDebugQueue);
+  const debugMode = useGamePlayStore((state) => state.debugMode);
+  const debugParams = useGamePlayStore((state) => state.debugParams);
+  const applyDebugPreset = useGamePlayStore((state) => state.applyDebugPreset);
+  const setDebugQueue = useGamePlayStore((state) => state.setDebugQueue);
 
   if (!debugMode || !debugParams) {
     return null;

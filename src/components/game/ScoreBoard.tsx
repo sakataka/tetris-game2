@@ -1,8 +1,8 @@
 import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
 import { useScoreAnimationState, useScoreState } from "@/hooks/selectors/useScoreSelectors";
 import { useAnimatedValue } from "@/hooks/ui/useAnimatedValue";
-import { useGameStore } from "@/store/gameStore";
 import { CARD_STYLES } from "@/utils/styles";
 import { AnimatedScoreItem } from "./AnimatedScoreItem";
 import { ComboIndicator } from "./ComboIndicator";
@@ -20,7 +20,7 @@ export function ScoreBoard() {
 
   // FloatingScoreText cleanup handler
   const handleFloatingScoreComplete = (_id: string) => {
-    useGameStore.getState().clearAnimationData?.(); // Cleanup if available
+    useGamePlayStore.getState().clearAnimationData?.(); // Cleanup if available
   };
 
   return (

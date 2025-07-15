@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useGamePlayState } from "@/features/game-play";
 import { useInputDebounce } from "@/hooks/common/useInputDebounce";
-import { useGameStore } from "@/store/gameStore";
 import { type GameInputActions, useGameInputActions } from "./useGameInputActions";
 import { useKeyboardInput } from "./useKeyboardInput";
 
@@ -48,8 +48,8 @@ export function useKeyboardControls(keyMapping: KeyMapping = DEFAULT_KEY_MAPPING
   // Compose small hooks
   const { pressedKeys, isKeyPressed } = useKeyboardInput();
   const gameActions = useGameInputActions();
-  const isGameActive = useGameStore((state) => !state.isGameOver && !state.isPaused);
-  const isGameOver = useGameStore((state) => state.isGameOver);
+  const { isPlaying, isPaused, isGameOver } = useGamePlayState();
+  const isGameActive = isPlaying && !isPaused && !isGameOver;
 
   // Track processed keys to prevent duplicate executions
   const processedKeysRef = useRef<Set<string>>(new Set());
