@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
+import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
 import { getGameSpeed } from "@/game/game";
 import { useGameStore } from "@/store/gameStore";
-import { useGameActionHandler } from "./useGameActionHandler";
 
 /**
  * Game loop implementation using requestAnimationFrame
@@ -13,38 +13,48 @@ import { useGameActionHandler } from "./useGameActionHandler";
  * - Prevent timer drift that can occur with setInterval
  */
 export function useGameLoop() {
-  const moveDown = useGameStore((state) => state.moveDown);
-  const isPaused = useGameStore((state) => state.isPaused);
-  const isGameOver = useGameStore((state) => state.isGameOver);
+  // Use new game-play store for game state
+  const softDrop = useGamePlayStore((state) => state.softDrop);
+  const isPaused = useGamePlayStore((state) => state.isPaused);
+  const isGameOver = useGamePlayStore((state) => state.isGameOver);
+  const isPlaying = useGamePlayStore((state) => state.isPlaying);
+
+  // Keep using old store for reset confirmation and level (until migration is complete)
   const showResetConfirmation = useGameStore((state) => state.showResetConfirmation);
   const level = useGameStore((state) => state.level);
   const lastUpdateTime = useRef(0);
   const animationIdRef = useRef<number | null>(null);
-  const executeAction = useGameActionHandler();
 
   useEffect(() => {
-    if (isPaused || isGameOver || showResetConfirmation) return;
+    if (!isPlaying || isPaused || isGameOver || showResetConfirmation) return;
 
     const gameSpeed = getGameSpeed(level);
 
     const gameLoop = (currentTime: number) => {
       // Check game state before processing - safety check for state changes during execution
-      const currentState = useGameStore.getState();
-      if (currentState.isPaused || currentState.isGameOver || currentState.showResetConfirmation) {
+      const currentGamePlayState = useGamePlayStore.getState();
+      const currentGameState = useGameStore.getState();
+      if (
+        !currentGamePlayState.isPlaying ||
+        currentGamePlayState.isPaused ||
+        currentGamePlayState.isGameOver ||
+        currentGameState.showResetConfirmation
+      ) {
         return; // Stop the loop immediately if game state changed
       }
 
       if (currentTime - lastUpdateTime.current >= gameSpeed) {
-        // Use executeAction which handles game state checks and transitions
-        executeAction(moveDown);
+        // Use softDrop from new store instead of moveDown
+        softDrop();
         lastUpdateTime.current = currentTime;
       }
 
       // Only continue the loop if the game is still active
       if (
-        !currentState.isPaused &&
-        !currentState.isGameOver &&
-        !currentState.showResetConfirmation
+        currentGamePlayState.isPlaying &&
+        !currentGamePlayState.isPaused &&
+        !currentGamePlayState.isGameOver &&
+        !currentGameState.showResetConfirmation
       ) {
         animationIdRef.current = requestAnimationFrame(gameLoop);
       }
@@ -58,5 +68,5 @@ export function useGameLoop() {
         animationIdRef.current = null;
       }
     };
-  }, [moveDown, isPaused, isGameOver, showResetConfirmation, level, executeAction]);
+  }, [softDrop, isPlaying, isPaused, isGameOver, showResetConfirmation, level]);
 }

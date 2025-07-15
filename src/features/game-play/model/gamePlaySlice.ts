@@ -7,6 +7,7 @@ import type {
   Tetromino,
   TetrominoTypeName,
 } from "@/types/game";
+import { gameEngineAdapter } from "../api/gameEngineAdapter";
 
 interface GamePlayState {
   // Core game state
@@ -99,22 +100,56 @@ export const useGamePlayStore = create<GamePlayState>()(
       setCanHold: (canHold) => set(() => ({ canHold })),
 
       // Game control actions
-      startGame: () =>
-        set(() => ({
-          isPlaying: true,
-          isPaused: false,
-          isGameOver: false,
-          lastFall: Date.now(),
-          animationState: "idle",
-          lineClearData: null,
-        })),
+      startGame: () => {
+        // Start the game engine
+        gameEngineAdapter.startGame();
+
+        // Get initial state from engine
+        const engineState = gameEngineAdapter.getGameState();
+        if (engineState) {
+          set(() => ({
+            board: engineState.board,
+            currentPiece: engineState.currentPiece,
+            ghostPiece:
+              engineState.ghostPosition && engineState.currentPiece
+                ? {
+                    ...engineState.currentPiece,
+                    position: engineState.ghostPosition,
+                  }
+                : null,
+            nextPieces: [engineState.nextPiece],
+            heldPiece: engineState.heldPiece,
+            canHold: engineState.canHold,
+            isPlaying: true,
+            isPaused: false,
+            isGameOver: false,
+            lastFall: Date.now(),
+            fallSpeed: 1000, // Will be updated based on level
+            animationState: "idle",
+            lineClearData: null,
+          }));
+        } else {
+          // Fallback if engine fails
+          set(() => ({
+            isPlaying: true,
+            isPaused: false,
+            isGameOver: false,
+            lastFall: Date.now(),
+            animationState: "idle",
+            lineClearData: null,
+          }));
+        }
+      },
 
       pauseGame: () =>
         set((state) => ({
           isPaused: !state.isPaused,
         })),
 
-      resetGame: () =>
+      resetGame: () => {
+        // Reset the game engine
+        gameEngineAdapter.resetGame();
+
         set(() => ({
           board: Array(20)
             .fill(null)
@@ -131,7 +166,8 @@ export const useGamePlayStore = create<GamePlayState>()(
           lockDelayActive: false,
           animationState: "idle",
           lineClearData: null,
-        })),
+        }));
+      },
 
       endGame: () =>
         set(() => ({
@@ -170,61 +206,166 @@ export const useGamePlayStore = create<GamePlayState>()(
           lineClearData: null,
         })),
 
-      // Movement actions (placeholders - will integrate with game engine)
+      // Movement actions
       moveLeft: () => {
         const state = get();
         if (!state.isPlaying || state.isPaused) return;
 
-        console.log("[GamePlay] Move left requested");
-        // TODO: Integrate with game engine
+        if (gameEngineAdapter.moveLeft()) {
+          const engineState = gameEngineAdapter.getGameState();
+          if (engineState) {
+            set(() => ({
+              board: engineState.board,
+              currentPiece: engineState.currentPiece,
+              ghostPiece:
+                engineState.ghostPosition && engineState.currentPiece
+                  ? {
+                      ...engineState.currentPiece,
+                      position: engineState.ghostPosition,
+                    }
+                  : null,
+            }));
+          }
+        }
       },
 
       moveRight: () => {
         const state = get();
         if (!state.isPlaying || state.isPaused) return;
 
-        console.log("[GamePlay] Move right requested");
-        // TODO: Integrate with game engine
+        if (gameEngineAdapter.moveRight()) {
+          const engineState = gameEngineAdapter.getGameState();
+          if (engineState) {
+            set(() => ({
+              board: engineState.board,
+              currentPiece: engineState.currentPiece,
+              ghostPiece:
+                engineState.ghostPosition && engineState.currentPiece
+                  ? {
+                      ...engineState.currentPiece,
+                      position: engineState.ghostPosition,
+                    }
+                  : null,
+            }));
+          }
+        }
       },
 
       rotateClockwise: () => {
         const state = get();
         if (!state.isPlaying || state.isPaused) return;
 
-        console.log("[GamePlay] Rotate clockwise requested");
-        // TODO: Integrate with game engine
+        if (gameEngineAdapter.rotateClockwise()) {
+          const engineState = gameEngineAdapter.getGameState();
+          if (engineState) {
+            set(() => ({
+              board: engineState.board,
+              currentPiece: engineState.currentPiece,
+              ghostPiece:
+                engineState.ghostPosition && engineState.currentPiece
+                  ? {
+                      ...engineState.currentPiece,
+                      position: engineState.ghostPosition,
+                    }
+                  : null,
+            }));
+          }
+        }
       },
 
       rotateCounterClockwise: () => {
         const state = get();
         if (!state.isPlaying || state.isPaused) return;
 
-        console.log("[GamePlay] Rotate counter-clockwise requested");
-        // TODO: Integrate with game engine
+        if (gameEngineAdapter.rotateCounterClockwise()) {
+          const engineState = gameEngineAdapter.getGameState();
+          if (engineState) {
+            set(() => ({
+              board: engineState.board,
+              currentPiece: engineState.currentPiece,
+              ghostPiece:
+                engineState.ghostPosition && engineState.currentPiece
+                  ? {
+                      ...engineState.currentPiece,
+                      position: engineState.ghostPosition,
+                    }
+                  : null,
+            }));
+          }
+        }
       },
 
       softDrop: () => {
         const state = get();
         if (!state.isPlaying || state.isPaused) return;
 
-        console.log("[GamePlay] Soft drop requested");
-        // TODO: Integrate with game engine
+        if (gameEngineAdapter.softDrop()) {
+          const engineState = gameEngineAdapter.getGameState();
+          if (engineState) {
+            set(() => ({
+              board: engineState.board,
+              currentPiece: engineState.currentPiece,
+              ghostPiece:
+                engineState.ghostPosition && engineState.currentPiece
+                  ? {
+                      ...engineState.currentPiece,
+                      position: engineState.ghostPosition,
+                    }
+                  : null,
+            }));
+          }
+        }
       },
 
       hardDrop: () => {
         const state = get();
         if (!state.isPlaying || state.isPaused) return;
 
-        console.log("[GamePlay] Hard drop requested");
-        // TODO: Integrate with game engine
+        if (gameEngineAdapter.hardDrop()) {
+          const engineState = gameEngineAdapter.getGameState();
+          if (engineState) {
+            set(() => ({
+              board: engineState.board,
+              currentPiece: engineState.currentPiece,
+              ghostPiece:
+                engineState.ghostPosition && engineState.currentPiece
+                  ? {
+                      ...engineState.currentPiece,
+                      position: engineState.ghostPosition,
+                    }
+                  : null,
+              nextPieces: [engineState.nextPiece],
+              heldPiece: engineState.heldPiece,
+              canHold: true, // Reset hold ability after placing
+            }));
+
+            // TODO: Handle line clears, scoring, etc.
+          }
+        }
       },
 
       holdPiece: () => {
         const state = get();
         if (!state.isPlaying || state.isPaused || !state.canHold) return;
 
-        console.log("[GamePlay] Hold piece requested");
-        // TODO: Integrate with game engine
+        if (gameEngineAdapter.holdPiece()) {
+          const engineState = gameEngineAdapter.getGameState();
+          if (engineState) {
+            set(() => ({
+              currentPiece: engineState.currentPiece,
+              ghostPiece:
+                engineState.ghostPosition && engineState.currentPiece
+                  ? {
+                      ...engineState.currentPiece,
+                      position: engineState.ghostPosition,
+                    }
+                  : null,
+              heldPiece: engineState.heldPiece,
+              canHold: engineState.canHold,
+              nextPieces: [engineState.nextPiece],
+            }));
+          }
+        }
       },
 
       // Timing control
