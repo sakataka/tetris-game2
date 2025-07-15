@@ -1,5 +1,19 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.1.1/schema.json",
+  "files": {
+    "experimentalScannerIgnores": [
+      "dist/**",
+      "build/**",
+      "coverage/**",
+      "node_modules/**",
+      "*.min.js",
+      "*.bundle.js",
+      ".next/**",
+      ".cache/**",
+      "public/build/**",
+      "storybook-static/**"
+    ]
+  },
   "linter": {
     "enabled": true,
     "rules": {
