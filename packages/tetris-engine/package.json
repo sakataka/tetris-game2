@@ -2,14 +2,15 @@
   "name": "@tetris-game/engine",
   "version": "1.0.0",
   "description": "Pure TypeScript Tetris Game Engine with BitBoard implementation",
+  "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
-      "require": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.js"
     }
   },
   "scripts": {
@@ -33,11 +34,12 @@
   "author": "sakataka",
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "^22.10.7",
     "@biomejs/biome": "^1.9.4",
+    "@types/node": "^22.10.7",
+    "@vitest/coverage-v8": "^3.2.4",
     "tsup": "^8.4.0",
     "typescript": "^5.8.3",
-    "vitest": "^2.1.9"
+    "vitest": "^3.2.4"
   },
   "peerDependencies": {},
   "dependencies": {},
