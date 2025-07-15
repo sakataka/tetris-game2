@@ -31,6 +31,19 @@ jobs:
       - name: Run tests
         run: bun test
 
+      - name: Test internal packages
+        run: |
+          cd packages/tetris-engine
+          bun test
+          bun run test:coverage
+          bun run test:golden-master
+          bun run test:performance
+
+      - name: Build internal packages
+        run: |
+          cd packages/tetris-engine
+          bun run build
+
       - name: Check dead code
         run: bun run knip
 
