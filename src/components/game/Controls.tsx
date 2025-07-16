@@ -24,11 +24,11 @@ export function Controls() {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           {controls.map(({ key, action }) => (
             <div
               key={key}
-              className={`flex items-center justify-between py-1.5 px-3 ${CONTROL_STYLES.interactiveItem} rounded-md`}
+              className={`flex items-center justify-between py-1 px-2.5 ${CONTROL_STYLES.interactiveItem} rounded-md`}
             >
               <Badge variant="outline" className="font-mono text-xs border-gray-600 text-gray-300">
                 {key}

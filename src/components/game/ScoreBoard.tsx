@@ -27,7 +27,7 @@ export function ScoreBoard() {
             {t("game.score.title")}
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-2.5">
           {/* Live region for important score updates (level changes) */}
           <div aria-live="polite" aria-atomic="true" className="sr-only">
             {t("game.score.level")} {level}
@@ -46,7 +46,7 @@ export function ScoreBoard() {
 
           {/* Combo Indicator with 120ms response */}
           {comboState.isActive && comboState.count > 1 && (
-            <div className="flex items-center justify-center py-2">
+            <div className="flex items-center justify-center py-1.5">
               <ComboIndicator
                 comboCount={comboState.count}
                 isActive={comboState.isActive}

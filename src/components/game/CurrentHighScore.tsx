@@ -35,20 +35,22 @@ export function CurrentHighScore({ score, className }: CurrentHighScoreProps) {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           <div className="text-center">
-            <div className="text-xl font-bold text-yellow-400 mb-1">{formatScore(score.score)}</div>
+            <div className="text-xl font-bold text-yellow-400 mb-0.5">
+              {formatScore(score.score)}
+            </div>
             <div className="text-sm text-gray-400">{formatDate(score.timestamp)}</div>
           </div>
           <div className="grid grid-cols-2 gap-2 text-center">
-            <div className={`${CONTROL_STYLES.interactiveItem} rounded-md p-1.5`}>
+            <div className={`${CONTROL_STYLES.interactiveItem} rounded-md p-1`}>
               <div className="text-xs text-gray-400 flex items-center justify-center gap-1">
                 <Target className="h-3 w-3" />
                 {t("game.score.lines")}
               </div>
               <div className="text-sm font-semibold text-white">{score.lines}</div>
             </div>
-            <div className={`${CONTROL_STYLES.interactiveItem} rounded-md p-1.5`}>
+            <div className={`${CONTROL_STYLES.interactiveItem} rounded-md p-1`}>
               <div className="text-xs text-gray-400 flex items-center justify-center gap-1">
                 <TrendingUp className="h-3 w-3" />
                 {t("game.score.level")}

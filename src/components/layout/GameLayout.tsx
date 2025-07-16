@@ -39,7 +39,7 @@ export const GameLayout: React.FC<GameLayoutProps> = ({
   return (
     <div
       className={cn(
-        "min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white p-4",
+        "min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white p-3.5",
         animationsEnabled && "transition-all duration-300",
       )}
       style={
@@ -58,7 +58,7 @@ export const GameLayout: React.FC<GameLayoutProps> = ({
       <main
         id="main-content"
         className={cn(
-          "grid gap-6 items-start justify-center min-h-[calc(100vh-2rem)] pt-4",
+          "grid gap-5 items-start justify-center min-h-[calc(100vh-2rem)] pt-3",
           "desktop-layout",
           mode === "compact" && "compact-mode",
           animationsEnabled && "transition-grid",

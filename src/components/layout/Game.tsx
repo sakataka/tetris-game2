@@ -108,7 +108,7 @@ export function Game() {
           {/* Left Sidebar - Game Info */}
           <aside
             id="game-info"
-            className="layout-sidebar gap-3 pr-2"
+            className="layout-sidebar gap-2.5 pr-2"
             aria-label="Game Information"
             tabIndex={-1}
           >
@@ -149,7 +149,7 @@ export function Game() {
 
           {/* Right Sidebar - AI Controls & Visualization (only when AI features enabled) */}
           {enableAIFeatures && (
-            <aside className="layout-ai gap-3 pl-2" aria-label="AI Controls and Visualization">
+            <aside className="layout-ai gap-2.5 pl-2" aria-label="AI Controls and Visualization">
               {/* Advanced AI Controls */}
               {aiController && (
                 <ErrorBoundary>
