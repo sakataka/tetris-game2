@@ -2,6 +2,15 @@
   "app": {
     "title": "Tetris Game"
   },
+  "ai": {
+    "title": "AI Control",
+    "enable": "Enable AI",
+    "toggle": "Toggle AI on/off",
+    "status": {
+      "active": "AI is playing",
+      "inactive": "AI is disabled"
+    }
+  },
   "accessibility": {
     "skipToMain": "Skip to main content",
     "skipToGameBoard": "Skip to game board",

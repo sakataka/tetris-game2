@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { AnimatedButton } from "@/components/ui/AnimatedButton";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { useSimpleAIStore } from "@/features/ai-control";
 import { useSettings } from "@/features/settings";
 import { CONTROL_STYLES, MODAL_STYLES } from "@/utils/styles";
 
@@ -13,12 +14,11 @@ export function GameSettings() {
   const {
     showGhostPiece,
     enableTSpinDetection,
-    enableAIFeatures,
     setShowGhostPiece,
     setEnableTSpinDetection,
-    setEnableAIFeatures,
     setLanguage,
   } = useSettings();
+  const { isEnabled: isAIEnabled, toggleAI } = useSimpleAIStore();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -179,33 +179,34 @@ export function GameSettings() {
             {/* Separator */}
             <div className={`${MODAL_STYLES.separator} mx-3 my-2`} />
 
-            {/* AI Features Section */}
+            {/* AI Control Section */}
             <div className="px-3 py-2">
               <div className="text-xs text-gray-400 uppercase font-semibold mb-2">
-                {t("game.settings.aiFeatures")}
+                {t("ai.title")}
               </div>
               <button
                 type="button"
                 className={`${CONTROL_STYLES.interactiveItem} flex items-center justify-between p-2 rounded cursor-pointer w-full text-left`}
                 onClick={(e) => {
                   e.stopPropagation();
-                  setEnableAIFeatures(!enableAIFeatures);
+                  toggleAI();
                 }}
               >
                 <div className="flex flex-col">
-                  <span className="text-white text-sm">
-                    {t("game.settings.aiFeaturesDescription")}
-                  </span>
+                  <span className="text-white text-sm">{t("ai.enable")}</span>
+                  {isAIEnabled && (
+                    <span className="text-xs text-gray-400">{t("ai.status.active")}</span>
+                  )}
                 </div>
                 <div className="flex items-center gap-2">
                   <div
                     className={`w-10 h-5 rounded-full p-1 transition-colors ${
-                      enableAIFeatures ? CONTROL_STYLES.toggleOn : CONTROL_STYLES.toggleOff
+                      isAIEnabled ? CONTROL_STYLES.toggleOn : CONTROL_STYLES.toggleOff
                     }`}
                   >
                     <div
                       className={`${CONTROL_STYLES.toggleThumb} ${
-                        enableAIFeatures ? "translate-x-5" : "translate-x-0"
+                        isAIEnabled ? "translate-x-5" : "translate-x-0"
                       }`}
                     />
                   </div>

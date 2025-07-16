@@ -1,6 +1,4 @@
-import { useEffect, useState } from "react";
-import { useShallow } from "zustand/shallow";
-import { ErrorBoundary } from "@/components/common/ErrorBoundary";
+import { useEffect } from "react";
 import {
   Board,
   Controls,
@@ -12,17 +10,13 @@ import {
   ResetConfirmationDialog,
   ScoreBoard,
 } from "@/components/game";
-import { AdvancedAIControls } from "@/components/game/AdvancedAIControls";
-import { AIReplay } from "@/components/game/AIReplay";
-import { AIVisualization } from "@/components/game/AIVisualization";
+import { useSimpleAI } from "@/features/ai-control";
 import { useGamePlay } from "@/features/game-play";
 import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
-import { useScoringStore } from "@/features/scoring/model/scoringSlice";
 import { TSpinIndicator } from "@/features/scoring/ui/TSpinIndicator";
 import { useSettingsData } from "@/features/settings";
 import { useFocusManagement } from "@/hooks/accessibility/useFocusManagement";
 import { useScreenReaderAnnouncements } from "@/hooks/accessibility/useScreenReaderAnnouncements";
-import { useAdvancedAIController } from "@/hooks/ai/useAdvancedAIController";
 import { useKeyboardControls } from "@/hooks/controls/useKeyboardControls";
 import { useTouchGestures } from "@/hooks/controls/useTouchGestures";
 import { useDesignTokens } from "@/hooks/core/useDesignTokens";
@@ -69,29 +63,15 @@ export function Game() {
   const layoutMode: "compact" | "normal" =
     designLayoutMode === "gaming" ? "normal" : designLayoutMode;
 
-  // AI features setting
-  const { enableAIFeatures, enableTSpinDetection } = useSettingsData();
+  // T-Spin detection setting
+  const { enableTSpinDetection } = useSettingsData();
 
-  // Advanced AI controller (always call hook, but conditionally use result)
-  const aiControllerResult = useAdvancedAIController();
-  const aiController = enableAIFeatures ? aiControllerResult : null;
-
-  // Replay state
-  const [showReplay, setShowReplay] = useState(false);
+  // Simple AI controller
+  useSimpleAI();
 
   // T-Spin indicator state
   const tSpinState = useGamePlayStore((state) => state.tSpinState);
   const hideTSpinIndicator = useGamePlayStore((state) => state.hideTSpinIndicator);
-
-  // Game state for AI visualization (combine data from multiple stores)
-  const gamePlayData = useGamePlayStore(useShallow((state) => state));
-  const scoringData = useScoringStore(useShallow((state) => state));
-  const gameState = {
-    ...gamePlayData,
-    ...scoringData,
-    nextPiece: gamePlayData.nextPieces[0] || null, // Add compatibility for old GameState interface
-    floatingScoreEvents: gamePlayData.floatingScoreEvents, // Use gamePlay store's floatingScoreEvents
-  };
 
   return (
     <>
@@ -104,7 +84,7 @@ export function Game() {
       <div className="hidden md:block relative">
         <GameSettings />
 
-        <GameLayout mode={layoutMode} enableAIFeatures={enableAIFeatures}>
+        <GameLayout mode={layoutMode}>
           {/* Left Sidebar - Game Info */}
           <aside
             id="game-info"
@@ -146,68 +126,11 @@ export function Game() {
               )}
             </section>
           </div>
-
-          {/* Right Sidebar - AI Controls & Visualization (only when AI features enabled) */}
-          {enableAIFeatures && (
-            <aside className="layout-ai gap-2.5 pl-2" aria-label="AI Controls and Visualization">
-              {/* Advanced AI Controls */}
-              {aiController && (
-                <ErrorBoundary>
-                  <AdvancedAIControls
-                    aiState={aiController.aiState}
-                    settings={aiController.aiSettings}
-                    onSettingsChange={aiController.onSettingsChange}
-                    onToggleAI={aiController.onToggleAI}
-                    onPause={aiController.onPause}
-                  />
-                </ErrorBoundary>
-              )}
-
-              {/* AI Visualization */}
-              {aiController?.aiState.isEnabled &&
-                aiController.aiSettings.enableVisualization &&
-                aiController.lastDecision && (
-                  <ErrorBoundary>
-                    <AIVisualization
-                      decision={aiController.lastDecision}
-                      settings={aiController.aiSettings}
-                      gameState={gameState}
-                    />
-                  </ErrorBoundary>
-                )}
-
-              {/* Replay Controls */}
-              {aiController?.replayData && !aiController.aiState.isEnabled && (
-                <div className="space-y-2">
-                  <button
-                    type="button"
-                    onClick={() => setShowReplay(true)}
-                    className="w-full text-sm bg-blue-600 hover:bg-blue-700 text-white py-2 px-3 rounded"
-                    data-testid="start-replay"
-                  >
-                    View Replay
-                  </button>
-                </div>
-              )}
-            </aside>
-          )}
         </GameLayout>
       </div>
 
       {/* Reset confirmation dialog */}
       <ResetConfirmationDialog />
-
-      {/* Replay Modal */}
-      {showReplay && aiController?.replayData && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-slate-800 rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
-            <AIReplay
-              replayData={aiController.replayData}
-              onReplayEnd={() => setShowReplay(false)}
-            />
-          </div>
-        </div>
-      )}
 
       {/* Debug indicator */}
       <DebugIndicator />

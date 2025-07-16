@@ -138,7 +138,6 @@ export class GameEventBus {
       // Emit error event if it's not already an error event
       this.emitSync("AI_ERROR", {
         error: error instanceof Error ? error.message : "Unknown error in event handler",
-        requestId: undefined,
       });
     }
   }

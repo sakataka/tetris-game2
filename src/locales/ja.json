@@ -2,6 +2,15 @@
   "app": {
     "title": "テトリスゲーム"
   },
+  "ai": {
+    "title": "AI制御",
+    "enable": "AIを有効にする",
+    "toggle": "AI ON/OFF 切り替え",
+    "status": {
+      "active": "AIがプレイ中",
+      "inactive": "AIは無効です"
+    }
+  },
   "accessibility": {
     "skipToMain": "メインコンテンツへスキップ",
     "skipToGameBoard": "ゲームボードへスキップ",

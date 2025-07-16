@@ -25,20 +25,17 @@ describe("Feature-Sliced Design Integration", () => {
     const aiControlModule = await import("./ai-control");
 
     // Check UI exports
-    expect(aiControlModule.AIControlPanel).toBeDefined();
-    expect(typeof aiControlModule.AIControlPanel).toBe("function");
+    expect(aiControlModule.SimpleAIControl).toBeDefined();
+    expect(typeof aiControlModule.SimpleAIControl).toBe("function");
 
     // Check hooks exports
-    expect(aiControlModule.useAIControl).toBeDefined();
-    expect(typeof aiControlModule.useAIControl).toBe("function");
+    expect(aiControlModule.useSimpleAI).toBeDefined();
+    expect(typeof aiControlModule.useSimpleAI).toBe("function");
 
     // Check store exports
-    expect(aiControlModule.useAIStore).toBeDefined();
-    expect(typeof aiControlModule.useAIStore).toBe("function");
-
-    // Check API exports
-    expect(aiControlModule.aiWorkerManager).toBeDefined();
-    expect(aiControlModule.AIWorkerAdapter).toBeDefined();
+    expect(aiControlModule.useSimpleAIStore).toBeDefined();
+    expect(typeof aiControlModule.useSimpleAIStore).toBe("function");
+    // Simple AI doesn't have worker adapter
   });
 
   it("should import scoring feature exports correctly", async () => {

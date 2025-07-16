@@ -8,7 +8,6 @@ import { cn } from "@/lib/utils";
 interface GameLayoutProps {
   children: ReactNode;
   mode?: "compact" | "normal";
-  enableAIFeatures?: boolean;
 }
 
 /**
@@ -21,20 +20,16 @@ interface GameLayoutProps {
  * - Smooth transitions between modes
  * - AI features column when enabled
  */
-export const GameLayout: React.FC<GameLayoutProps> = ({
-  children,
-  mode = "normal",
-  enableAIFeatures = false,
-}) => {
+export const GameLayout: React.FC<GameLayoutProps> = ({ children, mode = "normal" }) => {
   const { t } = useTranslation();
   const { layout } = useDesignTokens();
   const { animationsEnabled } = useAdaptivePerformance();
 
-  // Calculate grid columns and areas based on mode and AI features
+  // Calculate grid columns and areas based on mode
   const sidebarWidth =
     mode === "compact" ? layout.sidebar.width.compact : layout.sidebar.width.normal;
-  const gridColumns = enableAIFeatures ? `${sidebarWidth} 1fr 300px` : `${sidebarWidth} 1fr`;
-  const gridAreas = enableAIFeatures ? '"sidebar main ai"' : '"sidebar main"';
+  const gridColumns = `${sidebarWidth} 1fr`;
+  const gridAreas = '"sidebar main"';
 
   return (
     <div
@@ -50,7 +45,6 @@ export const GameLayout: React.FC<GameLayoutProps> = ({
       }
       data-testid="game-layout"
       data-layout-mode={mode}
-      data-ai-enabled={enableAIFeatures}
     >
       {/* Skip links for keyboard navigation */}
       <SkipLinks />

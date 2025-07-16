@@ -3,15 +3,8 @@
  * Defines all possible events and their payload types
  */
 
-import type { AdvancedAIDecision } from "@/game/ai/core/advanced-ai-engine";
-import type { AIDecision } from "@/game/ai/core/ai-engine";
-import type {
-  GameBoard,
-  GameState,
-  LineClearAnimationData,
-  Position,
-  Tetromino,
-} from "@/types/game";
+// Simplified AI types
+import type { GameBoard, LineClearAnimationData, Position, Tetromino } from "@/types/game";
 
 export interface GameEventMap {
   // Game Control Events
@@ -46,25 +39,13 @@ export interface GameEventMap {
     oldLevel: number;
   };
 
-  // AI Events
+  // Simple AI Events
   AI_DECISION: {
-    decision: AdvancedAIDecision | AIDecision;
+    decision: { x: number; y: number; rotation: number } | null;
     thinkingTime: number;
   };
-  AI_THINKING_START: { requestId?: string };
-  AI_THINKING_END: { requestId?: string; thinkingTime: number };
-  AI_ERROR: { error: string; requestId?: string };
-  AI_MOVE_CALCULATED: {
-    result: AdvancedAIDecision | AIDecision;
-    responseTime: number;
-    source: string;
-  };
-  AI_MOVE_REQUESTED: { gameState: GameState };
-  AI_DIFFICULTY_CHANGED: { difficulty: "easy" | "medium" | "hard" | "expert" };
-  WORKER_INITIALIZED: {
-    version: string;
-    capabilities: string[];
-  };
+  AI_ENABLED: { enabled: boolean };
+  AI_ERROR: { error: string };
 
   // Animation Events
   ANIMATION_START: { type: string; duration: number };
