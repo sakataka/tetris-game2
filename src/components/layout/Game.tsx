@@ -11,7 +11,6 @@ import {
   NextPiece,
   ResetConfirmationDialog,
   ScoreBoard,
-  TSpinIndicator,
 } from "@/components/game";
 import { AdvancedAIControls } from "@/components/game/AdvancedAIControls";
 import { AIReplay } from "@/components/game/AIReplay";
@@ -19,6 +18,7 @@ import { AIVisualization } from "@/components/game/AIVisualization";
 import { useGamePlay } from "@/features/game-play";
 import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
 import { useScoringStore } from "@/features/scoring/model/scoringSlice";
+import { TSpinIndicator } from "@/features/scoring/ui/TSpinIndicator";
 import { useSettingsData } from "@/features/settings";
 import { useFocusManagement } from "@/hooks/accessibility/useFocusManagement";
 import { useScreenReaderAnnouncements } from "@/hooks/accessibility/useScreenReaderAnnouncements";
@@ -138,7 +138,7 @@ export function Game() {
               {/* T-Spin Indicator */}
               {enableTSpinDetection && (
                 <TSpinIndicator
-                  tSpinType={tSpinState.type}
+                  type={tSpinState.type}
                   linesCleared={tSpinState.linesCleared}
                   show={tSpinState.show}
                   onComplete={hideTSpinIndicator}

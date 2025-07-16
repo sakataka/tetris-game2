@@ -1,22 +1,18 @@
 import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
+import { AnimatedScoreItem } from "@/features/scoring/ui/AnimatedScoreItem";
+import { ComboIndicator } from "@/features/scoring/ui/ComboIndicator";
+import { FloatingScoreText as FloatingScoreManager } from "@/features/scoring/ui/FloatingScoreText";
+import { ScoreCounter } from "@/features/scoring/ui/ScoreCounter";
+import { TetrisFlashEffect } from "@/features/scoring/ui/TetrisFlashEffect";
 import { useScoreAnimationState, useScoreState } from "@/hooks/selectors/useScoreSelectors";
-import { useAnimatedValue } from "@/hooks/ui/useAnimatedValue";
 import { CARD_STYLES } from "@/utils/styles";
-import { AnimatedScoreItem } from "./AnimatedScoreItem";
-import { ComboIndicator } from "./ComboIndicator";
-import { FloatingScoreManager } from "./FloatingScoreText";
-import { ScoreCounter } from "./ScoreCounter";
-import { TetrisFlashEffect } from "./TetrisFlashEffect";
 
 export function ScoreBoard() {
   const { score, lines, level } = useScoreState();
   const { scoreAnimationState, comboState, floatingScoreEvents } = useScoreAnimationState();
   const { t } = useTranslation();
-
-  const linesKey = useAnimatedValue(lines);
-  const levelKey = useAnimatedValue(level);
 
   // FloatingScoreText cleanup handler
   const handleFloatingScoreComplete = (_id: string) => {
@@ -59,32 +55,47 @@ export function ScoreBoard() {
             </div>
           )}
 
-          <AnimatedScoreItem
-            label={t("game.score.lines")}
-            value={lines}
-            animationKey={`lines-${linesKey}`}
-            className="text-xl font-bold text-tetris-yellow"
-            animation="lines"
-          />
+          <div className="flex justify-between items-center">
+            <span className="text-lg font-medium text-muted-foreground">
+              {t("game.score.lines")}
+            </span>
+            <AnimatedScoreItem
+              value={lines}
+              className="text-xl font-bold text-tetris-yellow"
+              animation="lines"
+            />
+          </div>
 
-          <AnimatedScoreItem
-            label={t("game.score.level")}
-            value={level}
-            animationKey={`level-${levelKey}`}
-            className="text-xl font-bold text-tetris-purple"
-            animation="level"
-          />
+          <div className="flex justify-between items-center">
+            <span className="text-lg font-medium text-muted-foreground">
+              {t("game.score.level")}
+            </span>
+            <AnimatedScoreItem
+              value={level}
+              className="text-xl font-bold text-tetris-purple"
+              animation="level"
+            />
+          </div>
         </CardContent>
       </Card>
 
       {/* Tetris Flash Effect (200ms screen flash) */}
-      <TetrisFlashEffect isTriggered={scoreAnimationState.isTetris} />
+      <TetrisFlashEffect isActive={scoreAnimationState.isTetris} />
 
       {/* Floating Score Text Manager */}
-      <FloatingScoreManager
-        events={floatingScoreEvents}
-        onEventComplete={handleFloatingScoreComplete}
-      />
+      {floatingScoreEvents.map((event) => (
+        <FloatingScoreManager
+          key={event.id}
+          event={{
+            id: event.id,
+            value: event.points,
+            type: "line-clear",
+            position: event.position,
+            timestamp: event.startTime,
+          }}
+          onComplete={handleFloatingScoreComplete}
+        />
+      ))}
     </>
   );
 }

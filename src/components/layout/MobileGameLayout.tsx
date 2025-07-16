@@ -1,5 +1,6 @@
-import { Board, GameOverlay, TouchControls, TSpinIndicator } from "@/components/game";
+import { Board, GameOverlay, TouchControls } from "@/components/game";
 import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
+import { TSpinIndicator } from "@/features/scoring/ui/TSpinIndicator";
 import { useSettingsData } from "@/features/settings";
 import { useTouchGestures } from "@/hooks/controls/useTouchGestures";
 import { MobileHeader } from "./MobileHeader";
@@ -31,7 +32,7 @@ export function MobileGameLayout() {
           {/* T-Spin Indicator */}
           {enableTSpinDetection && (
             <TSpinIndicator
-              tSpinType={tSpinState.type}
+              type={tSpinState.type}
               linesCleared={tSpinState.linesCleared}
               show={tSpinState.show}
               onComplete={hideTSpinIndicator}

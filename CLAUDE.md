@@ -40,16 +40,6 @@ bun run analyze                  # Bundle analysis
 bun run analyze:visual           # Visual bundle analysis
 ```
 
-### ENGINE PACKAGE COMMANDS
-```bash
-cd packages/tetris-engine
-bun test                         # Engine unit tests (using vitest)
-bun run test:coverage            # Engine test coverage analysis
-bun run test:performance         # Engine performance benchmarks
-bun run test:golden-master       # Golden master regression tests
-bun run build                    # Build engine package (esbuild ESM-only)
-bun run dev                      # Build engine in watch mode
-```
 
 ### EXECUTION CONDITIONS
 - **Before commits**: `bun run lint && bun run typecheck` MUST pass
@@ -61,34 +51,30 @@ bun run dev                      # Build engine in watch mode
 
 **AI Decision Point**: Use Feature-Sliced Design. Test business logic in `/features/*/lib/` and `/features/*/model/`. Never test UI components.
 
-### Monorepo Structure
-This project uses a monorepo structure with internal packages:
+### Project Structure
+This project uses a single-package architecture with integrated game engine:
 
 ```
 tetris-game2/
-├── packages/                    # Internal packages
-│   └── tetris-engine/          # Core game engine package
-│       ├── src/                # Engine source code
-│       │   ├── core/          # BitBoard, collision, operations, tetrominos
-│       │   ├── events/        # Event bus system
-│       │   ├── index.ts       # Main exports
-│       │   └── types.ts       # Engine type definitions
-│       ├── tests/             # Comprehensive test suite
-│       │   ├── bitboard.test.ts
-│       │   ├── eventbus.test.ts
-│       │   ├── golden-master/  # Golden master tests
-│       │   └── performance/    # Performance benchmarks
-│       └── package.json       # @tetris-game/engine package
 ├── src/                        # Main application
-└── package.json               # Main application package
+│   ├── game/                  # Core game logic including AI engine
+│   │   ├── ai/               # Integrated AI system
+│   │   │   ├── core/         # BitBoard, collision, operations
+│   │   │   ├── evaluators/   # Dellacherie, Pattern, Stacking evaluators
+│   │   │   ├── search/       # Beam search, diversity search algorithms
+│   │   │   └── config/       # Runtime-tunable weights configuration
+│   │   ├── animations/       # Animation system
+│   │   └── *.ts             # Game engine components
+│   └── [other directories]   # Features, components, etc.
+└── package.json              # Single package configuration
 ```
 
-**@tetris-game/engine Package**:
-- **Purpose**: Framework-agnostic, high-performance Tetris game engine
-- **Architecture**: Event-driven with BitBoard implementation using Uint32Array
-- **Features**: Zero dependencies, tree-shakable, 100% test coverage
-- **Testing**: Vitest-based unit tests, property-based testing, golden master tests, performance benchmarks
-- **Build**: TypeScript with ESM-only output via esbuild
+**Integrated Game Engine**:
+- **Purpose**: High-performance Tetris game engine with integrated AI
+- **Architecture**: BitBoard implementation using Uint32Array for performance
+- **Features**: Runtime-tunable AI weights, comprehensive test coverage
+- **Testing**: Bun-based unit tests, property-based testing with fast-check
+- **Build**: TypeScript with Vite (rolldown) for optimal bundling
 
 ### Tech Stack
 - **Runtime**: Bun 1.2.18 (package manager + JavaScript runtime)
@@ -234,7 +220,7 @@ phase:
 - ✅ **Pure functions**: `/src/game/`, `/src/utils/`, `/src/shared/`
 - ✅ **Feature business logic**: `/src/features/*/lib/`, `/src/features/*/model/`
 - ✅ **AI modules**: All evaluators, search algorithms, core engines
-- ✅ **Engine package**: All `/packages/tetris-engine/` modules
+- ✅ **AI modules**: All evaluators, search algorithms, core engines (integrated in `/src/game/ai/`)
 - ❌ **React components**: UI components, DOM interactions, UI behavior
 
 ### Test Architecture
@@ -247,6 +233,26 @@ phase:
 ### AI Assistant Guidelines
 - **❌ NEVER** use `bun run dev` for automated testing (blocks terminal)
 - **❌ NEVER** test React components - focus on pure functions and business logic
+
+### Build Pipeline
+For comprehensive build pipeline execution, run the following commands in sequence:
+```bash
+# Execute full pipeline with fail-fast behavior
+bun run knip && \
+bun run format && \
+bun run lint && \
+bun run typecheck && \
+bun test && \
+bun run build
+```
+
+**Pipeline Steps**:
+1. **knip**: Dead code detection and dependency analysis
+2. **format**: Code formatting with Biome
+3. **lint**: Code quality checks and import organization
+4. **typecheck**: TypeScript type safety validation
+5. **test**: Comprehensive test suite execution (800+ tests)
+6. **build**: Optimized production bundle creation
 
 ## 🔧 Development Patterns
 
@@ -314,7 +320,7 @@ Use these specialized MCP tools only when specifically needed for their intended
 - **Accessibility first**: WCAG 2.2 AA compliance with automated testing
 
 ### Quick Access
-- **Engine Package**: `/packages/tetris-engine/` (core game engine)
+- **AI System**: `/src/game/ai/` (integrated game engine with AI)
 - **AI Config**: `/src/game/ai/config/weights.yaml` (runtime-tunable weights)
 - **AI Debug**: `?debug=true&ai=advanced&visualization=true`
 - **Design Tokens**: `/src/design-tokens/index.ts` (comprehensive token system)

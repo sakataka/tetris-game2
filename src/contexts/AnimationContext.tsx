@@ -1,5 +1,5 @@
 import type React from "react";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState } from "react";
 import { useAdaptivePerformance } from "@/hooks/core/useAdaptivePerformance";
 
 interface FineTuneConfig {
@@ -41,6 +41,46 @@ interface FineTuneConfig {
   };
 }
 
+// Integrated fine-tune configuration (previously from fine-tune.json)
+const DEFAULT_FINE_TUNE_CONFIG: FineTuneConfig = {
+  uiTimings: {
+    buttonHover: {
+      duration: 120,
+      targetResponseTime: 60,
+    },
+    buttonPress: {
+      duration: 100,
+      targetResponseTime: 30,
+    },
+    commonTimings: {
+      quick: 120,
+      normal: 300,
+      slow: 600,
+    },
+  },
+  performance: {
+    targets: {
+      hoverResponse: 60,
+      clickResponse: 30,
+      animationDuration: 120,
+      fpsMinimum: 55,
+    },
+    optimization: {
+      useGPUAcceleration: true,
+      enableWillChange: true,
+      prefersReducedMotion: "respect",
+    },
+  },
+  hapticFeedback: {
+    patterns: {
+      light: 10,
+      medium: 25,
+      heavy: 50,
+    },
+    enabledByDefault: true,
+  },
+};
+
 interface AnimationContextValue {
   quality: "full" | "reduced" | "essential";
   orchestrator: null; // Mock implementation for prototype
@@ -68,51 +108,9 @@ interface AnimationProviderProps {
 
 export const AnimationProvider: React.FC<AnimationProviderProps> = ({ children }) => {
   const { animationsEnabled, performanceMode } = useAdaptivePerformance();
-  const [config, setConfig] = useState<FineTuneConfig | null>(null);
-  const [isConfigLoaded, setIsConfigLoaded] = useState(false);
+  const [config] = useState<FineTuneConfig>(DEFAULT_FINE_TUNE_CONFIG);
+  const [isConfigLoaded] = useState(true);
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  // Load fine-tune configuration
-  useEffect(() => {
-    const loadConfig = async () => {
-      try {
-        const response = await fetch("/fine-tune.json");
-        const fineTuneConfig = await response.json();
-        setConfig(fineTuneConfig);
-        setIsConfigLoaded(true);
-      } catch (error) {
-        console.warn("[AnimationContext] Failed to load fine-tune.json, using defaults", error);
-        // Fallback configuration
-        setConfig({
-          uiTimings: {
-            buttonHover: { duration: 120, targetResponseTime: 60 },
-            buttonPress: { duration: 100, targetResponseTime: 30 },
-            commonTimings: { quick: 120, normal: 300, slow: 600 },
-          },
-          performance: {
-            targets: {
-              hoverResponse: 60,
-              clickResponse: 30,
-              animationDuration: 120,
-              fpsMinimum: 55,
-            },
-            optimization: {
-              useGPUAcceleration: true,
-              enableWillChange: true,
-              prefersReducedMotion: "respect",
-            },
-          },
-          hapticFeedback: {
-            patterns: { light: 10, medium: 25, heavy: 50 },
-            enabledByDefault: true,
-          },
-        });
-        setIsConfigLoaded(true);
-      }
-    };
-
-    loadConfig();
-  }, []);
 
   // Determine animation quality based on user preferences and performance
   const quality = prefersReducedMotion
@@ -126,19 +124,10 @@ export const AnimationProvider: React.FC<AnimationProviderProps> = ({ children }
   const value: AnimationContextValue = {
     quality,
     orchestrator: null, // Mock implementation for prototype
-    commonTimings: {
-      quick: config?.uiTimings?.commonTimings?.quick || 120,
-      normal: config?.uiTimings?.commonTimings?.normal || 300,
-      slow: config?.uiTimings?.commonTimings?.slow || 600,
-    },
+    commonTimings: config.uiTimings.commonTimings,
     prefersReducedMotion,
     config,
-    performanceTargets: {
-      hoverResponse: config?.performance?.targets?.hoverResponse || 60,
-      clickResponse: config?.performance?.targets?.clickResponse || 30,
-      animationDuration: config?.performance?.targets?.animationDuration || 120,
-      fpsMinimum: config?.performance?.targets?.fpsMinimum || 55,
-    },
+    performanceTargets: config.performance.targets,
     isConfigLoaded,
   };
 
