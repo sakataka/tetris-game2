@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { useShallow } from "zustand/react/shallow";
 import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
 import { useScoringStore } from "@/features/scoring";
 
@@ -8,12 +9,21 @@ import { useScoringStore } from "@/features/scoring";
  */
 export function useHighScoreSideEffect() {
   const isGameOver = useGamePlayStore((state) => state.isGameOver);
-  const { score, lines, level } = useScoringStore((state) => ({
-    score: state.score,
-    lines: state.lines,
-    level: state.level,
-  }));
-  const { addNewHighScore, setScore, setLines, setLevel } = useScoringStore();
+  const { score, lines, level } = useScoringStore(
+    useShallow((state) => ({
+      score: state.score,
+      lines: state.lines,
+      level: state.level,
+    })),
+  );
+  const { addNewHighScore, setScore, setLines, setLevel } = useScoringStore(
+    useShallow((state) => ({
+      addNewHighScore: state.addNewHighScore,
+      setScore: state.setScore,
+      setLines: state.setLines,
+      setLevel: state.setLevel,
+    })),
+  );
   const wasGameOverRef = useRef(isGameOver);
 
   useEffect(() => {

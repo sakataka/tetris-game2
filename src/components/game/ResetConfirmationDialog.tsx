@@ -1,4 +1,6 @@
+import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
+import { useShallow } from "zustand/react/shallow";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -20,15 +22,24 @@ export function ResetConfirmationDialog() {
   const hideResetDialog = useGamePlayStore((state) => state.hideResetDialog);
   const confirmReset = useGamePlayStore((state) => state.confirmReset);
 
-  // Get score data from appropriate stores
-  const scoreData = useScoringStore((state) => ({
-    score: state.score,
-    lines: state.lines,
-    level: state.level,
-  }));
-  const { addNewHighScore, setScore, setLines, setLevel } = useScoringStore();
+  // Get score data from appropriate stores with useShallow to prevent infinite re-renders
+  const scoreData = useScoringStore(
+    useShallow((state) => ({
+      score: state.score,
+      lines: state.lines,
+      level: state.level,
+    })),
+  );
+  const { addNewHighScore, setScore, setLines, setLevel } = useScoringStore(
+    useShallow((state) => ({
+      addNewHighScore: state.addNewHighScore,
+      setScore: state.setScore,
+      setLines: state.setLines,
+      setLevel: state.setLevel,
+    })),
+  );
 
-  const handleConfirm = () => {
+  const handleConfirm = useCallback(() => {
     // Save score before reset (same logic as game over)
     // Update scoring store with current game data before saving
     setScore(scoreData.score);
@@ -36,11 +47,20 @@ export function ResetConfirmationDialog() {
     setLevel(scoreData.level);
     addNewHighScore();
     confirmReset();
-  };
+  }, [
+    scoreData.score,
+    scoreData.lines,
+    scoreData.level,
+    setScore,
+    setLines,
+    setLevel,
+    addNewHighScore,
+    confirmReset,
+  ]);
 
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     hideResetDialog();
-  };
+  }, [hideResetDialog]);
 
   return (
     <Dialog open={showResetConfirmation} onOpenChange={handleCancel}>

@@ -1,6 +1,13 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
+import { create } from "zustand";
+import { devtools } from "zustand/middleware";
 import { designTokens } from "@/design-tokens";
 import type { ExtendedDesignTokens, LayoutMode } from "@/design-tokens/types";
+
+interface DesignTokensState {
+  layoutMode: LayoutMode;
+  setLayoutMode: (mode: LayoutMode) => void;
+}
 
 interface DesignTokensHook {
   tokens: ExtendedDesignTokens;
@@ -13,6 +20,24 @@ interface DesignTokensHook {
   animation: ExtendedDesignTokens["animation"];
 }
 
+// Global design tokens store to prevent multiple instances
+const useDesignTokensStore = create<DesignTokensState>()(
+  devtools(
+    (set) => ({
+      layoutMode: "normal",
+      setLayoutMode: (mode: LayoutMode) => {
+        if (import.meta.env.DEV) {
+          console.log(`[useDesignTokens] Layout mode changing to ${mode}`);
+        }
+        set({ layoutMode: mode });
+      },
+    }),
+    {
+      name: "design-tokens-store",
+    },
+  ),
+);
+
 /**
  * Hook for accessing design tokens with layout mode management
  *
@@ -22,21 +47,7 @@ interface DesignTokensHook {
  * @returns Design tokens and layout mode management
  */
 export const useDesignTokens = (): DesignTokensHook => {
-  const [layoutMode, setLayoutModeState] = useState<LayoutMode>("normal");
-
-  // Debug logging for layout mode changes (reduce frequency)
-  useEffect(() => {
-    if (import.meta.env.DEV) {
-      console.log(`[useDesignTokens] Layout mode state is now: ${layoutMode}`);
-    }
-  }, [layoutMode]);
-
-  const setLayoutMode = useCallback((mode: LayoutMode) => {
-    if (import.meta.env.DEV) {
-      console.log(`[useDesignTokens] Layout mode changing to ${mode}`);
-    }
-    setLayoutModeState(mode);
-  }, []);
+  const { layoutMode, setLayoutMode } = useDesignTokensStore();
 
   // Memoize layout tokens to prevent unnecessary re-renders
   const currentLayoutTokens = useMemo(
@@ -47,7 +58,7 @@ export const useDesignTokens = (): DesignTokensHook => {
     [layoutMode],
   );
 
-  // Memoize the entire tokens object
+  // Memoize tokens object to prevent unnecessary re-renders
   const tokens = useMemo(
     () => ({
       ...designTokens,
@@ -56,7 +67,7 @@ export const useDesignTokens = (): DesignTokensHook => {
     [currentLayoutTokens],
   );
 
-  // Memoize the return object to prevent infinite re-renders
+  // Memoize the entire return object to prevent infinite re-renders
   return useMemo(
     () => ({
       tokens,
