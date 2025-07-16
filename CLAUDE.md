@@ -1,331 +1,236 @@
-# Tetris Game Project - AI Assistant Development Guide
+# Tetris Game Project - AI Assistant Guide
 
-## 🚨 EXECUTION PRIORITY: Critical Development Rules
+AI assistant working on a high-performance TypeScript Tetris implementation with integrated AI engine. This file provides essential context to understand the project structure and development constraints without reading all source code.
 
-### ABSOLUTE PROHIBITIONS
-1. **Type Error Resolution**: NEVER relax TypeScript checks. ALWAYS fix root cause with proper types/interfaces.
-2. **Test Bypassing**: NEVER skip tests or use inappropriate mocks. ALWAYS address underlying problems.
-3. **Output Hardcoding**: NEVER hardcode user-facing text. ALWAYS use i18n translation files (`/src/locales/`).
-4. **Error Suppression**: NEVER hide error messages. ALWAYS implement proper error handling.
-5. **Any Type Usage**: NEVER use `any` type. ALWAYS use `unknown` with type guards or explicit interfaces.
-6. **Class Usage**: NEVER use classes except for external library interface compliance.
+## 🚨 Critical Rules & Constraints
 
-### MANDATORY PATTERNS
-- **Imports**: `@/` for cross-directory, `./` for same-directory
-- **i18n**: ALL user-facing text MUST use `/src/locales/` files (en.json, ja.json)
-- **Functions**: Pure functions over classes for maintainability/testability
-- **Testing**: ONLY test pure functions, utilities, business logic. NEVER test React components
+| ✅ Required | ❌ Forbidden |
+|-------------|-------------|
+| Pure functions only (no `class`, no `new`) | Adding classes / OO hierarchies |
+| State via Zustand slices or local React state | Direct writes to global objects |
+| `unknown` with type guards | `any` type usage |
+| i18n with `t('key')` from `/src/locales/*.json` | Hard-coded user-facing strings |
+| Tests for pure functions, business logic | Testing React components or UI |
+| `@/` imports for cross-directory, `./` for same-directory | Path traversals outside `/src` |
+| WCAG 2.2 AA compliance (4.5:1 contrast, keyboard nav) | Click-only interactions |
+| Bun test + fast-check for property testing | Jest / Vitest / RTL |
 
-## 📋 Development Commands
+## 📁 Project Structure
 
-### CRITICAL COMMANDS (MUST pass before commits)
+```
+src/
+├── game/                    # Core game logic - TEST ALL
+│   ├── ai/                 # Integrated AI engine
+│   │   ├── config/         # weights.yaml, runtime configuration
+│   │   ├── core/           # BitBoard, collision, move generation
+│   │   ├── evaluators/     # Dellacherie, pattern, stacking evaluators
+│   │   └── search/         # Beam search, diversity search algorithms
+│   ├── animations/         # Animation system with FrameBudgetSentinel
+│   └── *.ts               # Game engine (board, scoring, tetrominos)
+├── features/               # Feature-Sliced Design - TEST lib/ and model/
+│   ├── ai-control/         # AI control feature
+│   ├── game-play/          # Game play feature
+│   ├── scoring/            # Scoring system
+│   └── settings/           # Settings management
+├── components/             # Legacy UI components - DO NOT TEST
+│   ├── accessibility/      # WCAG 2.2 AA components
+│   ├── game/              # Game UI components
+│   └── ui/                # shadcn/ui components
+├── hooks/                  # React hooks - TEST PURE FUNCTIONS ONLY
+├── shared/                 # Reusable modules - TEST ALL
+├── utils/                  # Utility functions - TEST ALL
+├── locales/               # i18n files (en.json, ja.json)
+└── types/                 # TypeScript type definitions
+```
+
+## 🔧 Development Commands
+
 ```bash
-bun run lint && bun run typecheck  # MANDATORY before commits
-bun test                          # Unit tests (excludes components)
-bun run ci                        # Complete CI pipeline validation
+# Install dependencies
+bun install
+
+# Development server
+bun run dev
+
+# Testing
+bun test                    # Unit tests (excludes components)
+bun run test:a11y          # Accessibility tests
+bun run e2e                # End-to-end tests with Playwright
+
+# Code Quality (MANDATORY before commits)
+bun run lint && bun run typecheck
+bun run format             # Code formatting
+bun run knip               # Dead code detection
+
+# Build & Analysis
+bun run build             # Production build
+bun run ci                # Complete CI pipeline
+bun run analyze           # Bundle analysis
+bun run check:i18n        # i18n validation
 ```
 
-### TESTING COMMANDS
-```bash
-bun test                          # Unit tests (excludes components)
-bun run test:full                 # Full test suite execution
-bun run e2e                       # End-to-end tests
-```
+## 🧪 Testing Strategy
 
-### DOCUMENTATION & ANALYSIS
-```bash
-bun run storybook                 # Component documentation and visual testing
-bun run check:i18n               # Validate i18n translation keys
-bun run analyze                  # Bundle analysis
-bun run analyze:visual           # Visual bundle analysis
-```
+### Test These
+- ✅ Pure functions in `/src/game/`, `/src/utils/`, `/src/shared/`
+- ✅ Feature business logic in `/src/features/*/lib/` and `/src/features/*/model/`
+- ✅ AI modules: evaluators, search algorithms, core engines
+- ✅ Zustand slices and selectors
+- ✅ Property-based tests with fast-check for game mechanics
 
-
-### EXECUTION CONDITIONS
-- **Before commits**: `bun run lint && bun run typecheck` MUST pass
-- **After changes**: `bun test` to verify no regressions
-- **Git hooks**: Lefthook auto-runs formatting/validation (biome format & lint)
-- **Major releases**: `bun run ci` for complete validation pipeline
-
-## 🏗️ Project Architecture
-
-**AI Decision Point**: Use Feature-Sliced Design. Test business logic in `/features/*/lib/` and `/features/*/model/`. Never test UI components.
-
-### Project Structure
-This project uses a single-package architecture with integrated game engine:
-
-```
-tetris-game2/
-├── src/                        # Main application
-│   ├── game/                  # Core game logic including AI engine
-│   │   ├── ai/               # Integrated AI system
-│   │   │   ├── core/         # BitBoard, collision, operations
-│   │   │   ├── evaluators/   # Dellacherie, Pattern, Stacking evaluators
-│   │   │   ├── search/       # Beam search, diversity search algorithms
-│   │   │   └── config/       # Runtime-tunable weights configuration
-│   │   ├── animations/       # Animation system
-│   │   └── *.ts             # Game engine components
-│   └── [other directories]   # Features, components, etc.
-└── package.json              # Single package configuration
-```
-
-**Integrated Game Engine**:
-- **Purpose**: High-performance Tetris game engine with integrated AI
-- **Architecture**: BitBoard implementation using Uint32Array for performance
-- **Features**: Runtime-tunable AI weights, comprehensive test coverage
-- **Testing**: Bun-based unit tests, property-based testing with fast-check
-- **Build**: TypeScript with Vite (rolldown) for optimal bundling
-
-### Tech Stack
-- **Runtime**: Bun 1.2.18 (package manager + JavaScript runtime)
-- **Frontend**: React 19.1 + TypeScript 5.8 (strict mode)
-- **State**: Zustand 5.0.6 (functional state management)
-- **Styling**: Tailwind CSS 4.1 + shadcn/ui + Radix UI
-- **Animation**: Motion 12.23
-- **i18n**: i18next 25.3 + react-i18next 15.6 (English/Japanese)
-- **Build**: Vite 7.0 (rolldown-vite implementation)
-- **Quality**: Biome 2.1 (linting/formatting) + Lefthook 1.12 (Git hooks)
-- **Testing**: Bun Test + Playwright 1.54 + fast-check 4.2 (property-based testing)
-- **Documentation**: Storybook 9.0.17 (component documentation + visual testing)
-- **Accessibility**: @axe-core/react 4.10 + axe-playwright 2.1
-
-### Key Directories
-```
-/src/
-├── app/              # Application setup layer
-│   ├── providers/    # Application providers (EffectsProvider)
-│   ├── router/       # Routing configuration
-│   └── store/        # Store configuration
-├── features/         # Feature-Sliced Design architecture (TEST ALL)
-│   ├── ai-control/   # AI control feature
-│   │   ├── api/      # API adapters (aiWorkerAdapter, weights-loader)
-│   │   ├── lib/      # Business logic (useAIControl) - TEST ALL
-│   │   ├── model/    # State management (aiSlice) - TEST ALL
-│   │   └── ui/       # UI components - DO NOT TEST
-│   ├── game-play/    # Game play feature
-│   │   ├── api/      # Game engine adapters
-│   │   ├── lib/      # Game logic (useGamePlay) - TEST ALL
-│   │   ├── model/    # State management (gamePlaySlice) - TEST ALL
-│   │   └── ui/       # UI components - DO NOT TEST
-│   ├── scoring/      # Scoring feature
-│   │   ├── api/      # Score storage
-│   │   ├── lib/      # Scoring logic (useScoring) - TEST ALL
-│   │   ├── model/    # State management (scoringSlice) - TEST ALL
-│   │   └── ui/       # Score UI components - DO NOT TEST
-│   └── settings/     # Settings feature
-│       ├── api/      # Settings storage
-│       ├── lib/      # Settings logic (useSettings) - TEST ALL
-│       ├── model/    # State management (settingsSlice) - TEST ALL
-│       └── ui/       # Settings UI components - DO NOT TEST
-├── game/             # Core game logic - TEST ALL
-│   ├── ai/          # AI system - weights.yaml, evaluators, search algorithms
-│   │   ├── config/  # Runtime-tunable weights.yaml configuration
-│   │   ├── core/    # BitBoard, collision detection, move generation
-│   │   ├── evaluators/ # Dellacherie, Pattern, Stacking evaluators
-│   │   └── search/  # Beam search, diversity search, pattern search
-│   └── animations/  # Animation core, FrameBudgetSentinel
-├── components/       # React UI - DO NOT TEST (Legacy, migrating to features/)
-│   ├── accessibility/ # Skip links, WCAG 2.2 AA components
-│   ├── game/        # Game UI components with Stories
-│   ├── layout/      # Layout components for mobile/desktop
-│   └── ui/          # shadcn/ui components
-├── contexts/         # React contexts - TEST ALL
-│   ├── AnimationContext.tsx # Animation orchestration
-│   └── ThemeContext.tsx     # Compact/Normal/Gaming themes
-├── design-tokens/    # Design system - TEST ALL
-├── hooks/           # React hooks - TEST PURE FUNCTIONS ONLY
-│   ├── accessibility/ # Focus management, screen reader
-│   ├── ai/          # Advanced AI controller hooks
-│   ├── controls/    # Input handling, keyboard/touch controls
-│   └── core/        # Game loop, action handlers, performance monitoring
-├── shared/          # Shared modules - TEST ALL
-│   ├── effects/     # Game effects
-│   ├── events/      # Type-safe event system
-│   ├── types/       # Shared type definitions
-│   └── utils/       # Shared utilities
-├── utils/           # Utilities - TEST ALL
-├── locales/         # i18n files (en.json, ja.json)
-├── test/            # Test utilities, mocks, generators
-└── types/           # TypeScript type definitions
-```
-
-### Architecture Pattern: Feature-Sliced Design
-**Migration Complete**: Successfully transitioned to Feature-Sliced Design architecture
-- **Features Layer**: `/src/features/` - Business logic organized by feature
-- **Shared Layer**: `/src/shared/` - Reusable modules across features
-- **App Layer**: `/src/app/` - Application configuration and providers
-- **Legacy**: `/src/components/` - UI components (gradually migrating to features)
-
-**Each Feature Structure**:
-- `api/` - External API adapters and data fetching
-- `lib/` - Business logic and custom hooks (TEST ALL)
-- `model/` - State management slices (TEST ALL)
-- `ui/` - React components (DO NOT TEST)
-
-### State Management (Zustand v5)
-**CRITICAL Selector Rules**:
-- **NEVER** return new objects/arrays from selectors (causes re-renders)
-- **ALWAYS** use `useShallow` for object/array selectors 
-- **PREFER** individual primitive selectors for max performance
-
-```typescript
-// ✅ BEST: Individual primitives
-const score = useStore(state => state.score);
-// ✅ OK: useShallow for objects
-const { a, b } = useStore(useShallow(state => ({ a: state.a, b: state.b })));
-```
-
-### Theme System
-**Modes**: Compact/Normal/Gaming with adaptive performance integration
-**Design Tokens**: Auto-generated CSS variables from comprehensive token system
-**Performance**: Gaming mode disabled on low-performance devices
+### Don't Test These
+- ❌ React components and UI behavior
+- ❌ DOM interactions and rendering
+- ❌ Third-party library internals
+- ❌ Visual layouts and styling
 
 ## 🤖 AI System Architecture
 
-**AI Decision Point**: Use `/src/game/ai/config/weights.yaml` for tuning. Target 100k+ evaluations/sec performance.
+### Core Components
+```
+/src/game/ai/
+├── config/
+│   ├── weights.yaml        # Runtime-tunable AI weights
+│   └── weight-loader.ts    # Configuration loader
+├── core/
+│   ├── ai-engine.ts        # Main AI engine
+│   ├── bitboard.ts         # High-performance board representation
+│   └── collision-detection.ts # SRS-compatible collision detection
+├── evaluators/
+│   ├── dellacherie.ts      # 6-feature Dellacherie evaluator
+│   ├── pattern-evaluator.ts # Pattern-based evaluation
+│   └── stacking-evaluator.ts # Stacking strategy evaluation
+└── search/
+    ├── beam-search.ts      # Beam search algorithm
+    ├── diversity-beam-search.ts # Diversity beam search
+    └── search-strategy.ts  # Search strategy configuration
+```
 
-### AI Core
-- **BitBoard**: High-performance Uint32Array representation (target: 100,000+ evaluations/sec)
-- **Evaluators**: Dellacherie (6-feature), Pattern (PCO/DT/ST-Stack), Stacking, Advanced Features
-- **Search**: Beam search, Diversity beam search, Hold search, Pattern search (80ms response target)
-- **Move Generation**: SRS-compatible with collision detection (< 1ms for 1,000 checks)
+### Performance Targets
+- **BitBoard**: 100,000+ evaluations/second
+- **Search Response**: 80ms target for move decisions
+- **Move Generation**: <1ms for 1,000 collision checks
 
-### AI Configuration (weights.yaml)
-**Runtime-tunable weights** without code changes:
-- **Base weights**: linesCleared (1000.0), holes (-5.0), maxHeight (-15.0), bumpiness (-3.0)
-- **Phase weights**: Early/Mid/Late game adaptations
-- **Dynamic adjustments**: Danger zone, survival mode, cleanup mode multipliers
-
-**Sample weights.yaml**:
+### AI Configuration
+Runtime-tunable weights in `/src/game/ai/config/weights.yaml`:
 ```yaml
 base:
   linesCleared: 1000.0
   holes: -5.0
   maxHeight: -15.0
   bumpiness: -3.0
-  
-phase:
-  early: 1.0
-  mid: 1.2
-  late: 1.5
 ```
 
-**AI Debug**: `?debug=true&ai=advanced&visualization=true`
+## 🎯 Feature-Sliced Design
 
-## 🧪 Testing Strategy
+### Layer Rules
+- **Game Logic**: `/src/game/` - Pure business logic, no UI dependencies
+- **Features**: `/src/features/` - Feature-specific slices with api/lib/model/ui structure
+- **Shared**: `/src/shared/` - Reusable utilities, must be dependency-free
+- **Components**: `/src/components/` - Legacy UI components (migrating to features)
 
-**AI Decision Point**: Focus on pure functions and business logic. Never test React components.
-
-### Test Targets
-- ✅ **Pure functions**: `/src/game/`, `/src/utils/`, `/src/shared/`
-- ✅ **Feature business logic**: `/src/features/*/lib/`, `/src/features/*/model/`
-- ✅ **AI modules**: All evaluators, search algorithms, core engines
-- ✅ **AI modules**: All evaluators, search algorithms, core engines (integrated in `/src/game/ai/`)
-- ❌ **React components**: UI components, DOM interactions, UI behavior
-
-### Test Architecture
-- **Unit Tests**: Pure functions, game logic, AI algorithms, feature business logic
-- **Property-Based Tests**: Using fast-check for game mechanics validation
-- **Accessibility Tests**: Automated WCAG 2.2 AA compliance via axe-playwright
-- **E2E Tests**: Playwright tests for user workflows and cross-platform compatibility
-- **Visual Tests**: Storybook stories with interaction and visual regression testing
-
-### AI Assistant Guidelines
-- **❌ NEVER** use `bun run dev` for automated testing (blocks terminal)
-- **❌ NEVER** test React components - focus on pure functions and business logic
-
-### Build Pipeline
-For comprehensive build pipeline execution, run the following commands in sequence:
-```bash
-# Execute full pipeline with fail-fast behavior
-bun run knip && \
-bun run format && \
-bun run lint && \
-bun run typecheck && \
-bun test && \
-bun run build
+### Feature Structure
+```
+feature-name/
+├── api/      # External adapters and data fetching
+├── lib/      # Business logic and custom hooks (TEST ALL)
+├── model/    # Zustand slices and state management (TEST ALL)
+└── ui/       # React components (DO NOT TEST)
 ```
 
-**Pipeline Steps**:
-1. **knip**: Dead code detection and dependency analysis
-2. **format**: Code formatting with Biome
-3. **lint**: Code quality checks and import organization
-4. **typecheck**: TypeScript type safety validation
-5. **test**: Comprehensive test suite execution (800+ tests)
-6. **build**: Optimized production bundle creation
+## 🎨 Tech Stack
 
-## 🔧 Development Patterns
+- **Runtime**: Bun 1.2.18
+- **Frontend**: React 19.1 + TypeScript 5.8
+- **State**: Zustand 5.0.6 (functional state management)
+- **Styling**: Tailwind CSS 4.1 + shadcn/ui + Radix UI
+- **Animation**: Motion 12.23
+- **Build**: Vite 7.0 (rolldown-vite)
+- **Testing**: Bun Test + Playwright + fast-check
+- **Quality**: Biome 2.1 + Lefthook 1.12
+- **i18n**: i18next 25.3 + react-i18next 15.6
 
-**AI Decision Point**: Use pure functions over classes. Separate AI logic from React state for performance.
+## ♿ Accessibility Requirements
 
-### React Best Practices
-- **useEffect**: Use `useRef` for AI state, minimal dependencies to avoid infinite loops
-- **AI Performance**: Separate AI logic from React state, implement timeout cleanup
-- **State Updates**: Conditional updates to prevent unnecessary renders
+### Mandatory for All UI Contributions
+- All interactive elements reachable by Tab in logical order
+- ARIA roles and labels properly implemented
+- Color contrast ≥ 4.5:1 for normal text
+- Keyboard navigation fully functional
+- Screen reader announcements for game state changes
 
-## ♿ Accessibility (WCAG 2.2 AA)
+### Testing
+- Automated: `@axe-core/react` + `axe-playwright`
+- Manual: Keyboard-only navigation testing
+- Run: `bun run test:a11y`
 
-**AI Decision Point**: Validate WCAG 2.2 AA compliance through integrated accessibility testing. Include accessibility tests in development.
+## 🌍 Internationalization
 
-- **Skip Links**: Keyboard navigation shortcuts (`/src/components/accessibility/SkipLinks.tsx`)
-- **Screen Reader**: Comprehensive announcements for game state changes
-- **Focus Management**: Proper tab order and focus indicators
-- **Testing**: `@axe-core/react` + Playwright audits integrated into test suite
+### Rules
+- Use `useTranslation()` hook from `react-i18next`
+- All user-facing text must use translation keys
+- Keys stored in `/src/locales/{en,ja}.json`
+- Default language: English
+- Validation: `bun run check:i18n`
 
-## 📚 Component Documentation
+### Usage
+```typescript
+const { t } = useTranslation();
+return <button>{t('game.start')}</button>;
+```
 
-**AI Decision Point**: Use `bun run storybook` for component development and visual testing. Create Stories for new components.
+## 🔄 Development Workflow
 
-**Storybook**: Interactive documentation with a11y testing, visual testing, design token examples  
-**Location**: `/src/components/*/[Component].stories.tsx`
+1. **Start**: `git switch -c feature/my-change`
+2. **Code**: Write code + tests following this guide
+3. **Validate**: Run `bun run lint && bun run typecheck && bun test`
+4. **Commit**: Follow Conventional Commits format
+5. **Test**: E2E tests with `bun run e2e`
+6. **Review**: Open PR with clear description
 
-## 🔧 MCP Tool Usage Guidelines
+## 📝 State Management (Zustand)
 
-**AI Decision Point**: Use MCP tools selectively for their specific purposes. Always provide detailed context for better results.
+### Critical Rules
+- **NEVER** return new objects/arrays from selectors (causes re-renders)
+- **ALWAYS** use `useShallow` for object/array selectors
+- **PREFER** individual primitive selectors for performance
 
-### When to Use MCP Tools
-Use these specialized MCP tools only when specifically needed for their intended purposes:
+```typescript
+// ✅ Best: Individual primitives
+const score = useStore(state => state.score);
 
-#### 1. **O3 MCP (`mcp__o3__o3-search`)**
-- **Purpose**: Advanced web search and complex problem consultation
-- **When to use**: Architecture decisions, technical research, best practices inquiry
+// ✅ OK: useShallow for objects
+const { a, b } = useStore(useShallow(state => ({ a: state.a, b: state.b })));
 
-#### 2. **Context7 MCP (`mcp__context7__resolve-library-id`, `mcp__context7__get-library-docs`)**
-- **Purpose**: Library documentation lookup and API reference
-- **When to use**: Need current documentation for specific libraries/frameworks
-- **Process**: First resolve library ID, then fetch documentation
+// ❌ Never: New objects in selectors
+const data = useStore(state => ({ score: state.score })); // Causes re-renders
+```
 
-#### 3. **Playwright MCP (`mcp__playwright__*`)**
-- **Purpose**: End-to-end testing and browser automation
-- **When to use**: 
-  - Running `bun run e2e` tests
-  - Cross-platform compatibility validation
-  - UI workflow testing
-  - Accessibility testing integration
-- **Integration**: Works with project's existing Playwright configuration
+## 🎮 Game Engine Integration
 
-## 📖 Quick Reference
+### Core Game Loop
+```
+Game Loop → AI Engine → Move Evaluation → Board Update → State Sync
+```
 
-### Development Workflow
-1. **Initial setup**: `bun install && bun run dev` (first time setup)
-2. **Before commits**: `bun run lint && bun run typecheck` (MUST pass)
-3. **Testing**: `bun test` for feedback, avoid React component tests
-4. **Major changes**: `bun run ci` for complete validation
+### AI Integration Points
+- **Configuration**: `/src/game/ai/config/weights.yaml`
+- **Entry Point**: `/src/game/ai/index.ts`
+- **Feature Integration**: `/src/features/ai-control/`
 
-### Architecture Decisions
-- **No classes**: Use pure functions and functional patterns
-- **No `any` types**: Use `unknown` with type guards or explicit interfaces
-- **No hardcoded text**: Use i18n translation files (`/src/locales/`)
-- **Theme system**: Compact/Normal/Gaming modes with performance awareness
-- **Accessibility first**: WCAG 2.2 AA compliance with automated testing
+## 🔍 Quick Reference
 
-### Quick Access
-- **AI System**: `/src/game/ai/` (integrated game engine with AI)
-- **AI Config**: `/src/game/ai/config/weights.yaml` (runtime-tunable weights)
-- **AI Debug**: `?debug=true&ai=advanced&visualization=true`
-- **Design Tokens**: `/src/design-tokens/index.ts` (comprehensive token system)
-- **Theme Context**: `/src/contexts/ThemeContext.tsx` (Compact/Normal/Gaming)
-- **i18n Files**: `/src/locales/en.json`, `/src/locales/ja.json`
-- **Accessibility**: Integrated WCAG 2.2 AA compliance testing
-- **Bundle Analysis**: `bun run analyze` (bundle size analysis)
-- **Documentation**: `bun run storybook` (component docs + visual testing)
+### Essential Files
+- **AI Configuration**: `/src/game/ai/config/weights.yaml`
+- **Game Engine**: `/src/game/GameEngine.ts`
+- **Main Store**: `/src/app/store/`
+- **Theme System**: `/src/contexts/ThemeContext.tsx`
+- **i18n Config**: `/src/i18n/config.ts`
+
+### Debug Features
+- AI Debug: `?debug=true&ai=advanced&visualization=true`
+- Performance: `?debug=true&performance=true`
+
+---
+
+**Last Updated**: 2025-07-16 (Bun 1.2.18, React 19.1, Zustand 5.0.6)
