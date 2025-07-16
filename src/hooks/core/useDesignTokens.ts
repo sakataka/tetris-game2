@@ -47,38 +47,31 @@ const useDesignTokensStore = create<DesignTokensState>()(
  * @returns Design tokens and layout mode management
  */
 export const useDesignTokens = (): DesignTokensHook => {
-  const { layoutMode, setLayoutMode } = useDesignTokensStore();
+  const layoutMode = useDesignTokensStore((state) => state.layoutMode);
+  const setLayoutMode = useDesignTokensStore((state) => state.setLayoutMode);
 
-  // Memoize layout tokens to prevent unnecessary re-renders
-  const currentLayoutTokens = useMemo(
-    () => ({
+  // Create static references to design tokens (they don't change)
+  const tokens = useMemo(() => {
+    const currentLayoutTokens = {
       ...designTokens.layout,
       mode: layoutMode,
-    }),
-    [layoutMode],
-  );
+    };
 
-  // Memoize tokens object to prevent unnecessary re-renders
-  const tokens = useMemo(
-    () => ({
+    return {
       ...designTokens,
       layout: currentLayoutTokens,
-    }),
-    [currentLayoutTokens],
-  );
+    };
+  }, [layoutMode]);
 
-  // Memoize the entire return object to prevent infinite re-renders
-  return useMemo(
-    () => ({
-      tokens,
-      layoutMode,
-      setLayoutMode,
-      colors: designTokens.colors,
-      typography: designTokens.typography,
-      spacing: designTokens.spacing,
-      layout: currentLayoutTokens,
-      animation: designTokens.animation,
-    }),
-    [tokens, layoutMode, setLayoutMode, currentLayoutTokens],
-  );
+  // Return a simplified object structure
+  return {
+    tokens,
+    layoutMode,
+    setLayoutMode,
+    colors: designTokens.colors,
+    typography: designTokens.typography,
+    spacing: designTokens.spacing,
+    layout: tokens.layout,
+    animation: designTokens.animation,
+  };
 };

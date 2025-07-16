@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useSettingsData } from "@/features/settings";
+import { ErrorBoundary } from "./components/common/ErrorBoundary";
 import { Game } from "./components/layout/Game";
 import { AnimationProvider } from "./contexts/AnimationContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
@@ -39,7 +40,13 @@ function App() {
   return (
     <ThemeProvider defaultMode="normal" enableFeatureFlag={themeSystemEnabled}>
       <AnimationProvider>
-        <Game />
+        <ErrorBoundary
+          onError={(error, errorInfo) => {
+            console.error("[App] Game component error:", error, errorInfo);
+          }}
+        >
+          <Game />
+        </ErrorBoundary>
       </AnimationProvider>
     </ThemeProvider>
   );
