@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useGamePlayActions } from "@/features/game-play";
+import { useGamePlayActions, useGamePlayStore } from "@/features/game-play";
 
 /**
  * Game input actions interface
@@ -31,6 +31,8 @@ export interface GameInputActions {
 export function useGameInputActions(): GameInputActions {
   // Get all actions from the new game play store
   const gamePlayActions = useGamePlayActions();
+  // Get showResetDialog directly from store
+  const showResetDialog = useGamePlayStore((state) => state.showResetDialog);
 
   // Transform core actions to input-specific semantic names
   return useMemo(
@@ -44,8 +46,8 @@ export function useGameInputActions(): GameInputActions {
       hardDrop: gamePlayActions.hardDrop,
       hold: gamePlayActions.holdPiece,
       pause: gamePlayActions.pauseGame,
-      reset: gamePlayActions.resetGame,
+      reset: showResetDialog,
     }),
-    [gamePlayActions],
+    [gamePlayActions, showResetDialog],
   );
 }

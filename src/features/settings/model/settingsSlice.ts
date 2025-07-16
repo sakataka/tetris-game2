@@ -20,8 +20,6 @@ interface SettingsState extends GameSettings {
   setAutoRepeatDelay: (delay: number) => void;
   setAutoRepeatRate: (rate: number) => void;
 
-  // Theme settings actions
-  setTheme: (theme: "compact" | "normal" | "gaming") => void;
   setColorScheme: (scheme: "dark" | "light" | "auto") => void;
 
   // Audio settings actions
@@ -60,8 +58,6 @@ const DEFAULT_SETTINGS: GameSettings = {
   autoRepeatDelay: 170, // ms
   autoRepeatRate: 50, // ms
 
-  // Theme settings
-  theme: "normal",
   colorScheme: "dark",
 
   // Audio settings
@@ -130,13 +126,6 @@ export const useSettingsStore = create<SettingsState>()(
       setAutoRepeatRate: (rate) =>
         set(() => ({
           autoRepeatRate: Math.max(20, Math.min(100, rate)),
-          isDirty: true,
-        })),
-
-      // Theme settings actions
-      setTheme: (theme) =>
-        set(() => ({
-          theme,
           isDirty: true,
         })),
 
@@ -223,7 +212,6 @@ export const useSettingsStore = create<SettingsState>()(
         if (state.targetFPS < 30 || state.targetFPS > 120) return false;
 
         // Validate enums
-        if (!["compact", "normal", "gaming"].includes(state.theme)) return false;
         if (!["dark", "light", "auto"].includes(state.colorScheme)) return false;
 
         return true;
@@ -296,9 +284,6 @@ function validateSettingsData(settings: Partial<GameSettings>): GameSettings {
   }
 
   // Validate enums
-  if (settings.theme && ["compact", "normal", "gaming"].includes(settings.theme)) {
-    validated.theme = settings.theme as "compact" | "normal" | "gaming";
-  }
   if (settings.colorScheme && ["dark", "light", "auto"].includes(settings.colorScheme)) {
     validated.colorScheme = settings.colorScheme as "dark" | "light" | "auto";
   }

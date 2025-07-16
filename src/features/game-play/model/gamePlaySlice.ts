@@ -362,7 +362,7 @@ export const useGamePlayStore = create<GamePlayState>()(
             canHold: engineState.canHold,
             isPlaying: true,
             isPaused: false,
-            isGameOver: false,
+            isGameOver: engineState.isGameOver || false,
             lastFall: Date.now(),
             fallSpeed: 1000, // Will be updated based on level
             animationState: "idle",

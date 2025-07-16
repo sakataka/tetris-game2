@@ -28,8 +28,6 @@ export interface GameSettings {
   autoRepeatDelay: number;
   autoRepeatRate: number;
 
-  // Theme settings
-  theme: "compact" | "normal" | "gaming";
   colorScheme: "dark" | "light" | "auto";
 
   // Audio settings
@@ -219,37 +217,13 @@ export function SettingsPanel({
         </div>
       </div>
 
-      {/* Theme Settings */}
+      {/* Color Scheme Settings */}
       <div className="space-y-3">
         <h3 className={`font-medium text-gray-300 ${compact ? "text-sm" : "text-base"}`}>
           {t("game.settings.theme")}
         </h3>
 
         <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <label
-              htmlFor="theme-select"
-              className={`text-gray-300 ${compact ? "text-xs" : "text-sm"}`}
-            >
-              {t("game.settings.themeMode")}
-            </label>
-            <Select
-              value={settings.theme}
-              onValueChange={(value: "compact" | "normal" | "gaming") =>
-                updateSettings({ theme: value })
-              }
-            >
-              <SelectTrigger id="theme-select" className="w-32" data-testid="theme-select">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="compact">{t("game.settings.compact")}</SelectItem>
-                <SelectItem value="normal">{t("game.settings.normal")}</SelectItem>
-                <SelectItem value="gaming">{t("game.settings.gaming")}</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
           <div className="flex items-center justify-between">
             <label
               htmlFor="color-scheme-select"
@@ -279,8 +253,6 @@ export function SettingsPanel({
           </div>
         </div>
       </div>
-
-      {/* Audio Settings */}
       <div className="space-y-3">
         <h3 className={`font-medium text-gray-300 ${compact ? "text-sm" : "text-base"}`}>
           {t("game.settings.audio")}
@@ -338,8 +310,6 @@ export function SettingsPanel({
           </div>
         </div>
       </div>
-
-      {/* Language Settings */}
       <div className="space-y-3">
         <h3 className={`font-medium text-gray-300 ${compact ? "text-sm" : "text-base"}`}>
           {t("game.settings.language")}
@@ -358,8 +328,6 @@ export function SettingsPanel({
           </SelectContent>
         </Select>
       </div>
-
-      {/* Performance Settings */}
       <div className="space-y-3">
         <h3 className={`font-medium text-gray-300 ${compact ? "text-sm" : "text-base"}`}>
           {t("game.settings.performance")}

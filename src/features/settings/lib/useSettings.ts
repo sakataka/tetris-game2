@@ -14,7 +14,6 @@ export interface UseSettingsReturn {
   enableAnimations: boolean;
   enableTSpinDetection: boolean;
   enableAIFeatures: boolean;
-  theme: "compact" | "normal" | "gaming";
   colorScheme: "dark" | "light" | "auto";
   enableSound: boolean;
   soundVolume: number;
@@ -35,7 +34,6 @@ export interface UseSettingsReturn {
   setEnableAnimations: (enable: boolean) => void;
   setEnableTSpinDetection: (enable: boolean) => void;
   setEnableAIFeatures: (enable: boolean) => void;
-  setTheme: (theme: "compact" | "normal" | "gaming") => void;
   setColorScheme: (scheme: "dark" | "light" | "auto") => void;
   setEnableSound: (enable: boolean) => void;
   setSoundVolume: (volume: number) => void;
@@ -60,7 +58,6 @@ export const useSettings = (): UseSettingsReturn => {
       enableAIFeatures: state.enableAIFeatures,
       autoRepeatDelay: state.autoRepeatDelay,
       autoRepeatRate: state.autoRepeatRate,
-      theme: state.theme,
       colorScheme: state.colorScheme,
       enableSound: state.enableSound,
       soundVolume: state.soundVolume,
@@ -85,7 +82,6 @@ export const useSettings = (): UseSettingsReturn => {
       setEnableAIFeatures: state.setEnableAIFeatures,
       setAutoRepeatDelay: state.setAutoRepeatDelay,
       setAutoRepeatRate: state.setAutoRepeatRate,
-      setTheme: state.setTheme,
       setColorScheme: state.setColorScheme,
       setEnableSound: state.setEnableSound,
       setSoundVolume: state.setSoundVolume,
@@ -237,7 +233,6 @@ export const useSettings = (): UseSettingsReturn => {
     enableAnimations: settings.enableAnimations,
     enableTSpinDetection: settings.enableTSpinDetection,
     enableAIFeatures: settings.enableAIFeatures,
-    theme: settings.theme,
     colorScheme: settings.colorScheme,
     enableSound: settings.enableSound,
     soundVolume: settings.soundVolume,
@@ -258,7 +253,6 @@ export const useSettings = (): UseSettingsReturn => {
     setEnableAnimations: actions.setEnableAnimations,
     setEnableTSpinDetection: actions.setEnableTSpinDetection,
     setEnableAIFeatures: actions.setEnableAIFeatures,
-    setTheme: actions.setTheme,
     setColorScheme: actions.setColorScheme,
     setEnableSound: actions.setEnableSound,
     setSoundVolume: actions.setSoundVolume,
@@ -284,7 +278,6 @@ export const useSettingsData = () => {
       enableAnimations: state.enableAnimations,
       enableTSpinDetection: state.enableTSpinDetection,
       enableAIFeatures: state.enableAIFeatures,
-      theme: state.theme,
       colorScheme: state.colorScheme,
       enableSound: state.enableSound,
       soundVolume: state.soundVolume,
@@ -302,7 +295,6 @@ export const useSettingsData = () => {
 export const useThemeSettings = () => {
   return useSettingsStore(
     useShallow((state) => ({
-      theme: state.theme,
       colorScheme: state.colorScheme,
       enableAnimations: state.enableAnimations,
       enablePerformanceMode: state.enablePerformanceMode,

@@ -16,7 +16,6 @@ import {
 import { AdvancedAIControls } from "@/components/game/AdvancedAIControls";
 import { AIReplay } from "@/components/game/AIReplay";
 import { AIVisualization } from "@/components/game/AIVisualization";
-import { LayoutModeToggle } from "@/components/ui/LayoutModeToggle";
 import { useGamePlay } from "@/features/game-play";
 import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
 import { useScoringStore } from "@/features/scoring/model/scoringSlice";
@@ -66,7 +65,7 @@ export function Game() {
   });
 
   // Design tokens and layout management
-  const { layoutMode: designLayoutMode, setLayoutMode } = useDesignTokens();
+  const { layoutMode: designLayoutMode } = useDesignTokens();
   const layoutMode: "compact" | "normal" =
     designLayoutMode === "gaming" ? "normal" : designLayoutMode;
 
@@ -113,11 +112,6 @@ export function Game() {
             aria-label="Game Information"
             tabIndex={-1}
           >
-            {/* Layout Mode Toggle */}
-            <div className="mb-3">
-              <LayoutModeToggle currentMode={layoutMode} onModeChange={setLayoutMode} />
-            </div>
-
             <ScoreBoard />
             <HighScore />
             <HoldPiece />

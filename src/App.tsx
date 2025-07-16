@@ -5,7 +5,6 @@ import { ErrorBoundary } from "./components/common/ErrorBoundary";
 import { Game } from "./components/layout/Game";
 import { AnimationProvider } from "./contexts/AnimationContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import { useThemeFeatureFlags } from "./hooks/core/useFeatureFlag";
 
 // Import debug tools in development only
 if (import.meta.env.DEV) {
@@ -16,7 +15,6 @@ function App() {
   const { i18n } = useTranslation();
   const { language } = useSettingsData();
   const hasInitialized = useRef(false);
-  const { themeSystemEnabled } = useThemeFeatureFlags();
 
   // Initialize language from persisted settings only once
   useEffect(() => {
@@ -38,7 +36,7 @@ function App() {
   }, [language, i18n]);
 
   return (
-    <ThemeProvider defaultMode="normal" enableFeatureFlag={themeSystemEnabled}>
+    <ThemeProvider>
       <AnimationProvider>
         <ErrorBoundary
           onError={(error, errorInfo) => {

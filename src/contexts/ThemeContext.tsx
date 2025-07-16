@@ -1,10 +1,9 @@
 import type React from "react";
 import { createContext, useContext, useEffect, useState } from "react";
 import { designTokens } from "@/design-tokens";
-import type { ExtendedDesignTokens, LayoutMode } from "@/design-tokens/types";
-import { useAdaptivePerformance } from "@/hooks/core/useAdaptivePerformance";
+import type { ExtendedDesignTokens } from "@/design-tokens/types";
 
-export type ThemeMode = LayoutMode; // 'compact' | 'normal' | 'gaming'
+export type ThemeMode = "normal"; // Only normal mode is supported
 
 export interface ThemeConfig {
   mode: ThemeMode;
@@ -22,11 +21,11 @@ export interface ThemeContextValue {
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
-// Generate CSS variables from design tokens
-const generateCSSVariables = (mode: ThemeMode): Record<string, string> => {
+// Generate CSS variables from design tokens (normal mode only)
+const generateCSSVariables = (_mode: ThemeMode): Record<string, string> => {
   const tokens = designTokens;
-  const spacing = mode === "compact" ? tokens.spacing.compact : tokens.spacing.normal;
-  const sidebarWidth = tokens.layout.sidebar.width[mode === "compact" ? "compact" : "normal"];
+  const spacing = tokens.spacing.normal; // Always use normal spacing
+  const sidebarWidth = tokens.layout.sidebar.width.normal; // Always use normal sidebar width
 
   return {
     // Spacing variables
@@ -38,26 +37,16 @@ const generateCSSVariables = (mode: ThemeMode): Record<string, string> => {
 
     // Layout variables
     "--sidebar-width": sidebarWidth,
-    "--layout-gap": mode === "compact" ? "0.75rem" : "1rem",
+    "--layout-gap": "1rem", // Always use normal layout gap
 
-    // Color variables (enhanced for gaming mode)
-    "--color-primary":
-      mode === "gaming" ? tokens.colors.brand.gaming.neon : tokens.colors.semantic.primary,
+    // Color variables (standard mode only)
+    "--color-primary": tokens.colors.semantic.primary,
     "--color-background-primary": tokens.colors.semantic.background.primary,
     "--color-background-secondary": tokens.colors.semantic.background.secondary,
     "--color-background-tertiary": tokens.colors.semantic.background.tertiary,
     "--color-text-primary": tokens.colors.semantic.text.primary,
     "--color-text-secondary": tokens.colors.semantic.text.secondary,
     "--color-text-muted": tokens.colors.semantic.text.muted,
-
-    // Gaming mode enhancements
-    ...(mode === "gaming" && {
-      "--glow-intensity": "0.5",
-      "--animation-speed": "1.2",
-      "--border-glow": `0 0 10px ${tokens.colors.brand.gaming.neon}`,
-      "--color-accent": tokens.colors.brand.gaming.electric,
-      "--color-cyberpunk": tokens.colors.brand.gaming.cyberpunk,
-    }),
 
     // Typography
     "--font-size-base": tokens.typography.fontSize.md,
@@ -81,25 +70,15 @@ const createThemeConfig = (mode: ThemeMode): ThemeConfig => ({
 
 interface ThemeProviderProps {
   children: React.ReactNode;
-  defaultMode?: ThemeMode;
-  enableFeatureFlag?: boolean;
 }
 
-export const ThemeProvider: React.FC<ThemeProviderProps> = ({
-  children,
-  defaultMode = "normal",
-  enableFeatureFlag = true,
-}) => {
-  const [mode, setModeState] = useState<ThemeMode>(defaultMode);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const { animationsEnabled, performanceMode } = useAdaptivePerformance();
+export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
+  const [mode, setModeState] = useState<ThemeMode>("normal"); // Always use normal mode
+  const [isTransitioning] = useState(false);
 
-  // Load saved theme from localStorage
+  // Remove localStorage theme loading - always use normal mode
   useEffect(() => {
-    const savedMode = localStorage.getItem("tetris-theme-mode") as ThemeMode;
-    if (savedMode && ["compact", "normal", "gaming"].includes(savedMode)) {
-      setModeState(savedMode);
-    }
+    setModeState("normal");
   }, []);
 
   // Apply CSS variables to document root
@@ -112,52 +91,22 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
       root.style.setProperty(property, value);
     });
 
-    // Add theme class to body
+    // Add theme class to body (always normal)
     document.body.className = document.body.className.replace(/theme-\w+/, "");
-    document.body.classList.add(`theme-${mode}`);
+    document.body.classList.add("theme-normal");
 
-    // Add gaming mode specific effects
-    if (mode === "gaming" && animationsEnabled) {
-      document.body.classList.add("gaming-effects");
-    } else {
-      document.body.classList.remove("gaming-effects");
-    }
-  }, [mode, animationsEnabled]);
+    // Remove gaming effects (no longer supported)
+    document.body.classList.remove("gaming-effects");
+  }, [mode]);
 
-  // Theme switching with transition handling
-  const setMode = async (newMode: ThemeMode) => {
-    if (newMode === mode) return;
-
-    // Handle transition state
-    if (animationsEnabled) {
-      setIsTransitioning(true);
-
-      // Wait for transition to complete
-      setTimeout(() => {
-        setIsTransitioning(false);
-      }, 300);
-    }
-
-    // Update theme mode
-    setModeState(newMode);
-
-    // Save to localStorage
-    localStorage.setItem("tetris-theme-mode", newMode);
-
-    // Trigger re-evaluation of performance if switching to gaming mode
-    if (newMode === "gaming" && performanceMode === "reduced") {
-      console.warn(
-        "Gaming mode enabled with reduced performance. Consider upgrading device or switching to normal mode.",
-      );
-    }
+  // Theme switching - no-op since only normal mode is supported
+  const setMode = async (_newMode: ThemeMode) => {
+    // Always use normal mode, ignore any attempts to change
+    return;
   };
 
-  // Determine available modes based on feature flag and performance
-  const availableModes: ThemeMode[] = enableFeatureFlag
-    ? performanceMode === "reduced"
-      ? ["compact", "normal"] // No gaming mode on low performance
-      : ["compact", "normal", "gaming"]
-    : ["normal"]; // Only normal mode if feature flag disabled
+  // Only normal mode is available
+  const availableModes: ThemeMode[] = ["normal"];
 
   const config = createThemeConfig(mode);
 
