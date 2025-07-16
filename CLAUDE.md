@@ -206,12 +206,26 @@ const { a, b } = useStore(useShallow(state => ({ a: state.a, b: state.b })));
 const data = useStore(state => ({ score: state.score })); // Causes re-renders
 ```
 
-## 🎮 Game Engine Integration
+## 🎮 Game Engine Architecture
 
-### Core Game Loop
+### Engine Layer Structure
 ```
-Game Loop → AI Engine → Move Evaluation → Board Update → State Sync
+GameEngineAdapter → SimpleGameEngine → Game Core Logic
+     ↓                    ↓                ↓
+Feature Store    ← Game State Sync ← processPlacementAndClearing
 ```
+
+### Key Components
+- **GameEngine Interface**: `/src/game/GameEngine.ts` - Clean abstraction for UI features
+- **SimpleGameEngine**: `/src/game/SimpleGameEngine.ts` - Bridge to legacy game functions
+- **GameEngineAdapter**: `/src/features/game-play/api/gameEngineAdapter.ts` - Feature isolation layer
+- **Game Core Logic**: `/src/game/game.ts` - Pure functions for game mechanics
+
+### Critical Implementation Details
+- **Score Synchronization**: Engine calculates scores via `processPlacementAndClearing()`, Zustand store syncs from engine state
+- **Line Clearing**: `clearLines()` in `/src/game/board.ts` handles line detection and removal
+- **State Management**: Engine maintains authoritative game state, UI stores sync from engine
+- **Event System**: Engine emits events (line-cleared, piece-placed, game-over) for feature coordination
 
 ### AI Integration Points
 - **Configuration**: `/src/game/ai/config/weights.yaml`
@@ -221,16 +235,16 @@ Game Loop → AI Engine → Move Evaluation → Board Update → State Sync
 ## 🔍 Quick Reference
 
 ### Essential Files
+- **Game Engine Interface**: `/src/game/GameEngine.ts`
+- **Game Engine Implementation**: `/src/game/SimpleGameEngine.ts`
+- **Game Core Logic**: `/src/game/game.ts`
+- **Game-Play Feature Store**: `/src/features/game-play/model/gamePlaySlice.ts`
+- **Engine Adapter**: `/src/features/game-play/api/gameEngineAdapter.ts`
+- **Board Logic**: `/src/game/board.ts`
+- **Scoring System**: `/src/game/scoring.ts`
 - **AI Configuration**: `/src/game/ai/config/weights.yaml`
-- **Game Engine**: `/src/game/GameEngine.ts`
-- **Main Store**: `/src/app/store/`
-- **Theme System**: `/src/contexts/ThemeContext.tsx`
 - **i18n Config**: `/src/i18n/config.ts`
 
 ### Debug Features
 - AI Debug: `?debug=true&ai=advanced&visualization=true`
 - Performance: `?debug=true&performance=true`
-
----
-
-**Last Updated**: 2025-07-16 (Bun 1.2.18, React 19.1, Zustand 5.0.6)

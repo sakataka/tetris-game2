@@ -618,6 +618,10 @@ export const useGamePlayStore = create<GamePlayState>()(
                       position: engineState.ghostPosition,
                     }
                   : null,
+              // Sync score, lines, and level from engine
+              score: engineState.score,
+              lines: engineState.lines,
+              level: engineState.level,
               // Sync game over state from engine
               isGameOver: engineState.isGameOver,
               isPlaying: !engineState.isGameOver,
@@ -646,12 +650,14 @@ export const useGamePlayStore = create<GamePlayState>()(
               nextPieces: [engineState.nextPiece],
               heldPiece: engineState.heldPiece,
               canHold: true, // Reset hold ability after placing
+              // Sync score, lines, and level from engine
+              score: engineState.score,
+              lines: engineState.lines,
+              level: engineState.level,
               // Sync game over state from engine
               isGameOver: engineState.isGameOver,
               isPlaying: !engineState.isGameOver,
             }));
-
-            // TODO: Handle line clears, scoring, etc.
           }
         }
       },
