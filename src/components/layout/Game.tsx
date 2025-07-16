@@ -38,14 +38,14 @@ export function Game() {
   useHighScoreSideEffect();
 
   // Auto-start the game on mount
-  const { startGame, isPlaying } = useGamePlay();
+  const { startGame, isPlaying, isGameOver } = useGamePlay();
 
   useEffect(() => {
-    // Start the game automatically if it's not already playing
-    if (!isPlaying) {
+    // Start the game automatically if it's not already playing and not game over
+    if (!isPlaying && !isGameOver) {
       startGame();
     }
-  }, [isPlaying, startGame]);
+  }, [isPlaying, isGameOver, startGame]);
   const { handleTouchStart, handleTouchEnd } = useTouchGestures();
 
   // Initialize focus management for accessibility
@@ -159,7 +159,6 @@ export function Game() {
                     onSettingsChange={aiController.onSettingsChange}
                     onToggleAI={aiController.onToggleAI}
                     onPause={aiController.onPause}
-                    onStep={aiController.onStep}
                   />
                 </ErrorBoundary>
               )}

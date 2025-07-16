@@ -1,5 +1,5 @@
 import type React from "react";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import { designTokens } from "@/design-tokens";
 import type { ExtendedDesignTokens } from "@/design-tokens/types";
 
@@ -119,13 +119,4 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   };
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
-};
-
-// Custom hook for consuming theme context
-export const useTheme = (): ThemeContextValue => {
-  const context = useContext(ThemeContext);
-  if (!context) {
-    throw new Error("useTheme must be used within a ThemeProvider");
-  }
-  return context;
 };

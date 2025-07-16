@@ -451,12 +451,6 @@ export function useAdvancedAIController() {
     aiStoreRef.current.setPaused(!isPaused);
   }, [isPaused]);
 
-  const stepAI = useCallback(() => {
-    if (isPaused && isEnabled) {
-      aiThinkAndMoveRef.current();
-    }
-  }, [isPaused, isEnabled]);
-
   const handleSettingsChange = useCallback((newSettings: AISettings) => {
     aiStoreRef.current.updateSettings(newSettings);
   }, []);
@@ -475,7 +469,6 @@ export function useAdvancedAIController() {
     replayData,
     onToggleAI: toggleAI,
     onPause: pauseAI,
-    onStep: stepAI,
     onSettingsChange: handleSettingsChange,
   };
 }

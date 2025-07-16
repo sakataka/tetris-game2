@@ -61,6 +61,16 @@ export class SimpleGameEngine implements GameEngine {
     if (newState !== this.gameState) {
       this.gameState = newState;
       this.emit("piece-soft-dropped", { timestamp: Date.now() });
+
+      // Check for game over after move
+      if (this.gameState.isGameOver) {
+        this.emit("game-over", {
+          finalScore: this.gameState.score,
+          totalLines: this.gameState.lines,
+          timestamp: Date.now(),
+        });
+      }
+
       return true;
     }
     return false;
@@ -71,6 +81,16 @@ export class SimpleGameEngine implements GameEngine {
     if (newState !== this.gameState) {
       this.gameState = newState;
       this.emit("piece-hard-dropped", { timestamp: Date.now() });
+
+      // Check for game over after move
+      if (this.gameState.isGameOver) {
+        this.emit("game-over", {
+          finalScore: this.gameState.score,
+          totalLines: this.gameState.lines,
+          timestamp: Date.now(),
+        });
+      }
+
       return true;
     }
     return false;

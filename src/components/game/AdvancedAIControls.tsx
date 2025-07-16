@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -37,7 +36,6 @@ export interface AdvancedAIControlsProps {
   onSettingsChange: (settings: AISettings) => void;
   onToggleAI: () => void;
   onPause: () => void;
-  onStep: () => void;
 }
 
 export function AdvancedAIControls({
@@ -46,10 +44,8 @@ export function AdvancedAIControls({
   onSettingsChange,
   onToggleAI,
   onPause,
-  onStep,
 }: AdvancedAIControlsProps) {
   const { t } = useTranslation();
-  const [showAdvanced, setShowAdvanced] = useState(false);
 
   return (
     <Card className="p-4 space-y-4" data-testid="ai-controls">
@@ -67,14 +63,9 @@ export function AdvancedAIControls({
           </Button>
 
           {aiState.isEnabled && (
-            <>
-              <Button onClick={onPause} variant="outline" size="sm">
-                {aiState.isPaused ? t("game.ai.controls.resume") : t("game.ai.controls.pause")}
-              </Button>
-              <Button onClick={onStep} variant="outline" size="sm" disabled={!aiState.isPaused}>
-                {t("game.ai.controls.step")}
-              </Button>
-            </>
+            <Button onClick={onPause} variant="outline" size="sm">
+              {aiState.isPaused ? t("game.ai.controls.resume") : t("game.ai.controls.pause")}
+            </Button>
           )}
         </div>
       </div>
@@ -153,84 +144,6 @@ export function AdvancedAIControls({
             data-testid="enable-visualization"
           />
         </div>
-
-        {/* Advanced Settings */}
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setShowAdvanced(!showAdvanced)}
-          className="w-full"
-          data-testid="show-advanced"
-        >
-          {showAdvanced ? t("game.ai.controls.hideAdvanced") : t("game.ai.controls.showAdvanced")}{" "}
-          {t("game.ai.controls.advancedSettings")}
-        </Button>
-
-        {showAdvanced && (
-          <div className="space-y-3 pt-2 border-t">
-            {settings.aiLevel === "advanced" && (
-              <>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <label htmlFor="beam-width" className="text-sm font-medium">
-                      {t("game.ai.controls.beamWidth")}
-                    </label>
-                    <span
-                      className="text-sm text-muted-foreground"
-                      data-testid="current-beam-width"
-                    >
-                      {settings.beamWidth}
-                    </span>
-                  </div>
-                  <Slider
-                    id="beam-width"
-                    value={[settings.beamWidth]}
-                    onValueChange={([value]) => onSettingsChange({ ...settings, beamWidth: value })}
-                    min={5}
-                    max={20}
-                    step={1}
-                    className="w-full"
-                    data-testid="beam-width-slider"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <label htmlFor="time-limit" className="text-sm font-medium">
-                      {t("game.ai.controls.timeLimit")}
-                    </label>
-                    <span className="text-sm text-muted-foreground">
-                      {settings.thinkingTimeLimit}
-                    </span>
-                  </div>
-                  <Slider
-                    value={[settings.thinkingTimeLimit]}
-                    onValueChange={([value]) =>
-                      onSettingsChange({ ...settings, thinkingTimeLimit: value })
-                    }
-                    min={10}
-                    max={500}
-                    step={10}
-                    className="w-full"
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <label htmlFor="use-hold" className="text-sm font-medium">
-                    {t("game.ai.controls.useHold")}
-                  </label>
-                  <Switch
-                    id="use-hold"
-                    checked={settings.useHold}
-                    onCheckedChange={(checked) =>
-                      onSettingsChange({ ...settings, useHold: checked })
-                    }
-                  />
-                </div>
-              </>
-            )}
-          </div>
-        )}
       </div>
 
       {/* Statistics */}

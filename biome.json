@@ -1,29 +1,8 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.1.1/schema.json",
   "files": {
-    "includes": [
-      "**",
-      "!**/dist/**",
-      "!**/build/**",
-      "!**/coverage/**",
-      "!**/node_modules/**",
-      "!**/*.min.js",
-      "!**/*.bundle.js",
-      "!**/.next/**",
-      "!**/.cache/**",
-      "!**/public/build/**",
-      "!**/storybook-static/**",
-      "!**/*.d.ts"
-    ],
-    "experimentalScannerIgnores": [
-      "dist",
-      "build",
-      "coverage",
-      "node_modules",
-      ".next",
-      ".cache",
-      "storybook-static"
-    ]
+    "maxSize": 1048576,
+    "ignoreUnknown": false
   },
   "linter": {
     "enabled": true,

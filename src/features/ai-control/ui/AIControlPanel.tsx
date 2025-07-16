@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,8 +9,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
-import { Switch } from "@/components/ui/switch";
 import type { AdvancedAIDecision, AdvancedAIStats } from "@/game/ai";
 
 export interface AISettings {
@@ -37,7 +34,6 @@ export interface AIControlPanelProps {
   onSettingsChange: (settings: AISettings) => void;
   onToggleAI: () => void;
   onPause: () => void;
-  onStep: () => void;
   className?: string;
   compact?: boolean;
 }
@@ -48,12 +44,10 @@ export function AIControlPanel({
   onSettingsChange,
   onToggleAI,
   onPause,
-  onStep,
   className,
   compact = false,
 }: AIControlPanelProps) {
   const { t } = useTranslation();
-  const [showAdvanced, setShowAdvanced] = useState(false);
 
   const updateSettings = (updates: Partial<AISettings>) => {
     onSettingsChange({ ...settings, ...updates });
@@ -77,25 +71,14 @@ export function AIControlPanel({
           </Button>
 
           {aiState.isEnabled && (
-            <>
-              <Button
-                onClick={onPause}
-                variant="outline"
-                size={compact ? "sm" : "default"}
-                data-testid="pause-ai"
-              >
-                {aiState.isPaused ? t("game.ai.controls.resume") : t("game.ai.controls.pause")}
-              </Button>
-              <Button
-                onClick={onStep}
-                variant="outline"
-                size={compact ? "sm" : "default"}
-                disabled={!aiState.isPaused}
-                data-testid="step-ai"
-              >
-                {t("game.ai.controls.step")}
-              </Button>
-            </>
+            <Button
+              onClick={onPause}
+              variant="outline"
+              size={compact ? "sm" : "default"}
+              data-testid="pause-ai"
+            >
+              {aiState.isPaused ? t("game.ai.controls.resume") : t("game.ai.controls.pause")}
+            </Button>
           )}
         </div>
       </div>
@@ -139,95 +122,6 @@ export function AIControlPanel({
           </SelectContent>
         </Select>
       </div>
-
-      {/* Advanced Settings Toggle */}
-      {settings.aiLevel === "advanced" && (
-        <div className="flex items-center space-x-2">
-          <Switch id="show-advanced" checked={showAdvanced} onCheckedChange={setShowAdvanced} />
-          <label htmlFor="show-advanced" className="text-sm font-medium">
-            {t("game.ai.controls.showAdvanced")}
-          </label>
-        </div>
-      )}
-
-      {/* Advanced Settings */}
-      {settings.aiLevel === "advanced" && showAdvanced && (
-        <div className="space-y-4 pt-2 border-t">
-          {/* Beam Width */}
-          <div className="space-y-2">
-            <label htmlFor="beam-width-slider" className="text-sm font-medium">
-              {t("game.ai.controls.beamWidth")}: {settings.beamWidth}
-            </label>
-            <Slider
-              id="beam-width-slider"
-              value={[settings.beamWidth]}
-              onValueChange={([value]) => updateSettings({ beamWidth: value })}
-              min={1}
-              max={20}
-              step={1}
-              data-testid="beam-width-slider"
-            />
-          </div>
-
-          {/* Thinking Time Limit */}
-          <div className="space-y-2">
-            <label htmlFor="thinking-time-slider" className="text-sm font-medium">
-              {t("game.ai.controls.thinkingTime")}: {settings.thinkingTimeLimit}ms
-            </label>
-            <Slider
-              id="thinking-time-slider"
-              value={[settings.thinkingTimeLimit]}
-              onValueChange={([value]) => updateSettings({ thinkingTimeLimit: value })}
-              min={10}
-              max={200}
-              step={10}
-              data-testid="thinking-time-slider"
-            />
-          </div>
-
-          {/* Use Hold */}
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="use-hold"
-              checked={settings.useHold}
-              onCheckedChange={(checked) => updateSettings({ useHold: checked })}
-              data-testid="use-hold-switch"
-            />
-            <label htmlFor="use-hold" className="text-sm font-medium">
-              {t("game.ai.controls.useHold")}
-            </label>
-          </div>
-
-          {/* Enable Visualization */}
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="enable-visualization"
-              checked={settings.enableVisualization}
-              onCheckedChange={(checked) => updateSettings({ enableVisualization: checked })}
-              data-testid="visualization-switch"
-            />
-            <label htmlFor="enable-visualization" className="text-sm font-medium">
-              {t("game.ai.controls.visualization")}
-            </label>
-          </div>
-
-          {/* Playback Speed */}
-          <div className="space-y-2">
-            <label htmlFor="playback-speed-slider" className="text-sm font-medium">
-              {t("game.ai.controls.playbackSpeed")}: {settings.playbackSpeed}x
-            </label>
-            <Slider
-              id="playback-speed-slider"
-              value={[settings.playbackSpeed]}
-              onValueChange={([value]) => updateSettings({ playbackSpeed: value })}
-              min={0.1}
-              max={5}
-              step={0.1}
-              data-testid="playback-speed-slider"
-            />
-          </div>
-        </div>
-      )}
 
       {/* Statistics Display */}
       {aiState.stats && (

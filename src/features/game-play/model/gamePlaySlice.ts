@@ -344,6 +344,12 @@ export const useGamePlayStore = create<GamePlayState>()(
         // Start the game engine
         gameEngineAdapter.startGame();
 
+        // Set up game over event listener
+        gameEngineAdapter.on("game-over", (_data) => {
+          const { endGame } = get();
+          endGame();
+        });
+
         // Get initial state from engine
         const engineState = gameEngineAdapter.getGameState();
         if (engineState) {
@@ -612,6 +618,9 @@ export const useGamePlayStore = create<GamePlayState>()(
                       position: engineState.ghostPosition,
                     }
                   : null,
+              // Sync game over state from engine
+              isGameOver: engineState.isGameOver,
+              isPlaying: !engineState.isGameOver,
             }));
           }
         }
@@ -637,6 +646,9 @@ export const useGamePlayStore = create<GamePlayState>()(
               nextPieces: [engineState.nextPiece],
               heldPiece: engineState.heldPiece,
               canHold: true, // Reset hold ability after placing
+              // Sync game over state from engine
+              isGameOver: engineState.isGameOver,
+              isPlaying: !engineState.isGameOver,
             }));
 
             // TODO: Handle line clears, scoring, etc.
