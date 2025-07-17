@@ -2,7 +2,8 @@
   "$schema": "https://biomejs.dev/schemas/2.1.1/schema.json",
   "files": {
     "maxSize": 1048576,
-    "ignoreUnknown": false
+    "ignoreUnknown": false,
+    "includes": ["**", "!**/dist/**", "!**/node_modules/**"]
   },
   "linter": {
     "enabled": true,

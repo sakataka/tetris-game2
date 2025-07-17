@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef } from "react";
 import { gameEngineAdapter } from "@/features/game-play/api/gameEngineAdapter";
 import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
+import type { GameState } from "@/game/ai";
 import { SimpleAI } from "@/game/ai";
 import { useSimpleAIStore } from "../model/simpleAISlice";
-// GameState import removed as we use simplified state
 
 /**
  * シンプルAIコントローラー
@@ -30,7 +30,7 @@ export function useSimpleAI() {
       level: 1,
     };
 
-    const bestMove = aiRef.current.findBestMove(simpleGameState as any);
+    const bestMove = aiRef.current.findBestMove(simpleGameState as GameState);
 
     console.log("[SimpleAI] AI決定:", bestMove);
 

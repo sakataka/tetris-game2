@@ -7,8 +7,7 @@
     "enable": "Enable AI",
     "toggle": "Toggle AI on/off",
     "status": {
-      "active": "AI is playing",
-      "inactive": "AI is disabled"
+      "active": "AI is playing"
     }
   },
   "accessibility": {
@@ -62,20 +61,16 @@
       "tSpinDetection": "T-Spin Detection",
       "tSpinDetectionDescription": "Enable T-Spin detection and scoring",
       "aiFeatures": "AI Features",
-      "aiFeaturesDescription": "Enable AI player and visualization",
       "animations": "Animations",
       "audio": "Audio",
       "auto": "Auto",
       "badge": "Badge",
       "close": "Close",
       "colorScheme": "Color Scheme",
-      "compact": "Compact",
       "dark": "Dark",
       "gameplay": "Gameplay",
-      "gaming": "Gaming",
       "haptics": "Haptics",
       "light": "Light",
-      "normal": "Normal",
       "open": "Open",
       "performance": "Performance",
       "performanceMode": "Performance Mode",
@@ -83,13 +78,9 @@
       "sound": "Sound",
       "targetFPS": "Target FPS",
       "theme": "Theme",
-      "themeMode": "Theme Mode",
       "visual": "Visual",
       "volume": "Volume"
     },
-    "linesCleared": "{{count}} line cleared",
-    "linesCleared_plural": "{{count}} lines cleared",
-    "tSpinAnnouncement": "{{type}} with {{lines}} lines cleared",
     "pieces": {
       "i": "I-piece",
       "o": "O-piece",

@@ -1,12 +1,12 @@
 import { useShallow } from "zustand/shallow";
 import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
-import { useScoringStore } from "@/features/scoring/model/scoringSlice";
 
 /**
- * Score-related state selectors using the new scoring store
+ * Score-related state selectors using the game play store
+ * FIX: Use gamePlayStore as the single source of truth for score/lines/level
  */
 export const useScoreState = () =>
-  useScoringStore(
+  useGamePlayStore(
     useShallow((state) => ({
       score: state.score,
       lines: state.lines,
@@ -16,27 +16,18 @@ export const useScoreState = () =>
 
 /**
  * Enhanced score state selectors for animation system
- * Uses both scoring store for score data and gameplay store for animation state
+ * Uses gameplay store for both score data and animation state
  */
 export const useScoreAnimationState = () => {
-  // Get score data from scoring store
-  const scoreData = useScoringStore(
+  // Get both score data and animation state from gameplay store
+  const data = useGamePlayStore(
     useShallow((state) => ({
       score: state.score,
-    })),
-  );
-
-  // Get animation state from gameplay store
-  const animationData = useGamePlayStore(
-    useShallow((state) => ({
       scoreAnimationState: state.scoreAnimationState,
       comboState: state.comboState,
       floatingScoreEvents: state.floatingScoreEvents,
     })),
   );
 
-  return {
-    ...scoreData,
-    ...animationData,
-  };
+  return data;
 };

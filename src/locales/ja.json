@@ -7,8 +7,7 @@
     "enable": "AIを有効にする",
     "toggle": "AI ON/OFF 切り替え",
     "status": {
-      "active": "AIがプレイ中",
-      "inactive": "AIは無効です"
+      "active": "AIがプレイ中"
     }
   },
   "accessibility": {
@@ -62,20 +61,16 @@
       "tSpinDetection": "T-Spin検出",
       "tSpinDetectionDescription": "T-Spin検出とスコアリングを有効にする",
       "aiFeatures": "AI機能",
-      "aiFeaturesDescription": "AIプレイヤーと可視化を有効にする",
       "animations": "アニメーション",
       "audio": "オーディオ",
       "auto": "自動",
       "badge": "バッジ",
       "close": "閉じる",
       "colorScheme": "カラースキーム",
-      "compact": "コンパクト",
       "dark": "ダーク",
       "gameplay": "ゲームプレイ",
-      "gaming": "ゲーミング",
       "haptics": "ハプティック",
       "light": "ライト",
-      "normal": "ノーマル",
       "open": "開く",
       "performance": "パフォーマンス",
       "performanceMode": "パフォーマンスモード",
@@ -83,12 +78,9 @@
       "sound": "サウンド",
       "targetFPS": "ターゲットFPS",
       "theme": "テーマ",
-      "themeMode": "テーマモード",
       "visual": "ビジュアル",
       "volume": "音量"
     },
-    "linesCleared": "{{count}}ライン消去",
-    "tSpinAnnouncement": "{{type}} {{lines}}ライン消去",
     "pieces": {
       "i": "Iピース",
       "o": "Oピース",
