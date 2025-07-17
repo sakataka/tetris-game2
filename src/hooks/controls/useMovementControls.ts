@@ -1,7 +1,6 @@
 import { useCallback } from "react";
-import { useGameActionHandler } from "@/hooks/core/useGameActionHandler";
-import { useGameStoreActions } from "@/hooks/core/useGameStoreActions";
 import { useActionCooldown } from "./useActionCooldown";
+import { useGameInputActions } from "./useGameInputActions";
 
 /**
  * Hook for handling movement controls with proper debouncing to prevent multiple rapid movements
@@ -9,30 +8,29 @@ import { useActionCooldown } from "./useActionCooldown";
  * Implements cooldown periods between movements to ensure single action per button press
  */
 export function useMovementControls() {
-  const { moveLeft, moveRight, moveDown, drop } = useGameStoreActions();
-  const executeAction = useGameActionHandler();
+  const { moveLeft, moveRight, moveDown, drop } = useGameInputActions(); // Using consolidated hook with built-in validation
 
   // Cooldown periods in milliseconds to prevent double actions
   const MOVEMENT_COOLDOWN = 150; // Slightly faster than rotation for better feel
   const DROP_COOLDOWN = 200; // Same as rotation for consistency
 
   const moveLeftAction = useActionCooldown(
-    useCallback(() => executeAction(moveLeft), [executeAction, moveLeft]),
+    useCallback(() => moveLeft(), [moveLeft]),
     MOVEMENT_COOLDOWN,
   );
 
   const moveRightAction = useActionCooldown(
-    useCallback(() => executeAction(moveRight), [executeAction, moveRight]),
+    useCallback(() => moveRight(), [moveRight]),
     MOVEMENT_COOLDOWN,
   );
 
   const moveDownAction = useActionCooldown(
-    useCallback(() => executeAction(moveDown), [executeAction, moveDown]),
+    useCallback(() => moveDown(), [moveDown]),
     MOVEMENT_COOLDOWN,
   );
 
   const dropAction = useActionCooldown(
-    useCallback(() => executeAction(drop, true), [executeAction, drop]), // urgent = true for hard drop
+    useCallback(() => drop(), [drop]), // Note: drop is already marked as urgent in useGameInputActions
     DROP_COOLDOWN,
   );
 

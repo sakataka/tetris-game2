@@ -1,5 +1,4 @@
-import { useGameActionHandler } from "@/hooks/core/useGameActionHandler";
-import { useGameStoreActions } from "@/hooks/core/useGameStoreActions";
+import { useGameInputActions } from "./useGameInputActions";
 import { useRotationControl } from "./useRotationControl";
 import type { SwipeGesture, TapGesture } from "./useTouchDetection";
 
@@ -10,25 +9,24 @@ export interface TouchActionsReturn {
 }
 
 export function useTouchActions(): TouchActionsReturn {
-  const { moveLeft, moveRight, moveDown, drop } = useGameStoreActions();
-  const executeAction = useGameActionHandler();
+  const { moveLeft, moveRight, moveDown, drop } = useGameInputActions(); // Using consolidated hook with built-in validation
   const { handleRotate } = useRotationControl();
 
   const handleSwipe = (gesture: SwipeGesture) => {
     switch (gesture.direction) {
       case "left":
-        executeAction(moveLeft);
+        moveLeft();
         break;
       case "right":
-        executeAction(moveRight);
+        moveRight();
         break;
       case "down":
         if (gesture.isLongSwipe) {
           // Long swipe down = hard drop
-          executeAction(drop, true);
+          drop();
         } else {
           // Short swipe down = soft drop (using updated action name)
-          executeAction(moveDown);
+          moveDown();
         }
         break;
       case "up":
@@ -42,7 +40,7 @@ export function useTouchActions(): TouchActionsReturn {
   };
 
   const handleDoubleTap = (_gesture: TapGesture) => {
-    executeAction(drop, true);
+    drop();
   };
 
   return {
