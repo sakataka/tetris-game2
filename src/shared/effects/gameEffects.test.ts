@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it, mock, spyOn } from "bun:test";
-import { GameEffectsManager } from "./gameEffects";
+import { createGameEffectsManager, type GameEffectsManager } from "./gameEffects";
 
 describe("GameEffectsManager", () => {
   let manager: GameEffectsManager;
 
   beforeEach(() => {
-    manager = new GameEffectsManager();
+    manager = createGameEffectsManager();
   });
 
   it("should create with default config", () => {
@@ -85,7 +85,7 @@ describe("GameEffectsManager", () => {
     const consoleSpy = spyOn(console, "log").mockImplementation();
 
     // Create manager with animations disabled
-    const disabledManager = new GameEffectsManager({ enableAnimations: false });
+    const disabledManager = createGameEffectsManager({ enableAnimations: false });
     disabledManager.setupDefaultEffects();
 
     disabledManager.emit("LINE_CLEARED", { lines: 4, positions: [0, 1, 2, 3] });
