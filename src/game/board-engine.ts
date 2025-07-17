@@ -356,7 +356,7 @@ function createBitboardBoardEngine(): BoardEngine {
 
       // Add empty lines at the top
       for (let i = 0; i < clearedLineIndices.length; i++) {
-        newBoard.push(new Array(width).fill(0));
+        newBoard.push(Array(width).fill(0));
       }
 
       // Copy non-cleared lines

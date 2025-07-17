@@ -78,7 +78,7 @@ export function createSimpleAI(): SimpleAI {
     for (let y = board.length - 1; y >= 0; y--) {
       if (board[y].every((cell) => cell !== 0)) {
         board.splice(y, 1);
-        board.unshift(new Array(10).fill(0));
+        board.unshift(Array(10).fill(0));
         linesCleared++;
         y++; // 再チェック
       }
