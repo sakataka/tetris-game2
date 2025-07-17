@@ -17,7 +17,13 @@
     "skipToControls": "コントロールへスキップ",
     "gamePaused": "ゲームが一時停止されました。Pキーで再開してください。",
     "gameResumed": "ゲームが再開されました。",
-    "gameReady": "ゲーム開始準備完了。"
+    "gameReady": "ゲーム開始準備完了。",
+    "holdPiece": "現在のピースをホールド",
+    "resetGame": "ゲームリセット",
+    "resumeGame": "ゲーム再開",
+    "pauseGame": "ゲーム一時停止",
+    "gameInfo": "ゲーム情報",
+    "gameBoard": "ゲームボードエリア"
   },
   "game": {
     "hold": "ホールド",
@@ -147,5 +153,24 @@
         "wells": "穴"
       }
     }
+  },
+  "error": {
+    "component": "コンポーネントエラー",
+    "somethingWrong": "エラーが発生しました: {{message}}",
+    "retry": "再試行"
+  },
+  "debug": {
+    "mode": "デバッグモード",
+    "quickPresets": "クイックプリセット",
+    "customQueue": "カスタムキュー",
+    "queueExample": "例: IJLOSTZ",
+    "pressEnter": "Enterキーを押して適用"
+  },
+  "language": {
+    "english": "英語",
+    "japanese": "日本語"
+  },
+  "common": {
+    "close": "閉じる"
   }
 }

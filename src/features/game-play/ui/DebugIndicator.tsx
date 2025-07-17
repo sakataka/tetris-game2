@@ -1,5 +1,6 @@
 import { Badge } from "@shared/ui/badge";
 import { Card } from "@shared/ui/card";
+import { useTranslation } from "react-i18next";
 import { useShallow } from "zustand/react/shallow";
 import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
 import type { TetrominoTypeName } from "@/types/game";
@@ -7,6 +8,8 @@ import { generateDebugUrl } from "@/utils/debugParams";
 import { getDebugPreset, getPresetNames } from "@/utils/debugPresets";
 
 export function DebugIndicator() {
+  const { t } = useTranslation();
+
   // Optimize selectors with useShallow for better performance
   const { debugMode, debugParams } = useGamePlayStore(
     useShallow((state) => ({
@@ -33,7 +36,7 @@ export function DebugIndicator() {
       <div className="space-y-2">
         <div className="flex items-center gap-2">
           <Badge variant="destructive" className="text-xs">
-            DEBUG MODE
+            {t("debug.mode")}
           </Badge>
           {debugParams.preset && (
             <Badge variant="outline" className="text-xs">
@@ -52,7 +55,7 @@ export function DebugIndicator() {
 
         <details className="mt-2">
           <summary className="text-xs text-gray-300 cursor-pointer hover:text-gray-200">
-            Quick Presets
+            {t("debug.quickPresets")}
           </summary>
           <div className="mt-2 grid grid-cols-2 gap-1">
             {presetNames.map((name) => (
@@ -81,12 +84,12 @@ export function DebugIndicator() {
 
         <details className="mt-2">
           <summary className="text-xs text-gray-300 cursor-pointer hover:text-gray-200">
-            Custom Queue
+            {t("debug.customQueue")}
           </summary>
           <div className="mt-2 space-y-1">
             <input
               type="text"
-              placeholder="e.g., IJLOSTZ"
+              placeholder={t("debug.queueExample")}
               className="w-full text-xs px-2 py-1 bg-gray-800 rounded text-white"
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
@@ -101,7 +104,7 @@ export function DebugIndicator() {
                 }
               }}
             />
-            <div className="text-xs text-gray-400">Press Enter to apply</div>
+            <div className="text-xs text-gray-400">{t("debug.pressEnter")}</div>
           </div>
         </details>
 

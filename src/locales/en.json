@@ -17,7 +17,13 @@
     "skipToControls": "Skip to game controls",
     "gamePaused": "Game paused. Press P to resume.",
     "gameResumed": "Game resumed.",
-    "gameReady": "Game ready to start."
+    "gameReady": "Game ready to start.",
+    "holdPiece": "Hold current piece",
+    "resetGame": "Reset game",
+    "resumeGame": "Resume game",
+    "pauseGame": "Pause game",
+    "gameInfo": "Game Information",
+    "gameBoard": "Game Board Area"
   },
   "game": {
     "hold": "Hold",
@@ -147,5 +153,24 @@
         "wells": "Wells"
       }
     }
+  },
+  "error": {
+    "component": "Component Error",
+    "somethingWrong": "Something went wrong: {{message}}",
+    "retry": "Retry"
+  },
+  "debug": {
+    "mode": "DEBUG MODE",
+    "quickPresets": "Quick Presets",
+    "customQueue": "Custom Queue",
+    "queueExample": "e.g., IJLOSTZ",
+    "pressEnter": "Press Enter to apply"
+  },
+  "language": {
+    "english": "English",
+    "japanese": "Japanese"
+  },
+  "common": {
+    "close": "Close"
   }
 }

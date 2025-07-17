@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Board, GameOverlay, TouchControls } from "@/features/game-play";
 import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
 import { TSpinIndicator } from "@/features/scoring/ui/TSpinIndicator";
@@ -6,6 +7,7 @@ import { useTouchGestures } from "@/hooks/controls/useTouchGestures";
 import { MobileHeader } from "./MobileHeader";
 
 export function MobileGameLayout() {
+  const { t } = useTranslation();
   const { handleTouchStart, handleTouchEnd } = useTouchGestures();
 
   // T-Spin indicator state
@@ -22,7 +24,7 @@ export function MobileGameLayout() {
       <div className="flex-1 flex items-center justify-center px-4 relative">
         <section
           className="relative"
-          aria-label="Game Board Area"
+          aria-label={t("accessibility.gameBoard")}
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >

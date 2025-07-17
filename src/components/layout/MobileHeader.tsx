@@ -1,11 +1,14 @@
 import { AnimatedButton } from "@shared/ui/AnimatedButton";
 import { Pause, Play, RefreshCw } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { useShallow } from "zustand/react/shallow";
 import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
 import { GameSettingsComponent as GameSettings } from "@/features/settings";
 import { useHapticFeedback } from "@/hooks/common/useHapticFeedback";
 
 export function MobileHeader() {
+  const { t } = useTranslation();
+
   // Optimize selectors with useShallow for better performance
   const { score, lines, level, isPaused, isGameOver, canHold } = useGamePlayStore(
     useShallow((state) => ({
@@ -58,24 +61,24 @@ export function MobileHeader() {
       {/* Left side - Score info and Hold/Next */}
       <div className="flex gap-4 text-sm flex-1">
         <div className="text-center">
-          <div className="text-xs text-slate-400">Score</div>
+          <div className="text-xs text-slate-400">{t("game.score.title")}</div>
           <div className="font-bold text-cyan-400" data-testid="score">
             {score}
           </div>
         </div>
         <div className="text-center">
-          <div className="text-xs text-slate-400">Lines</div>
+          <div className="text-xs text-slate-400">{t("game.score.lines")}</div>
           <div className="font-bold text-yellow-400">{lines}</div>
         </div>
         <div className="text-center">
-          <div className="text-xs text-slate-400">Level</div>
+          <div className="text-xs text-slate-400">{t("game.score.level")}</div>
           <div className="font-bold text-purple-400">{level}</div>
         </div>
 
         {/* Hold/Next pieces moved to left side */}
         <div className="flex gap-3 ml-2">
           <div className="text-center">
-            <div className="text-xs text-slate-400 mb-1">Hold</div>
+            <div className="text-xs text-slate-400 mb-1">{t("game.hold")}</div>
             <AnimatedButton
               variant="outline"
               size="sm"
@@ -84,13 +87,13 @@ export function MobileHeader() {
               className={`w-8 h-8 bg-slate-800 border border-slate-700 hover:bg-slate-700 flex items-center justify-center ${
                 !canHold ? "opacity-50" : ""
               }`}
-              aria-label="Hold current piece"
+              aria-label={t("accessibility.holdPiece")}
             >
               {heldPiece && <span className="text-xs font-bold text-slate-300">{heldPiece}</span>}
             </AnimatedButton>
           </div>
           <div className="text-center">
-            <div className="text-xs text-slate-400 mb-1">Next</div>
+            <div className="text-xs text-slate-400 mb-1">{t("game.next")}</div>
             <div className="w-8 h-8 bg-slate-800 rounded border border-slate-700 flex items-center justify-center">
               {nextPiece && <span className="text-xs font-bold text-slate-300">{nextPiece}</span>}
             </div>
@@ -106,7 +109,7 @@ export function MobileHeader() {
             size="sm"
             onClick={handleReset}
             className="h-8 w-8 bg-orange-800/70 border-orange-600 hover:bg-orange-700/50"
-            aria-label="Reset game"
+            aria-label={t("accessibility.resetGame")}
           >
             <RefreshCw className="h-4 w-4" />
           </AnimatedButton>
@@ -118,7 +121,7 @@ export function MobileHeader() {
             onClick={handleTogglePause}
             disabled={isGameOver}
             className="h-8 w-8 bg-slate-800/70 border-slate-600 hover:bg-slate-700/50"
-            aria-label={isPaused ? "Resume game" : "Pause game"}
+            aria-label={isPaused ? t("accessibility.resumeGame") : t("accessibility.pauseGame")}
           >
             {isPaused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
           </AnimatedButton>

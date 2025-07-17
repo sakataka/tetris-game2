@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useSimpleAI } from "@/features/ai-control";
 import {
   Board,
@@ -26,6 +27,8 @@ import { GameLayout } from "./GameLayout";
 import { MobileGameLayout } from "./MobileGameLayout";
 
 export function Game() {
+  const { t } = useTranslation();
+
   useGameLoop();
   useKeyboardControls();
   useHighScoreSideEffect();
@@ -88,7 +91,7 @@ export function Game() {
           <aside
             id="game-info"
             className="layout-sidebar gap-2.5 pr-2"
-            aria-label="Game Information"
+            aria-label={t("accessibility.gameInfo")}
             tabIndex={-1}
           >
             <ScoreBoard />
@@ -105,7 +108,7 @@ export function Game() {
             <section
               id="game-board"
               className="relative"
-              aria-label="Game Board Area"
+              aria-label={t("accessibility.gameBoard")}
               tabIndex={-1}
               onTouchStart={handleTouchStart}
               onTouchEnd={handleTouchEnd}

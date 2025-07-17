@@ -43,10 +43,10 @@ export function GameSettings() {
 
   const languages = useMemo(
     () => [
-      { value: "en", label: "English", flag: "🇺🇸" },
-      { value: "ja", label: "Japanese", flag: "🇯🇵" },
+      { value: "en", label: t("language.english"), flag: "🇺🇸" },
+      { value: "ja", label: t("language.japanese"), flag: "🇯🇵" },
     ],
-    [],
+    [t],
   );
 
   const handleLanguageChange = async (value: string) => {

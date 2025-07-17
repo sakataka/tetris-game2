@@ -1,5 +1,4 @@
 import { afterEach, beforeEach } from "bun:test";
-import { cleanup } from "@testing-library/react";
 
 // Type definitions for Zustand store interfaces
 interface ZustandStore {
@@ -206,9 +205,6 @@ beforeEach(async () => {
 
 // Clean up after each test
 afterEach(() => {
-  // React Testing Library cleanup
-  cleanup();
-
   // Clear timers after each test without overriding the functions
   if (global.clearTimeout && global.clearInterval) {
     // Clear any active timers (limited range to prevent performance issues)
