@@ -22,10 +22,5 @@
   ],
   "ignoreExportsUsedInFile": true,
   "includeEntryExports": false,
-  "ignoreDependencies": [
-    "@biomejs/biome",
-    "bun-types",
-    "@testing-library/jest-dom",
-    "@axe-core/react"
-  ]
+  "ignoreDependencies": ["@biomejs/biome", "bun-types", "@axe-core/react"]
 }

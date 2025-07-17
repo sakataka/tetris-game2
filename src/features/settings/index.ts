@@ -1,8 +1,15 @@
 // UI Components
 
 // API
-export type { SettingsExportData, SettingsStorageAdapter } from "./api/settingsStorage";
-export { createSettingsStorageAdapter, settingsStorage } from "./api/settingsStorage";
+export type {
+  SettingsExportData,
+  SettingsStorageAdapter as SettingsStorageAdapterType,
+} from "./api/settingsStorage";
+export {
+  createSettingsStorageAdapter,
+  createSettingsStorageAdapter as SettingsStorageAdapter,
+  settingsStorage,
+} from "./api/settingsStorage";
 export type { UseSettingsReturn } from "./lib/useSettings";
 // Hooks
 export { useSettings, useSettingsData, useThemeSettings } from "./lib/useSettings";
