@@ -61,10 +61,7 @@ mock.module("./useGameInputActions", () => ({
   useGameInputActions: () => mockGameInputActions,
 }));
 
-// Mock useInputDebounce
-mock.module("../common/useInputDebounce", () => ({
-  useInputDebounce: mock((value) => value), // Simple pass-through for testing
-}));
+// Note: useInputDebounce is now inlined in useKeyboardControls
 
 describe("useKeyboardControls", () => {
   beforeEach(() => {

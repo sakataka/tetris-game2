@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useGamePlayState } from "@/features/game-play";
-import { useInputDebounce } from "@/hooks/common/useInputDebounce";
 import { type GameInputActions, useGameInputActions } from "./useGameInputActions";
 import { useKeyboardInput } from "./useKeyboardInput";
 
@@ -40,7 +39,7 @@ const DEFAULT_KEY_MAPPING: KeyMapping = {
  * - useKeyboardInput for pure input detection
  * - useGameInputActions for game-specific actions
  * - useActionCooldown for preventing rapid executions
- * - useInputDebounce for repeat key handling
+ * - Inline debounce implementation for repeat key handling
  *
  * @param keyMapping - Custom key mapping (optional)
  */
@@ -56,10 +55,35 @@ export function useKeyboardControls(keyMapping: KeyMapping = DEFAULT_KEY_MAPPING
 
   // Get repeatable keys for debouncing
   const repeatableKeys = pressedKeys.filter((key) => keyMapping[key]?.repeat);
-  const debouncedKeys = useInputDebounce(repeatableKeys, 50, { trailing: true });
+
+  // Inline debounce implementation (replaces useInputDebounce)
+  const [debouncedKeys, setDebouncedKeys] = useState<string[]>([]);
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   // Track cooldowns for each key
   const [keyCooldowns, setKeyCooldowns] = useState<Record<string, number>>({});
+
+  // Handle debouncing for repeatable keys
+  useEffect(() => {
+    // Clear existing timeout
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+    }
+
+    // Set new timeout for trailing edge (50ms delay)
+    debounceTimeoutRef.current = setTimeout(() => {
+      setDebouncedKeys(repeatableKeys);
+      debounceTimeoutRef.current = undefined;
+    }, 50);
+
+    // Cleanup function
+    return () => {
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+        debounceTimeoutRef.current = undefined;
+      }
+    };
+  }, [repeatableKeys]);
 
   // Handle key actions with cooldown
   const executeKeyAction = useCallback(
