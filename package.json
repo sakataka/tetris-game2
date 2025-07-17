@@ -14,20 +14,11 @@
     "dev": "bun --bun vite",
     "build": "bun x vite build",
     "test": "bun test src/ --ignore='**/benchmarks/**' --ignore='**/visual/**' --ignore='tests/**' --ignore='**/components/**'",
-    "test:full": "bun test src/ --ignore='**/benchmarks/**' --ignore='**/visual/**' --ignore='tests/**' --ignore='**/components/**'",
-    "test:a11y": "bun x playwright test tests/accessibility.spec.ts",
     "lint": "bun x biome check --write",
     "format": "bun x biome format --write",
     "typecheck": "bun x tsc --noEmit",
-    "preview": "bun x vite preview",
-    "ci": "bun x biome ci && bun run typecheck && bun test && bun run build",
     "prepare": "lefthook install",
-    "check:i18n": "bun run scripts/check-i18n-keys.ts",
-    "audit:accessibility": "bun run scripts/accessibility-audit.ts",
-    "audit:accessibility:comprehensive": "bun run scripts/accessibility-audit.ts --comprehensive",
-    "e2e": "bun x playwright test --config=playwright.config.ts",
-    "analyze": "bun run scripts/analyze-bundle.ts",
-    "analyze:visual": "bun x vite build && bun x rollup-plugin-visualizer dist/stats.html"
+    "check:i18n": "bun run scripts/check-i18n-keys.ts"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.14",

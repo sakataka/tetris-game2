@@ -4,43 +4,81 @@ AI assistant working on a high-performance TypeScript Tetris implementation with
 
 ## 🚨 Critical Rules & Constraints
 
-| ✅ Required | ❌ Forbidden |
-|-------------|-------------|
-| Pure functions only (no `class`, no `new`) | Adding classes / OO hierarchies |
-| State via Zustand slices or local React state | Direct writes to global objects |
-| `unknown` with type guards | `any` type usage |
-| i18n with `t('key')` from `/src/locales/*.json` | Hard-coded user-facing strings |
-| Tests for pure functions, business logic | Testing React components or UI |
-| `@/` imports for cross-directory, `./` for same-directory | Path traversals outside `/src` |
-| WCAG 2.2 AA compliance (4.5:1 contrast, keyboard nav) | Click-only interactions |
-| Bun test + fast-check for property testing | Jest / Vitest / RTL |
+### ✅ Required Practices
+- Pure functions only (no `class`, no `new`)
+- State via Zustand slices or local React state
+- `unknown` with type guards for type safety
+- i18n with `t('key')` from `/src/locales/*.json`
+- Tests for pure functions and business logic
+- `@/` imports for cross-directory, `./` for same-directory
+- WCAG 2.2 AA compliance (4.5:1 contrast, keyboard nav)
+- Bun test + fast-check for property testing
+
+### ❌ Forbidden Practices
+- Adding classes / OO hierarchies
+- Direct writes to global objects
+- `any` type usage
+- Hard-coded user-facing strings
+- Testing React components or UI
+- Path traversals outside `/src`
+- Click-only interactions
+- Jest / Vitest / RTL usage
 
 ## 📁 Project Structure
 
 ```
 src/
 ├── game/                    # Core game logic - TEST ALL
-│   ├── ai/                 # Integrated AI engine
-│   │   ├── config/         # weights.yaml, runtime configuration
-│   │   ├── core/           # BitBoard, collision, move generation
-│   │   ├── evaluators/     # Dellacherie, pattern, stacking evaluators
-│   │   └── search/         # Beam search, diversity search algorithms
+│   ├── ai/                 # Simple AI implementation
+│   │   ├── index.ts        # AI exports
+│   │   └── simple-ai.ts    # Basic AI engine
 │   ├── animations/         # Animation system with FrameBudgetSentinel
-│   └── *.ts               # Game engine (board, scoring, tetrominos)
+│   │   ├── config/         # Animation configuration
+│   │   ├── core/           # Core animation logic
+│   │   └── sentinel/       # FrameBudgetSentinel implementation
+│   ├── GameEngine.ts       # Game engine interface
+│   ├── SimpleGameEngine.ts # Game engine implementation
+│   └── *.ts               # Game logic (board, scoring, tetrominos)
 ├── features/               # Feature-Sliced Design - TEST lib/ and model/
 │   ├── ai-control/         # AI control feature
 │   ├── game-play/          # Game play feature
 │   ├── scoring/            # Scoring system
 │   └── settings/           # Settings management
-├── components/             # Legacy UI components - DO NOT TEST
-│   ├── accessibility/      # WCAG 2.2 AA components
-│   ├── game/              # Game UI components
+├── components/             # UI components - DO NOT TEST
+│   ├── common/             # Common UI components
+│   ├── layout/             # Layout components
 │   └── ui/                # shadcn/ui components
 ├── hooks/                  # React hooks - TEST PURE FUNCTIONS ONLY
+│   ├── accessibility/      # Accessibility hooks
+│   ├── actions/            # Action hooks
+│   ├── animations/         # Animation hooks
+│   ├── common/             # Common hooks
+│   ├── controls/           # Control hooks
+│   ├── core/               # Core hooks
+│   ├── data/               # Data hooks
+│   ├── effects/            # Effect hooks
+│   ├── game/               # Game hooks
+│   ├── selectors/          # Selector hooks
+│   └── ui/                 # UI hooks
 ├── shared/                 # Reusable modules - TEST ALL
+│   ├── config/             # Configuration
+│   ├── effects/            # Shared effects
+│   ├── events/             # Event system
+│   ├── lib/                # Shared libraries
+│   ├── mocks/              # Mock implementations
+│   ├── performance/        # Performance utilities
+│   ├── types/              # Shared types
+│   ├── ui/                 # Shared UI components
+│   └── utils/              # Shared utilities
 ├── utils/                  # Utility functions - TEST ALL
 ├── locales/               # i18n files (en.json, ja.json)
-└── types/                 # TypeScript type definitions
+├── types/                 # TypeScript type definitions
+├── contexts/              # React contexts
+├── design-tokens/         # Design tokens
+├── i18n/                  # i18n configuration
+├── lib/                   # Library utilities
+├── styles/                # Global styles
+└── test/                  # Test utilities and setup
 ```
 
 ## 🔧 Development Commands
@@ -54,19 +92,17 @@ bun run dev
 
 # Testing
 bun test                    # Unit tests (excludes components)
-bun run test:a11y          # Accessibility tests
-bun run e2e                # End-to-end tests with Playwright
 
 # Code Quality (MANDATORY before commits)
 bun run lint && bun run typecheck
 bun run format             # Code formatting
-bun run knip               # Dead code detection
-
-# Build & Analysis
-bun run build             # Production build
-bun run ci                # Complete CI pipeline
-bun run analyze           # Bundle analysis
 bun run check:i18n        # i18n validation
+
+# Build
+bun run build             # Production build
+
+# Git hooks
+bun run prepare           # Install lefthook
 ```
 
 ## 🧪 Testing Strategy
@@ -86,40 +122,22 @@ bun run check:i18n        # i18n validation
 
 ## 🤖 AI System Architecture
 
-### Core Components
+### Simple AI Implementation
 ```
 /src/game/ai/
-├── config/
-│   ├── weights.yaml        # Runtime-tunable AI weights
-│   └── weight-loader.ts    # Configuration loader
-├── core/
-│   ├── ai-engine.ts        # Main AI engine
-│   ├── bitboard.ts         # High-performance board representation
-│   └── collision-detection.ts # SRS-compatible collision detection
-├── evaluators/
-│   ├── dellacherie.ts      # 6-feature Dellacherie evaluator
-│   ├── pattern-evaluator.ts # Pattern-based evaluation
-│   └── stacking-evaluator.ts # Stacking strategy evaluation
-└── search/
-    ├── beam-search.ts      # Beam search algorithm
-    ├── diversity-beam-search.ts # Diversity beam search
-    └── search-strategy.ts  # Search strategy configuration
+├── index.ts           # AI exports
+└── simple-ai.ts      # Basic AI engine implementation
 ```
 
-### Performance Targets
-- **BitBoard**: 100,000+ evaluations/second
-- **Search Response**: 80ms target for move decisions
-- **Move Generation**: <1ms for 1,000 collision checks
+### AI Features
+- **Basic AI**: Simple heuristic-based AI for piece placement
+- **Integration**: Integrated with game engine through feature slices
+- **Performance**: Lightweight implementation for real-time gameplay
 
 ### AI Configuration
-Runtime-tunable weights in `/src/game/ai/config/weights.yaml`:
-```yaml
-base:
-  linesCleared: 1000.0
-  holes: -5.0
-  maxHeight: -15.0
-  bumpiness: -3.0
-```
+- AI behavior is controlled through the `/src/features/ai-control/` feature
+- No external configuration files - all logic is code-based
+- Simple evaluation functions for piece placement decisions
 
 ## 🎯 Feature-Sliced Design
 
@@ -160,9 +178,9 @@ feature-name/
 - Screen reader announcements for game state changes
 
 ### Testing
-- Automated: `@axe-core/react` + `axe-playwright`
+- Automated: `@axe-core/react` integration
 - Manual: Keyboard-only navigation testing
-- Run: `bun run test:a11y`
+- Focus management and screen reader announcements
 
 ## 🌍 Internationalization
 
@@ -184,9 +202,8 @@ return <button>{t('game.start')}</button>;
 1. **Start**: `git switch -c feature/my-change`
 2. **Code**: Write code + tests following this guide
 3. **Validate**: Run `bun run lint && bun run typecheck && bun test`
-4. **Commit**: Follow Conventional Commits format
-5. **Test**: E2E tests with `bun run e2e`
-6. **Review**: Open PR with clear description
+4. **Commit**: Follow Conventional Commits format (lefthook will run checks)
+5. **Review**: Open PR with clear description
 
 ## 📝 State Management (Zustand)
 
@@ -228,9 +245,9 @@ Feature Store    ← Game State Sync ← processPlacementAndClearing
 - **Event System**: Engine emits events (line-cleared, piece-placed, game-over) for feature coordination
 
 ### AI Integration Points
-- **Configuration**: `/src/game/ai/config/weights.yaml`
 - **Entry Point**: `/src/game/ai/index.ts`
 - **Feature Integration**: `/src/features/ai-control/`
+- **Game Engine**: AI integrates through the game engine interface
 
 ## 🔍 Quick Reference
 
@@ -242,9 +259,13 @@ Feature Store    ← Game State Sync ← processPlacementAndClearing
 - **Engine Adapter**: `/src/features/game-play/api/gameEngineAdapter.ts`
 - **Board Logic**: `/src/game/board.ts`
 - **Scoring System**: `/src/game/scoring.ts`
-- **AI Configuration**: `/src/game/ai/config/weights.yaml`
+- **AI Implementation**: `/src/game/ai/simple-ai.ts`
 - **i18n Config**: `/src/i18n/config.ts`
+- **App Entry**: `/src/main.tsx`
+- **App Component**: `/src/App.tsx`
 
 ### Debug Features
-- AI Debug: `?debug=true&ai=advanced&visualization=true`
-- Performance: `?debug=true&performance=true`
+- Debug Mode: `?debug=true` - Enable debug mode
+- Debug Parameters: Support for preset, queue, seed, score, level, lines parameters
+- Debug Language: `debugLanguage.forceEnglish()` / `debugLanguage.forceJapanese()`
+- Debug Presets: Various game state presets for testing
