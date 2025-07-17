@@ -3,6 +3,7 @@ import { gameEngineAdapter } from "@/features/game-play/api/gameEngineAdapter";
 import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
 import type { GameState } from "@/game/ai";
 import { createSimpleAI, type SimpleAI } from "@/game/ai";
+import { aiLogger } from "@/shared/utils/debugLogger";
 import { useSimpleAIStore } from "../model/simpleAISlice";
 
 /**
@@ -32,10 +33,10 @@ export function useSimpleAI() {
 
     const bestMove = aiRef.current.findBestMove(simpleGameState as GameState);
 
-    console.log("[SimpleAI] AI決定:", bestMove);
+    aiLogger.log("AI決定:", bestMove);
 
     if (bestMove) {
-      console.log("[SimpleAI] AI実行開始:", {
+      aiLogger.log("AI実行開始:", {
         rotation: bestMove.rotation,
         targetX: bestMove.x,
         currentX: currentPiece.position.x,
@@ -43,7 +44,7 @@ export function useSimpleAI() {
 
       // 回転を適用
       for (let i = 0; i < bestMove.rotation; i++) {
-        console.log(`[SimpleAI] 回転実行: ${i + 1}/${bestMove.rotation}`);
+        aiLogger.log(`回転実行: ${i + 1}/${bestMove.rotation}`);
         gameEngineAdapter.rotateClockwise();
       }
 
@@ -51,31 +52,31 @@ export function useSimpleAI() {
       const currentX = currentPiece.position.x;
       const deltaX = bestMove.x - currentX;
 
-      console.log(`[SimpleAI] 横移動: ${currentX} -> ${bestMove.x} (delta: ${deltaX})`);
+      aiLogger.log(`横移動: ${currentX} -> ${bestMove.x} (delta: ${deltaX})`);
 
       for (let i = 0; i < Math.abs(deltaX); i++) {
         if (deltaX > 0) {
-          console.log(`[SimpleAI] 右移動: ${i + 1}/${Math.abs(deltaX)}`);
+          aiLogger.log(`右移動: ${i + 1}/${Math.abs(deltaX)}`);
           gameEngineAdapter.moveRight();
         } else {
-          console.log(`[SimpleAI] 左移動: ${i + 1}/${Math.abs(deltaX)}`);
+          aiLogger.log(`左移動: ${i + 1}/${Math.abs(deltaX)}`);
           gameEngineAdapter.moveLeft();
         }
       }
 
       // ハードドロップ
-      console.log("[SimpleAI] ハードドロップ実行");
+      aiLogger.log("ハードドロップ実行");
       gameEngineAdapter.hardDrop();
-      console.log("[SimpleAI] AI実行完了");
+      aiLogger.log("AI実行完了");
     } else {
-      console.warn("[SimpleAI] 有効な手が見つかりませんでした");
+      aiLogger.warn("有効な手が見つかりませんでした");
     }
   }, [isEnabled, isPlaying, isGameOver, currentPiece, board]);
 
   // AIが有効な時に自動で手を打つ
   useEffect(() => {
     if (isEnabled && isPlaying && !isGameOver && currentPiece) {
-      console.log("[SimpleAI] AI実行準備完了 - 500ms後に実行");
+      aiLogger.log("AI実行準備完了 - 500ms後に実行");
       const timeout = setTimeout(makeAIMove, 500); // 500msに変更してデバッグしやすく
       return () => clearTimeout(timeout);
     }

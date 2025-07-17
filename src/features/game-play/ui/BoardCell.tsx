@@ -48,7 +48,7 @@ export function BoardCell({ row, col, cellSize = GAME_CONSTANTS.BOARD.CELL_SIZE 
   );
   const { showGhostPiece } = useSettingsData();
 
-  // Compute cell display state
+  // Compute cell display state with optimized calculations
   const cellState = useMemo(() => {
     const positionKey = createCellKey({ x: col, y: row });
 
@@ -58,28 +58,31 @@ export function BoardCell({ row, col, cellSize = GAME_CONSTANTS.BOARD.CELL_SIZE 
         ? (boardBeforeClear[row]?.[col] ?? 0)
         : baseCellValue;
 
-    // Check if current piece is at this position
+    // Single pass through piece cells for both current and ghost pieces
     let isCurrentPiece = false;
+    let isGhostPiece = false;
     let cellValue = effectiveCellValue;
 
     if (currentPiece) {
       const colorIndex = getTetrominoColorIndex(currentPiece.type);
+
+      // Check current piece position first
       forEachPieceCell(currentPiece.shape, currentPiece.position, (boardX, boardY) => {
         if (boardX === col && boardY === row && isValidBoardPosition({ x: boardX, y: boardY })) {
           isCurrentPiece = true;
           cellValue = colorIndex;
         }
       });
-    }
 
-    // Check if ghost piece is at this position
-    let isGhostPiece = false;
-    if (showGhostPiece && currentPiece && ghostPosition && !isCurrentPiece) {
-      forEachPieceCell(currentPiece.shape, ghostPosition, (boardX, boardY) => {
-        if (boardX === col && boardY === row && isValidBoardPosition({ x: boardX, y: boardY })) {
-          isGhostPiece = true;
-        }
-      });
+      // Check ghost piece position only if showGhostPiece is enabled, ghost position exists, and current piece doesn't occupy this cell
+      if (showGhostPiece && ghostPosition && !isCurrentPiece) {
+        // Use the same piece shape but ghost position
+        forEachPieceCell(currentPiece.shape, ghostPosition, (boardX, boardY) => {
+          if (boardX === col && boardY === row && isValidBoardPosition({ x: boardX, y: boardY })) {
+            isGhostPiece = true;
+          }
+        });
+      }
     }
 
     // Check if this position was recently placed
