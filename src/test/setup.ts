@@ -1,6 +1,5 @@
 import { afterEach, beforeEach } from "bun:test";
 import { cleanup } from "@testing-library/react";
-import "@testing-library/jest-dom";
 
 // Type definitions for Zustand store interfaces
 interface ZustandStore {
@@ -12,12 +11,6 @@ interface ZustandStore {
 
 interface GameState {
   resetGame?: () => void;
-}
-
-interface GlobalWithJest {
-  jest?: {
-    clearAllMocks?: () => void;
-  };
 }
 
 // Import stores for cleanup
@@ -248,11 +241,5 @@ afterEach(() => {
   }
 
   // Clear any remaining mocks
-  if (typeof globalThis !== "undefined" && "jest" in globalThis) {
-    const globalWithJest = globalThis as unknown as GlobalWithJest;
-    const jest = globalWithJest.jest;
-    if (jest?.clearAllMocks) {
-      jest.clearAllMocks();
-    }
-  }
+  // Note: Bun test runner automatically clears mocks between tests
 });

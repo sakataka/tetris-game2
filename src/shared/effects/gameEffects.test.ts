@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, jest } from "bun:test";
+import { beforeEach, describe, expect, it, mock, spyOn } from "bun:test";
 import { GameEffectsManager } from "./gameEffects";
 
 describe("GameEffectsManager", () => {
@@ -17,7 +17,7 @@ describe("GameEffectsManager", () => {
   });
 
   it("should register and call event handlers", () => {
-    const mockHandler = jest.fn();
+    const mockHandler = mock();
 
     manager.on("TEST_EVENT", mockHandler);
     manager.emit("TEST_EVENT", { data: "test" });
@@ -30,8 +30,8 @@ describe("GameEffectsManager", () => {
   });
 
   it("should support multiple handlers for same event", () => {
-    const handler1 = jest.fn();
-    const handler2 = jest.fn();
+    const handler1 = mock();
+    const handler2 = mock();
 
     manager.on("TEST_EVENT", handler1);
     manager.on("TEST_EVENT", handler2);
@@ -42,7 +42,7 @@ describe("GameEffectsManager", () => {
   });
 
   it("should remove event handlers", () => {
-    const mockHandler = jest.fn();
+    const mockHandler = mock();
 
     manager.on("TEST_EVENT", mockHandler);
     manager.off("TEST_EVENT", mockHandler);
@@ -59,13 +59,13 @@ describe("GameEffectsManager", () => {
   });
 
   it("should handle errors in effect handlers gracefully", () => {
-    const errorHandler = jest.fn(() => {
+    const errorHandler = mock(() => {
       throw new Error("Test error");
     });
-    const validHandler = jest.fn();
+    const validHandler = mock();
 
     // Mock console.error to avoid noise in test output
-    const consoleSpy = jest.spyOn(console, "error").mockImplementation();
+    const consoleSpy = spyOn(console, "error").mockImplementation();
 
     manager.on("TEST_EVENT", errorHandler);
     manager.on("TEST_EVENT", validHandler);
@@ -82,7 +82,7 @@ describe("GameEffectsManager", () => {
   });
 
   it("should not trigger effects when disabled", () => {
-    const consoleSpy = jest.spyOn(console, "log").mockImplementation();
+    const consoleSpy = spyOn(console, "log").mockImplementation();
 
     // Create manager with animations disabled
     const disabledManager = new GameEffectsManager({ enableAnimations: false });

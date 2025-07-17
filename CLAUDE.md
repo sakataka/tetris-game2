@@ -13,6 +13,7 @@ AI assistant working on a high-performance TypeScript Tetris implementation with
 - `@/` imports for cross-directory, `./` for same-directory
 - WCAG 2.2 AA compliance (4.5:1 contrast, keyboard nav)
 - Bun test + fast-check for property testing
+- Minimal comments: only for non-obvious implementations or design intent
 
 ### ❌ Forbidden Practices
 - Adding classes / OO hierarchies
@@ -23,6 +24,7 @@ AI assistant working on a high-performance TypeScript Tetris implementation with
 - Path traversals outside `/src`
 - Click-only interactions
 - Jest / Vitest / RTL usage
+- Excessive code comments (code should be self-explanatory)
 
 ## 📁 Project Structure
 
@@ -196,14 +198,6 @@ feature-name/
 const { t } = useTranslation();
 return <button>{t('game.start')}</button>;
 ```
-
-## 🔄 Development Workflow
-
-1. **Start**: `git switch -c feature/my-change`
-2. **Code**: Write code + tests following this guide
-3. **Validate**: Run `bun run lint && bun run typecheck && bun test`
-4. **Commit**: Follow Conventional Commits format (lefthook will run checks)
-5. **Review**: Open PR with clear description
 
 ## 📝 State Management (Zustand)
 
