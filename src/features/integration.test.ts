@@ -50,8 +50,8 @@ describe("Feature-Sliced Design Integration", () => {
     expect(typeof scoringModule.useScoring).toBe("function");
 
     // Check store exports
-    expect(scoringModule.useScoringStore).toBeDefined();
-    expect(typeof scoringModule.useScoringStore).toBe("function");
+    expect(scoringModule.useHighScoreStore).toBeDefined();
+    expect(typeof scoringModule.useHighScoreStore).toBe("function");
 
     // Check API exports
     expect(scoringModule.scoreStorage).toBeDefined();

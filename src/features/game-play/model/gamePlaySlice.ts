@@ -61,6 +61,16 @@ interface GamePlayState {
   floatingScoreEvents: FloatingScoreEvent[];
   levelCelebrationState: LevelCelebrationState;
 
+  // Game statistics
+  totalLinesCleared: number;
+  totalTSpins: number;
+  totalPerfectClears: number;
+  totalTetrises: number;
+  totalSingles: number;
+  totalDoubles: number;
+  totalTriples: number;
+  maxCombo: number;
+
   // Debug features
   debugMode: boolean;
   debugParams: DebugParams | null;
@@ -93,6 +103,7 @@ interface GamePlayState {
   updateComboState: (state: ComboState) => void;
   incrementCombo: (clearType: "single" | "double" | "triple" | "tetris" | "tspin") => void;
   resetCombo: () => void;
+  updateMaxCombo: (count: number) => void;
 
   // Score animation actions
   updateScoreAnimationState: (state: ScoreAnimationState) => void;
@@ -105,6 +116,16 @@ interface GamePlayState {
   updateLevelCelebrationPhase: (phase: "intro" | "main" | "outro" | "completed") => void;
   completeLevelCelebration: () => void;
   cancelLevelCelebration: () => void;
+
+  // Statistics actions
+  incrementTotalLines: (lines: number) => void;
+  incrementTSpins: () => void;
+  incrementPerfectClears: () => void;
+  incrementTetrises: () => void;
+  incrementSingles: () => void;
+  incrementDoubles: () => void;
+  incrementTriples: () => void;
+  resetStatistics: () => void;
 
   // Debug actions
   setDebugMode: (enabled: boolean) => void;
@@ -211,6 +232,17 @@ export const useGamePlayStore = create<GamePlayState>()(
         phase: "completed",
         userCancelled: false,
       },
+
+      // Statistics
+      totalLinesCleared: 0,
+      totalTSpins: 0,
+      totalPerfectClears: 0,
+      totalTetrises: 0,
+      totalSingles: 0,
+      totalDoubles: 0,
+      totalTriples: 0,
+      maxCombo: 0,
+
       debugMode: false,
       debugParams: null,
       showResetConfirmation: false,
@@ -244,13 +276,18 @@ export const useGamePlayStore = create<GamePlayState>()(
       // Combo actions
       updateComboState: (comboState) => set(() => ({ comboState })),
       incrementCombo: (clearType) =>
-        set((state) => ({
-          comboState: {
-            count: state.comboState.count + 1,
-            isActive: true,
-            lastClearType: clearType,
-          },
-        })),
+        set((state) => {
+          const newCombo = state.comboState.count + 1;
+          const newMaxCombo = Math.max(state.maxCombo, newCombo);
+          return {
+            comboState: {
+              count: newCombo,
+              isActive: true,
+              lastClearType: clearType,
+            },
+            maxCombo: newMaxCombo,
+          };
+        }),
       resetCombo: () =>
         set(() => ({
           comboState: {
@@ -258,6 +295,10 @@ export const useGamePlayStore = create<GamePlayState>()(
             isActive: false,
             lastClearType: null,
           },
+        })),
+      updateMaxCombo: (count) =>
+        set((state) => ({
+          maxCombo: Math.max(state.maxCombo, count),
         })),
 
       // Score animation actions
@@ -304,6 +345,47 @@ export const useGamePlayStore = create<GamePlayState>()(
             userCancelled: true,
             phase: "completed",
           },
+        })),
+
+      // Statistics actions
+      incrementTotalLines: (lines) =>
+        set((state) => ({
+          totalLinesCleared: state.totalLinesCleared + lines,
+        })),
+      incrementTSpins: () =>
+        set((state) => ({
+          totalTSpins: state.totalTSpins + 1,
+        })),
+      incrementPerfectClears: () =>
+        set((state) => ({
+          totalPerfectClears: state.totalPerfectClears + 1,
+        })),
+      incrementTetrises: () =>
+        set((state) => ({
+          totalTetrises: state.totalTetrises + 1,
+        })),
+      incrementSingles: () =>
+        set((state) => ({
+          totalSingles: state.totalSingles + 1,
+        })),
+      incrementDoubles: () =>
+        set((state) => ({
+          totalDoubles: state.totalDoubles + 1,
+        })),
+      incrementTriples: () =>
+        set((state) => ({
+          totalTriples: state.totalTriples + 1,
+        })),
+      resetStatistics: () =>
+        set(() => ({
+          totalLinesCleared: 0,
+          totalTSpins: 0,
+          totalPerfectClears: 0,
+          totalTetrises: 0,
+          totalSingles: 0,
+          totalDoubles: 0,
+          totalTriples: 0,
+          maxCombo: 0,
         })),
 
       // Debug actions
@@ -772,6 +854,16 @@ export const useGamePlayActions = () =>
       completeLevelCelebration: state.completeLevelCelebration,
       cancelLevelCelebration: state.cancelLevelCelebration,
 
+      // Statistics actions
+      incrementTotalLines: state.incrementTotalLines,
+      incrementTSpins: state.incrementTSpins,
+      incrementPerfectClears: state.incrementPerfectClears,
+      incrementTetrises: state.incrementTetrises,
+      incrementSingles: state.incrementSingles,
+      incrementDoubles: state.incrementDoubles,
+      incrementTriples: state.incrementTriples,
+      resetStatistics: state.resetStatistics,
+
       // Debug actions
       setDebugMode: state.setDebugMode,
       applyDebugPreset: state.applyDebugPreset,
@@ -864,6 +956,16 @@ export const useGamePlayState = () =>
       scoreAnimationState: state.scoreAnimationState,
       floatingScoreEvents: state.floatingScoreEvents,
       levelCelebrationState: state.levelCelebrationState,
+
+      // Statistics
+      totalLinesCleared: state.totalLinesCleared,
+      totalTSpins: state.totalTSpins,
+      totalPerfectClears: state.totalPerfectClears,
+      totalTetrises: state.totalTetrises,
+      totalSingles: state.totalSingles,
+      totalDoubles: state.totalDoubles,
+      totalTriples: state.totalTriples,
+      maxCombo: state.maxCombo,
 
       // Debug features
       debugMode: state.debugMode,

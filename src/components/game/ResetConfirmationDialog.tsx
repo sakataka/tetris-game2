@@ -1,6 +1,5 @@
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { useShallow } from "zustand/react/shallow";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,7 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
-import { useScoringStore } from "@/features/scoring";
+import { useHighScore } from "@/features/scoring/lib/useHighScore";
 import { MODAL_STYLES } from "@/utils/styles";
 
 export function ResetConfirmationDialog() {
@@ -22,41 +21,15 @@ export function ResetConfirmationDialog() {
   const hideResetDialog = useGamePlayStore((state) => state.hideResetDialog);
   const confirmReset = useGamePlayStore((state) => state.confirmReset);
 
-  // Get score data from appropriate stores with useShallow to prevent infinite re-renders
-  const scoreData = useScoringStore(
-    useShallow((state) => ({
-      score: state.score,
-      lines: state.lines,
-      level: state.level,
-    })),
-  );
-  const { addNewHighScore, setScore, setLines, setLevel } = useScoringStore(
-    useShallow((state) => ({
-      addNewHighScore: state.addNewHighScore,
-      setScore: state.setScore,
-      setLines: state.setLines,
-      setLevel: state.setLevel,
-    })),
-  );
+  // Score data is already in gamePlayStore and will be accessed by addNewHighScore
+  const { addNewHighScore } = useHighScore();
 
   const handleConfirm = useCallback(() => {
     // Save score before reset (same logic as game over)
-    // Update scoring store with current game data before saving
-    setScore(scoreData.score);
-    setLines(scoreData.lines);
-    setLevel(scoreData.level);
+    // Score data is already in gamePlayStore, so we can directly save it
     addNewHighScore();
     confirmReset();
-  }, [
-    scoreData.score,
-    scoreData.lines,
-    scoreData.level,
-    setScore,
-    setLines,
-    setLevel,
-    addNewHighScore,
-    confirmReset,
-  ]);
+  }, [addNewHighScore, confirmReset]);
 
   const handleCancel = useCallback(() => {
     hideResetDialog();

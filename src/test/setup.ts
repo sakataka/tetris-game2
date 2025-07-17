@@ -14,10 +14,6 @@ interface GameState {
   resetGame?: () => void;
 }
 
-interface ScoringState {
-  reset?: () => void;
-}
-
 interface GlobalWithJest {
   jest?: {
     clearAllMocks?: () => void;
@@ -27,17 +23,14 @@ interface GlobalWithJest {
 // Import stores for cleanup
 let gameStore: unknown;
 let settingsStore: unknown;
-let scoringStore: unknown;
 
 // Dynamically import stores to avoid dependency issues
 const importStores = async () => {
   try {
     const { useGamePlayStore } = await import("@/features/game-play/model/gamePlaySlice");
     const { useSettingsStore } = await import("@/features/settings");
-    const { useScoringStore } = await import("@/features/scoring");
     gameStore = useGamePlayStore;
     settingsStore = useSettingsStore;
-    scoringStore = useScoringStore;
   } catch {
     // Stores might not be available in some test contexts
   }
@@ -202,13 +195,8 @@ beforeEach(async () => {
     }
   }
 
-  if (scoringStore && typeof scoringStore === "object" && "getState" in scoringStore) {
-    const store = scoringStore as unknown as ZustandStore;
-    const state = store.getState() as ScoringState;
-    if (state?.reset) {
-      state.reset();
-    }
-  }
+  // High score store doesn't need reset for tests
+  // High scores should persist across test runs unless explicitly cleared
 
   // Clear all existing timers (functions are already set up globally)
   if (global.clearTimeout && global.clearInterval) {

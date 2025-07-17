@@ -1,15 +1,13 @@
 import { Pause, Play, RefreshCw } from "lucide-react";
 import { AnimatedButton } from "@/components/ui/AnimatedButton";
 import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
-import { useScoringStore } from "@/features/scoring/model/scoringSlice";
 import { useHapticFeedback } from "@/hooks/common/useHapticFeedback";
+import { useScoreState } from "@/hooks/selectors/useScoreSelectors";
 import { GameSettings } from "./GameSettings";
 
 export function MobileHeader() {
-  // Get scoring data from scoring store
-  const score = useScoringStore((state) => state.score);
-  const lines = useScoringStore((state) => state.lines);
-  const level = useScoringStore((state) => state.level);
+  // Get scoring data from gameplay store via useScoreSelectors
+  const { score, lines, level } = useScoreState();
 
   // Get game state from gameplay store
   const nextPieces = useGamePlayStore((state) => state.nextPieces);

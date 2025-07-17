@@ -2,13 +2,14 @@ import { useTranslation } from "react-i18next";
 import { AnimatedButton } from "@/components/ui/AnimatedButton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useGamePlay } from "@/features/game-play";
-import { useScoringData, useScoringStore } from "@/features/scoring";
+import { useHighScoreData } from "@/features/scoring/lib/useHighScore";
+import { useScoreState } from "@/hooks/selectors/useScoreSelectors";
 import { MODAL_STYLES } from "@/utils/styles";
 
 export function GameOverlay() {
   const { isGameOver, isPaused, resetGame, pauseGame } = useGamePlay();
-  const { score } = useScoringData();
-  const currentHighScore = useScoringStore((state) => state.currentHighScore);
+  const { score } = useScoreState();
+  const { currentHighScore } = useHighScoreData();
   const { t } = useTranslation();
 
   // Check if current score is a new high score

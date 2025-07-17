@@ -1,12 +1,8 @@
 import { useCallback } from "react";
 import { useShallow } from "zustand/react/shallow";
-import { useScoringStore } from "../model/scoringSlice";
-import type {
-  ComboState,
-  FloatingScoreEvent,
-  ScoreAnimationState,
-  ScoreData,
-} from "../ui/ScoreDisplay";
+import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
+import type { ComboState, FloatingScoreEvent } from "@/types/game";
+import type { ScoreData } from "../ui/ScoreDisplay";
 
 export interface LineClearData {
   linesCleared: number;
@@ -19,7 +15,11 @@ export interface LineClearData {
 export interface UseScoringReturn {
   // Score data
   scoreData: ScoreData;
-  animationState: ScoreAnimationState;
+  animationState: {
+    previousScore: number;
+    isAnimating: boolean;
+    scoreIncrement: number;
+  };
   comboState: ComboState;
   floatingScoreEvents: FloatingScoreEvent[];
 
@@ -33,7 +33,11 @@ export interface UseScoringReturn {
   updateLevel: (level: number) => void;
   incrementCombo: () => void;
   resetCombo: () => void;
-  addFloatingScore: (event: Omit<FloatingScoreEvent, "id" | "timestamp">) => void;
+  addFloatingScore: (event: {
+    value: number;
+    type: string;
+    position: { x: number; y: number };
+  }) => void;
   removeFloatingScore: (id: string) => void;
   clearAnimations: () => void;
 
@@ -48,50 +52,56 @@ export interface UseScoringReturn {
 }
 
 export const useScoring = (): UseScoringReturn => {
-  // Get score state using shallow comparison
-  const scoreData = useScoringStore(
+  // Get score state using shallow comparison from gamePlayStore
+  const scoreData = useGamePlayStore(
     useShallow((state) => ({
       score: state.score,
       lines: state.lines,
       level: state.level,
-      previousScore: state.previousScore,
+      previousScore: state.scoreAnimationState.previousScore,
     })),
   );
 
-  const animationState = useScoringStore(
+  const animationState = useGamePlayStore(
     useShallow((state) => ({
-      previousScore: state.previousScore,
-      isAnimating: state.isAnimating,
-      scoreIncrement: state.scoreIncrement,
+      previousScore: state.scoreAnimationState.previousScore,
+      isAnimating: state.scoreAnimationState.scoreIncrease > 0,
+      scoreIncrement: state.scoreAnimationState.scoreIncrease,
     })),
   );
 
-  const comboState = useScoringStore(
+  const comboState = useGamePlayStore(
     useShallow((state) => ({
-      count: state.comboCount,
-      isActive: state.comboActive,
-      lastUpdate: state.comboLastUpdate,
+      count: state.comboState.count,
+      isActive: state.comboState.isActive,
+      lastClearType: state.comboState.lastClearType,
     })),
   );
 
-  const floatingScoreEvents = useScoringStore((state) => state.floatingScoreEvents);
+  const floatingScoreEvents = useGamePlayStore((state) => state.floatingScoreEvents);
 
   // Get actions
-  const actions = useScoringStore(
+  const actions = useGamePlayStore(
     useShallow((state) => ({
-      setScore: state.setScore,
-      setLines: state.setLines,
-      setLevel: state.setLevel,
-      setPreviousScore: state.setPreviousScore,
-      setAnimating: state.setAnimating,
-      setScoreIncrement: state.setScoreIncrement,
-      setComboCount: state.setComboCount,
-      setComboActive: state.setComboActive,
-      setComboLastUpdate: state.setComboLastUpdate,
+      updateScore: state.updateScore,
+      updateLines: state.updateLines,
+      updateLevel: state.updateLevel,
+      updateScoreAnimationState: state.updateScoreAnimationState,
+      updateComboState: state.updateComboState,
+      incrementCombo: state.incrementCombo,
+      resetCombo: state.resetCombo,
       addFloatingScoreEvent: state.addFloatingScoreEvent,
       removeFloatingScoreEvent: state.removeFloatingScoreEvent,
       clearFloatingScoreEvents: state.clearFloatingScoreEvents,
-      reset: state.reset,
+      resetGame: state.resetGame,
+      // Statistics actions
+      incrementTotalLines: state.incrementTotalLines,
+      incrementTSpins: state.incrementTSpins,
+      incrementPerfectClears: state.incrementPerfectClears,
+      incrementTetrises: state.incrementTetrises,
+      incrementSingles: state.incrementSingles,
+      incrementDoubles: state.incrementDoubles,
+      incrementTriples: state.incrementTriples,
     })),
   );
 
@@ -164,16 +174,20 @@ export const useScoring = (): UseScoringReturn => {
   const addScore = useCallback(
     (points: number, source?: string) => {
       const currentScore = scoreData.score;
+      const newScore = currentScore + points;
 
-      actions.setPreviousScore(currentScore);
-      actions.setScore(currentScore + points);
-      actions.setScoreIncrement(points);
-      actions.setAnimating(true);
+      // Update score animation state
+      actions.updateScoreAnimationState({
+        previousScore: currentScore,
+        scoreIncrease: points,
+        lineCount: 0,
+        clearType: null,
+        isTetris: false,
+        animationTriggerTime: Date.now(),
+      });
 
-      // Stop animation after a delay
-      setTimeout(() => {
-        actions.setAnimating(false);
-      }, 1000);
+      // Update actual score
+      actions.updateScore(newScore);
 
       console.log(`[Scoring] Added ${points} points from ${source || "unknown"}`);
     },
@@ -186,10 +200,10 @@ export const useScoring = (): UseScoringReturn => {
       const newTotalLines = scoreData.lines + lines;
       const newLevel = calculateLevel(newTotalLines);
 
-      actions.setLines(newTotalLines);
+      actions.updateLines(newTotalLines);
 
       if (newLevel > scoreData.level) {
-        actions.setLevel(newLevel);
+        actions.updateLevel(newLevel);
       }
     },
     [scoreData.lines, scoreData.level, calculateLevel, actions],
@@ -198,32 +212,30 @@ export const useScoring = (): UseScoringReturn => {
   // Update level manually
   const updateLevel = useCallback(
     (level: number) => {
-      actions.setLevel(level);
+      actions.updateLevel(level);
     },
     [actions],
   );
 
   // Increment combo
   const incrementCombo = useCallback(() => {
-    const newCombo = comboState.count + 1;
-    actions.setComboCount(newCombo);
-    actions.setComboActive(true);
-    actions.setComboLastUpdate(Date.now());
-  }, [comboState.count, actions]);
+    actions.incrementCombo("single");
+  }, [actions]);
 
   // Reset combo
   const resetCombo = useCallback(() => {
-    actions.setComboCount(0);
-    actions.setComboActive(false);
+    actions.resetCombo();
   }, [actions]);
 
   // Add floating score event
   const addFloatingScore = useCallback(
-    (event: Omit<FloatingScoreEvent, "id" | "timestamp">) => {
+    (event: { value: number; type: string; position: { x: number; y: number } }) => {
       const floatingEvent: FloatingScoreEvent = {
-        ...event,
         id: `floating-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        timestamp: Date.now(),
+        points: event.value,
+        position: event.position,
+        startTime: Date.now(),
+        isActive: true,
       };
 
       actions.addFloatingScoreEvent(floatingEvent);
@@ -241,8 +253,15 @@ export const useScoring = (): UseScoringReturn => {
 
   // Clear all animations
   const clearAnimations = useCallback(() => {
-    actions.setAnimating(false);
-    actions.setComboActive(false);
+    actions.updateScoreAnimationState({
+      previousScore: 0,
+      scoreIncrease: 0,
+      lineCount: 0,
+      clearType: null,
+      isTetris: false,
+      animationTriggerTime: 0,
+    });
+    actions.resetCombo();
     actions.clearFloatingScoreEvents();
   }, [actions]);
 
@@ -257,6 +276,33 @@ export const useScoring = (): UseScoringReturn => {
 
       // Add lines
       addLines(linesCleared);
+
+      // Update statistics
+      actions.incrementTotalLines(linesCleared);
+
+      if (isTSpin) {
+        actions.incrementTSpins();
+      }
+
+      if (isPerfectClear) {
+        actions.incrementPerfectClears();
+      }
+
+      // Update specific line clear statistics
+      switch (linesCleared) {
+        case 1:
+          actions.incrementSingles();
+          break;
+        case 2:
+          actions.incrementDoubles();
+          break;
+        case 3:
+          actions.incrementTriples();
+          break;
+        case 4:
+          actions.incrementTetrises();
+          break;
+      }
 
       // Handle combo
       if (linesCleared > 0) {
@@ -280,22 +326,22 @@ export const useScoring = (): UseScoringReturn => {
         `[Scoring] Line clear: ${linesCleared} lines, ${points} points, T-Spin: ${isTSpin}, Perfect: ${isPerfectClear}`,
       );
     },
-    [calculateScore, addScore, addLines, incrementCombo, addFloatingScore],
+    [calculateScore, addScore, addLines, incrementCombo, addFloatingScore, actions],
   );
 
   // Handle piece placed event
   const onPiecePlaced = useCallback(() => {
     // Reset combo if no lines were cleared
+    // Note: This is a simplified implementation
+    // In a full implementation, this should be coordinated with the game engine
     setTimeout(() => {
-      if (comboState.lastUpdate < Date.now() - 100) {
-        resetCombo();
-      }
+      resetCombo();
     }, 50);
-  }, [comboState.lastUpdate, resetCombo]);
+  }, [resetCombo]);
 
   // Handle game reset
   const onGameReset = useCallback(() => {
-    actions.reset();
+    actions.resetGame();
   }, [actions]);
 
   return {
@@ -325,12 +371,12 @@ export const useScoring = (): UseScoringReturn => {
  * Hook for score data only (read-only)
  */
 export const useScoringData = () => {
-  return useScoringStore(
+  return useGamePlayStore(
     useShallow((state) => ({
       score: state.score,
       lines: state.lines,
       level: state.level,
-      previousScore: state.previousScore,
+      previousScore: state.scoreAnimationState.previousScore,
     })),
   );
 };
@@ -339,12 +385,12 @@ export const useScoringData = () => {
  * Hook for score animation state only (read-only)
  */
 export const useScoringAnimationState = () => {
-  return useScoringStore(
+  return useGamePlayStore(
     useShallow((state) => ({
-      isAnimating: state.isAnimating,
-      scoreIncrement: state.scoreIncrement,
-      comboCount: state.comboCount,
-      comboActive: state.comboActive,
+      isAnimating: state.scoreAnimationState.scoreIncrease > 0,
+      scoreIncrement: state.scoreAnimationState.scoreIncrease,
+      comboCount: state.comboState.count,
+      comboActive: state.comboState.isActive,
       floatingScoreEvents: state.floatingScoreEvents,
     })),
   );

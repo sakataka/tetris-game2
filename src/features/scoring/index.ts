@@ -8,7 +8,7 @@ export type { LineClearData, UseScoringReturn } from "./lib/useScoring";
 export { useScoring, useScoringAnimationState, useScoringData } from "./lib/useScoring";
 
 // Store
-export { useScoringStore } from "./model/scoringSlice";
+export { useHighScoreStore } from "./model/highScoreSlice";
 export type {
   ComboState,
   FloatingScoreEvent,
