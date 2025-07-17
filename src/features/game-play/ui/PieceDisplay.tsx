@@ -1,5 +1,5 @@
+import { Card, CardContent, CardHeader, CardTitle } from "@shared/ui/card";
 import { useTranslation } from "react-i18next";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getTetrominoShape } from "@/game/tetrominos";
 import { cn } from "@/lib/utils";
 import type { TetrominoTypeName } from "@/types/game";

@@ -1,6 +1,6 @@
+import { AnimatedButton } from "@shared/ui/AnimatedButton";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@shared/ui/dialog";
 import { useTranslation } from "react-i18next";
-import { AnimatedButton } from "@/components/ui/AnimatedButton";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useGamePlay } from "@/features/game-play";
 import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
 import { useHighScoreData } from "@/features/scoring/lib/useHighScore";

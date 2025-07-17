@@ -1,5 +1,5 @@
+import { Badge } from "@shared/ui/badge";
 import { Calendar, Target, TrendingUp } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import type { HighScoreEntry } from "@/features/scoring";
 import { CONTROL_STYLES } from "@/utils/styles";
 

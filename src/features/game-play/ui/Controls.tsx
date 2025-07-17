@@ -1,6 +1,6 @@
+import { Badge } from "@shared/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@shared/ui/card";
 import { useTranslation } from "react-i18next";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CARD_STYLES, CONTROL_STYLES } from "@/utils/styles";
 
 export function Controls() {

@@ -1,5 +1,5 @@
-import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
+import { Badge } from "@shared/ui/badge";
+import { Card } from "@shared/ui/card";
 import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
 import type { TetrominoTypeName } from "@/types/game";
 import { generateDebugUrl } from "@/utils/debugParams";

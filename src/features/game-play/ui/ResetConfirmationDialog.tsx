@@ -1,6 +1,4 @@
-import { useCallback } from "react";
-import { useTranslation } from "react-i18next";
-import { Button } from "@/components/ui/button";
+import { Button } from "@shared/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -8,7 +6,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from "@shared/ui/dialog";
+import { useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
 import { useHighScore } from "@/features/scoring/lib/useHighScore";
 import { MODAL_STYLES } from "@/utils/styles";

@@ -1,10 +1,10 @@
+import { AnimatedButton } from "@shared/ui/AnimatedButton";
+import { Badge } from "@shared/ui/badge";
+import { Card } from "@shared/ui/card";
 import { Settings } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
-import { AnimatedButton } from "@/components/ui/AnimatedButton";
-import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
 import { useSimpleAIStore } from "@/features/ai-control";
 import { useSettings } from "@/features/settings";
 import { CONTROL_STYLES, MODAL_STYLES } from "@/utils/styles";

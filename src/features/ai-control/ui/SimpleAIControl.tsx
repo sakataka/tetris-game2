@@ -1,6 +1,6 @@
+import { Card, CardContent, CardHeader, CardTitle } from "@shared/ui/card";
+import { Switch } from "@shared/ui/switch";
 import { useTranslation } from "react-i18next";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
 import { useSimpleAIStore } from "../model/simpleAISlice";
 
 /**

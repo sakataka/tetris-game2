@@ -1,6 +1,6 @@
+import { AnimatedButton } from "@shared/ui/AnimatedButton";
+import type { ButtonProps } from "@shared/ui/button";
 import { useCallback } from "react";
-import { AnimatedButton } from "@/components/ui/AnimatedButton";
-import type { ButtonProps } from "@/components/ui/button";
 import { useHapticFeedback } from "@/hooks/common/useHapticFeedback";
 import { usePerformanceMonitor } from "@/hooks/ui/usePerformanceMonitor";
 

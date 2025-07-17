@@ -1,6 +1,6 @@
+import { Card, CardContent, CardHeader, CardTitle } from "@shared/ui/card";
 import { Target, TrendingUp, Trophy } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { HighScoreEntry } from "@/features/scoring";
 import { CARD_STYLES, CONTROL_STYLES } from "@/utils/styles";
 

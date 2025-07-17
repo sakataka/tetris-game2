@@ -1,19 +1,13 @@
+import { AnimatedButton } from "@shared/ui/AnimatedButton";
+import { Badge } from "@shared/ui/badge";
+import { Card } from "@shared/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@shared/ui/select";
+import { Slider } from "@shared/ui/slider";
+import { Switch } from "@shared/ui/switch";
 import { Settings } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
-import { AnimatedButton } from "@/components/ui/AnimatedButton";
-import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
-import { Switch } from "@/components/ui/switch";
 import { CONTROL_STYLES, MODAL_STYLES } from "@/utils/styles";
 
 export interface GameSettings {

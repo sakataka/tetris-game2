@@ -1,5 +1,5 @@
+import { Card, CardContent, CardHeader, CardTitle } from "@shared/ui/card";
 import { useTranslation } from "react-i18next";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
 import { AnimatedScoreItem } from "@/features/scoring/ui/AnimatedScoreItem";
 import { ComboIndicator } from "@/features/scoring/ui/ComboIndicator";

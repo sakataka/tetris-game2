@@ -1,6 +1,6 @@
+import { Card } from "@shared/ui/card";
 import { useAnimate } from "motion/react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import { Card } from "@/components/ui/card";
 import { useGamePlayState } from "@/features/game-play";
 import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
 import { useDesignTokens } from "@/hooks/core/useDesignTokens";

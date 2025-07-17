@@ -1,5 +1,5 @@
+import { AnimatedButton } from "@shared/ui/AnimatedButton";
 import { Pause, Play, RefreshCw } from "lucide-react";
-import { AnimatedButton } from "@/components/ui/AnimatedButton";
 import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
 import { GameSettingsComponent as GameSettings } from "@/features/settings";
 import { useHapticFeedback } from "@/hooks/common/useHapticFeedback";

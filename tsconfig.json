@@ -19,7 +19,8 @@
     /* Path mapping */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@shared/ui/*": ["./src/components/ui/*"]
     },
 
     /* Linting */
