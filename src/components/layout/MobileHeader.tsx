@@ -3,11 +3,12 @@ import { AnimatedButton } from "@/components/ui/AnimatedButton";
 import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
 import { GameSettingsComponent as GameSettings } from "@/features/settings";
 import { useHapticFeedback } from "@/hooks/common/useHapticFeedback";
-import { useScoreState } from "@/hooks/selectors/useScoreSelectors";
 
 export function MobileHeader() {
-  // Get scoring data from gameplay store via useScoreSelectors
-  const { score, lines, level } = useScoreState();
+  // Use direct store access with individual primitive selectors for best performance
+  const score = useGamePlayStore((state) => state.score);
+  const lines = useGamePlayStore((state) => state.lines);
+  const level = useGamePlayStore((state) => state.level);
 
   // Get game state from gameplay store
   const nextPieces = useGamePlayStore((state) => state.nextPieces);

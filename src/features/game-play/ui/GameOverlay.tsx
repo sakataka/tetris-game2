@@ -2,13 +2,14 @@ import { useTranslation } from "react-i18next";
 import { AnimatedButton } from "@/components/ui/AnimatedButton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useGamePlay } from "@/features/game-play";
+import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
 import { useHighScoreData } from "@/features/scoring/lib/useHighScore";
-import { useScoreState } from "@/hooks/selectors/useScoreSelectors";
 import { MODAL_STYLES } from "@/utils/styles";
 
 export function GameOverlay() {
   const { isGameOver, isPaused, resetGame, pauseGame } = useGamePlay();
-  const { score } = useScoreState();
+  // Use direct store access with individual primitive selector for best performance
+  const score = useGamePlayStore((state) => state.score);
   const { currentHighScore } = useHighScoreData();
   const { t } = useTranslation();
 

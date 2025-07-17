@@ -6,12 +6,16 @@ import { ComboIndicator } from "@/features/scoring/ui/ComboIndicator";
 import { FloatingScoreText as FloatingScoreManager } from "@/features/scoring/ui/FloatingScoreText";
 import { ScoreCounter } from "@/features/scoring/ui/ScoreCounter";
 import { TetrisFlashEffect } from "@/features/scoring/ui/TetrisFlashEffect";
-import { useScoreAnimationState, useScoreState } from "@/hooks/selectors/useScoreSelectors";
 import { CARD_STYLES } from "@/utils/styles";
 
 export function ScoreBoard() {
-  const { score, lines, level } = useScoreState();
-  const { scoreAnimationState, comboState, floatingScoreEvents } = useScoreAnimationState();
+  // Use direct store access with individual primitive selectors for best performance
+  const score = useGamePlayStore((state) => state.score);
+  const lines = useGamePlayStore((state) => state.lines);
+  const level = useGamePlayStore((state) => state.level);
+  const scoreAnimationState = useGamePlayStore((state) => state.scoreAnimationState);
+  const comboState = useGamePlayStore((state) => state.comboState);
+  const floatingScoreEvents = useGamePlayStore((state) => state.floatingScoreEvents);
   const { t } = useTranslation();
 
   // FloatingScoreText cleanup handler
