@@ -31,20 +31,3 @@ export const useScoreAnimationState = () => {
 
   return data;
 };
-
-/**
- * Statistics state selectors from gameplay store
- */
-export const useStatisticsState = () =>
-  useGamePlayStore(
-    useShallow((state) => ({
-      totalLinesCleared: state.totalLinesCleared,
-      totalTSpins: state.totalTSpins,
-      totalPerfectClears: state.totalPerfectClears,
-      totalTetrises: state.totalTetrises,
-      totalSingles: state.totalSingles,
-      totalDoubles: state.totalDoubles,
-      totalTriples: state.totalTriples,
-      maxCombo: state.maxCombo,
-    })),
-  );
