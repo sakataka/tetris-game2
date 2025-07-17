@@ -1,8 +1,8 @@
 import { useCallback } from "react";
 import { AnimatedButton } from "@/components/ui/AnimatedButton";
 import type { ButtonProps } from "@/components/ui/button";
+import { useHapticFeedback } from "@/hooks/common/useHapticFeedback";
 import { usePerformanceMonitor } from "@/hooks/ui/usePerformanceMonitor";
-import { useHapticFeedback } from "@/utils/browserCompat";
 
 export type GameAction =
   | "move-left"
@@ -68,16 +68,22 @@ export const GameControlButton: React.FC<GameControlButtonProps> = ({
   ...buttonProps
 }) => {
   const { measureResponseTime } = usePerformanceMonitor();
-  const { triggerHaptic, isSupported: hapticSupported } = useHapticFeedback();
+  const { lightImpact, mediumImpact, heavyImpact } = useHapticFeedback();
 
   const handleAction = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
       // Start performance measurement
       const startTime = measureResponseTime(`game-control-${action}`);
 
-      // Provide immediate haptic feedback if enabled and supported
-      if (enableHaptic && hapticSupported) {
-        triggerHaptic(hapticIntensity);
+      // Provide immediate haptic feedback if enabled
+      if (enableHaptic) {
+        const hapticFunction =
+          hapticIntensity === "light"
+            ? lightImpact
+            : hapticIntensity === "medium"
+              ? mediumImpact
+              : heavyImpact;
+        hapticFunction();
       }
 
       // Execute game action callback
@@ -101,8 +107,9 @@ export const GameControlButton: React.FC<GameControlButtonProps> = ({
       action,
       measureResponseTime,
       enableHaptic,
-      hapticSupported,
-      triggerHaptic,
+      lightImpact,
+      mediumImpact,
+      heavyImpact,
       hapticIntensity,
       onClick,
     ],

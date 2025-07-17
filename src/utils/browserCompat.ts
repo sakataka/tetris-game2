@@ -1,5 +1,3 @@
-import { useCallback, useEffect, useState } from "react";
-
 /**
  * Supported CSS properties with fallbacks for older browsers
  * Ensures 95% browser support as required by O3 specifications
@@ -99,43 +97,6 @@ export const detectBrowserCapabilities = (): BrowserCapabilities => {
     isWebKitBased: /webkit/i.test(userAgent),
 
     isMobile: /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent),
-  };
-};
-
-/**
- * Mobile haptic feedback hook with conditional support
- * Provides tactile feedback for button interactions on supported devices
- */
-export const useHapticFeedback = () => {
-  const [isSupported, setIsSupported] = useState(false);
-
-  useEffect(() => {
-    setIsSupported("vibrate" in navigator);
-  }, []);
-
-  const triggerHaptic = useCallback(
-    (type: "light" | "medium" | "heavy" = "light") => {
-      if (!isSupported || !navigator.vibrate) return;
-
-      const patterns = {
-        light: 10,
-        medium: 25,
-        heavy: 50,
-      };
-
-      try {
-        navigator.vibrate(patterns[type]);
-      } catch (error) {
-        // Silently fail for unsupported devices
-        console.debug("[useHapticFeedback] Vibration not supported:", error);
-      }
-    },
-    [isSupported],
-  );
-
-  return {
-    triggerHaptic,
-    isSupported,
   };
 };
 
