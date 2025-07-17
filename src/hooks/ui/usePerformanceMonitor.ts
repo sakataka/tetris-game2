@@ -14,7 +14,7 @@ declare global {
   }
 }
 
-export interface PerformanceMonitorConfig {
+interface PerformanceMonitorConfig {
   enableLogging: boolean;
   targetResponseTime: number;
   warningThreshold: number;

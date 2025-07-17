@@ -2,7 +2,7 @@ import { useGameInputActions } from "./useGameInputActions";
 import { useRotationControl } from "./useRotationControl";
 import type { SwipeGesture, TapGesture } from "./useTouchDetection";
 
-export interface TouchActionsReturn {
+interface TouchActionsReturn {
   handleSwipe: (gesture: SwipeGesture) => void;
   handleTap: (gesture: TapGesture) => void;
   handleDoubleTap: (gesture: TapGesture) => void;

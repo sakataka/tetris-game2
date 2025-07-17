@@ -31,7 +31,7 @@ export interface TouchDetectionEvents {
   onTap?: (gesture: TapGesture) => void;
   onDoubleTap?: (gesture: TapGesture) => void;
 }
-export interface TouchDetectionReturn {
+interface TouchDetectionReturn {
   handleTouchStart: (event: React.TouchEvent) => void;
   handleTouchEnd: (event: React.TouchEvent) => void;
 }
