@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@shared/ui/card";
 import { useTranslation } from "react-i18next";
+import { useShallow } from "zustand/react/shallow";
 import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
 import { AnimatedScoreItem } from "@/features/scoring/ui/AnimatedScoreItem";
 import { ComboIndicator } from "@/features/scoring/ui/ComboIndicator";
@@ -9,13 +10,22 @@ import { TetrisFlashEffect } from "@/features/scoring/ui/TetrisFlashEffect";
 import { CARD_STYLES } from "@/utils/styles";
 
 export function ScoreBoard() {
-  // Use direct store access with individual primitive selectors for best performance
-  const score = useGamePlayStore((state) => state.score);
-  const lines = useGamePlayStore((state) => state.lines);
-  const level = useGamePlayStore((state) => state.level);
-  const scoreAnimationState = useGamePlayStore((state) => state.scoreAnimationState);
-  const comboState = useGamePlayStore((state) => state.comboState);
-  const floatingScoreEvents = useGamePlayStore((state) => state.floatingScoreEvents);
+  // Optimize selectors with useShallow for better performance
+  const { score, lines, level } = useGamePlayStore(
+    useShallow((state) => ({
+      score: state.score,
+      lines: state.lines,
+      level: state.level,
+    })),
+  );
+
+  const { scoreAnimationState, comboState, floatingScoreEvents } = useGamePlayStore(
+    useShallow((state) => ({
+      scoreAnimationState: state.scoreAnimationState,
+      comboState: state.comboState,
+      floatingScoreEvents: state.floatingScoreEvents,
+    })),
+  );
   const { t } = useTranslation();
 
   // FloatingScoreText cleanup handler

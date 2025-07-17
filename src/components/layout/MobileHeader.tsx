@@ -1,24 +1,37 @@
 import { AnimatedButton } from "@shared/ui/AnimatedButton";
 import { Pause, Play, RefreshCw } from "lucide-react";
+import { useShallow } from "zustand/react/shallow";
 import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
 import { GameSettingsComponent as GameSettings } from "@/features/settings";
 import { useHapticFeedback } from "@/hooks/common/useHapticFeedback";
 
 export function MobileHeader() {
-  // Use direct store access with individual primitive selectors for best performance
-  const score = useGamePlayStore((state) => state.score);
-  const lines = useGamePlayStore((state) => state.lines);
-  const level = useGamePlayStore((state) => state.level);
+  // Optimize selectors with useShallow for better performance
+  const { score, lines, level, isPaused, isGameOver, canHold } = useGamePlayStore(
+    useShallow((state) => ({
+      score: state.score,
+      lines: state.lines,
+      level: state.level,
+      isPaused: state.isPaused,
+      isGameOver: state.isGameOver,
+      canHold: state.canHold,
+    })),
+  );
 
-  // Get game state from gameplay store
-  const nextPieces = useGamePlayStore((state) => state.nextPieces);
-  const heldPiece = useGamePlayStore((state) => state.heldPiece);
-  const isPaused = useGamePlayStore((state) => state.isPaused);
-  const isGameOver = useGamePlayStore((state) => state.isGameOver);
-  const pauseGame = useGamePlayStore((state) => state.pauseGame);
-  const showResetDialog = useGamePlayStore((state) => state.showResetDialog);
-  const holdPiece = useGamePlayStore((state) => state.holdPiece);
-  const canHold = useGamePlayStore((state) => state.canHold);
+  const { nextPieces, heldPiece } = useGamePlayStore(
+    useShallow((state) => ({
+      nextPieces: state.nextPieces,
+      heldPiece: state.heldPiece,
+    })),
+  );
+
+  const { pauseGame, showResetDialog, holdPiece } = useGamePlayStore(
+    useShallow((state) => ({
+      pauseGame: state.pauseGame,
+      showResetDialog: state.showResetDialog,
+      holdPiece: state.holdPiece,
+    })),
+  );
 
   // Get next piece for compatibility
   const nextPiece = nextPieces[0] || null;

@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useTransition } from "react";
+import { useShallow } from "zustand/react/shallow";
 import { useGamePlayActions, useGamePlayStore } from "@/features/game-play";
 
 /**
@@ -45,15 +46,22 @@ export function useGameInputActions(): GameInputActions {
   // Get all actions from the new game play store
   const gamePlayActions = useGamePlayActions();
 
-  // Get state for validation
-  const isGameOver = useGamePlayStore((state) => state.isGameOver);
-  const isPaused = useGamePlayStore((state) => state.isPaused);
+  // Optimize selectors with useShallow for better performance
+  const { isGameOver, isPaused } = useGamePlayStore(
+    useShallow((state) => ({
+      isGameOver: state.isGameOver,
+      isPaused: state.isPaused,
+    })),
+  );
 
-  // Get additional actions directly from store
-  const showResetDialog = useGamePlayStore((state) => state.showResetDialog);
-  const hideResetDialog = useGamePlayStore((state) => state.hideResetDialog);
-  const confirmReset = useGamePlayStore((state) => state.confirmReset);
-  const clearAnimationData = useGamePlayStore((state) => state.clearAnimationData);
+  const { showResetDialog, hideResetDialog, confirmReset, clearAnimationData } = useGamePlayStore(
+    useShallow((state) => ({
+      showResetDialog: state.showResetDialog,
+      hideResetDialog: state.hideResetDialog,
+      confirmReset: state.confirmReset,
+      clearAnimationData: state.clearAnimationData,
+    })),
+  );
 
   // Transition for non-urgent actions
   const [, startTransition] = useTransition();

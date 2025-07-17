@@ -1,5 +1,6 @@
 import { motion } from "motion/react";
 import { useMemo } from "react";
+import { useShallow } from "zustand/react/shallow";
 import { useGamePlayState } from "@/features/game-play";
 import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
 import { useSettingsData } from "@/features/settings";
@@ -29,14 +30,22 @@ export function BoardCell({ row, col, cellSize = GAME_CONSTANTS.BOARD.CELL_SIZE 
   const baseCellValue = board[row]?.[col] ?? 0;
   const ghostPosition = ghostPiece?.position;
 
-  // Get animation control functions
-  const clearAnimationData = useGamePlayStore((state) => state.clearAnimationData);
-
-  // Animation states from new architecture
-  const boardBeforeClear = useGamePlayStore((state) => state.boardBeforeClear);
-  const clearingLines = useGamePlayStore((state) => state.clearingLines);
-  const placedPositions = useGamePlayStore((state) => state.placedPositions);
-  const animationTriggerKey = useGamePlayStore((state) => state.animationTriggerKey);
+  // Optimize selectors with useShallow for better performance
+  const {
+    boardBeforeClear,
+    clearingLines,
+    placedPositions,
+    animationTriggerKey,
+    clearAnimationData,
+  } = useGamePlayStore(
+    useShallow((state) => ({
+      boardBeforeClear: state.boardBeforeClear,
+      clearingLines: state.clearingLines,
+      placedPositions: state.placedPositions,
+      animationTriggerKey: state.animationTriggerKey,
+      clearAnimationData: state.clearAnimationData,
+    })),
+  );
   const { showGhostPiece } = useSettingsData();
 
   // Compute cell display state

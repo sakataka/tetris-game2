@@ -1,15 +1,26 @@
 import { Badge } from "@shared/ui/badge";
 import { Card } from "@shared/ui/card";
+import { useShallow } from "zustand/react/shallow";
 import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
 import type { TetrominoTypeName } from "@/types/game";
 import { generateDebugUrl } from "@/utils/debugParams";
 import { getDebugPreset, getPresetNames } from "@/utils/debugPresets";
 
 export function DebugIndicator() {
-  const debugMode = useGamePlayStore((state) => state.debugMode);
-  const debugParams = useGamePlayStore((state) => state.debugParams);
-  const applyDebugPreset = useGamePlayStore((state) => state.applyDebugPreset);
-  const setDebugQueue = useGamePlayStore((state) => state.setDebugQueue);
+  // Optimize selectors with useShallow for better performance
+  const { debugMode, debugParams } = useGamePlayStore(
+    useShallow((state) => ({
+      debugMode: state.debugMode,
+      debugParams: state.debugParams,
+    })),
+  );
+
+  const { applyDebugPreset, setDebugQueue } = useGamePlayStore(
+    useShallow((state) => ({
+      applyDebugPreset: state.applyDebugPreset,
+      setDebugQueue: state.setDebugQueue,
+    })),
+  );
 
   if (!debugMode || !debugParams) {
     return null;

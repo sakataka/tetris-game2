@@ -9,6 +9,7 @@ import {
 } from "@shared/ui/dialog";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
+import { useShallow } from "zustand/react/shallow";
 import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
 import { useHighScore } from "@/features/scoring/lib/useHighScore";
 import { MODAL_STYLES } from "@/utils/styles";
@@ -16,10 +17,14 @@ import { MODAL_STYLES } from "@/utils/styles";
 export function ResetConfirmationDialog() {
   const { t } = useTranslation();
 
-  // Get reset confirmation state from gamePlay store
-  const showResetConfirmation = useGamePlayStore((state) => state.showResetConfirmation);
-  const hideResetDialog = useGamePlayStore((state) => state.hideResetDialog);
-  const confirmReset = useGamePlayStore((state) => state.confirmReset);
+  // Optimize selectors with useShallow for better performance
+  const { showResetConfirmation, hideResetDialog, confirmReset } = useGamePlayStore(
+    useShallow((state) => ({
+      showResetConfirmation: state.showResetConfirmation,
+      hideResetDialog: state.hideResetDialog,
+      confirmReset: state.confirmReset,
+    })),
+  );
 
   // Score data is already in gamePlayStore and will be accessed by addNewHighScore
   const { addNewHighScore } = useHighScore();

@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { useShallow } from "zustand/react/shallow";
 import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
 import { getGameSpeed } from "@/game/game";
 
@@ -12,13 +13,18 @@ import { getGameSpeed } from "@/game/game";
  * - Prevent timer drift that can occur with setInterval
  */
 export function useGameLoop() {
-  // Use new game-play store for all game state
+  // Optimize selectors with useShallow for better performance
+  const { isPaused, isGameOver, isPlaying, showResetConfirmation, level } = useGamePlayStore(
+    useShallow((state) => ({
+      isPaused: state.isPaused,
+      isGameOver: state.isGameOver,
+      isPlaying: state.isPlaying,
+      showResetConfirmation: state.showResetConfirmation,
+      level: state.level,
+    })),
+  );
+
   const softDrop = useGamePlayStore((state) => state.softDrop);
-  const isPaused = useGamePlayStore((state) => state.isPaused);
-  const isGameOver = useGamePlayStore((state) => state.isGameOver);
-  const isPlaying = useGamePlayStore((state) => state.isPlaying);
-  const showResetConfirmation = useGamePlayStore((state) => state.showResetConfirmation);
-  const level = useGamePlayStore((state) => state.level);
   const lastUpdateTime = useRef(0);
   const animationIdRef = useRef<number | null>(null);
 
