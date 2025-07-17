@@ -106,7 +106,7 @@ interface AnimationProviderProps {
   children: React.ReactNode;
 }
 
-export const AnimationProvider: React.FC<AnimationProviderProps> = ({ children }) => {
+export const AnimationProvider = ({ children }: AnimationProviderProps) => {
   const { animationsEnabled, performanceMode } = useAdaptivePerformance();
   const [config] = useState<FineTuneConfig>(DEFAULT_FINE_TUNE_CONFIG);
   const [isConfigLoaded] = useState(true);

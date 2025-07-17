@@ -72,7 +72,7 @@ interface ThemeProviderProps {
   children: React.ReactNode;
 }
 
-export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
+export const ThemeProvider = ({ children }: ThemeProviderProps) => {
   const [mode, setModeState] = useState<ThemeMode>("normal"); // Always use normal mode
   const [isTransitioning] = useState(false);
 

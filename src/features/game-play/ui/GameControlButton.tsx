@@ -57,7 +57,7 @@ interface GameControlButtonProps extends Omit<ButtonProps, "onClick"> {
  * </GameControlButton>
  * ```
  */
-export const GameControlButton: React.FC<GameControlButtonProps> = ({
+export const GameControlButton = ({
   action,
   onClick,
   enableHaptic = true,
@@ -66,7 +66,7 @@ export const GameControlButton: React.FC<GameControlButtonProps> = ({
   children,
   className,
   ...buttonProps
-}) => {
+}: GameControlButtonProps) => {
   const { measureResponseTime } = usePerformanceMonitor();
   const { lightImpact, mediumImpact, heavyImpact } = useHapticFeedback();
 

@@ -20,7 +20,7 @@ interface GameLayoutProps {
  * - Smooth transitions between modes
  * - AI features column when enabled
  */
-export const GameLayout: React.FC<GameLayoutProps> = ({ children, mode = "normal" }) => {
+export const GameLayout = ({ children, mode = "normal" }: GameLayoutProps) => {
   const { t } = useTranslation();
   const { layout } = useDesignTokens();
   const { animationsEnabled } = useAdaptivePerformance();
