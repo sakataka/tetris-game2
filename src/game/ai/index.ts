@@ -3,4 +3,5 @@
  */
 
 export type { GameState } from "@/types/game";
-export { SimpleAI } from "./simple-ai";
+export type { SimpleAI } from "./simple-ai";
+export { createSimpleAI } from "./simple-ai";

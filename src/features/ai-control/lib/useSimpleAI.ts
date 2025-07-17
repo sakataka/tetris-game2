@@ -2,14 +2,14 @@ import { useCallback, useEffect, useRef } from "react";
 import { gameEngineAdapter } from "@/features/game-play/api/gameEngineAdapter";
 import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
 import type { GameState } from "@/game/ai";
-import { SimpleAI } from "@/game/ai";
+import { createSimpleAI, type SimpleAI } from "@/game/ai";
 import { useSimpleAIStore } from "../model/simpleAISlice";
 
 /**
  * シンプルAIコントローラー
  */
 export function useSimpleAI() {
-  const aiRef = useRef<SimpleAI>(new SimpleAI());
+  const aiRef = useRef<SimpleAI>(createSimpleAI());
   const { isEnabled } = useSimpleAIStore();
   const { board, currentPiece, isPlaying, isGameOver } = useGamePlayStore();
 

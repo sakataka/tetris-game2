@@ -9,6 +9,9 @@ export interface FrameBudgetSentinel {
   startMonitoring(): void;
   getCurrentBudget(): number; // remaining ms this frame
   requestBudget(requiredMs: number): boolean;
+  stopMonitoring(): void;
+  getTargetBudget(): number;
+  measureRequestOverhead(): number;
   // PROTOTYPE: getPlatformOverhead() will be added in full implementation
 }
 
@@ -16,105 +19,108 @@ export interface FrameBudgetSentinel {
  * Minimal implementation for prototype validation
  * Focuses on technical feasibility testing
  */
-export class MinimalFrameBudgetSentinel implements FrameBudgetSentinel {
-  private frameStartTime = 0;
-  private budgetMs = 16.67; // 60fps target (1000ms / 60)
-  private isMonitoring = false;
+export function createMinimalFrameBudgetSentinel(): FrameBudgetSentinel {
+  let frameStartTime = 0;
+  let isMonitoring = false;
 
   // Platform-specific budget adjustments
-  private readonly platformBudgets = {
+  const platformBudgets = {
     safari: 15.5, // Conservative budget for Safari
     default: 16.67,
   };
 
-  constructor() {
-    // Detect Safari for platform-specific handling
-    if (typeof window !== "undefined" && window.navigator) {
-      const userAgent = window.navigator.userAgent;
-      const isSafari = /^((?!chrome|android).)*safari/i.test(userAgent);
-      if (isSafari) {
-        this.budgetMs = this.platformBudgets.safari;
+  // Detect Safari for platform-specific handling
+  let budgetMs = platformBudgets.default;
+  if (typeof window !== "undefined" && window.navigator) {
+    const userAgent = window.navigator.userAgent;
+    const isSafari = /^((?!chrome|android).)*safari/i.test(userAgent);
+    if (isSafari) {
+      budgetMs = platformBudgets.safari;
+    }
+  }
+
+  return {
+    startMonitoring(): void {
+      if (typeof performance === "undefined") {
+        console.warn("Performance API not available, frame budget monitoring disabled");
+        return;
       }
-    }
-  }
 
-  startMonitoring(): void {
-    if (typeof performance === "undefined") {
-      console.warn("Performance API not available, frame budget monitoring disabled");
-      return;
-    }
+      isMonitoring = true;
 
-    this.isMonitoring = true;
+      // Initialize frame start time immediately
+      frameStartTime = performance.now();
 
-    // Initialize frame start time immediately
-    this.frameStartTime = performance.now();
+      // Use requestAnimationFrame to sync with browser rendering
+      if (typeof requestAnimationFrame !== "undefined") {
+        const frameCallback = (_timestamp: number) => {
+          if (!isMonitoring) return;
 
-    // Use requestAnimationFrame to sync with browser rendering
-    if (typeof requestAnimationFrame !== "undefined") {
-      const frameCallback = (_timestamp: number) => {
-        if (!this.isMonitoring) return;
+          // Update frame start time
+          frameStartTime = performance.now();
 
-        // Update frame start time
-        this.frameStartTime = performance.now();
+          // Continue monitoring
+          requestAnimationFrame(frameCallback);
+        };
 
-        // Continue monitoring
         requestAnimationFrame(frameCallback);
-      };
+      }
+    },
 
-      requestAnimationFrame(frameCallback);
-    }
-  }
+    getCurrentBudget(): number {
+      if (!isMonitoring || typeof performance === "undefined") {
+        return 0; // No budget available if not monitoring
+      }
 
-  getCurrentBudget(): number {
-    if (!this.isMonitoring || typeof performance === "undefined") {
-      return 0; // No budget available if not monitoring
-    }
+      const elapsed = performance.now() - frameStartTime;
+      const remaining = Math.max(0, budgetMs - elapsed);
 
-    const elapsed = performance.now() - this.frameStartTime;
-    const remaining = Math.max(0, this.budgetMs - elapsed);
+      return remaining;
+    },
 
-    return remaining;
-  }
+    requestBudget(requiredMs: number): boolean {
+      if (!isMonitoring) {
+        return false; // Cannot grant budget if not monitoring
+      }
 
-  requestBudget(requiredMs: number): boolean {
-    if (!this.isMonitoring) {
-      return false; // Cannot grant budget if not monitoring
-    }
+      const currentBudget = this.getCurrentBudget();
 
-    const currentBudget = this.getCurrentBudget();
+      // Simple availability check
+      // In production, this could include predictive logic
+      return currentBudget >= requiredMs;
+    },
 
-    // Simple availability check
-    // In production, this could include predictive logic
-    return currentBudget >= requiredMs;
-  }
+    /**
+     * Stop monitoring (for cleanup)
+     */
+    stopMonitoring(): void {
+      isMonitoring = false;
+    },
 
-  /**
-   * Stop monitoring (for cleanup)
-   */
-  stopMonitoring(): void {
-    this.isMonitoring = false;
-  }
+    /**
+     * Get configured budget for current platform
+     */
+    getTargetBudget(): number {
+      return budgetMs;
+    },
 
-  /**
-   * Get configured budget for current platform
-   */
-  getTargetBudget(): number {
-    return this.budgetMs;
-  }
+    /**
+     * Measure overhead of a single requestBudget call
+     * Used for performance validation
+     */
+    measureRequestOverhead(): number {
+      if (typeof performance === "undefined") {
+        return 0;
+      }
 
-  /**
-   * Measure overhead of a single requestBudget call
-   * Used for performance validation
-   */
-  measureRequestOverhead(): number {
-    if (typeof performance === "undefined") {
-      return 0;
-    }
+      const start = performance.now();
+      this.requestBudget(1); // Minimal request
+      const end = performance.now();
 
-    const start = performance.now();
-    this.requestBudget(1); // Minimal request
-    const end = performance.now();
-
-    return end - start;
-  }
+      return end - start;
+    },
+  };
 }
+
+// Export alias for backward compatibility
+export { createMinimalFrameBudgetSentinel as MinimalFrameBudgetSentinel };

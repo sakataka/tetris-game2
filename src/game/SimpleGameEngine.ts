@@ -13,154 +13,12 @@ import {
  * Simple GameEngine implementation using existing game functions
  * This bridges the new GameEngine interface with the legacy game functions
  */
-export class SimpleGameEngine implements GameEngine {
-  private gameState: GameState;
-  private eventListeners: Map<string, ((data: unknown) => void)[]> = new Map();
+export function createSimpleGameEngine(initialState?: GameState): GameEngine {
+  let gameState: GameState = initialState || createInitialGameState();
+  const eventListeners: Map<string, ((data: unknown) => void)[]> = new Map();
 
-  constructor(initialState?: GameState) {
-    this.gameState = initialState || createInitialGameState();
-  }
-
-  startGame(): void {
-    this.gameState = createInitialGameState();
-    this.emit("game-started", { timestamp: Date.now() });
-  }
-
-  pauseGame(): void {
-    // Note: Pause state should be handled at the store level
-    this.emit("game-paused", { timestamp: Date.now() });
-  }
-
-  resetGame(): void {
-    this.gameState = createInitialGameState();
-    this.emit("game-reset", { timestamp: Date.now() });
-  }
-
-  moveLeft(): boolean {
-    const newState = moveTetrominoByLegacy(this.gameState, -1, 0);
-    if (newState !== this.gameState) {
-      this.gameState = newState;
-      this.emit("piece-moved", { direction: "left", timestamp: Date.now() });
-      return true;
-    }
-    return false;
-  }
-
-  moveRight(): boolean {
-    const newState = moveTetrominoByLegacy(this.gameState, 1, 0);
-    if (newState !== this.gameState) {
-      this.gameState = newState;
-      this.emit("piece-moved", { direction: "right", timestamp: Date.now() });
-      return true;
-    }
-    return false;
-  }
-
-  softDrop(): boolean {
-    const newState = moveTetrominoByLegacy(this.gameState, 0, 1);
-    if (newState !== this.gameState) {
-      this.gameState = newState;
-      this.emit("piece-soft-dropped", { timestamp: Date.now() });
-
-      // Check for game over after move
-      if (this.gameState.isGameOver) {
-        this.emit("game-over", {
-          finalScore: this.gameState.score,
-          totalLines: this.gameState.lines,
-          timestamp: Date.now(),
-        });
-      }
-
-      return true;
-    }
-    return false;
-  }
-
-  hardDrop(): boolean {
-    const newState = hardDropTetromino(this.gameState);
-    if (newState !== this.gameState) {
-      this.gameState = newState;
-      this.emit("piece-hard-dropped", { timestamp: Date.now() });
-
-      // Check for game over after move
-      if (this.gameState.isGameOver) {
-        this.emit("game-over", {
-          finalScore: this.gameState.score,
-          totalLines: this.gameState.lines,
-          timestamp: Date.now(),
-        });
-      }
-
-      return true;
-    }
-    return false;
-  }
-
-  rotateClockwise(): boolean {
-    const newState = rotateTetrominoCWLegacy(this.gameState);
-    if (newState !== this.gameState) {
-      this.gameState = newState;
-      this.emit("piece-rotated", { direction: "clockwise", timestamp: Date.now() });
-      return true;
-    }
-    return false;
-  }
-
-  rotateCounterClockwise(): boolean {
-    const newState = rotateTetromino180Legacy(this.gameState);
-    if (newState !== this.gameState) {
-      this.gameState = newState;
-      this.emit("piece-rotated", { direction: "counter-clockwise", timestamp: Date.now() });
-      return true;
-    }
-    return false;
-  }
-
-  holdPiece(): boolean {
-    const newState = holdCurrentPieceLegacy(this.gameState);
-    if (newState !== this.gameState) {
-      this.gameState = newState;
-      this.emit("piece-held", { timestamp: Date.now() });
-      return true;
-    }
-    return false;
-  }
-
-  getState(): GameState {
-    return this.gameState;
-  }
-
-  getBoard(): GameState["board"] {
-    return this.gameState.board;
-  }
-
-  getCurrentPiece(): Tetromino | null {
-    return this.gameState.currentPiece;
-  }
-
-  getGhostPiece(): Tetromino | null {
-    return this.gameState.ghostPiece;
-  }
-
-  on(event: string, callback: (data: unknown) => void): void {
-    if (!this.eventListeners.has(event)) {
-      this.eventListeners.set(event, []);
-    }
-    this.eventListeners.get(event)?.push(callback);
-  }
-
-  off(event: string, callback: (data: unknown) => void): void {
-    const listeners = this.eventListeners.get(event);
-    if (listeners) {
-      const index = listeners.indexOf(callback);
-      if (index !== -1) {
-        listeners.splice(index, 1);
-      }
-    }
-  }
-
-  private emit(event: string, data: unknown): void {
-    const listeners = this.eventListeners.get(event);
+  const emit = (event: string, data: unknown): void => {
+    const listeners = eventListeners.get(event);
     if (listeners) {
       listeners.forEach((callback) => {
         try {
@@ -170,5 +28,145 @@ export class SimpleGameEngine implements GameEngine {
         }
       });
     }
-  }
+  };
+
+  return {
+    startGame(): void {
+      gameState = createInitialGameState();
+      emit("game-started", { timestamp: Date.now() });
+    },
+
+    pauseGame(): void {
+      // Note: Pause state should be handled at the store level
+      emit("game-paused", { timestamp: Date.now() });
+    },
+
+    resetGame(): void {
+      gameState = createInitialGameState();
+      emit("game-reset", { timestamp: Date.now() });
+    },
+
+    moveLeft(): boolean {
+      const newState = moveTetrominoByLegacy(gameState, -1, 0);
+      if (newState !== gameState) {
+        gameState = newState;
+        emit("piece-moved", { direction: "left", timestamp: Date.now() });
+        return true;
+      }
+      return false;
+    },
+
+    moveRight(): boolean {
+      const newState = moveTetrominoByLegacy(gameState, 1, 0);
+      if (newState !== gameState) {
+        gameState = newState;
+        emit("piece-moved", { direction: "right", timestamp: Date.now() });
+        return true;
+      }
+      return false;
+    },
+
+    softDrop(): boolean {
+      const newState = moveTetrominoByLegacy(gameState, 0, 1);
+      if (newState !== gameState) {
+        gameState = newState;
+        emit("piece-soft-dropped", { timestamp: Date.now() });
+
+        // Check for game over after move
+        if (gameState.isGameOver) {
+          emit("game-over", {
+            finalScore: gameState.score,
+            totalLines: gameState.lines,
+            timestamp: Date.now(),
+          });
+        }
+
+        return true;
+      }
+      return false;
+    },
+
+    hardDrop(): boolean {
+      const newState = hardDropTetromino(gameState);
+      if (newState !== gameState) {
+        gameState = newState;
+        emit("piece-hard-dropped", { timestamp: Date.now() });
+
+        // Check for game over after move
+        if (gameState.isGameOver) {
+          emit("game-over", {
+            finalScore: gameState.score,
+            totalLines: gameState.lines,
+            timestamp: Date.now(),
+          });
+        }
+
+        return true;
+      }
+      return false;
+    },
+
+    rotateClockwise(): boolean {
+      const newState = rotateTetrominoCWLegacy(gameState);
+      if (newState !== gameState) {
+        gameState = newState;
+        emit("piece-rotated", { direction: "clockwise", timestamp: Date.now() });
+        return true;
+      }
+      return false;
+    },
+
+    rotateCounterClockwise(): boolean {
+      const newState = rotateTetromino180Legacy(gameState);
+      if (newState !== gameState) {
+        gameState = newState;
+        emit("piece-rotated", { direction: "counter-clockwise", timestamp: Date.now() });
+        return true;
+      }
+      return false;
+    },
+
+    holdPiece(): boolean {
+      const newState = holdCurrentPieceLegacy(gameState);
+      if (newState !== gameState) {
+        gameState = newState;
+        emit("piece-held", { timestamp: Date.now() });
+        return true;
+      }
+      return false;
+    },
+
+    getState(): GameState {
+      return gameState;
+    },
+
+    getBoard(): GameState["board"] {
+      return gameState.board;
+    },
+
+    getCurrentPiece(): Tetromino | null {
+      return gameState.currentPiece;
+    },
+
+    getGhostPiece(): Tetromino | null {
+      return gameState.ghostPiece;
+    },
+
+    on(event: string, callback: (data: unknown) => void): void {
+      if (!eventListeners.has(event)) {
+        eventListeners.set(event, []);
+      }
+      eventListeners.get(event)?.push(callback);
+    },
+
+    off(event: string, callback: (data: unknown) => void): void {
+      const listeners = eventListeners.get(event);
+      if (listeners) {
+        const index = listeners.indexOf(callback);
+        if (index !== -1) {
+          listeners.splice(index, 1);
+        }
+      }
+    },
+  };
 }

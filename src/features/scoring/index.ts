@@ -1,8 +1,8 @@
 // UI Components
 
-export type { HighScoreEntry, ScoreStatistics } from "./api/scoreStorage";
 // API
-export { ScoreStorageAdapter, scoreStorage } from "./api/scoreStorage";
+export type { HighScoreEntry, ScoreStatistics, ScoreStorageAdapter } from "./api/scoreStorage";
+export { createScoreStorageAdapter as ScoreStorageAdapter, scoreStorage } from "./api/scoreStorage";
 export type { LineClearData, UseScoringReturn } from "./lib/useScoring";
 // Hooks
 export { useScoring, useScoringAnimationState, useScoringData } from "./lib/useScoring";

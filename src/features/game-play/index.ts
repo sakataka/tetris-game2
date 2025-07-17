@@ -1,7 +1,11 @@
 // UI Components
 
 // API
-export { GameEngineAdapter, gameEngineAdapter } from "./api/gameEngineAdapter";
+export type { GameEngineAdapter } from "./api/gameEngineAdapter";
+export {
+  createGameEngineAdapter as GameEngineAdapter,
+  gameEngineAdapter,
+} from "./api/gameEngineAdapter";
 export type { UseGamePlayReturn } from "./lib/useGamePlay";
 // Hooks
 export { useGamePlay, useGamePlayActions, useGamePlayState } from "./lib/useGamePlay";
