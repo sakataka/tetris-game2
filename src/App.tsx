@@ -1,8 +1,8 @@
 import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
+import { Game } from "@/app/pages/Game";
 import { useSettingsData } from "@/features/settings";
-import { ErrorBoundary } from "./components/common/ErrorBoundary";
-import { Game } from "./components/layout/Game";
+import { ErrorBoundary } from "@/shared/ui/ErrorBoundary";
 import { AnimationProvider } from "./contexts/AnimationContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 

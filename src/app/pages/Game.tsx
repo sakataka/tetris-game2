@@ -1,5 +1,7 @@
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { GameLayout } from "@/app/layouts/GameLayout";
+import { MobileGameLayout } from "@/app/layouts/MobileGameLayout";
 import { useSimpleAI } from "@/features/ai-control";
 import {
   Board,
@@ -23,8 +25,6 @@ import { useTouchGestures } from "@/hooks/controls/useTouchGestures";
 import { useDesignTokens } from "@/hooks/core/useDesignTokens";
 import { useGameLoop } from "@/hooks/core/useGameLoop";
 import { useHighScoreSideEffect } from "@/hooks/effects/useHighScoreSideEffect";
-import { GameLayout } from "./GameLayout";
-import { MobileGameLayout } from "./MobileGameLayout";
 
 export function Game() {
   const { t } = useTranslation();
