@@ -1,9 +1,9 @@
 import { Pause, Play, RefreshCw } from "lucide-react";
 import { AnimatedButton } from "@/components/ui/AnimatedButton";
 import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
+import { GameSettingsComponent as GameSettings } from "@/features/settings";
 import { useHapticFeedback } from "@/hooks/common/useHapticFeedback";
 import { useScoreState } from "@/hooks/selectors/useScoreSelectors";
-import { GameSettings } from "./GameSettings";
 
 export function MobileHeader() {
   // Get scoring data from gameplay store via useScoreSelectors

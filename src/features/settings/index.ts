@@ -9,5 +9,6 @@ export { useSettings, useSettingsData, useThemeSettings } from "./lib/useSetting
 
 // Store
 export { useSettingsStore } from "./model/settingsSlice";
+export { GameSettings as GameSettingsComponent } from "./ui/GameSettings";
 export type { GameSettings, SettingsPanelProps } from "./ui/SettingsPanel";
 export { SettingsPanel } from "./ui/SettingsPanel";

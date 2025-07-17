@@ -1,6 +1,5 @@
 import { useAnimate } from "motion/react";
 import { useCallback, useEffect, useRef } from "react";
-import { BoardCell } from "@/components/game/BoardCell";
 import { Card } from "@/components/ui/card";
 import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
 import { useDesignTokens } from "@/hooks/core/useDesignTokens";
@@ -9,6 +8,7 @@ import type { LineClearAnimationData } from "@/types/game";
 import { ANIMATION_PRESETS } from "@/utils/animationConstants";
 import { GAME_CONSTANTS } from "@/utils/gameConstants";
 import { BOARD_STYLES, CARD_STYLES } from "@/utils/styles";
+import { BoardCell } from "./BoardCell";
 
 export interface GameBoardProps {
   showGrid?: boolean;

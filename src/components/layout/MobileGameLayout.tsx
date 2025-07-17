@@ -1,4 +1,4 @@
-import { Board, GameOverlay, TouchControls } from "@/components/game";
+import { Board, GameOverlay, TouchControls } from "@/features/game-play";
 import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
 import { TSpinIndicator } from "@/features/scoring/ui/TSpinIndicator";
 import { useSettingsData } from "@/features/settings";

@@ -1,9 +1,9 @@
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { SkipLinks } from "@/components/accessibility/SkipLinks";
 import { useAdaptivePerformance } from "@/hooks/core/useAdaptivePerformance";
 import { useDesignTokens } from "@/hooks/core/useDesignTokens";
 import { cn } from "@/lib/utils";
+import { SkipLinks } from "@/shared/ui/SkipLinks";
 
 interface GameLayoutProps {
   children: ReactNode;

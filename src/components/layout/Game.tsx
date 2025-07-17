@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useSimpleAI } from "@/features/ai-control";
 import {
   Board,
   Controls,
@@ -9,12 +10,11 @@ import {
   NextPiece,
   ResetConfirmationDialog,
   ScoreBoard,
-} from "@/components/game";
-import { useSimpleAI } from "@/features/ai-control";
-import { useGamePlay } from "@/features/game-play";
+  useGamePlay,
+} from "@/features/game-play";
 import { useGamePlayStore } from "@/features/game-play/model/gamePlaySlice";
 import { TSpinIndicator } from "@/features/scoring/ui/TSpinIndicator";
-import { useSettingsData } from "@/features/settings";
+import { GameSettingsComponent as GameSettings, useSettingsData } from "@/features/settings";
 import { useFocusManagement } from "@/hooks/accessibility/useFocusManagement";
 import { useScreenReaderAnnouncements } from "@/hooks/accessibility/useScreenReaderAnnouncements";
 import { useKeyboardControls } from "@/hooks/controls/useKeyboardControls";
@@ -23,7 +23,6 @@ import { useDesignTokens } from "@/hooks/core/useDesignTokens";
 import { useGameLoop } from "@/hooks/core/useGameLoop";
 import { useHighScoreSideEffect } from "@/hooks/effects/useHighScoreSideEffect";
 import { GameLayout } from "./GameLayout";
-import { GameSettings } from "./GameSettings";
 import { MobileGameLayout } from "./MobileGameLayout";
 
 export function Game() {
