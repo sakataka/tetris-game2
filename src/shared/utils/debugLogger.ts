@@ -23,5 +23,3 @@ export const createDebugLogger = (namespace: string) => ({
 
 // Pre-configured loggers for common use cases
 export const aiLogger = createDebugLogger("AI");
-export const gameLogger = createDebugLogger("Game");
-export const performanceLogger = createDebugLogger("Performance");

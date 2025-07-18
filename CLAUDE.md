@@ -30,10 +30,14 @@ AI assistant working on a high-performance TypeScript Tetris implementation with
 
 ```
 src/
-├── game/                    # Core game logic - TEST ALL
+├── app/                    # Application structure
+│   ├── layouts/            # Layout components
+│   ├── pages/              # Page components
+│   └── providers/          # App-level providers
+├── game/                   # Core game logic - TEST ALL
 │   ├── ai/                 # Simple AI implementation
 │   │   ├── index.ts        # AI exports
-│   │   └── simple-ai.ts    # Basic AI engine
+│   │   └── simple-ai.ts    # Basic AI engine with heuristics
 │   ├── animations/         # Animation system with FrameBudgetSentinel
 │   │   ├── config/         # Animation configuration
 │   │   ├── core/           # Core animation logic
@@ -46,10 +50,6 @@ src/
 │   ├── game-play/          # Game play feature
 │   ├── scoring/            # Scoring system
 │   └── settings/           # Settings management
-├── components/             # UI components - DO NOT TEST
-│   ├── common/             # Common UI components
-│   ├── layout/             # Layout components
-│   └── ui/                # shadcn/ui components
 ├── hooks/                  # React hooks - TEST PURE FUNCTIONS ONLY
 │   ├── accessibility/      # Accessibility hooks
 │   ├── actions/            # Action hooks
@@ -70,7 +70,7 @@ src/
 │   ├── mocks/              # Mock implementations
 │   ├── performance/        # Performance utilities
 │   ├── types/              # Shared types
-│   ├── ui/                 # Shared UI components
+│   ├── ui/                 # Shared UI components (DO NOT TEST)
 │   └── utils/              # Shared utilities
 ├── utils/                  # Utility functions - TEST ALL
 ├── locales/               # i18n files (en.json, ja.json)
@@ -105,6 +105,9 @@ bun run build             # Production build
 
 # Git hooks
 bun run prepare           # Install lefthook
+
+# Debug
+bun run analyze:bundle     # Analyze bundle size
 ```
 
 ## 🧪 Testing Strategy
@@ -132,7 +135,11 @@ bun run prepare           # Install lefthook
 ```
 
 ### AI Features
-- **Basic AI**: Simple heuristic-based AI for piece placement
+- **Basic AI**: Simple heuristic-based AI with 4 evaluation criteria:
+  - Height penalty: -0.510066
+  - Lines cleared reward: 0.760666
+  - Holes penalty: -0.35663
+  - Bumpiness penalty: -0.184483
 - **Integration**: Integrated with game engine through feature slices
 - **Performance**: Lightweight implementation for real-time gameplay
 
@@ -144,10 +151,10 @@ bun run prepare           # Install lefthook
 ## 🎯 Feature-Sliced Design
 
 ### Layer Rules
+- **App**: `/src/app/` - Application structure (layouts, pages, providers)
 - **Game Logic**: `/src/game/` - Pure business logic, no UI dependencies
 - **Features**: `/src/features/` - Feature-specific slices with api/lib/model/ui structure
-- **Shared**: `/src/shared/` - Reusable utilities, must be dependency-free
-- **Components**: `/src/components/` - Legacy UI components (migrating to features)
+- **Shared**: `/src/shared/` - Reusable utilities and UI components
 
 ### Feature Structure
 ```
@@ -166,7 +173,7 @@ feature-name/
 - **Styling**: Tailwind CSS 4.1 + shadcn/ui + Radix UI
 - **Animation**: Motion 12.23
 - **Build**: Vite 7.0 (rolldown-vite)
-- **Testing**: Bun Test + Playwright + fast-check
+- **Testing**: Bun Test + fast-check 4.2
 - **Quality**: Biome 2.1 + Lefthook 1.12
 - **i18n**: i18next 25.3 + react-i18next 15.6
 
@@ -180,7 +187,6 @@ feature-name/
 - Screen reader announcements for game state changes
 
 ### Testing
-- Automated: `@axe-core/react` integration
 - Manual: Keyboard-only navigation testing
 - Focus management and screen reader announcements
 
